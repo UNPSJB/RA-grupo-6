@@ -20,7 +20,7 @@ Las tecnologias utilizadas en el proyecto son:
 
 PROXIMAMENTE
     
-### ⚡ Contribuidores
+## ⚡ Contribuidores
 
  * [![Static Badge](https://img.shields.io/badge/Macarena_Pereira-black?logo=GitHub)](https://www.github.com/17mpana)
 

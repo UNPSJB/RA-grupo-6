@@ -4,8 +4,13 @@ from sqlalchemy import delete, select, update
 from src.Pregunta.models import Pregunta, Opcion
 from src.Pregunta import schemas, exceptions
 
-def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> schemas.Pregunta:
-    pass
+def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="abierta")
+    
+    db.add(_nueva_pregunta)
+    db.commit()
+    db.refresh(_nueva_pregunta)
+    return _nueva_pregunta
 
 def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate) -> Pregunta:
     if not pregunta.opciones or len(pregunta.opciones) == 0 or pregunta.opciones == 0:

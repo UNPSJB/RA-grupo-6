@@ -8,6 +8,7 @@ from src.models import ModeloBase
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
 
+
 load_dotenv()
 
 ENV = os.getenv("ENV")
@@ -38,3 +39,9 @@ app.add_middleware(
 # Asociamos los routers a nuestra app
 # Example: app.include_router(personas_router)
 
+#Router de Preguntas
+from src.Pregunta.router import router as preguntas_router
+app.include_router(preguntas_router)
+#Route de Respuestas
+from src.Respuesta.router import router as respuestas_router
+app.include_router(respuestas_router)

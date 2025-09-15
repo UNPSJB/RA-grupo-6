@@ -1,4 +1,4 @@
-import { useState } from 'react'
+/* import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -32,4 +32,22 @@ function App() {
   )
 }
 
-export default App
+export default App */
+
+import './App.css';
+import CrearPreguntaAbierta from './components/CrearPreguntaAbierta';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        {/* <h1>Titulo</h1> */}
+      </header>
+      <main>
+        <CrearPreguntaAbierta />
+      </main>
+    </div>
+  )
+}
+
+export default App;

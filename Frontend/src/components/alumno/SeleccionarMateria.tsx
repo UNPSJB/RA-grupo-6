@@ -15,7 +15,7 @@ function SeleccionarMateria(){
     useEffect(() => {
         const cargarMaterias = async () => {
             try {//cargar desde el backend
-                const response = await fetch('http://127.0.0.1:8000/'); //así sería el fetch? T_T
+                const response = await fetch('http://127.0.0.1:8000/materias/'); //así sería el fetch? T_T
                 
                 if (response.ok){
                     const data = await response.json();

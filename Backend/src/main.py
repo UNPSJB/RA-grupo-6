@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from src.database import engine
-from src.models import ModeloBase
+from src.models import ModeloBase   
 
 from src.Materia.router import router as materia_router
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,14 +22,8 @@ app.add_middleware(
 
 app.include_router(materia_router)
 
-<<<<<<< HEAD
 # Asociamos los routers a nuestra app
 app.include_router(materias_router)
 
 # Example: app.include_router(personas_router)
 
-=======
-@app.get("/")
-def read_root():
-    return {"message": "API de Encuestas Universitarias"}
->>>>>>> seleccionar_materia

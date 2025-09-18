@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 type Materia = {
     id:string;
@@ -56,17 +55,6 @@ function MateriaList(){
     );
 
 };
-
-export function mostrarMateria(){
-
-    return(
-
-        <h1> Elegiste la materia ##### para hacer la encuesta </h1>
-    
-    )
-
-}
-
 
 
 export default MateriaList;

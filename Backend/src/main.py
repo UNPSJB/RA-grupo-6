@@ -9,6 +9,7 @@ from src.models import ModeloBase
 from fastapi.middleware.cors import CORSMiddleware
 from src.materias.router import router as materias_router
 
+
 load_dotenv()
 
 ENV = os.getenv("ENV")
@@ -41,3 +42,12 @@ app.include_router(materias_router)
 
 # Example: app.include_router(personas_router)
 
+#Router de Preguntas
+from src.Pregunta.router import router as preguntas_router
+app.include_router(preguntas_router)
+#Route de Respuestas
+from src.Respuesta.router import router as respuestas_router
+app.include_router(respuestas_router)
+#Route de Opciones 
+from src.Opciones.router import router as opciones_router
+app.include_router(opciones_router)

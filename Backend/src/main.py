@@ -5,36 +5,22 @@ from fastapi import FastAPI
 from src.database import engine
 from src.models import ModeloBase
 
-# importamos los routers desde nuestros modulos
+from src.Materia.router import router as materia_router
 from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv()
+app = FastAPI()
 
-ENV = os.getenv("ENV")
-ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
-
-
-@asynccontextmanager
-async def db_creation_lifespan(app: FastAPI):
-    ModeloBase.metadata.create_all(bind=engine)
-    yield
-
-
-app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
-
-origins = [
-    "http://localhost:5173", # para recibir requests desde app React (puerto: 5173)
-]
-
+# Configurar CORS para permitir requests desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:3000"],  # URL de tu frontend React
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(materia_router)
 
-# Asociamos los routers a nuestra app
-# Example: app.include_router(personas_router)
-
+@app.get("/")
+def read_root():
+    return {"message": "API de Encuestas Universitarias"}

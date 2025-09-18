@@ -19,9 +19,10 @@ function CrearPreguntaAbierta() {
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/preguntas/preguntas/abierta', {
+            const response = await fetch("http://127.0.0.1:8000/preguntas/abierta", {
                 method: 'POST',
                 headers: {
+        
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(nuevaPregunta),

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import delete, select, update
 from src.Pregunta.models import Pregunta, Opcion
 from src.Pregunta import schemas, exceptions
+from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
     _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="abierta")
@@ -13,14 +14,14 @@ def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate)
     return _nueva_pregunta
 
 def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate) -> Pregunta:
-    if not pregunta.opciones or len(pregunta.opciones) == 0 or pregunta.opciones == 0:
+    if len(pregunta.opciones) == 0:
         raise exceptions.PreguntaSinOpciones()
     
     # Filtrar ids validos
     opciones_validas = db.query(Opcion).filter(Opcion.id.in_([op for op in pregunta.opciones if op > 0])).all()
    
-    if not opciones_validas:
-        raise exceptions.PreguntaSinOpciones("No se proporcionó ninguna opción válida.")
+    if len(opciones_validas) != len(pregunta.opciones):
+        raise exceptions.PreguntaSinOpciones("Algunas opciones proporcionadas no son válidas.")
 
 
     _nueva = Pregunta(texto=pregunta.texto, tipo="cerrada")
@@ -30,7 +31,6 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
     db.commit()
     db.refresh(_nueva)
     return _nueva
-
 
 def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
     return db.scalars(select(Pregunta)).all()
@@ -53,35 +53,4 @@ def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
     db.execute(delete(Pregunta).where(Pregunta.id == pregunta_id))
     db.commit()
     return db_pregunta
-
-#-------------- OPCIONES -----------------
-
-def crear_opcion(db: Session, opcion: schemas.OpcionCreate) -> schemas.Opcion:
-    _nueva_opcion = Opcion(**opcion.model_dump())
-    db.add(_nueva_opcion)
-    db.commit()
-    db.refresh(_nueva_opcion)
-    return _nueva_opcion
-
-def listar_opciones(db: Session) -> List[schemas.Opcion]:
-    return db.scalars(select(Opcion)).all()
-
-def obtner_opcion(db: Session, opcion_id: int) -> schemas.Opcion:
-    db_opcion = db.scalar(select(Opcion).where(Opcion.id == opcion_id))
-    if db_opcion is None:
-        raise exceptions.OpcionNoEncontrada()
-    return db_opcion    
-
-def modificar_opcion(db: Session, opcion_id: int, opcion: schemas.OpcionUpdate) -> schemas.Opcion:
-    db_opcion = obtner_opcion(db, opcion_id)
-    db.execute(update(Opcion).where(Opcion.id == opcion_id).values(**opcion.model_dump()))
-    db.commit()
-    db.refresh(db_opcion)
-    return db_opcion
-
-def eliminar_opcion(db: Session, opcion_id: int) -> schemas.OpcionDelete:
-    db_opcion = obtner_opcion(db, opcion_id)
-    db.execute(delete(Opcion).where(Opcion.id == opcion_id))
-    db.commit()
-    return db_opcion
 

@@ -1,15 +1,15 @@
 from pydantic import BaseModel
-
+from typing import Optional
 class PreguntaBase(BaseModel):
     texto: str
-    tipo: str  # abierta, cerrada
+    tipo: Optional[str] = None  # abierta, cerrada
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo : str = "abierta"
 
 class PreguntaCerradaCreate(PreguntaBase):
-    tipo : str = "cerrada"
     opciones: list[int]  
+    tipo :str = "cerrada"
 
     
 
@@ -26,24 +26,6 @@ class Pregunta(PreguntaBase):
         "from_attributes": True 
     } # Habilita la conversión desde ORM a Pydantic
 
-class OpcionBase(BaseModel):
-    texto: str
-
-class OpcionCreate(OpcionBase):
-    pass
-
-class OpcionUpdate(OpcionBase):
-    pass
-
-class OpcionDelete(BaseModel):
-    id: int
-
-class Opcion(OpcionBase):
-    id: int
-
-    model_config = {
-        "from_attributes": True
-    } 
 
 
 

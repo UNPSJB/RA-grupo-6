@@ -45,3 +45,6 @@ app.include_router(preguntas_router)
 #Route de Respuestas
 from src.Respuesta.router import router as respuestas_router
 app.include_router(respuestas_router)
+#Route de Opciones 
+from src.Opciones.router import router as opciones_router
+app.include_router(opciones_router)

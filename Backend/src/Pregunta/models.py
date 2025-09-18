@@ -2,6 +2,7 @@ from __future__ import annotations
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
+from src.Opciones.models import Opcion
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  
@@ -28,16 +29,6 @@ class Pregunta(ModeloBase):
         "Respuesta",
         back_populates="pregunta",
         cascade="all, delete-orphan"
-    )
-
-class Opcion(ModeloBase):
-    __tablename__ = "opciones"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    texto: Mapped[str] = mapped_column(String(100), nullable=False)
-    preguntas: Mapped[list["Pregunta"]] = relationship(
-        "Pregunta",
-        secondary=pregunta_opcion,
-        back_populates="opciones"
     )
 
 

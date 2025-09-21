@@ -164,8 +164,6 @@ function CrearPreguntaCerrada() {
 
   return (
     <div>
-      <h2>Crear Pregunta Cerrada</h2>
-
       <div>
         <label>Pregunta: </label>
         <input

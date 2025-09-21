@@ -27,8 +27,6 @@ function MateriaList(){
 
     return(
         <>
-            <h1>Materias</h1>
-
             <ul className="list-group">
                 {materias.map((materia) => (
                     <>

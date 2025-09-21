@@ -40,3 +40,49 @@
 .read-the-docs {
   color: #888;
 }
+
+
+
+
+/* BOTON DE SELECCION */ 
+
+/* Ocultar los radios originales */
+.tipo-pregunta{
+  display: none;
+}
+
+/* Labels como botones sólidos */
+.tipo-pregunta + label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1.5em;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 12px;
+  cursor: pointer;
+  /*background-color: #7c52ff; /* violeta más marcado 
+  */
+
+  background-color: #6c74ff; /* violeta más marcado */ 
+
+  color: white;
+  margin-right: 1em;
+  box-shadow: 0 4px 12px rgba(124,82,255,0.3);
+  user-select: none;
+}
+
+/* Hover */
+.tipo-pregunta + label:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(124,82,255,0.5);
+  background-color: #4b4eff; 
+  /*background-color: #6f46ff; */ 
+
+}
+
+/* Estado seleccionado */
+.tipo-pregunta:checked + label {
+  border: 2px solid white; /* borde blanco para indicar selección */
+  box-shadow: 0 4px 12px rgba(124,82,255,0.3); /* misma sombra que normal */
+}

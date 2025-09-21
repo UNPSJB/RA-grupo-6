@@ -43,7 +43,6 @@ function CrearPreguntaAbierta() {
 
     return (
         <div>
-            <h2>Crear Nueva Pregunta Abierta</h2>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="texto-pregunta">Ingresar pregunta:</label>

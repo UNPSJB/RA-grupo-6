@@ -6,7 +6,7 @@ from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="abierta")
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="Abierta")
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -24,7 +24,7 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
         raise exceptions.PreguntaSinOpciones("Algunas opciones proporcionadas no son válidas.")
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo="cerrada")
+    _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada")
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)

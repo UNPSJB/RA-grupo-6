@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Opcion } from "../Opcion/OpcionTypes";
 import Card from "react-bootstrap/Card"
-import { Badge, Button, CardBody, CardSubtitle } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import Menu from "../Menu";
 
 
@@ -96,7 +96,7 @@ function VerPregunta(){
                                     ))}
                                 </Card.Text>
 
-}
+                            }
                         </Card.Body>
                     </Card>
 

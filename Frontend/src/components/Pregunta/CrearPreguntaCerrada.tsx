@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Opcion } from "../Opcion/OpcionTypes";
 
 import OpcionList from "../Opcion/OpcionList";
@@ -16,7 +16,7 @@ type PreguntaCerrada = {
 function CrearPreguntaCerrada() {
 
   //Definicion de constantes
-  const [preguntaCerrada, setPreguntaCerrada] = useState("");
+  const [texto, setTexto] = useState("")
   const [mostrar, setMostrar] = useState(false);
   const [TextoMostrar, setTextoMostrar] = useState("Mostrar");
   const[opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>([])
@@ -30,7 +30,7 @@ function CrearPreguntaCerrada() {
     // }
 
     const nuevaPregunta: PreguntaCerrada = {
-      texto: preguntaCerrada,
+      texto: texto,
       opciones: seleccionadas,
       tipo: "Cerrada",
     };
@@ -40,7 +40,7 @@ function CrearPreguntaCerrada() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevaPregunta),
     }).then(() => {
-      setPreguntaCerrada("");
+      setTexto("");
       setOpcionesSeleccionadas([]);
     });
   };
@@ -51,8 +51,6 @@ function CrearPreguntaCerrada() {
     mostrar? setTextoMostrar("Mostrar") : setTextoMostrar("Ocultar")
   
   }
-
-  const [texto, setTexto] = useState("")
 
   return (
     <div>

@@ -1,26 +1,45 @@
 import CrearPreguntaAbierta from "./CrearPreguntaAbierta";
 import CrearPreguntaCerrada from "./CrearPreguntaCerrada";
 import { useState } from "react";
+import { Form, Col} from 'react-bootstrap'
+import Menu from "../Menu";
 
 
-function CrearPregunta({numero}:{numero : number}){
+import "./pregunta.css"
+
+function CrearPregunta(){
 
 
-    const [opcion, cambiarOpcion] = useState(<CrearPreguntaAbierta/>);
+    const [checked, setChecked] = useState(true);
 
     return(
 
     <>
-        <div className={`pregunta-${numero}`}>
-            <input type="radio" className='tipo-pregunta' name={`tipo-pregunta-${numero}`} id='pregunta-abierta' defaultChecked={true} onChange={() => cambiarOpcion(<CrearPreguntaAbierta/>)}/>
-            <label htmlFor="pregunta-abierta"> Abierta </label>
+        <Menu></Menu>
 
-            <input type="radio" className='tipo-pregunta' name={`tipo-pregunta-${numero}`} id='pregunta-cerrada' onChange={() => cambiarOpcion(<CrearPreguntaCerrada/>)} />
-            <label htmlFor="pregunta-cerrada"> Cerrada </label>
+        <div className="container text-start mt-4"></div>
+
+        <div className="container text-start">
+            <div className="vertical-line">
+                <h3 className="mb-3">Crear Nueva Pregunta</h3>
+                <p className="text-muted">Seleccione el tipo de pregunta a crear</p>
+            </div>
+
+            <Col className="d-flex justify-content-center">
+                <Form.Label className="switch">
+                    <Form.Control 
+                        type="checkbox" 
+                        onChange={() => setChecked(!checked)}    
+                        />
+
+                    <span> Abierta </span>
+                    <span> Cerrada </span>
+                </Form.Label>
+            </Col>
         </div>
-
-        {opcion}
-
+        
+        {checked? <div className="container"> <CrearPreguntaAbierta/> </div> : <div className="container"><CrearPreguntaCerrada/> </div>}
+        
     </>
 
     )

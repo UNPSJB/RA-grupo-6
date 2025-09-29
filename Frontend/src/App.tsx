@@ -1,18 +1,12 @@
 import './App.css';
-import CrearPreguntaAbierta from './components/Pregunta/CrearPreguntaAbierta';
-import CrearPreguntaCerrada from'./components/Pregunta/CrearPreguntaCerrada';
-import MateriaList from './components/materia';
+import { BrowserRouter, Route } from 'react-router-dom';
+import VerPregunta from './components/Pregunta/VerPregunta';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-      </header>
-      <main>
 
 
-      </main>
-    </div>
+
   )
 }
 

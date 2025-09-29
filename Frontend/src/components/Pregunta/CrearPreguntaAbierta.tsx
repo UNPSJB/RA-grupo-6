@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form'
+import Col from 'react-bootstrap/Col'
+import IngresarPregunta from './IngresarPregunta';
 
 function CrearPreguntaAbierta() {
     const [texto, setTexto] = useState('');
@@ -15,7 +19,7 @@ function CrearPreguntaAbierta() {
         
         const nuevaPregunta = {
             texto: texto,
-            tipo: "abierta" 
+            tipo: "Abierta" 
         };
 
         try {
@@ -30,7 +34,7 @@ function CrearPreguntaAbierta() {
 
             if (response.ok) {
                 const data = await response.json();
-                setMensaje(`Pregunta guardada con éxito, ID: ${data.id}`);
+                setMensaje(`Pregunta guardada con éxito`);
                 setTexto(''); 
             } else {
                 setMensaje('Error al guardar la pregunta.');
@@ -43,22 +47,14 @@ function CrearPreguntaAbierta() {
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="texto-pregunta">Ingresar pregunta:</label>
-                    <textarea
-                        id="texto-pregunta"
-                        value={texto}
-                        onChange={(e) => setTexto(e.target.value)}
-                        placeholder="Ingresar nueva pregunta para el formulario."
-                        rows={4}
-                        style={{ width: '100%', marginTop: '8px' }}
-                    />
-                </div>
-                <button type="submit" style={{ marginTop: '10px' }}>
-                    Guardar Pregunta
-                </button>
-            </form>
+            <Form onSubmit={handleSubmit}>
+
+                <IngresarPregunta texto={texto} setTexto={setTexto}></IngresarPregunta>
+
+                <Col className="d-flex justify-content-center">
+                    <Button className="mt-3" variant='primary' type='submit'>Crear Pregunta</Button>
+                </Col>
+            </Form>
 
             {mensaje && <p style={{ marginTop: '15px' }}>{mensaje}</p>}
         </div>

@@ -23,7 +23,6 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
     if len(opciones_validas) != len(pregunta.opciones):
         raise exceptions.PreguntaSinOpciones("Algunas opciones proporcionadas no son válidas.")
 
-
     _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada")
     _nueva.opciones = opciones_validas
     

@@ -3,9 +3,11 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from src.Opciones.models import Opcion
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  
+    from src.Formulario.models import Formulario
     from src.Respuesta.models import Respuesta
     
 pregunta_opcion = Table(
@@ -20,6 +22,14 @@ class Pregunta(ModeloBase):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     texto: Mapped[str] = mapped_column(String(250), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False, default="abierta")
+
+    formularios: Mapped[list["Formulario"]] = relationship(
+    "Formulario",
+    secondary="formulario_pregunta",
+    back_populates="preguntas"
+    )
+
+
     opciones: Mapped[list["Opcion"]] = relationship(
         "Opcion",
         secondary=pregunta_opcion,

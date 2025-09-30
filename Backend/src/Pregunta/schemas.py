@@ -6,6 +6,7 @@ from src.Opciones.schemas import Opcion
 class PreguntaBase(BaseModel):
     texto: str
     tipo: Optional[str] = None  # abierta, cerrada
+    opciones: Optional[List[int]] = None
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo : str = "Abierta"
@@ -13,8 +14,6 @@ class PreguntaAbiertaCreate(PreguntaBase):
 class PreguntaCerradaCreate(PreguntaBase):
     opciones: list[int]  
     tipo :str = "Cerrada"
-
-    
 
 class PreguntaUpdate(PreguntaBase):
     pass

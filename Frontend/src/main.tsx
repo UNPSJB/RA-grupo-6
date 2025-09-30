@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import VerPregunta from './components/Pregunta/VerPregunta.tsx';
 import CrearPregunta from './components/Pregunta/CrearPregunta.tsx';
+import ELegirRol from './components/Rol/ElegirRol.tsx';
 
 
 // createRoot(document.getElementById('root')!).render(

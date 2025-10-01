@@ -27,9 +27,7 @@ function Menu(){
                         <Nav.Link href="/CrearPregunta">Crear preguntas</Nav.Link>    
                     </Nav>
                 </Navbar.Collapse>
-
             </Container>
-
         </Navbar>
 
     )

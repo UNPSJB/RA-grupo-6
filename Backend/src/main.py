@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.materias.router import router as materias_router
 
 
+
 load_dotenv()
 
 ENV = os.getenv("ENV")
@@ -54,3 +55,11 @@ app.include_router(opciones_router)
 #Router de Formularios
 from src.Formulario.router import router as formulario_router
 app.include_router(formulario_router)
+
+#Route de Rol
+from src.Roles.router import router as roles_router
+app.include_router(roles_router)
+
+#Route de Usuario
+from src.Usuarios.router import router as usuarios_router
+app.include_router(usuarios_router)

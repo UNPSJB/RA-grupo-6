@@ -7,7 +7,7 @@ from src.Opciones.models import Opcion
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  
-    from src.Formulario.models import Formulario
+    from src.PlantillaFormulario.models import PlantillaFormulario
     from src.Respuesta.models import Respuesta
     
 pregunta_opcion = Table(
@@ -23,8 +23,8 @@ class Pregunta(ModeloBase):
     texto: Mapped[str] = mapped_column(String(250), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False, default="abierta")
 
-    formularios: Mapped[list["Formulario"]] = relationship(
-    "Formulario",
+    formularios: Mapped[list["PlantillaFormulario"]] = relationship(
+    "PlantillaFormulario",
     secondary="formulario_pregunta",
     back_populates="preguntas"
     )

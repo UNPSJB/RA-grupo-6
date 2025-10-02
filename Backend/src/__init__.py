@@ -3,4 +3,4 @@ from src.Pregunta.schemas import Pregunta
 from src.Opciones.schemas import Opcion
 from src.Respuesta.schemas import Respuesta
 from src.materias.schemas import Materia
-from src.Formulario.schemas import Formulario
+from src.PlantillaFormulario.schemas import PlantillaFormulario

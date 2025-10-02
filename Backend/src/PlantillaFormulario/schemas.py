@@ -1,21 +1,25 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from src.Pregunta.schemas import Pregunta
+from src.Roles.schemas import Rol
 
-class FormularioBase(BaseModel):
+class PlantillaFormularioBase(BaseModel):
     titulo: str
+    rol: int
 
-class FormularioCreate(FormularioBase):
+class FormularioCreate(PlantillaFormularioBase):
+    preguntas: Optional[List[int]] = []
+    
+
+class PlantillaFormularioUpdate(PlantillaFormularioBase):
     preguntas: Optional[List[int]] = []
 
-class FormularioUpdate(FormularioBase):
-    preguntas: Optional[List[int]] = []
-
-class FormularioDelete(BaseModel):
+class PlantillaFormularioDelete(BaseModel):
     id: int
 
-class Formulario(FormularioBase):
+class PlantillaFormulario(PlantillaFormularioBase):
     id: int
+    rol: "Rol"
     preguntas: List[Pregunta] = []
 
     model_config = {

@@ -4,20 +4,20 @@ from sqlalchemy import Integer, String, Date, ForeignKey, Column, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from datetime import date
-from src.Pregunta.models import Pregunta
 
 if TYPE_CHECKING:
     from src.Pregunta.models import Pregunta
+    from src.Roles.models import Rol
 
 formulario_pregunta = Table(
     "formulario_pregunta",
     ModeloBase.metadata,
-    Column("formulario_id", Integer, ForeignKey("formularios.id"), primary_key=True),
+    Column("plantilla_formulario_id", Integer, ForeignKey("plantilla_formularios.id"), primary_key=True),
     Column("pregunta_id", Integer, ForeignKey("preguntas.id"), primary_key=True)
 )
 
-class Formulario(ModeloBase):
-    __tablename__ = "formularios"
+class PlantillaFormulario(ModeloBase):
+    __tablename__ = "plantilla_formularios"
     id: Mapped[int] = mapped_column(Integer, primary_key= True, index=True)
     titulo: Mapped[str] = mapped_column(String(50), nullable= False)
     fecha_creacion: Mapped[date] = mapped_column(Date, default=date.today, nullable= False)
@@ -26,3 +26,5 @@ class Formulario(ModeloBase):
         secondary= formulario_pregunta,
         back_populates="formularios"
     )
+    rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False) 
+    rol: Mapped["Rol"] =relationship("Rol", back_populates="Plantillaformularios")

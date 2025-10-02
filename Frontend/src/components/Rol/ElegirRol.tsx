@@ -1,14 +1,17 @@
 
 import { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
 import Form from "react-bootstrap/Form"
 
 type Rol = {
-    id: number
-    nombre: String
+    id: number;
+    nombre: string;
 }
+type ELegirRolProps = {
+    selectedRol: string;
+    onChangeRol: (rol: string) => void;
+};
 
-function ELegirRol(){
+function ELegirRol({ selectedRol, onChangeRol }: ELegirRolProps){
 
     const [roles, setRoles] = useState<Rol[]>([])
 
@@ -21,27 +24,30 @@ function ELegirRol(){
         .catch(error => console.log(error));
     }, []);
 
-
     return(
-        <>
-
-        <Form.Select className="w-25" id="select-roles" defaultValue={""}>
-        
-            <option value="" disabled> Seleccione un rol... </option>
-
-            {roles.map((rol) => 
-            
-                <option value={rol.id}> {rol.nombre} </option>
-        
-            )}
-        
+    <div>
+        <h5 className="mb-3 fw-semibold text-secondary" style={{ fontSize: "0.95rem" }}>
+        Dirigido a
+        </h5>
+        <Form.Select
+        id="select-roles"
+        value={selectedRol}
+        onChange={(e) => onChangeRol(e.target.value)}
+        className="border-2"
+        style={{ 
+            borderColor: "#dee2e6",
+            padding: "0.75rem" 
+        }}
+        >
+        <option value="">Seleccione un rol...</option>
+        {roles.map((rol) => (
+            <option key={rol.id} value={rol.id}>
+            {rol.nombre}
+            </option>
+        ))}
         </Form.Select>
-
-        </>
-        
+    </div>
     )
 }
-
-
 
 export default ELegirRol;

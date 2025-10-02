@@ -5,3 +5,4 @@ from src.Respuesta.schemas import Respuesta
 
 
 from src.materias.schemas import Materia
+from src.Encuesta.schemas import InformeListSchema, InformeDetailSchema, RespuestaDetalleSchema

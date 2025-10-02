@@ -1,10 +1,13 @@
+
+
 from __future__ import annotations 
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from Backend.src.Pregunta.schemas import Pregunta
-from Backend.src.Respuesta.models import Respuesta
-from Backend.src.Roles.models import Rol
-from Backend.src.Usuarios.schemas import Usuario
+
+from src.Pregunta.models import Pregunta
+from src.Usuarios.models import Usuario
+from src.Respuesta.models import Respuesta
+from src.Roles.models import Rol
 from src.models import ModeloBase
 
 
@@ -23,7 +26,7 @@ class RespuestaEncuesta(ModeloBase):
     __tablename__ = "respuestas_encuesta"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     fecha_completado: Mapped[Date] = mapped_column(Date)
-    estado: Mapped[str] = mapped_column(String(50), default="COMPLETADO") # ej: 'PENDIENTE', 'COMPLETADO'
+    estado: Mapped[str] = mapped_column(String(50), default="COMPLETADO")
     
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="respuestas_encuesta")
@@ -31,5 +34,4 @@ class RespuestaEncuesta(ModeloBase):
     plantilla_id: Mapped[int] = mapped_column(ForeignKey("plantillas_encuesta.id"))
     plantilla: Mapped["PlantillaEncuesta"] = relationship("PlantillaEncuesta")
 
-    #respuestas individuales a cada pregunta
     respuestas_individuales: Mapped[list["Respuesta"]] = relationship("Respuesta", back_populates="respuesta_encuesta")

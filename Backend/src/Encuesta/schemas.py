@@ -4,7 +4,7 @@ from typing import List
 
 #para lista de informes
 class InformeListSchema(BaseModel):
-    id: int # El ID de RespuestaEncuesta
+    id: int 
     titulo_informe: str
     docente_nombre: str
     fecha_completado: date

@@ -1,56 +1,44 @@
-from typing import List
-from sqlalchemy.orm import Session
-from sqlalchemy import delete, select, update
-from src.Pregunta.models import Pregunta, Opcion
-from src.Pregunta import schemas, exceptions
-from src.Opciones.models import Opcion
+from typing import List, Optional
+from sqlalchemy.orm import Session, joinedload
 
-def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="Abierta")
-    
-    db.add(_nueva_pregunta)
-    db.commit()
-    db.refresh(_nueva_pregunta)
-    return _nueva_pregunta
-
-def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate) -> Pregunta:
-    if len(pregunta.opciones) == 0:
-        raise exceptions.PreguntaSinOpciones()
-    
-    # Filtrar ids validos
-    opciones_validas = db.query(Opcion).filter(Opcion.id.in_([op for op in pregunta.opciones if op > 0])).all()
-   
-    if len(opciones_validas) != len(pregunta.opciones):
-        raise exceptions.PreguntaSinOpciones("Algunas opciones proporcionadas no son válidas.")
+from src.Encuesta import models
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada")
-    _nueva.opciones = opciones_validas
-    
-    db.add(_nueva)
-    db.commit()
-    db.refresh(_nueva)
-    return _nueva
+# Constante para el rol que nos interesa
+ROL_DOCENTE = "DOCENTE"
 
-def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
-    return db.scalars(select(Pregunta)).all()
+def get_informes_completados_docentes(db: Session) -> List[models.RespuestaEncuesta]:
+    """
+    Servicio que obtiene de la base de datos todos los informes de cátedra
+    (aquellos completados por docentes).
+    Devuelve una lista de objetos del modelo SQLAlchemy.
+    """
+    return (
+        db.query(models.RespuestaEncuesta)
+        .join(models.PlantillaEncuesta)
+        .join(models.Rol)
+        .filter(models.Rol.nombre == ROL_DOCENTE)
+        .filter(models.RespuestaEncuesta.estado == "COMPLETADO")
+        .options(
+            joinedload(models.RespuestaEncuesta.usuario),
+            joinedload(models.RespuestaEncuesta.plantilla)
+        )
+        .all()
+    )
 
-def obtner_pregunta(db: Session, pregunta_id: int) -> schemas.Pregunta:
-    db_pregunta = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_id))
-    if db_pregunta is None:
-        raise exceptions.PreguntaNoEncontrada()
-    return db_pregunta
-
-def modificar_pregunta(db: Session, pregunta_id: int, pregunta: schemas.PreguntaUpdate) -> Pregunta:
-    db_pregunta = obtner_pregunta(db, pregunta_id)
-    db.execute(update(Pregunta).where(Pregunta.id == pregunta_id).values(**pregunta.model_dump()))
-    db.commit()
-    db.refresh(db_pregunta)
-    return db_pregunta  
-
-def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
-    db_pregunta = obtner_pregunta(db, pregunta_id)
-    db.execute(delete(Pregunta).where(Pregunta.id == pregunta_id))
-    db.commit()
-    return db_pregunta
-
+def get_informe_por_id(db: Session, informe_id: int) -> Optional[models.RespuestaEncuesta]:
+    """
+    Servicio que obtiene un informe específico por su ID, precargando toda
+    la información necesaria para la vista de detalle.
+    Devuelve un único objeto del modelo SQLAlchemy o None si no se encuentra.
+    """
+    return (
+        db.query(models.RespuestaEncuesta)
+        .filter(models.RespuestaEncuesta.id == informe_id)
+        .options(
+            joinedload(models.RespuestaEncuesta.usuario),
+            joinedload(models.RespuestaEncuesta.plantilla).joinedload(models.PlantillaEncuesta.rol),
+            joinedload(models.RespuestaEncuesta.respuestas_individuales).joinedload(models.Respuesta.pregunta)
+        )
+        .first()
+    )

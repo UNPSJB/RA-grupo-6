@@ -27,10 +27,9 @@ function CrearOpcion({onCrear}: CrearOpcionProps){
     };
 
     return(
-        <InputGroup className="mb-4">
+        <InputGroup className="mb-3">
             <Form.Control
                 type="text"
-                name='create-option'
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
                 placeholder="Nueva opción..."

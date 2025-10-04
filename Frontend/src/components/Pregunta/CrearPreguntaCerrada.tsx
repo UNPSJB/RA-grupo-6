@@ -12,8 +12,13 @@ type PreguntaCerrada = {
   tipo: string;
 };
 
+type Props = {
+  manejarPestaña: () => void;
+  refrescarPreguntas: () => void;
+};
 
-function CrearPreguntaCerrada() {
+
+function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
 
   //Definicion de constantes
   const [texto, setTexto] = useState("")
@@ -23,11 +28,6 @@ function CrearPreguntaCerrada() {
 
   const crearPregunta = () => {
     const seleccionadas = opcionesSeleccionadas.map(op => op.id);
-
-    // if (!preguntaCerrada.trim() || seleccionadas.length === 0) {
-    //   alert("Escribe la pregunta y selecciona al menos una opción");
-    //   return;
-    // }
 
     const nuevaPregunta: PreguntaCerrada = {
       texto: texto,
@@ -42,6 +42,8 @@ function CrearPreguntaCerrada() {
     }).then(() => {
       setTexto("");
       setOpcionesSeleccionadas([]);
+      refrescarPreguntas();
+      manejarPestaña();
     });
   };
 
@@ -54,19 +56,30 @@ function CrearPreguntaCerrada() {
 
   return (
     <div>
+      <IngresarPregunta texto={texto} setTexto={setTexto} />
 
-      <IngresarPregunta texto={texto} setTexto={setTexto}></IngresarPregunta>
-    
-      <div className="options mb-3 ">
-        <h3>Gestion de opciones </h3>
-        
-        <Button className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2" onClick={cambiarMostrar}> <i className="fa-solid fa-gear text-dark" style={{ fontSize: '18px', color: 'white' }} > </i> {TextoMostrar} </Button>
+      <div  className="mb-3 d-flex justify-content-between align-items-center">
+        <h6>Gestión de opciones</h6>
+        <Button
+          className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
+          onClick={cambiarMostrar}
+        >
+          <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />
+          {TextoMostrar}
+        </Button>
       </div>
 
-      {mostrar && <OpcionList opcionesSeleccionadas={opcionesSeleccionadas} setOpcionesSeleccionadas={setOpcionesSeleccionadas}/>}
+      {mostrar && (
+        <OpcionList
+          opcionesSeleccionadas={opcionesSeleccionadas}
+          setOpcionesSeleccionadas={setOpcionesSeleccionadas}
+        />
+      )}
 
       <Col className="d-flex justify-content-center">
-        <Button className="mt-3" onClick={crearPregunta}>Crear Pregunta</Button>
+        <Button className="mt-3" onClick={crearPregunta} size="sm">
+          Crear Pregunta
+        </Button>
       </Col>
     </div>
   );

@@ -7,7 +7,7 @@ type Props = {
     setTexto: (v: string) => void;
 };
 
-export default function IngresarPregunta({texto, setTexto} : Props){
+function IngresarPregunta({texto, setTexto} : Props){
 
     return (
 
@@ -24,4 +24,6 @@ export default function IngresarPregunta({texto, setTexto} : Props){
         </Form.Group>
 
     );
-}
+};
+
+export default IngresarPregunta;

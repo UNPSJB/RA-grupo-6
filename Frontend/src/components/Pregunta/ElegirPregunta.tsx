@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Card, Badge} from "react-bootstrap";
 import type { Pregunta} from "./PreguntaTypes";
+import CrearPregunta from "./CrearPregunta";
 
 type Props = {
   preguntasSeleccionadas: Pregunta[];
@@ -10,13 +11,18 @@ type Props = {
 function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: Props) {
   const [preguntasDisponibles, setPreguntasDisponibles] = useState<Pregunta[]>([]);
   const [preguntaSeleccionadaId, setPreguntaSeleccionadaId] = useState<number>();
+  const [showModal, setShowModal] = useState(false);
   
-  
-  useEffect(() => {
+  const refrescarPreguntas = () => {
     fetch("http://127.0.0.1:8000/preguntas/")
       .then(res => res.json())
       .then(data => setPreguntasDisponibles(data))
       .catch(err => console.error(err));
+  };
+
+
+  useEffect(() => {
+    refrescarPreguntas();
   }, []);
 
   const agregarPregunta = () => {
@@ -25,11 +31,13 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
     if (!pregunta) return;
 
     setPreguntasSeleccionadas([...preguntasSeleccionadas, pregunta]);
+    setPreguntaSeleccionadaId(undefined);
   };
   
   const eliminarPregunta = (id: number) => {
     setPreguntasSeleccionadas(preguntasSeleccionadas.filter(p => p.id !==id));
   };
+
 
   const preguntasParaSelect = preguntasDisponibles.filter(
     p => !preguntasSeleccionadas.some(s => s.id === p.id)
@@ -37,16 +45,28 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
 
   return (
     <div>
-      <div className="mb-3">
-        <h5 className="mb-3 fw-semibold text-secondary" style={{ fontSize: "0.95rem" }}>
-          Preguntas del Formulario
-        </h5>
-        {preguntasSeleccionadas.length > 0 && (
-          <Badge bg="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
-            {preguntasSeleccionadas.length}{" "}
-            {preguntasSeleccionadas.length === 1 ? "pregunta" : "preguntas"}
-          </Badge>
-        )}
+      <div>
+        <div className="mb-3">
+          <h5 className="mb-3 fw-semibold text-secondary" style={{ fontSize: "0.95rem" }}>
+            Preguntas del Formulario
+          </h5>
+          {preguntasSeleccionadas.length > 0 && (
+            <Badge bg="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
+              {preguntasSeleccionadas.length}{" "}
+              {preguntasSeleccionadas.length === 1 ? "pregunta" : "preguntas"}
+            </Badge>
+          )}
+        </div>
+        
+          <Button 
+            variant="outline-primary" 
+            size="sm"
+            onClick={() => setShowModal(true)}
+            className="d-flex align-items-center gap-2"
+          >
+            <i className="fa-solid fa-plus"></i>
+            Nueva Pregunta
+          </Button>
       </div>
 
       {preguntasSeleccionadas.length > 0 ? (
@@ -155,6 +175,11 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
       <div className="d-grid">
         <Button onClick={agregarPregunta}>+ Agregar</Button>
       </div>
+      <CrearPregunta
+        mostrar={showModal}
+        manejarPestaña={() => setShowModal(false)}
+        refrescarPreguntas={refrescarPreguntas}
+      />
     </div>
   );
 }

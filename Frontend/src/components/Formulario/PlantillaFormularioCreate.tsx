@@ -35,34 +35,36 @@ function CrearPlantillaFormulario() {
   };
 
   return (
-    <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2rem", paddingBottom: "2rem" }}>
-      <Container style={{ maxWidth: "1000px" }}>
-        <Card className="border-0 shadow-sm w-100">
-          <Card.Body className="p-4">
-            <div className="mb-5">
-              <h1 className="fw-bold mb-2" style={{ color: "#2c3e50" }}>
+    <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
+      <Container style={{ maxWidth: "900px" }}>
+        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+          <Card.Body className="p-4 p-md-5">
+            <div className="mb-5 text-center text-md-start">
+              <h1 className="fw-bold mb-2"  style={{ color: "#1f2937", fontSize: "1.875rem" }}>
                 Crear Nuevo Formulario
               </h1>
-              <p className="text-muted mb-0">
+              <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
                 Completa los campos para crear el Formulario
               </p>
             </div>
 
             <div className="d-flex flex-column gap-4">
 
-              <Form.Label className="fw-semibold text-secondary mb-3" style={{ fontSize: "0.95rem" }}>
+              <Form.Label className="fw-semibold mb-2" style={{ fontSize: "0.875rem", color: "#4b5563" }}>
                 Título del Formulario
               </Form.Label>
               <Form.Control
                 type="text"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                placeholder="Ingrese Título..."
-                className="border-2"
+                placeholder="Ingrese el título del formulario..."
+                className="shadow-none"
                 style={{ 
-                  borderColor: "#dee2e6",
+                  borderWidth: "2px",
+                  borderColor: "#e5e7eb",
+                  borderRadius: "0.5rem",
                   fontSize: "1rem",
-                  padding: "0.75rem"
+                  padding: "0.75rem 1rem"
                 }}
               />
 
@@ -79,9 +81,9 @@ function CrearPlantillaFormulario() {
                 />
 
               {/* Botón Crear */}
-                <div className="d-grid">
+                <div className="d-grid mt-3">
                   <Button className="btn-success" onClick={crearFormularioNuevo}>
-                    Crear Formulario
+                    <i className="fa-solid fa-check me-2"></i> Crear Formulario
                   </Button>
                 </div>
             </div>

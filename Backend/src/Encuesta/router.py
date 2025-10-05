@@ -1,61 +1,53 @@
-
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-  # Importamos los servicios
-from src.Encuesta import schemas, services
-from src.database import get_db 
+from src.database import get_db
+from . import schemas, services, models
 
 router = APIRouter(
     prefix="/informes-sinteticos",
     tags=["Informes Sintéticos"]
 )
 
-@router.get("/", response_model=List[schemas.InformeListSchema])
-def listar_informes_de_docentes(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[schemas.InformeSinteticoListSchema])
+def listar_informes_sinteticos_api(db: Session = Depends(get_db)):
     """
-    Obtiene una lista de todos los informes completados por docentes (Informes de Cátedra).
-    La lógica de la base de datos está en la capa de servicios.
+    Endpoint para listar todos los informes sintéticos completados por el Departamento.
     """
-    informes_db = services.get_informes_completados_docentes(db)
+    informes_db = services.listar_informes_sinteticos(db)
     
-    resultado = [
-        schemas.InformeListSchema(
+    return [
+        schemas.InformeSinteticoListSchema(
             id=informe.id,
-            titulo_informe=informe.plantilla.titulo,
-            docente_nombre=f"{informe.usuario.nombre} {informe.usuario.apellido}",
+            titulo_formulario=informe.plantilla.titulo,
+            autor_nombre=f"{informe.usuario.nombre} {informe.usuario.apellido}",
             fecha_completado=informe.fecha_completado
         ) for informe in informes_db
     ]
+
+@router.get("/{informe_id}", response_model=schemas.InformeSinteticoDetailSchema)
+def ver_informe_sintetico_detalle_api(informe_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para ver el contenido detallado de un informe sintético específico.
+    """
+    informe_db = services.obtener_informe_sintetico_por_id(db, informe_id)
+
+    if not informe_db or informe_db.usuario.rol.nombre != services.ROL_DEPARTAMENTO:
+        raise HTTPException(status_code=404, detail="Informe sintético no encontrado")
     
-    return resultado
-
-@router.get("/{informe_id}", response_model=schemas.InformeDetailSchema)
-def ver_detalle_de_informe(informe_id: int, db: Session = Depends(get_db)):
-    """
-    Visualiza el contenido completo de un informe específico.
-    """
-    informe = services.get_informe_por_id(db, informe_id)
-
-    if not informe:
-        raise HTTPException(status_code=404, detail="Informe no encontrado")
-
-    if informe.plantilla.rol.nombre != services.ROL_DOCENTE:
-        raise HTTPException(status_code=403, detail="Acceso no permitido a este tipo de informe")
-        
-    respuestas_mapeadas = [
+    respuestas_detalladas = [
         schemas.RespuestaDetalleSchema(
-            pregunta=res.pregunta.texto,
-            respuesta=res.texto_respuesta
-        ) for res in informe.respuestas_individuales
+            pregunta_texto=res.pregunta.texto,
+            respuesta_texto=res.texto_respuesta,
+            opcion_seleccionada=res.opcion.texto if res.opcion else None
+        ) for res in informe_db.respuestas_individuales
     ]
-
-    return schemas.InformeDetailSchema(
-        id=informe.id,
-        titulo_informe=informe.plantilla.titulo,
-        docente_nombre=f"{informe.usuario.nombre} {informe.usuario.apellido}",
-        fecha_completado=informe.fecha_completado,
-        respuestas=respuestas_mapeadas
+    
+    return schemas.InformeSinteticoDetailSchema(
+        id=informe_db.id,
+        titulo_formulario=informe_db.plantilla.titulo,
+        autor_nombre=f"{informe_db.usuario.nombre} {informe_db.usuario.apellido}",
+        fecha_completado=informe_db.fecha_completado,
+        respuestas=respuestas_detalladas
     )

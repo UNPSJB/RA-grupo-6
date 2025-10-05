@@ -2,6 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
+
 from src.database import engine
 from src.models import ModeloBase
 
@@ -52,6 +53,9 @@ app.include_router(respuestas_router)
 #Route de Opciones 
 from src.Opciones.router import router as opciones_router
 app.include_router(opciones_router)
+#Router de Formularios
+from src.PlantillaFormulario.router import router as formulario_router
+app.include_router(formulario_router)
 
 #Route de Rol
 from src.Roles.router import router as roles_router
@@ -61,6 +65,5 @@ app.include_router(roles_router)
 from src.Usuarios.router import router as usuarios_router
 app.include_router(usuarios_router)
 
-#Route de Encuesta
 from src.Encuesta.router import router as encuesta_router
 app.include_router(encuesta_router)

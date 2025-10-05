@@ -1,50 +1,90 @@
 import CrearPreguntaAbierta from "./CrearPreguntaAbierta";
 import CrearPreguntaCerrada from "./CrearPreguntaCerrada";
 import { useState } from "react";
-import { Form, Col} from 'react-bootstrap'
-import Menu from "../Menu";
+import { Form, Modal, Button} from 'react-bootstrap'
 
+type Props = {
+    mostrar: boolean;
+    manejarPestaña: () => void;
+    refrescarPreguntas: () => void;
+};
 
 import "./pregunta.css"
 
-function CrearPregunta(){
-
-
-    const [checked, setChecked] = useState(true);
+function CrearPregunta({mostrar, manejarPestaña, refrescarPreguntas}: Props){
+    const [tipoPregunta, setTipoPregunta] = useState<"Abierta" | "Cerrada">("Abierta");
 
     return(
+        <Modal show={mostrar} onHide={manejarPestaña} size="lg" centered>
+            <Modal.Header closeButton className="border-bottom" style={{padding: "1.5rem"}}>
+                <Modal.Title className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="px-4 py-4">
+                <Form>
+                    <div className="mb-4 text-center">
+                        <Form.Label 
+                            className="fw-semibold mb-3 d-block"
+                            style={{ fontSize: "0.875rem", color: "#4b5563" }}
+                        >
+                            Tipo de pregunta
+                        </Form.Label>
+                        
+                        <div className="d-flex justify-content-center align-items-center gap-3">
+                            <Button
+                                variant={tipoPregunta === "Abierta" ? "success" : "light"}
+                                className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
+                                    tipoPregunta === "Abierta" ? "shadow-sm" : ""
+                                }`}
+                                style={{
+                                    border: tipoPregunta === "Abierta" ? "none" : "2px solid #e5e7eb",
+                                    borderRadius: "0.5rem",
+                                    fontSize: "0.875rem"
+                                }}
+                                onClick={() => setTipoPregunta("Abierta")}
+                            >
+                                <i className="fa-solid fa-align-left"></i>
+                                Abierta
+                            </Button>
 
-    <>
-        <Menu></Menu>
+                            <Button
+                                variant={tipoPregunta === "Cerrada" ? "primary" : "light"}
+                                className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
+                                    tipoPregunta === "Cerrada" ? "shadow-sm" : ""
+                                }`}
+                                style={{
+                                    border: tipoPregunta === "Cerrada" ? "none" : "2px solid #e5e7eb",
+                                    borderRadius: "0.5rem",
+                                    fontSize: "0.875rem"
+                                }}
+                                onClick={() => setTipoPregunta("Cerrada")}
+                            >
+                                <i className="fa-solid fa-list-check"></i>
+                                Cerrada
+                            </Button>
+                        </div>
+                    </div>
 
-        <div className="container text-start mt-4"></div>
-
-        <div className="container text-start">
-            <div className="vertical-line">
-                <h3 className="mb-3">Crear Nueva Pregunta</h3>
-                <p className="text-muted">Seleccione el tipo de pregunta a crear</p>
-            </div>
-
-            <Col className="d-flex justify-content-center">
-                <Form.Label className="switch">
-                    <Form.Control 
-                        type="checkbox" 
-                        onChange={() => setChecked(!checked)}    
+                    {tipoPregunta === "Abierta" ? (
+                        <CrearPreguntaAbierta
+                            manejarPestaña={manejarPestaña}
+                            refrescarPreguntas={refrescarPreguntas}
                         />
+                    ) : (
+                        <CrearPreguntaCerrada
+                            manejarPestaña={manejarPestaña}
+                            refrescarPreguntas={refrescarPreguntas}
+                        />
+                    )}
+                </Form>
+            </Modal.Body>
+            <Modal.Footer className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
+                <Button variant="outline-secondary" onClick={manejarPestaña} >
+                    Cerrar
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
 
-                    <span> Abierta </span>
-                    <span> Cerrada </span>
-                </Form.Label>
-            </Col>
-        </div>
-        
-        {checked? <div className="container"> <CrearPreguntaAbierta/> </div> : <div className="container"><CrearPreguntaCerrada/> </div>}
-        
-    </>
-
-    )
-
-}
-
+};
 
 export default CrearPregunta;

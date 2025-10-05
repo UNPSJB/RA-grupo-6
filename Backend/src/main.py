@@ -52,6 +52,9 @@ app.include_router(respuestas_router)
 #Route de Opciones 
 from src.Opciones.router import router as opciones_router
 app.include_router(opciones_router)
+#Router de Formularios
+from src.PlantillaFormulario.router import router as formulario_router
+app.include_router(formulario_router)
 
 #Route de Rol
 from src.Roles.router import router as roles_router

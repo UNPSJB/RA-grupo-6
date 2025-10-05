@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Opcion } from "./OpcionTypes";
 import CrearOpcion from "./OpcionCreate";
-import {Col, Form, ListGroup, Row} from "react-bootstrap"
+import { Form, ListGroup} from "react-bootstrap"
 import EliminarOpcion from "./OpcionDelete";
 
 const url_base = 'http://127.0.0.1:8000/opciones/'
@@ -47,54 +47,34 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
     }, []);
 
     return(
+    <>
+      <CrearOpcion onCrear={agregarOpcion} />
 
-        <>
-
-            <CrearOpcion onCrear={agregarOpcion} />
-
-            {/* Se renderiza si existe al menos una opcion */}
-            { opciones.length >= 1 &&
-                
-                <ListGroup variant="flush" className="border border-dark p-3 rounded">
-                    
-                    {opciones.map((opcion) => (
-                        
-                        <ListGroup.Item key={opcion.id} className="border border-dark rounded mt-3">
-                            <Row className="d-flex align-items-center">
-                                <Col>
-                                    <Form.Check type="checkbox" id={`opcion-${opcion.id}`} onChange={() => agregarOpcionSeleccionada(opcion)} label={opcion.texto }/> 
-                                </Col>
-                                <Col className="d-flex justify-content-end">
-                                    <EliminarOpcion opcionId={opcion.id} onDeleted={eliminarOpcion}/> 
-                                </Col>
-                            </Row>
-                        </ListGroup.Item>
-                        
-                    ))}
-
-                </ListGroup>
-            }            
-
-            {/* { OpcionesSeleccionadas.length >= 1 &&
-                
-                <ListGroup className="mb-5 mt-5">
-                    <h4>Opciones Seleccionadas</h4>
-                    {OpcionesSeleccionadas.map((opcionSeleccionada) =>
-
-                        <ListGroup.Item key={opcionSeleccionada.id}>
-                            {opcionSeleccionada.texto}
-                        </ListGroup.Item>
-                    )}
-
-                </ListGroup>
-            } */}
-
-        </>
-
+      {opciones.length > 0 && (
+        <ListGroup variant="flush" className="border p-3 rounded">
+          <p className="text-muted mb-3" style={{ fontSize: "0.875rem" }}>
+            Selecciona las opciones disponibles:
+          </p>
+          {opciones.map((opcion) => (
+            <ListGroup.Item
+              key={opcion.id}
+              className="d-flex align-items-center justify-content-between mb-2 border rounded p-2"
+            >
+              <Form.Check
+                type="checkbox"
+                id={`opcion-${opcion.id}`}
+                label={opcion.texto}
+                checked={opcionesSeleccionadas.some((o) => o.id === opcion.id)}
+                onChange={() => agregarOpcionSeleccionada(opcion)}
+              />
+              <EliminarOpcion opcionId={opcion.id} onDeleted={eliminarOpcion} />
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      )}
+    </>
 
     )
-
-
 }
 
 export default OpcionList;

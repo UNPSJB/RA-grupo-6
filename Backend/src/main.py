@@ -65,5 +65,6 @@ app.include_router(roles_router)
 from src.Usuarios.router import router as usuarios_router
 app.include_router(usuarios_router)
 
-from src.Encuesta.router import router as encuesta_router
+#Route de Encuesta
+from src.Informes.router import router as encuesta_router
 app.include_router(encuesta_router)

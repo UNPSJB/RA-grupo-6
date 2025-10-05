@@ -8,18 +8,18 @@ from src.Usuarios.models import Usuario
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src import models
 
-ROL_DEPARTAMENTO = "DEPARTAMENTO" 
+ROL_DOCENTE = "DOCENTE" 
 
 def listar_informes_sinteticos(db: Session) -> List[RespuestasFormulario]:
     """
     Obtiene de la DB todos los formularios completados por usuarios
-    con el rol de 'DEPARTAMENTO'.
+    con el rol de 'DOCENTE'.
     """
     return (
         db.query(RespuestasFormulario)
         .join(Usuario)
         .join(Rol)
-        .filter(Rol.nombre == ROL_DEPARTAMENTO) # <--- ÚNICO CAMBIO EN LA LÓGICA
+        .filter(Rol.nombre == ROL_DOCENTE)
         .options(
             joinedload(RespuestasFormulario.usuario),
             joinedload(RespuestasFormulario.plantilla)

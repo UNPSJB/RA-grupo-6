@@ -1,6 +1,6 @@
 import type { Opcion } from "../Opcion/OpcionTypes"
 
-export type TipoPregunta = {
+export type Pregunta = {
     id: number
     texto: String
     opciones: Opcion[]
@@ -11,3 +11,8 @@ export const EnumTipoPregunta = Object.freeze({
     cerrada: "Cerrada",
     abierta: "Abierta"
 })
+
+export type RespuestaCerrada = {
+    pregunta_id: Number
+    opcion_id: Number
+}

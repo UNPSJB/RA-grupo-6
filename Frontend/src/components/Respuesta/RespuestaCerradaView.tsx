@@ -2,14 +2,36 @@
 import { useEffect, useState } from "react"
 import { ListGroup } from "react-bootstrap";
 import Form from "react-bootstrap/Form"
-import type { TipoPregunta } from "./PreguntaTypes";
+import type { Pregunta } from "./PreguntaTypes";
+import type {RespuestaCerrada} from "./PreguntaTypes";
+
+function manejarSeleccion(opcion : number, {pregunta_id, respuestas, actualizarRespuestas} : Props ){
+
+    const nuevaRespuesta: RespuestaCerrada = {
+        pregunta_id: pregunta_id,
+        opcion_id:  opcion,
+    }
+
+    let nuevaLista = respuestas.filter(item => item.pregunta_id !== pregunta_id);
+    nuevaLista.push(nuevaRespuesta);
+    actualizarRespuestas(nuevaLista);
+
+}
+
+type Props = {
+    pregunta_id : number,
+    respuestas : RespuestaCerrada[]
+    actualizarRespuestas: (valor : RespuestaCerrada[]) => void;
+
+}
 
 
-function RespuestaCerradaView({pregunta_id} : {pregunta_id : number}){
+function RespuestaCerradaView({pregunta_id, respuestas, actualizarRespuestas} : Props){
     
-    const url_base = "http://127.0.0.1:8000/preguntas/" + pregunta_id;
 
-    const [pregunta, setPregunta] = useState<TipoPregunta>({
+    const url_base = `http://127.0.0.1:8000/preguntas/${pregunta_id}`;
+
+    const [pregunta, setPregunta] = useState<Pregunta>({
         id: 0,
         texto: "",
         opciones: [],
@@ -17,9 +39,7 @@ function RespuestaCerradaView({pregunta_id} : {pregunta_id : number}){
     });
 
     useEffect(() => {
-
-    fetch(url_base) 
-
+        fetch(url_base) 
         .then(response => response.json())
         .then((data) => setPregunta(data))
         .catch(error => console.log(error))
@@ -31,15 +51,18 @@ function RespuestaCerradaView({pregunta_id} : {pregunta_id : number}){
         <div className={`question-$pregunta.id`}>
             
             <h3>{pregunta.texto}</h3>
-            <Form.Label> Seleccione una opcion... </Form.Label>
+            <Form.Group aria-required>
+                <Form.Label > Seleccione una opcion... </Form.Label>
+                    <ListGroup>
+                        {pregunta.opciones.map((opcion) =>
 
-                {pregunta.opciones.map((opcion) =>
-
-                    <ListGroup.Item > 
-                        <Form.Check type="radio" name={`answers-question-${pregunta.id}`} label={opcion.texto}/>
-                    </ListGroup.Item>    
-                    
-                )}
+                            <ListGroup.Item > 
+                                <Form.Check required type="radio" name={`answers-question-${pregunta.id}`} onChange={() => manejarSeleccion(opcion.id, {pregunta_id, respuestas, actualizarRespuestas})} label={opcion.texto}/>
+                            </ListGroup.Item>    
+                            
+                        )}
+                </ListGroup>
+            </Form.Group>
         </div>
     )
     

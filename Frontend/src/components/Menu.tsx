@@ -26,6 +26,7 @@ function Menu(){
                         <Nav.Link href="/VerPregunta">Ver preguntas</Nav.Link>
                         <Nav.Link href="/CrearPregunta">Crear preguntas</Nav.Link>
                         <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>    
+                        <Nav.Link href="/PaginaInformesSinteticos">Ver Informes Sintéticos</Nav.Link>    
                     </Nav>
                 </Navbar.Collapse>
             </Container>

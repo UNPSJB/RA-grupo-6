@@ -1,6 +1,5 @@
-from sqlalchemy import Integer, String, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from enum import auto, StrEnum
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 from src.models import ModeloBase
 
 class Materia(ModeloBase):

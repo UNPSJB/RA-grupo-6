@@ -25,6 +25,7 @@ function Menu(){
                         <Nav.Link href='/'> <i className="fa-solid fa-house"></i> Volver al inicio </Nav.Link>
                         <Nav.Link href="/VerPregunta">Ver preguntas</Nav.Link>
                         <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>    
+                        <Nav.Link href="/InstrumentoList">Instrumentos</Nav.Link>  
                     </Nav>
                 </Navbar.Collapse>
             </Container>

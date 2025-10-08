@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import VerPregunta from './components/Pregunta/VerPregunta.tsx';
 import CrearPlantillaFormulario from './components/Formulario/PlantillaFormularioCreate.tsx';
 import Menu from './components/Menu.tsx';
+import InstrumentoList from './components/Instrumento/InstrumentoList.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path='/' element={<Menu/>}></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
+        <Route path='/InstrumentoList' element={<InstrumentoList/>}></Route>
       </Routes>
     </BrowserRouter>
 

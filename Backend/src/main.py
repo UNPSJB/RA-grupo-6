@@ -67,3 +67,7 @@ app.include_router(usuarios_router)
 #Route de Respuestas Formulario
 from src.RespuestasFormulario.router import router as respuestas_formulario_router
 app.include_router(respuestas_formulario_router)
+
+#Route de Instrumentos
+from src.Instrumento.router import router as instrumento_router
+app.include_router(instrumento_router)

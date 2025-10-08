@@ -8,18 +8,23 @@ class PreguntaBase(BaseModel):
     tipo: Optional[str] = None  # abierta, cerrada
     opciones: Optional[List[int]] = None
 
+
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo : str = "Abierta"
+
 
 class PreguntaCerradaCreate(PreguntaBase):
     opciones: list[int]  
     tipo :str = "Cerrada"
 
+
 class PreguntaUpdate(PreguntaBase):
     pass
 
+
 class PreguntaDelete(BaseModel):
     id: int
+
 
 class Pregunta(PreguntaBase):
     id: int

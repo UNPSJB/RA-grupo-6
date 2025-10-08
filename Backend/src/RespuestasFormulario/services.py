@@ -5,14 +5,14 @@ from src.RespuestasFormulario import schemas, exceptions
 from src.RespuestasFormulario.models import RespuestasFormulario
 
 def crear_respuestas_formulario(db:Session, respuestas_formulario: schemas.RespuestasFormulario) -> schemas.RespuestasFormulario:
-    _respuestas_formulario = RespuestasFormulario(**respuestas_formulario.mode__dump())
+    _respuestas_formulario = RespuestasFormulario(**respuestas_formulario.model__dump())
     db.add(_respuestas_formulario)
     db.commit()
     db.refresh(_respuestas_formulario)
     return _respuestas_formulario
 
-def obtener_respuestas_formulario(db: Session, respuestas_formulario: int) -> schemas.RespuestasFormulario:
-    db_respuestas = db.scalar(select(RespuestasFormulario).where(RespuestasFormulario.id == respuestas_formulario.id))
+def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int) -> schemas.RespuestasFormulario:
+    db_respuestas = db.scalar(select(RespuestasFormulario).where(RespuestasFormulario.id == respuestas_formulario_id))
     
     if db_respuestas is None:
         raise exceptions.RespuestasNoEncontradas()

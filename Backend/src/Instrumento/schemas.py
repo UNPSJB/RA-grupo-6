@@ -53,7 +53,7 @@ class RespuestaDetalle(BaseModel):
 
 class InstrumentoDetalle(BaseModel):
     id: int
-    titulo_formulario: str
-    autor_nombre: str
+    #titulo_formulario: str
+    #autor_nombre: str
     fecha_completado: date
     respuestas: List[RespuestaDetalle]

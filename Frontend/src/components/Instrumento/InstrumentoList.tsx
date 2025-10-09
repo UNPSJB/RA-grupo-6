@@ -25,7 +25,7 @@ function InstrumentoList() {
 
   const handleSeleccionarInforme = (id: number) => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/instrumentos/${id}`)
+    fetch(`http://127.0.0.1:8000/instrumentos/${id}/detail`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("No se pudo cargar el detalle del informe.");

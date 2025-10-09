@@ -23,11 +23,7 @@ def get_instrumentos_por_tipo(tipo_instrumento: TipoInstrumento, db: Session = D
     
     return instrumentos
 
-
-
-
-
-@router.get("/{instrumento_id}", response_model=InstrumentoDetalle)
+@router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)
 def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
     """
     Obtiene el detalle completo de un único instrumento para ser visualizado.
@@ -42,7 +38,7 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
             .joinedload(RespuestaModel.pregunta),
         joinedload(InstrumentoModel.respuestas_formulario)
             .joinedload(RespuestasFormularioModel.respuestas)
-            .joinedload(RespuestaModel.opcion_seleccionada)
+            .joinedload(RespuestaModel.opcion)
     ).filter(InstrumentoModel.id == instrumento_id).first()
 
     if not instrumento:
@@ -56,8 +52,8 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
     respuestas_procesadas = [
         RespuestaDetalle(
             pregunta_texto=r.pregunta.texto,
-            respuesta_texto=r.texto_respuesta,
-            opcion_seleccionada=r.opcion_seleccionada.texto if r.opcion_seleccionada else None
+            respuesta_texto=r.texto,
+            opcion_seleccionada=r.opcion.texto if r.opcion else None
         ) for r in respuestas_form.respuestas
     ]
     

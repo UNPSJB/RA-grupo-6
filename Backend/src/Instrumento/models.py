@@ -1,7 +1,7 @@
 import enum
 from sqlalchemy import Enum, ForeignKey, Integer, String, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 # Asumo que tenés una clase base como esta
@@ -26,9 +26,20 @@ class Instrumento(ModeloBase):
     tipo: Mapped[TipoInstrumento] = mapped_column(Enum(TipoInstrumento), nullable=False)
 
     plantilla_formulario_id: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
-    
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
 
+    instrumento_padre_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("instrumento.id"), unique=True, nullable=True
+    )
+    
+    instrumento_hijo: Mapped[Optional["Instrumento"]] = relationship(
+        back_populates="instrumento_padre", uselist=False
+    )
+
+    instrumento_padre: Mapped[Optional["Instrumento"]] = relationship(
+        back_populates="instrumento_hijo", remote_side=[id]
+    )
+    
     # --- Relaciones ---
     plantilla_formulario: Mapped["PlantillaFormulario"] = relationship(back_populates="instrumentos")
     materia: Mapped["Materia"] = relationship(back_populates="instrumentos")

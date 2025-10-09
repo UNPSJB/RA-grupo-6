@@ -15,4 +15,5 @@ class RespuestasFormulario(ModeloBase):
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)
 
     respuestas: Mapped[List["src.Respuesta.models.Respuesta"]] = relationship(back_populates="formulario")
-
+    materia: Mapped["src.materias.models.Materia"] = relationship(back_populates="respuestas_formulario")
+    usuario: Mapped["src.Usuarios.models.Usuario"] = relationship(back_populates="respuestas_formulario")

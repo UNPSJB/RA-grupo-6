@@ -1,14 +1,34 @@
+import type { Opcion } from "../Opcion/OpcionTypes"
+import type { Pregunta } from "../Pregunta/PreguntaTypes"
 
 
 export type Respuesta = {
     texto: string
-    opcion_id: number
-    pregunta_id: number
+    opcion: Opcion
+    pregunta: Pregunta
 }
 
+export type Materia = {
+    nombre: String
+}
+
+export type Rol = {
+    nombre: String
+}
+
+
+export type Usuario = {
+    nombre: String
+    apellido: String
+    legajo: number
+    email: String
+    rol: Rol
+}
+
+
 export type TypeRespuestasFormulario = {
-    materia_id: number
-    usuario_id: number
+    materia: Materia
+    usuario: Usuario
     fecha_envio: Date
     respuestas: Respuesta[]
 

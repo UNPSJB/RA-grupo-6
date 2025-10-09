@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import type { Respuesta, TypeRespuestasFormulario } from "../RespuestasFormulario/RespuestasFormularioTypes";
+import type {TypeRespuestasFormulario } from "../RespuestasFormulario/RespuestasFormularioTypes";
 import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import RespuestaView from "../Respuesta/RespuestaView";
 
@@ -11,11 +11,13 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
     const [respuestasFormulario, setRespuestasFormulario] = useState<TypeRespuestasFormulario>()
 
-    const [respuestaElegida, setRespuestaElegida] = useState<Respuesta>({
-        texto: "",
-        opcion: {id: 0, texto:""},
-        pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
-    })
+    let [indiceRespuestaElegida, setIndiceRespuestaElegida] = useState(0);
+
+    // const [respuestaElegida, setRespuestaElegida] = useState<Respuesta>({
+    //     texto: "",
+    //     opcion: {id: 0, texto:""},
+    //     pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
+    // })
 
     useEffect( () => {
 
@@ -29,7 +31,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
     return(
 
-        <Container >
+        <Container className="pb-5">
 
             <ListGroup className="mb-4 pt-4">
                 <h2> Tus respuestas </h2>
@@ -58,7 +60,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
                 {respuestasFormulario?.respuestas.map((respuesta, indice) =>
                     <>
                         <Row className="mb-3 ms-2 me-2">
-                            <Button variant="outline-dark" onClick={() => setRespuestaElegida(respuesta)}className="d-flex flex-wrap ">
+                            <Button variant="outline-dark" className="d-flex flex-wrap " onClick={() => setIndiceRespuestaElegida(indice)}> {/* */}
                                 <Col xs={12} className="d-flex justify-content-between ps-3 pe-3 pt-2">
                                     <p className="text-decoration-underline">
                                         Pregunta {indice + 1}
@@ -79,8 +81,30 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
             </div>
 
-            
-            <RespuestaView respuesta={respuestaElegida} />
+            <div className="border border-dark rounded pb-3 ms-2 me-2">
+                <RespuestaView respuesta={respuestasFormulario?.respuestas? respuestasFormulario?.respuestas[indiceRespuestaElegida] : {
+                    texto: "",
+                    opcion: {id: 0, texto:""},
+                    pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
+                } } />
+                
+                <Row className="d-flex gap-5">
+
+                    <Col className="d-flex justify-content-center ms-5 rounded">
+                        <Button onClick={() => (indiceRespuestaElegida == 0)? null : setIndiceRespuestaElegida(--indiceRespuestaElegida)} className="w-100" disabled={indiceRespuestaElegida == 0}>
+                            Anterior
+                        </Button>
+                    </Col>
+
+                    <Col className="d-flex justify-content-center me-5 rounded">
+                        <Button onClick={() => (indiceRespuestaElegida + 1 == respuestasFormulario?.respuestas.length)? null : setIndiceRespuestaElegida(++indiceRespuestaElegida)} className="w-100" disabled={(indiceRespuestaElegida + 1 == respuestasFormulario?.respuestas.length)} > 
+                            Siguiente
+                        </Button>
+                    </Col>
+                </Row>
+
+            </div>
+
 
 
         </Container>

@@ -10,7 +10,7 @@ function RespuestaView({respuesta}: {respuesta : Respuesta}){
         <>            
             {respuesta.pregunta.tipo == EnumTipoPregunta.cerrada ?
             
-            <ListGroupItem className="border border-dark rounded p-3 mb-3 ms-2 me-2">
+            <ListGroupItem className="p-3 mb-3 ms-2 me-2">
                 <h4>{respuesta.pregunta.texto}</h4>
                 
                 <p>
@@ -27,9 +27,9 @@ function RespuestaView({respuesta}: {respuesta : Respuesta}){
                 </p>
                 
                 <ListGroup>
-                    <Row className="g-5 ">
+                    <Row className="g-3 ">
                         {respuesta.pregunta.opciones.map((opcion) => (
-                        <Col md={6}>
+                        <Col md={6} >
                             <ListGroupItem className="border border-dark rounded">
                                 <p className="mb-0 ms-2">
                                     {opcion.texto}
@@ -45,7 +45,7 @@ function RespuestaView({respuesta}: {respuesta : Respuesta}){
             </ListGroupItem>
             
             :
-                <div className="border border-dark rounded p-3 gap-3 d-flex align-items-center mb-3 ms-2 me-2">
+                <div className="p-3 gap-3 d-flex align-items-center mb-3 ms-2 me-2">
                     <Row className="d-flex gap-3">
                         <Col xs={12}>
                             <h4>{respuesta.pregunta.texto}</h4>

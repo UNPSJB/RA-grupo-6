@@ -53,7 +53,19 @@ class RespuestaDetalle(BaseModel):
 
 class InstrumentoDetalle(BaseModel):
     id: int
-    #titulo_formulario: str
+    titulo_formulario: str
     #autor_nombre: str
     fecha_completado: date
     respuestas: List[RespuestaDetalle]
+
+
+# cómo se ve cada opción con su conteo?
+class EstadisticaOpcion(BaseModel):
+    texto_opcion: str
+    cantidad: int
+
+# estadísticas para una pregunta completa
+class EstadisticaPregunta(BaseModel):
+    pregunta_id: int
+    pregunta_texto: str
+    opciones: List[EstadisticaOpcion]

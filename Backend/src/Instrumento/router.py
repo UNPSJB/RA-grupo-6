@@ -62,7 +62,7 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
 
     return InstrumentoDetalle(
         id=instrumento.id,
-        titulo_formulario=instrumento.plantilla_formulario.titulo,
+        titulo_formulario=instrumento.titulo(),
         autor_nombre=autor_nombre_completo,
         fecha_completado=respuestas_form.fecha_envio,
         respuestas=respuestas_procesadas

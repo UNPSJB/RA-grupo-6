@@ -44,3 +44,6 @@ class Instrumento(ModeloBase):
     plantilla_formulario: Mapped["PlantillaFormulario"] = relationship(back_populates="instrumentos")
     materia: Mapped["Materia"] = relationship(back_populates="instrumentos")
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="instrumento")
+
+    def titulo(self):
+        return f'Informe Sintético N°{self.id}'

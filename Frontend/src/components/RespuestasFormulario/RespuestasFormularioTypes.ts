@@ -27,8 +27,8 @@ export type Usuario = {
 
 
 export type TypeRespuestasFormulario = {
-    materia: Materia
-    usuario: Usuario
+    materia: Materia | null
+    usuario: Usuario | null
     fecha_envio: Date
     respuestas: Respuesta[]
 

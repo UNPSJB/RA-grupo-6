@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import type { Respuesta, TypeRespuestasFormulario } from "../RespuestasFormulario/RespuestasFormularioTypes";
-import { Button, ListGroup, ListGroupItem, Row } from "react-bootstrap";
+import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import RespuestaView from "../Respuesta/RespuestaView";
 
 
@@ -29,44 +29,48 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
     return(
 
-        <div className="container">
+        <Container >
 
-            <ListGroup>
+            <ListGroup className="mb-4 pt-4">
                 <h2> Tus respuestas </h2>
                 
-                <ListGroupItem className="rounded">
-                    <h3>Respondido por</h3>
-                    {respuestasFormulario?.usuario.nombre}
-                    {" "}
-                    {respuestasFormulario?.usuario.apellido} ({respuestasFormulario?.usuario.email})
+                <ListGroupItem>
+                    <h4 className="d-flex gap-3 align-items-center"><i className="fa-solid fa-book"></i> Materia</h4>
+                    <p className="m-0">
+                        {respuestasFormulario?.materia.nombre}
+                    </p>
                 </ListGroupItem>
 
                 <ListGroupItem>
-                    <h3>Materia</h3>
-                    {respuestasFormulario?.materia.nombre}
-                </ListGroupItem>
-
-                <ListGroupItem>
-                    <h3>Completada</h3>
-                    {respuestasFormulario?.fecha_envio.toString()}
+                    <h4 className="d-flex gap-3 align-items-center"><i className="fa-regular fa-clock "></i> Completada</h4>
+                    <p className="m-0">
+                        {new Date(respuestasFormulario?.fecha_envio || new Date()).toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"})}
+                    </p>
+                    
                 </ListGroupItem>
 
             </ListGroup>
-
-            <br />
             
-            <div>
+            <div className="mb-4">
 
-                <h3> <i className="fa-regular fa-comment"></i> Preguntas</h3>
+                <h5> <i className="fa-regular fa-comment" ></i> Preguntas</h5>
 
                 {respuestasFormulario?.respuestas.map((respuesta, indice) =>
                     <>
-                        <Row>
-                            <Button variant="outline-dark" onClick={() => setRespuestaElegida(respuesta)}className="d-flex justify-content-start flex-wrap">
-                                Pregunta {indice + 1}
-                                <br />
-                                {respuesta.pregunta.texto}
-
+                        <Row className="mb-3 ms-2 me-2">
+                            <Button variant="outline-dark" onClick={() => setRespuestaElegida(respuesta)}className="d-flex flex-wrap ">
+                                <Col xs={12} className="d-flex justify-content-between ps-3 pe-3 pt-2">
+                                    <p className="text-decoration-underline">
+                                        Pregunta {indice + 1}
+                                        
+                                    </p>
+                                    <i className="fa-regular fa-circle-check"></i>
+                                </Col>
+                                <Col xs={12} className="d-flex ps-3 pb-2">
+                                    <p>
+                                        {respuesta.pregunta.texto}
+                                    </p>
+                                </Col>
                             </Button>
                         </Row>
                     
@@ -79,10 +83,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
             <RespuestaView respuesta={respuestaElegida} />
 
 
-            
-
-
-        </div>
+        </Container>
 
     )
 }

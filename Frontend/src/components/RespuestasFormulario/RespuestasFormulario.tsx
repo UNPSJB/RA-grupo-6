@@ -13,12 +13,6 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
     let [indiceRespuestaElegida, setIndiceRespuestaElegida] = useState(0);
 
-    // const [respuestaElegida, setRespuestaElegida] = useState<Respuesta>({
-    //     texto: "",
-    //     opcion: {id: 0, texto:""},
-    //     pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
-    // })
-
     useEffect( () => {
 
         fetch(url_base)
@@ -28,6 +22,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
     
     }, []);
 
+    const numeroPreguntas = respuestasFormulario?.respuestas.length? respuestasFormulario?.respuestas.length : 0;
 
     return(
 
@@ -60,7 +55,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
                 {respuestasFormulario?.respuestas.map((respuesta, indice) =>
                     <>
                         <Row className="mb-3 ms-2 me-2">
-                            <Button variant="outline-dark" className="d-flex flex-wrap " onClick={() => setIndiceRespuestaElegida(indice)}> {/* */}
+                            <Button variant="outline-dark" className="d-flex flex-wrap " onClick={() => setIndiceRespuestaElegida(indice)}> 
                                 <Col xs={12} className="d-flex justify-content-between ps-3 pe-3 pt-2">
                                     <p className="text-decoration-underline">
                                         Pregunta {indice + 1}
@@ -82,11 +77,11 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
             </div>
 
             <div className="border border-dark rounded pb-3 ms-2 me-2">
-                <RespuestaView respuesta={respuestasFormulario?.respuestas? respuestasFormulario?.respuestas[indiceRespuestaElegida] : {
+                <RespuestaView respuesta={respuestasFormulario?.respuestas? respuestasFormulario?.respuestas[indiceRespuestaElegida]  : {
                     texto: "",
                     opcion: {id: 0, texto:""},
                     pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
-                } } />
+                } } numeroPregunta={indiceRespuestaElegida + 1} cantidadPreguntas={numeroPreguntas}/>
                 
                 <Row className="d-flex gap-5">
 

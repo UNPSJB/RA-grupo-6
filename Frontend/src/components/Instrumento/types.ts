@@ -1,4 +1,31 @@
-import type { ReactNode } from "react";
+
+export type TipoInstrumento = 
+  | 'ENCUESTA_ESTUDIANTE' 
+  | 'INFORME_CATEDRA' 
+  | 'INFORME_SINTETICO';
+
+export type InstrumentoBase = {
+  id: number;
+  tipo: TipoInstrumento;
+};
+export type instrumentoList = InstrumentoBase & {
+  fecha_inicio: string;
+  fecha_cierre: string;
+  materia: {
+    id: string;
+    nombre: string;
+  };
+  plantilla_formulario: {
+    id: number;
+    titulo: string;
+  };
+};
+
+export type InstrumentoDetail = InstrumentoBase & {
+  titulo_formulario: string;
+  fecha_completado: string;
+  respuestas: RespuestaDetalle[];
+};
 
 export type RespuestaDetalle = {
   pregunta_texto: string;
@@ -6,15 +33,16 @@ export type RespuestaDetalle = {
   opcion_seleccionada: string | null;
 };
 
-export type InstrumentoList = {
-  fecha_cierre: string | number | Date;
-  tipo: ReactNode;
-  fecha_inicio: string | number | Date;
-  id: number;
-  titulo_formulario: string;
-  fecha_completado: string; 
+
+// tipos para las Estadísticas ---
+
+export type EstadisticaOpcion = {
+  texto_opcion: string;
+  cantidad: number;
 };
 
-export type InstrumentoDetail = InstrumentoList & {
-  respuestas: RespuestaDetalle[];
+export type EstadisticaPregunta = {
+  pregunta_id: number;
+  pregunta_texto: string;
+  opciones: EstadisticaOpcion[];
 };

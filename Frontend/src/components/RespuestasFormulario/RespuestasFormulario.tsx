@@ -4,7 +4,6 @@ import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-boo
 import RespuestaView from "../Respuesta/RespuestaView";
 
 
-
 export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_formulario : number}){
 
     const url_base = `http://127.0.0.1:8000/RespuestasFormulario/${id_respuestas_formulario}`
@@ -50,7 +49,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
             
             <div className="mb-4">
 
-                <h5> <i className="fa-regular fa-comment" ></i> Preguntas</h5>
+                <h5 className="mb-3"> <i className="fa-regular fa-comment" ></i> Preguntas</h5>
 
                 {respuestasFormulario?.respuestas.map((respuesta, indice) =>
                     <>

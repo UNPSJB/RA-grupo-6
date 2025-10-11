@@ -23,6 +23,10 @@ class Pregunta(ModeloBase):
     texto: Mapped[str] = mapped_column(String(250), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False, default="abierta")
 
+    grupo_pregunta_id: Mapped[str] = mapped_column(ForeignKey("grupos_pregunta.letra"))
+
+    grupo_pregunta: Mapped["src.GrupoPregunta.models.GrupoPregunta"] = relationship(back_populates="preguntas")
+
     formularios: Mapped[list["PlantillaFormulario"]] = relationship(
     "PlantillaFormulario",
     secondary="formulario_pregunta",
@@ -41,5 +45,6 @@ class Pregunta(ModeloBase):
         cascade="all, delete-orphan"
     )
 
+    
 
 

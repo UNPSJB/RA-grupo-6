@@ -10,7 +10,6 @@ class MateriaBase(BaseModel):
     id: str
     nombre: str
 
-
 class Materia(MateriaBase):
     model_config = {"from_attributes": True}
     pass

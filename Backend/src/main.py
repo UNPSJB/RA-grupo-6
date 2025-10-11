@@ -63,3 +63,7 @@ app.include_router(roles_router)
 #Route de Usuario
 from src.Usuarios.router import router as usuarios_router
 app.include_router(usuarios_router)
+
+#Route de Grupo de pregunta
+from src.GrupoPregunta.router import router as grupo_pregunta_router
+app.include_router(grupo_pregunta_router)

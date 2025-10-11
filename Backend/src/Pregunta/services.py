@@ -19,11 +19,13 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
     
     # Filtrar ids validos
     opciones_validas = db.query(Opcion).filter(Opcion.id.in_([op for op in pregunta.opciones if op > 0])).all()
-   
+
     if len(opciones_validas) != len(pregunta.opciones):
         raise exceptions.PreguntaSinOpciones("Algunas opciones proporcionadas no son válidas.")
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada")
+
+
+    _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada", grupo_pregunta_id=pregunta.grupo_pregunta_id)
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)

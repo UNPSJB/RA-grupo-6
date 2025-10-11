@@ -6,3 +6,10 @@ export type Pregunta = {
   tipo: string;
   opciones: Opcion[];
 };
+
+export type GrupoPregunta = {
+  id: number;
+  letra: string;
+  titulo: string;
+
+}

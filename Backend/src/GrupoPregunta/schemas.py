@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class GrupoPreguntaBase(BaseModel):
+    id:int
     letra: str
     titulo: str
 

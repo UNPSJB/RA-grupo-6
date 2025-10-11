@@ -7,7 +7,7 @@ router = APIRouter(prefix="/respuestas", tags=["Respuestas"])
 
 #Rutas de Respuestas
 
-@router.post("/respuestas")
+@router.post("/")
 def crear_respuesta(respuesta: schemas.RespuestaCreate, db: Session = Depends(get_db)):
     return services.crear_respuesta(db, respuesta)
 

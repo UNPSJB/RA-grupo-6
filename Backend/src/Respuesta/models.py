@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from typing import List
+from sqlalchemy import  Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from src.Pregunta.models import Pregunta, Opcion
@@ -13,3 +14,6 @@ class Respuesta(ModeloBase):
 
     pregunta: Mapped["Pregunta"] = relationship("Pregunta", back_populates="respuestas")
     opcion: Mapped["Opcion"] = relationship("Opcion")
+
+    formulario_id: Mapped[int] = mapped_column(ForeignKey("respuestas_formulario.id"))
+    formulario: Mapped["src.RespuestasFormulario.models.RespuestasFormulario"] = relationship(back_populates="respuestas")

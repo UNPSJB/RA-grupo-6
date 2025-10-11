@@ -33,7 +33,6 @@ class Pregunta(ModeloBase):
     back_populates="preguntas"
     )
 
-
     opciones: Mapped[list["Opcion"]] = relationship(
         "Opcion",
         secondary=pregunta_opcion,

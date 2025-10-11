@@ -13,16 +13,20 @@ class PreguntaBase(BaseModel):
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo : str = "Abierta"
 
+
 class PreguntaCerradaCreate(PreguntaBase):
     opciones: list[int]  
     tipo :str = "Cerrada"
     grupo_pregunta_id: int
 
+
 class PreguntaUpdate(PreguntaBase):
     pass
 
+
 class PreguntaDelete(BaseModel):
     id: int
+
 
 class Pregunta(PreguntaBase):
     id: int

@@ -14,8 +14,8 @@ def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate)
     return _nueva_pregunta
 
 def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate) -> Pregunta:
-    if len(pregunta.opciones) == 0:
-        raise exceptions.PreguntaSinOpciones()
+    if len(pregunta.opciones) <= 1:
+        raise exceptions.PreguntaSinOpciones("Tiene que tener como minimo 2 opciones")
     
     # Filtrar ids validos
     opciones_validas = db.query(Opcion).filter(Opcion.id.in_([op for op in pregunta.opciones if op > 0])).all()

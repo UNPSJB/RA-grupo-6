@@ -37,7 +37,6 @@ function CrearPlantillaFormulario() {
 
   return (
     <>
-      <Menu></Menu>
       <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
         <Container style={{ maxWidth: "900px" }}>
           <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>

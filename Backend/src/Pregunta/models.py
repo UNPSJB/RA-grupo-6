@@ -23,7 +23,7 @@ class Pregunta(ModeloBase):
     texto: Mapped[str] = mapped_column(String(250), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False, default="abierta")
 
-    grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"))
+    grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"), nullable=True)
 
     grupo_pregunta: Mapped["src.GrupoPregunta.models.GrupoPregunta"] = relationship(back_populates="preguntas")
 

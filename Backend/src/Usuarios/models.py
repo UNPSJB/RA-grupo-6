@@ -1,4 +1,5 @@
-from typing import List, Optional
+from typing import List
+from src.RespuestasFormulario.models import RespuestasFormulario
 from src.models import ModeloBase
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey
@@ -14,5 +15,4 @@ class Usuario(ModeloBase):
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
 
     rol: Mapped["src.Roles.models.Rol"] = relationship("src.Roles.models.Rol", back_populates="usuarios")
-
-    respuestas_formulario: Mapped[Optional[List["src.RespuestasFormulario.models.RespuestasFormulario"]]] = relationship(back_populates='usuario')
+    respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="usuario")

@@ -36,8 +36,6 @@ function VerPregunta(){
     }, []);
     return(
         <>
-        <Menu></Menu>
-
         <div className="container text-start mt-4"></div>
 
         <div className="container">

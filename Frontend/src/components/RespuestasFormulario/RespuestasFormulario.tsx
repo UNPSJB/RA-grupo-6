@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import type {TypeRespuestasFormulario } from "../RespuestasFormulario/RespuestasFormularioTypes";
 import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import RespuestaView from "../Respuesta/RespuestaView";
+import Menu from "../Menu";
 
 
 export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_formulario : number}){
@@ -24,8 +25,10 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
     const numeroPreguntas = respuestasFormulario?.respuestas.length? respuestasFormulario?.respuestas.length : 0;
 
     return(
-
+        <>
+        
         <Container className="pb-5">
+
 
             <ListGroup className="mb-4 pt-4">
                 <h2> Tus respuestas </h2>
@@ -102,6 +105,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
 
         </Container>
+        </>
 
     )
 }

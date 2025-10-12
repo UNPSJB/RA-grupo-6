@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
-from Backend.src.Roles import exceptions
+from src.Roles import exceptions
 from src.Roles.models import Rol
 from src.Roles import schemas
 

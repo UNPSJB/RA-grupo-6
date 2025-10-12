@@ -3,16 +3,19 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
+import { ElegirGrupoPregunta } from '../GrupoPregunta/GrupoPregunta';
 
 type Props = {
-  manejarPestaña: () => void;
-  refrescarPreguntas: () => void;
+    manejarPestaña: () => void;
+    refrescarPreguntas: () => void;
 };
 
 function CrearPreguntaAbierta({ manejarPestaña, refrescarPreguntas}: Props) {
     const [texto, setTexto] = useState('');
     
     const [mensaje, setMensaje] = useState('');
+    const [grupoSeleccionado, setGrupoSeleccionado] = useState(0)
+
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault(); 
@@ -24,10 +27,18 @@ function CrearPreguntaAbierta({ manejarPestaña, refrescarPreguntas}: Props) {
         
         const nuevaPregunta = {
             texto: texto,
-            tipo: "Abierta" 
+            tipo: "Abierta",
+            grupo_pregunta_id: grupoSeleccionado
         };
 
+        if(grupoSeleccionado == 0){
+            alert("Ingrese el grupo al que pertenece la pregunta");
+            return
+        }
+        
         try {
+            
+
             const response = await fetch("http://127.0.0.1:8000/preguntas/abierta", {
                 method: 'POST',
                 headers: {
@@ -55,7 +66,9 @@ function CrearPreguntaAbierta({ manejarPestaña, refrescarPreguntas}: Props) {
     return (
         <>
             <Form onSubmit={handleSubmit}>
+                
                 <IngresarPregunta texto={texto} setTexto={setTexto} />
+                <ElegirGrupoPregunta selectedGrupo={grupoSeleccionado} onChangeGrupo={setGrupoSeleccionado}></ElegirGrupoPregunta>
 
                 <Col className="d-flex justify-content-center">
                 <Button className="mt-3" variant="primary" type="submit" onClick={handleSubmit} size='sm'>

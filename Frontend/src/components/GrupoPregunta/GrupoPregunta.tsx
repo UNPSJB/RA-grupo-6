@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GrupoPregunta } from "../Pregunta/PreguntaTypes";
+import type { GrupoPregunta } from "../types";
 import { Form } from "react-bootstrap";
 
 

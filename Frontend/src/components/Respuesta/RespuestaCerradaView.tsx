@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react"
 import { ListGroup } from "react-bootstrap";
 import Form from "react-bootstrap/Form"
-import type { Pregunta } from "./PreguntaTypes";
-import type {RespuestaCerrada} from "./PreguntaTypes";
+import type { Pregunta } from "../types";
+import type {RespuestaCerrada} from "../types";
 
 function manejarSeleccion(opcion : number, {pregunta_id, respuestas, actualizarRespuestas} : Props ){
 

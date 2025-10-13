@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Pregunta } from "./PreguntaTypes";
-import { EnumTipoPregunta } from "./PreguntaTypes";
+import type { Pregunta } from "../types";
+import { EnumTipoPregunta } from "../types";
 import { Button, Form} from "react-bootstrap";
 import RespuestaCerradaView from "./RespuestaCerradaView";
 
-import type { RespuestaCerrada } from "./PreguntaTypes";
+import type { RespuestaCerrada } from "../types";
 
 // Guardar las respuestas
 const url_envio = "http://127.0.0.1:8000/respuestas/"

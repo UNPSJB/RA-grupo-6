@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
 import ModalExito from "./ModalEnvio";
-import { EnumTipoPregunta } from "./Pregunta/PreguntaTypes";
+import { EnumTipoPregunta } from "./types";
 
 // Usuario temporal
 const USUARIO_ACTUAL = {

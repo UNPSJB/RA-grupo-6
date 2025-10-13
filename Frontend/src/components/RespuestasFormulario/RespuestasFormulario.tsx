@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import type {TypeRespuestasFormulario } from "../RespuestasFormulario/RespuestasFormularioTypes";
+import type {TypeRespuestasFormulario } from "../types"
 import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import RespuestaView from "../Respuesta/RespuestaView";
-import Menu from "../Menu";
+
 
 
 export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_formulario : number}){

@@ -1,4 +1,71 @@
 
+export type Opcion = {
+    id: number;
+    texto: string;
+};
+
+export type Pregunta = {
+    id: number
+    texto: string
+    opciones: Opcion[]
+    tipo: string | null
+}
+
+export const EnumTipoPregunta = Object.freeze({
+    cerrada: "Cerrada",
+    abierta: "Abierta"
+})
+export type TipoPregunta = typeof EnumTipoPregunta[keyof typeof EnumTipoPregunta];
+
+export type GrupoPregunta = {
+    id: number;
+    letra: string;
+    titulo: string;
+}
+export type RespuestaBase = {
+    pregunta_id: number
+}
+
+export type RespuestaCerrada = RespuestaBase & {
+    opcion_id: number
+}
+
+export type RespuestaAbierta = RespuestaBase & {
+    texto: string
+}
+
+export type RespuestaEnvio = RespuestaCerrada | RespuestaAbierta
+export type Respuesta = {
+    texto: string
+    opcion: Opcion
+    pregunta: Pregunta
+}
+
+export type Materia = {
+    nombre: string
+}
+
+export type Rol = {
+    nombre: string
+}
+
+
+export type Usuario = {
+    nombre: string
+    apellido: string
+    legajo: number
+    email: string
+    rol: Rol
+}
+
+
+export type TypeRespuestasFormulario = {
+    materia: Materia
+    usuario: Usuario 
+    fecha_envio: Date
+    respuestas: Respuesta[]
+
+}
 export type TipoInstrumento = 
   | 'ENCUESTA_ESTUDIANTE' 
   | 'INFORME_CATEDRA' 

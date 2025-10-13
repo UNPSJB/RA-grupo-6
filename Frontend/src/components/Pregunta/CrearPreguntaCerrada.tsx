@@ -1,9 +1,9 @@
 import {useState } from "react";
-import type { Opcion } from "../Opcion/OpcionTypes";
+import type { Opcion } from "../types";
 
 import OpcionList from "../Opcion/OpcionList";
 import { Button, Col } from "react-bootstrap";
-import { EnumTipoPregunta } from "./PreguntaTypes";
+import { EnumTipoPregunta } from "../types";
 import IngresarPregunta from "./IngresarPregunta";
 import { ElegirGrupoPregunta } from "../GrupoPregunta/GrupoPregunta";
 

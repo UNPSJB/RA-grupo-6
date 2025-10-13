@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
-import { EnumTipoPregunta } from "./PreguntaTypes";
+import { EnumTipoPregunta } from "../types";
 import { ElegirGrupoPregunta } from '../GrupoPregunta/GrupoPregunta';
 
 type Props = {

@@ -1,7 +1,7 @@
 import CrearPreguntaAbierta from "./CrearPreguntaAbierta";
 import CrearPreguntaCerrada from "./CrearPreguntaCerrada";
-import { EnumTipoPregunta } from "./PreguntaTypes";
-import type { TipoPregunta } from "./PreguntaTypes";
+import { EnumTipoPregunta } from "../types";
+import type { TipoPregunta } from "../types";
 import { useState } from "react";
 import { Form, Modal, Button } from 'react-bootstrap';
 

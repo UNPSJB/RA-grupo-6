@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Opcion } from "./OpcionTypes";
+import type { Opcion } from "../types";
 import CrearOpcion from "./OpcionCreate";
 import { Form, ListGroup} from "react-bootstrap"
 import EliminarOpcion from "./OpcionDelete";

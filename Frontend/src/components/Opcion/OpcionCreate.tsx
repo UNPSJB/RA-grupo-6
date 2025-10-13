@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Opcion } from "./OpcionTypes";
+import type { Opcion } from "../types";
 
 import {Form, Button, InputGroup} from "react-bootstrap";
 

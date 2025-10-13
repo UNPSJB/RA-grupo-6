@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { Opcion } from "../Opcion/OpcionTypes";
+import type { Opcion } from "../types";
 import Card from "react-bootstrap/Card";
 import { Badge, Button } from "react-bootstrap";
 import EliminarPregunta from "./EliminarPregunta";
-import { EnumTipoPregunta } from "./PreguntaTypes";
+import { EnumTipoPregunta } from "../types";
 const url_base = 'http://127.0.0.1:8000/preguntas/';
 
 type Pregunta = {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Card, Badge} from "react-bootstrap";
-import type { Pregunta} from "./PreguntaTypes";
+import type { Pregunta} from "../types";
 import CrearPregunta from "./CrearPregunta";
-import { EnumTipoPregunta } from "./PreguntaTypes";
+import { EnumTipoPregunta } from "../types";
 
 
 type Props = {

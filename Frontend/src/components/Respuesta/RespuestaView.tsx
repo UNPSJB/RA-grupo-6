@@ -1,7 +1,7 @@
-import type { Respuesta } from "../RespuestasFormulario/RespuestasFormularioTypes";
+import type { Respuesta } from "../types";
 import { Badge, Col, Row } from "react-bootstrap";
-import { EnumTipoPregunta } from "./PreguntaTypes";
-import type { Opcion } from "../Opcion/OpcionTypes";
+import { EnumTipoPregunta } from "../types";
+import type { Opcion } from "../types";
 
 type RespuestaViewProps = {
     respuesta: Respuesta,

@@ -37,11 +37,12 @@ function ResponderInstrumento() {
                 const instrumentoResponse = await fetch(`http://127.0.0.1:8000/instrumentos/${instrumentoId}/detail`);
                 if (!instrumentoResponse.ok) throw new Error('No se pudo cargar la encuesta');
                 const instrumentoData = await instrumentoResponse.json();
+                console.log("plantilla_formulario_id:", instrumentoData.plantilla_formulario_id);
                 console.log(instrumentoData)
                 setInstrumento(instrumentoData);
 
                 // Obtener PlantillaFormulario
-                const plantillaResponse = await fetch(`http://127.0.0.1:8000/formularios/${instrumentoData.plantilla_formulario_id}?fomulario_id=${instrumentoData.plantilla_formulario_id}`); //${instrumentoData.plantilla_formulario_id}
+                const plantillaResponse = await fetch(`http://127.0.0.1:8000/formularios/${instrumentoData.plantilla_formulario_id}`); //${instrumentoData.plantilla_formulario_id}
                 if (!plantillaResponse.ok) throw new Error('No se pudo cargar el formulario');
                 const plantillaData = await plantillaResponse.json();
                 setPlantillaFormulario(plantillaData);

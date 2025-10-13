@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
+import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form, CardBody } from 'react-bootstrap';
 
 // Usuario temporal
 const USUARIO_ACTUAL = {
@@ -107,8 +107,6 @@ function ResponderInstrumento() {
                 respuestas: [] // Array vacío - las respuestas se crearán después
             };
 
-            console.log("Creando RespuestasFormulario:", nuevoRespuestasFormulario);
-
             const respuestasFormularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -122,8 +120,6 @@ function ResponderInstrumento() {
 
             const respuestasFormularioCreado = await respuestasFormularioResponse.json();
             const formularioId = respuestasFormularioCreado.id;
-
-            console.log("RespuestasFormulario creado con ID:", formularioId);
 
             // crear cada respuesta individual asociada al formulario
             for (const respuesta of respuestas) {
@@ -201,163 +197,102 @@ function ResponderInstrumento() {
         );
     }
 
-    return (
+       return (
         <>
-            <Container className="mt-4" style={{ maxWidth: '900px' }}>
-                <Card className="border-0 shadow-sm" style={{ borderRadius: "1rem" }}>
-                    <Card.Body className="p-4 p-md-5">
-                        {/* Header */}
-                        <div className="text-center mb-5">
-                            <h1 className="fw-bold mb-3" style={{ fontSize: '2rem' }}>
-                                {plantillaFormulario?.titulo || `Encuesta de ${materiaNombre}`}
-                            </h1>
-                            <p className="text-muted mb-0" style={{ fontSize: '1.1rem' }}>
-                                Complete todas las preguntas para finalizar la encuesta.
-                            </p>
-                        </div>
+            <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
+            <Container style={{ maxWidth: '900px' }}>
+                <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                <div className="text-center mb-3"> {/* mb-5 -> mb-3 */}
+                    <h1 className="fw-bold mb-2" style={{ color: "#1f2937", fontSize: "1.875rem" }}>
+                        {plantillaFormulario?.titulo || `Encuesta de ${materiaNombre}`}
+                    </h1>
+                    <p className="text-muted mb-0">Complete todas las preguntas para finalizar la encuesta.</p> {/* mb-0 para quitar margen inferior */}
+                </div>
 
-                        {/* Mostrando preguntas */}
-                        {plantillaFormulario?.preguntas
-                            ?.sort((a: any, b: any) => a.id - b.id)
-                            ?.map((pregunta: any, index: number) => (
-                            <div key={pregunta.id} className="mb-4">
-                                <Card className="border-0 shadow-sm" style={{ borderRadius: "0.75rem" }}>
-                                    <Card.Body className="p-4">
-                                        <div className="d-flex align-items-start gap-3 mb-4">
-                                            <Badge 
-                                                bg="secondary"
-                                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                                style={{ 
-                                                    width: '40px', 
-                                                    height: '40px', 
-                                                    fontSize: '1rem', 
-                                                    flexShrink: 0 
-                                                }}
-                                            >
-                                                {index + 1}
-                                            </Badge>
-                                            <div className="flex-grow-1">
-                                                <h5 className="fw-semibold mb-2" style={{ fontSize: '1.2rem', lineHeight: '1.4' }}>
-                                                    {pregunta.texto}
-                                                </h5>
-                                                <Badge 
-                                                    bg={pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? 'success' : 'info'} 
-                                                    className="px-2 py-1" 
-                                                    style={{ fontSize: '0.85rem' }}
-                                                >
-                                                    {pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? 'Pregunta Abierta' : 'Pregunta Cerrada'}
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Renderizar respuestas locales*/}
-                                        {pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? (
-                                            <div className="ps-5">
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={5}
-                                                    value={obtenerRespuesta(pregunta.id)?.texto || ''}
-                                                    onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value, undefined)}
-                                                    placeholder="Escriba su respuesta aquí..."
-                                                    className="border-2"
-                                                    style={{
-                                                        borderColor: "#e5e7eb",
-                                                        borderRadius: "0.5rem",
-                                                        fontSize: "1.1rem",
-                                                        padding: "1rem",
-                                                        resize: "vertical",
-                                                        minHeight: "150px"
-                                                    }}
-                                                />
-                                                {!obtenerRespuesta(pregunta.id)?.texto?.trim() && (
-                                                    <Form.Text className="text-danger" style={{ fontSize: '0.9rem' }}>
-                                                        * Esta pregunta es obligatoria
-                                                    </Form.Text>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="ps-5">
-                                                {pregunta.opciones?.map((opcion: any) => (
-                                                    <div key={opcion.id} className="mb-3">
-                                                        <Form.Check
-                                                            type="radio"
-                                                            name={`pregunta-${pregunta.id}`}
-                                                            id={`opcion-${opcion.id}`}
-                                                            label={opcion.texto}
-                                                            checked={obtenerRespuesta(pregunta.id)?.opcion_id === opcion.id}
-                                                            onChange={() => actualizarRespuesta(pregunta.id, undefined, opcion.id)}
-                                                            style={{ fontSize: '1.1rem' }}
-                                                        />
-                                                    </div>
-                                                ))}
-                                                {!obtenerRespuesta(pregunta.id)?.opcion_id && (
-                                                    <Form.Text className="text-danger" style={{ fontSize: '0.9rem' }}>
-                                                        * Esta pregunta es obligatoria
-                                                    </Form.Text>
-                                                )}
-                                            </div>
-                                        )}
-                                    </Card.Body>
-                                </Card>
-                            </div>
-                        ))}
+                <Card.Body className="p-3 p-md-4"> {/* p-4 p-md-5 -> p-3 p-md-4 */}
+                    {plantillaFormulario?.preguntas?.map((pregunta: any, idx: number) => (
+                        <Card key={pregunta.id} className="border-0 shadow-sm w-100 mb-3" style={{ borderRadius: "1rem" }}>
+                            <Card.Body className="p-3"> {/* p-4 p-md-5 -> p-3 */}
+                                <div className="mb-2 d-flex align-items-center gap-3"> {/* mb-3 -> mb-2 */}
+                                    <Badge
+                                        bg="secondary"
+                                        className="rounded-circle"
+                                        style={{ width: '35px', height: '35px', fontSize: '1rem', display:'flex', alignItems:'center', justifyContent:'center' }}
+                                    >
+                                        {idx + 1}
+                                    </Badge>
+                                    <div>
+                                        <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
+                                        <Badge bg={pregunta.tipo.toLowerCase() === 'abierta' ? 'success' : 'info'}>
+                                            {pregunta.tipo === 'Abierta' ? 'Abierta' : 'Cerrada'}
+                                        </Badge>
+                                    </div>
+                                </div>
 
-                        {/* Estado de completado */}
-                        {todasRespondidas && (
-                            <Alert variant="success" className="text-center" style={{ fontSize: '1.1rem' }}>
-                                <i className="fas fa-check-circle me-2"></i>
-                                Listo para enviar tus respuestas.
-                            </Alert>
-                        )}
+                                {pregunta.tipo.toLowerCase() === 'abierta' ? (
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={4}
+                                        value={obtenerRespuesta(pregunta.id)?.texto || ''}
+                                        onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value)}
+                                        placeholder="Escriba su respuesta..."
+                                        className="input-pregunta"
+                                        style={{ marginBottom: '0.5rem' }} // un poquito de espacio abajo
+                                    />
+                                ) : (
+                                    <Form.Group>
+                                        {pregunta.opciones?.map((opcion: any) => (
+                                            <Form.Check
+                                                key={opcion.id}
+                                                type="radio"
+                                                name={`pregunta-${pregunta.id}`}
+                                                label={opcion.texto}
+                                                checked={obtenerRespuesta(pregunta.id)?.opcion_id === opcion.id}
+                                                onChange={() => actualizarRespuesta(pregunta.id, undefined, opcion.id)}
+                                                className="mb-2"
+                                            />
+                                        ))}
+                                    </Form.Group>
+                                )}
 
-                        {/* Mensaje si faltan respuestas */}
-                        {!todasRespondidas && (
-                            <Alert variant="warning" className="mt-3" style={{ fontSize: '1.1rem' }}>
-                                <i className="fas fa-exclamation-triangle me-2"></i>
-                                Por favor, responde todas las preguntas antes de enviar la encuesta.
-                            </Alert>
-                        )}
+                                {!obtenerRespuesta(pregunta.id)?.texto?.trim() && pregunta.tipo.toLowerCase() === 'abierta' && (
+                                    <Form.Text className="text-danger">* Esta pregunta es obligatoria</Form.Text>
+                                )}
+                                {!obtenerRespuesta(pregunta.id)?.opcion_id && pregunta.tipo.toLowerCase() !== 'abierta' && (
+                                    <Form.Text className="text-danger">* Esta pregunta es obligatoria</Form.Text>
+                                )}
+                            </Card.Body>
+                        </Card>
+                    ))}
 
-                        {/* Botones */}
-                        <Row className="mt-5">
-                            <Col md={6}>
-                                <Button 
-                                    variant="outline-secondary" 
-                                    onClick={() => navigate('/seleccionar-materia')}
-                                    className="w-100 py-3"
-                                    style={{ fontSize: '1.1rem' }}
-                                >
-                                    <i className="fas fa-arrow-left me-2"></i>
-                                    Volver a Materias
-                                </Button>
-                            </Col>
-                            <Col md={6}>
-                                <Button 
-                                    variant="success"
-                                    disabled={!todasRespondidas || enviando}
-                                    onClick={enviarRespuestas}
-                                    className="w-100 py-3"
-                                    style={{ fontSize: '1.1rem' }}
-                                >
-                                    {enviando ? (
-                                        <>
-                                            <div className="spinner-border spinner-border-sm me-2" role="status">
-                                                <span className="visually-hidden">Enviando...</span>
-                                            </div>
-                                            Enviando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <i className="fas fa-paper-plane me-2"></i>
-                                            Enviar Formulario
-                                        </>
-                                    )}
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Card.Body>
-                </Card>
+                    {todasRespondidas ? (
+                        <Alert variant="success" className="text-center mt-3">¡Listo para enviar tus respuestas!</Alert>
+                    ) : (
+                        <Alert variant="warning" className="text-center mt-3">Por favor, responde todas las preguntas antes de enviar.</Alert>
+                    )}
+
+                    <Row className="mt-4">
+                        <Col md={6} className="mb-2">
+                            <Button variant="outline-secondary" className="w-100" onClick={() => navigate('/seleccionar-materia')}>
+                                Volver a Materias
+                            </Button>
+                        </Col>
+                        <Col md={6}>
+                            <Button
+                                variant="success"
+                                className="w-100"
+                                disabled={!todasRespondidas || enviando}
+                                onClick={enviarRespuestas}
+                            >
+                                {enviando ? 'Enviando...' : 'Enviar Formulario'}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
             </Container>
+        </div>
+
         </>
     );
 }

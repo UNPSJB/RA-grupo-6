@@ -9,19 +9,19 @@ export type Respuesta = {
 }
 
 export type Materia = {
-    nombre: String
+    nombre: string
 }
 
 export type Rol = {
-    nombre: String
+    nombre: string
 }
 
 
 export type Usuario = {
-    nombre: String
-    apellido: String
+    nombre: string
+    apellido: string
     legajo: number
-    email: String
+    email: string
     rol: Rol
 }
 

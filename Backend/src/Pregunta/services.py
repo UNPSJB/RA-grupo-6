@@ -1,12 +1,12 @@
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import delete, select, update
-from src.Pregunta.models import Pregunta, Opcion
+from src.Pregunta.models import Pregunta, Opcion, EnumTipoPregunta
 from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo="Abierta", grupo_pregunta_id = pregunta.grupo_pregunta_id)
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id)
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -25,7 +25,7 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
 
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo="Cerrada", grupo_pregunta_id=pregunta.grupo_pregunta_id)
+    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id)
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)

@@ -24,7 +24,8 @@ function Menu(){
                     <Nav>
                         <Nav.Link href='/'> <i className="fa-solid fa-house"></i> Volver al inicio </Nav.Link>
                         <Nav.Link href="/VerPregunta">Ver preguntas</Nav.Link>
-                        <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>    
+                        <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>  
+                        <Nav.Link href="/respuestaFormulario">Ver respuestas del formulario</Nav.Link>  
                         <Nav.Link href="/VerInformesSinteticos">Informes sintéticos</Nav.Link>  
                         <Nav.Link href="/VerEncuestasEstudiante">Encuestas de estudiante</Nav.Link>  
                     </Nav>

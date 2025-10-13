@@ -24,4 +24,4 @@ class RespuestasFormulario(ModeloBase):
     respuestas: Mapped[List["Respuesta"]] = relationship(back_populates="formulario")
 
     # TODO: Recordar borrar esta columna y hacer la migración en la base de datos
-    materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
+    materia_id: Mapped[int] = mapped_column(ForeignKey("materia.id"), nullable=False)

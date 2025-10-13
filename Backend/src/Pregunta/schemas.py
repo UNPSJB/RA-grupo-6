@@ -2,23 +2,23 @@ from click import Option
 from pydantic import BaseModel
 from typing import List, Optional
 from src.Opciones.schemas import Opcion
-
+from .models import EnumTipoPregunta 
 
 class PreguntaBase(BaseModel):
     texto: str
-    tipo: Optional[str] = None  # abierta, cerrada
+    tipo: Optional[EnumTipoPregunta] = None
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
 
 
 
 class PreguntaAbiertaCreate(PreguntaBase):
-    tipo : str = "Abierta"
+    tipo :EnumTipoPregunta = EnumTipoPregunta.abierta
 
 
 class PreguntaCerradaCreate(PreguntaBase):
     opciones: list[int]  
-    tipo :str = "Cerrada"
+    tipo : EnumTipoPregunta = EnumTipoPregunta.cerrada
 
 
 class PreguntaUpdate(PreguntaBase):

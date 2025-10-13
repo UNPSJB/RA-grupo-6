@@ -1,5 +1,6 @@
 from __future__ import annotations 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+import enum
+from sqlalchemy import Enum,Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from src.Opciones.models import Opcion
@@ -9,7 +10,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  
     from src.PlantillaFormulario.models import PlantillaFormulario
     from src.Respuesta.models import Respuesta
-    
+
+class EnumTipoPregunta(str, enum.Enum):
+    abierta = "abierta"
+    cerrada = "cerrada"
+
 pregunta_opcion = Table(
     'pregunta_opcion',
     ModeloBase.metadata,
@@ -21,7 +26,11 @@ class Pregunta(ModeloBase):
     __tablename__ = "preguntas"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     texto: Mapped[str] = mapped_column(String(250), nullable=False)
-    tipo: Mapped[str] = mapped_column(String(50), nullable=False, default="abierta")
+    tipo: Mapped[EnumTipoPregunta] = mapped_column(
+        Enum(EnumTipoPregunta),  
+        nullable=False,
+        default=EnumTipoPregunta.abierta
+    )
 
     grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"), nullable=True)
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
 import ModalExito from "./ModalEnvio";
+import { EnumTipoPregunta } from "./Pregunta/PreguntaTypes";
 
 // Usuario temporal
 const USUARIO_ACTUAL = {
@@ -99,6 +100,7 @@ function ResponderInstrumento() {
     const enviarRespuestas = (): Promise<boolean> => {
     setEnviando(true);
 
+
     return fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -106,17 +108,19 @@ function ResponderInstrumento() {
             materia_id: instrumento.materia.id,
             usuario_id: USUARIO_ACTUAL.id,
             instrumento_id: parseInt(instrumentoId!),
-            fecha_envio: new Date().toISOString().split('T')[0],
-            respuestas: []
+            fecha_envio: new Date().toISOString().split('T')[0]
+            // NO incluir 'respuestas' aquí
         })
     })
     .then(res => {
         if (!res.ok) throw new Error("Error al crear el formulario");
         return res.json();
     })
-    .then(formularioCreado => {
-        respuestas.forEach(respuesta => {
-            if (respuesta.texto?.trim() || respuesta.opcion_id) {
+    .then(async formularioCreado => {
+        // PASO 2: Crear cada respuesta individualmente
+        const promesasRespuestas = respuestas
+            .filter(respuesta => respuesta.texto?.trim() || respuesta.opcion_id)
+            .map(respuesta => 
                 fetch("http://127.0.0.1:8000/respuestas/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -126,17 +130,19 @@ function ResponderInstrumento() {
                         opcion_id: respuesta.opcion_id || null,
                         formulario_id: formularioCreado.id,
                     }),
-                });
-            }
-        });
+                })
+            );
+        
+        await Promise.all(promesasRespuestas);
         return true; 
     })
     .catch(err => {
         console.error(err);
+        alert("Error al enviar las respuestas: " + err.message);
         return false; 
     })
     .finally(() => setEnviando(false));
-    };
+};
 
     // Verificar preguntas respondidas
     const todasRespondidas = respuestas.every(respuesta => 
@@ -205,13 +211,13 @@ function ResponderInstrumento() {
                                     </Badge>
                                     <div>
                                         <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
-                                        <Badge bg={pregunta.tipo.toLowerCase() === 'abierta' ? 'success' : 'info'}>
-                                            {pregunta.tipo === 'Abierta' ? 'Abierta' : 'Cerrada'}
+                                        <Badge bg={pregunta.tipo.toLowerCase() === EnumTipoPregunta.abierta ? 'success' : 'info'}>
+                                            {pregunta.tipo === EnumTipoPregunta.abierta ? EnumTipoPregunta.abierta : EnumTipoPregunta.cerrada}
                                         </Badge>
                                     </div>
                                 </div>
 
-                                {pregunta.tipo.toLowerCase() === 'abierta' ? (
+                                {pregunta.tipo.toLowerCase() === EnumTipoPregunta.abierta.toLowerCase()  ? (
                                     <Form.Control
                                         as="textarea"
                                         rows={4}
@@ -237,10 +243,10 @@ function ResponderInstrumento() {
                                     </Form.Group>
                                 )}
 
-                                {!obtenerRespuesta(pregunta.id)?.texto?.trim() && pregunta.tipo.toLowerCase() === 'abierta' && (
+                                {!obtenerRespuesta(pregunta.id)?.texto?.trim() && pregunta.tipo.toLowerCase() === EnumTipoPregunta.abierta && (
                                     <Form.Text className="text-danger">* Esta pregunta es obligatoria</Form.Text>
                                 )}
-                                {!obtenerRespuesta(pregunta.id)?.opcion_id && pregunta.tipo.toLowerCase() !== 'abierta' && (
+                                {!obtenerRespuesta(pregunta.id)?.opcion_id && pregunta.tipo.toLowerCase() !== EnumTipoPregunta.abierta && (
                                     <Form.Text className="text-danger">* Esta pregunta es obligatoria</Form.Text>
                                 )}
                             </Card.Body>

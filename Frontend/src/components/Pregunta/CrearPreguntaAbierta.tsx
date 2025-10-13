@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
+import { EnumTipoPregunta } from "./PreguntaTypes";
 import { ElegirGrupoPregunta } from '../GrupoPregunta/GrupoPregunta';
 
 type Props = {
@@ -27,7 +28,7 @@ function CrearPreguntaAbierta({ manejarPestaña, refrescarPreguntas}: Props) {
         
         const nuevaPregunta = {
             texto: texto,
-            tipo: "Abierta",
+            tipo: EnumTipoPregunta.abierta,
             grupo_pregunta_id: grupoSeleccionado
         };
 

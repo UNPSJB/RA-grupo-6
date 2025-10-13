@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Form, Button, Card, Badge} from "react-bootstrap";
 import type { Pregunta} from "./PreguntaTypes";
 import CrearPregunta from "./CrearPregunta";
+import { EnumTipoPregunta } from "./PreguntaTypes";
+
 
 type Props = {
   preguntasSeleccionadas: Pregunta[];
@@ -90,7 +92,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
                       </Badge>
 
                       <Badge
-                        bg={pregunta.tipo === "Cerrada" ? "secondary" : "success"}
+                        bg={pregunta.tipo === EnumTipoPregunta.cerrada? "secondary" : "success"}
                         className="px-2 py-1"
                         style={{ fontSize: "0.7rem", fontWeight: "500" }}
                       >
@@ -116,7 +118,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
                     {pregunta.texto}
                   </p>
 
-                  {pregunta.tipo === "Cerrada" && pregunta.opciones.length > 0 && (
+                  {pregunta.tipo === EnumTipoPregunta.cerrada && pregunta.opciones.length > 0 && (
                     <div className="d-flex gap-2 flex-wrap mt-2">
                       {pregunta.opciones.map((op) => (
                         <span

@@ -1,11 +1,12 @@
+from typing import Optional
 from pydantic import BaseModel
 
 from src.Opciones.schemas import Opcion
 from src.Pregunta.schemas import Pregunta
 
 class RespuestaBase(BaseModel):
-    texto: str | None = None  # para respuestas abiertas
-    opcion_id: int | None = None  # para respuestas cerradas
+    texto: str | None = None  
+    opcion_id: int | None = None  
     pregunta_id: int
     formulario_id: int
 
@@ -20,6 +21,8 @@ class RespuestaDelete(BaseModel):
 
 class Respuesta(RespuestaBase):
     id: int
+    pregunta: Pregunta
+    opcion: Optional[Opcion] = None 
 
     model_config = {
         "from_attributes": True

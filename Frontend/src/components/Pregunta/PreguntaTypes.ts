@@ -13,3 +13,9 @@ export type GrupoPregunta = {
   titulo: string;
 
 }
+
+export const EnumTipoPregunta = Object.freeze({
+    cerrada: "Cerrada",
+    abierta: "Abierta"
+})
+export type TipoPregunta = typeof EnumTipoPregunta[keyof typeof EnumTipoPregunta];

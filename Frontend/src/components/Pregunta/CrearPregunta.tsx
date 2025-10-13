@@ -1,7 +1,9 @@
 import CrearPreguntaAbierta from "./CrearPreguntaAbierta";
 import CrearPreguntaCerrada from "./CrearPreguntaCerrada";
+import { EnumTipoPregunta } from "./PreguntaTypes";
+import type { TipoPregunta } from "./PreguntaTypes";
 import { useState } from "react";
-import { Form, Modal, Button} from 'react-bootstrap'
+import { Form, Modal, Button } from 'react-bootstrap';
 
 type Props = {
     mostrar: boolean;
@@ -9,14 +11,14 @@ type Props = {
     refrescarPreguntas: () => void;
 };
 
-import "./pregunta.css"
+import "./pregunta.css";
 
-function CrearPregunta({mostrar, manejarPestaña, refrescarPreguntas}: Props){
-    const [tipoPregunta, setTipoPregunta] = useState<"Abierta" | "Cerrada">("Abierta");
+function CrearPregunta({ mostrar, manejarPestaña, refrescarPreguntas }: Props) {
+    const [tipoPregunta, setTipoPregunta] = useState<TipoPregunta>(EnumTipoPregunta.abierta);
 
-    return(
+    return (
         <Modal show={mostrar} onHide={manejarPestaña} size="lg" centered>
-            <Modal.Header closeButton className="border-bottom" style={{padding: "1.5rem"}}>
+            <Modal.Header closeButton className="border-bottom" style={{ padding: "1.5rem" }}>
                 <Modal.Title className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </Modal.Title>
             </Modal.Header>
             <Modal.Body className="px-4 py-4">
@@ -31,32 +33,32 @@ function CrearPregunta({mostrar, manejarPestaña, refrescarPreguntas}: Props){
                         
                         <div className="d-flex justify-content-center align-items-center gap-3">
                             <Button
-                                variant={tipoPregunta === "Abierta" ? "success" : "light"}
+                                variant={tipoPregunta === EnumTipoPregunta.abierta ? "success" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
-                                    tipoPregunta === "Abierta" ? "shadow-sm" : ""
+                                    tipoPregunta === EnumTipoPregunta.abierta ? "shadow-sm" : ""
                                 }`}
                                 style={{
-                                    border: tipoPregunta === "Abierta" ? "none" : "2px solid #e5e7eb",
+                                    border: tipoPregunta === EnumTipoPregunta.abierta ? "none" : "2px solid #e5e7eb",
                                     borderRadius: "0.5rem",
                                     fontSize: "0.875rem"
                                 }}
-                                onClick={() => setTipoPregunta("Abierta")}
+                                onClick={() => setTipoPregunta(EnumTipoPregunta.abierta)}
                             >
                                 <i className="fa-solid fa-align-left"></i>
                                 Abierta
                             </Button>
 
                             <Button
-                                variant={tipoPregunta === "Cerrada" ? "primary" : "light"}
+                                variant={tipoPregunta === EnumTipoPregunta.cerrada ? "primary" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
-                                    tipoPregunta === "Cerrada" ? "shadow-sm" : ""
+                                    tipoPregunta === EnumTipoPregunta.cerrada ? "shadow-sm" : ""
                                 }`}
                                 style={{
-                                    border: tipoPregunta === "Cerrada" ? "none" : "2px solid #e5e7eb",
+                                    border: tipoPregunta === EnumTipoPregunta.cerrada ? "none" : "2px solid #e5e7eb",
                                     borderRadius: "0.5rem",
                                     fontSize: "0.875rem"
                                 }}
-                                onClick={() => setTipoPregunta("Cerrada")}
+                                onClick={() => setTipoPregunta(EnumTipoPregunta.cerrada)}
                             >
                                 <i className="fa-solid fa-list-check"></i>
                                 Cerrada
@@ -64,7 +66,7 @@ function CrearPregunta({mostrar, manejarPestaña, refrescarPreguntas}: Props){
                         </div>
                     </div>
 
-                    {tipoPregunta === "Abierta" ? (
+                    {tipoPregunta === EnumTipoPregunta.abierta ? (
                         <CrearPreguntaAbierta
                             manejarPestaña={manejarPestaña}
                             refrescarPreguntas={refrescarPreguntas}
@@ -78,13 +80,12 @@ function CrearPregunta({mostrar, manejarPestaña, refrescarPreguntas}: Props){
                 </Form>
             </Modal.Body>
             <Modal.Footer className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
-                <Button variant="outline-secondary" onClick={manejarPestaña} >
+                <Button variant="outline-secondary" onClick={manejarPestaña}>
                     Cerrar
                 </Button>
             </Modal.Footer>
         </Modal>
     );
-
-};
+}
 
 export default CrearPregunta;

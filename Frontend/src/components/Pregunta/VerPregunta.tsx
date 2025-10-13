@@ -3,7 +3,7 @@ import type { Opcion } from "../Opcion/OpcionTypes";
 import Card from "react-bootstrap/Card";
 import { Badge, Button } from "react-bootstrap";
 import EliminarPregunta from "./EliminarPregunta";
-
+import { EnumTipoPregunta } from "./PreguntaTypes";
 const url_base = 'http://127.0.0.1:8000/preguntas/';
 
 type Pregunta = {
@@ -77,7 +77,7 @@ function VerPregunta() {
 
                                 <Card.Subtitle className="d-flex">{pregunta.texto}</Card.Subtitle>
 
-                                {pregunta.tipo.toLowerCase() === "cerrada" &&
+                                {pregunta.tipo.toLowerCase() === EnumTipoPregunta.cerrada &&
                                     <Card.Text className="d-flex gap-2 flex-wrap">
                                         {pregunta.opciones.map((op) => (
                                             <span className="border rounded-3 p-2 d-inline-flex justify-content-center align-items-center" key={op.id}>

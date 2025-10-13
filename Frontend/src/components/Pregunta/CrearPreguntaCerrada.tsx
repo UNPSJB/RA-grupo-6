@@ -3,7 +3,7 @@ import type { Opcion } from "../Opcion/OpcionTypes";
 
 import OpcionList from "../Opcion/OpcionList";
 import { Button, Col } from "react-bootstrap";
-
+import { EnumTipoPregunta } from "./PreguntaTypes";
 import IngresarPregunta from "./IngresarPregunta";
 import { ElegirGrupoPregunta } from "../GrupoPregunta/GrupoPregunta";
 
@@ -41,7 +41,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
     const nuevaPregunta: PreguntaCerrada = {
       texto: texto,
       opciones: seleccionadas,
-      tipo: "Cerrada",
+      tipo: EnumTipoPregunta.cerrada,
       grupo_pregunta_id: grupoSeleccionado,
     };
 

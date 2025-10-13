@@ -3,7 +3,6 @@ import { Form, Button, Container, Card } from "react-bootstrap";
 import ElegirRol from "../Rol/ElegirRol";
 import ElegirPregunta from "../Pregunta/ElegirPregunta";
 import type { Pregunta } from "../Pregunta/PreguntaTypes";
-import Menu from "../Menu";
 
 type Formulario = {
   titulo: string;

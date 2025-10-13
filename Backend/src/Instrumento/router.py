@@ -59,5 +59,6 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         fecha_completado=respuestas_form.fecha_envio,
         plantilla_formulario_id=instrumento.plantilla_formulario_id, 
         respuestas=respuestas_procesadas,
-        plantilla_formulario=instrumento.plantilla_formulario
+        plantilla_formulario=instrumento.plantilla_formulario,
+        materia=instrumento.materia
     )

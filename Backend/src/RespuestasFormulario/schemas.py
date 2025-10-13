@@ -7,8 +7,9 @@ from src.materias.schemas import Materia
 from src.Respuesta.schemas import Respuesta
 
 class RespuestasFormularioBase(BaseModel):
-    materia: Materia
-    usuario: Usuario
+    materia_id: str
+    usuario_id: int
+    instrumento_id: int
     fecha_envio: date
     respuestas: List[Respuesta]
 

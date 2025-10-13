@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Badge, Spinner, Row, Col } from 'react-bootstrap';
-import ResponderPreguntaAbierta from './Respuesta/ResponderPreguntaAbierta';
+import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
 
-// Usuario temporal, requeire aunteticacion?
+// Usuario temporal, requiere autenticación?
 const USUARIO_ACTUAL = {
     id: 1,
     nombre: "Alumno",
     apellido: "Demo"
 };
+
+// Tipo para las respuestas temporales
+interface RespuestaTemporal {
+    pregunta_id: number;
+    texto?: string;
+    opcion_id?: number;
+    formulario_id: number;
+}
 
 function ResponderInstrumento() {
     const { instrumentoId } = useParams();
@@ -19,8 +26,10 @@ function ResponderInstrumento() {
     const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState('');
-    const [respuestasFormularioId, setRespuestasFormularioId] = useState<number | null>(null);
-    const [respuestasEnviadas, setRespuestasEnviadas] = useState<number[]>([]);
+    const [enviando, setEnviando] = useState(false);
+    
+    // useState para respuestas temporales
+    const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
 
     const materiaNombre = location.state?.materiaNombre;
 
@@ -37,36 +46,28 @@ function ResponderInstrumento() {
                 const instrumentoResponse = await fetch(`http://127.0.0.1:8000/instrumentos/${instrumentoId}/detail`);
                 if (!instrumentoResponse.ok) throw new Error('No se pudo cargar la encuesta');
                 const instrumentoData = await instrumentoResponse.json();
+                setInstrumento(instrumentoData);
+
+
                 console.log("plantilla_formulario_id:", instrumentoData.plantilla_formulario_id);
                 console.log(instrumentoData)
+                console.log("Instrumento cargado:", instrumentoData);
                 setInstrumento(instrumentoData);
 
                 // Obtener PlantillaFormulario
-                const plantillaResponse = await fetch(`http://127.0.0.1:8000/formularios/${instrumentoData.plantilla_formulario_id}`); //${instrumentoData.plantilla_formulario_id}
+                const plantillaResponse = await fetch(`http://127.0.0.1:8000/formularios/${instrumentoData.plantilla_formulario_id}`);
                 if (!plantillaResponse.ok) throw new Error('No se pudo cargar el formulario');
                 const plantillaData = await plantillaResponse.json();
                 setPlantillaFormulario(plantillaData);
 
-                // Crear RespuestasFormulario
-                const nuevoFormulario = {
-                    materia_id: instrumentoData.materia_id,
-                    usuario_id: USUARIO_ACTUAL.id,
-                    instrumento_id: parseInt(instrumentoId),
-                    fecha_envio: new Date().toISOString().split('T')[0]
-                };
-
-                const formularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoFormulario)
-                });
-
-                if (formularioResponse.ok) {
-                    const formularioCreado = await formularioResponse.json();
-                    setRespuestasFormularioId(formularioCreado.id);
-                } else {
-                    throw new Error('Error al crear RespuestasFormulario');
-                }
+                // Inicializar array de respuestas vacías
+                const respuestasIniciales = plantillaData.preguntas.map((pregunta: any) => ({
+                    pregunta_id: pregunta.id,
+                    texto: '',
+                    opcion_id: undefined,
+                    formulario_id: instrumentoData.plantilla_formulario_id
+                }));
+                setRespuestas(respuestasIniciales);
 
                 setCargando(false);
             } catch (err: any) {
@@ -78,11 +79,101 @@ function ResponderInstrumento() {
         cargarDatos();
     }, [instrumentoId]);
 
-    const manejarRespuestaEnviada = (preguntaId: number) => {
-        setRespuestasEnviadas(prev => [...prev, preguntaId]);
+    const actualizarRespuesta = (preguntaId: number, nuevoTexto?: string, nuevaOpcionId?: number) => {
+        const respuestasActualizadas = [...respuestas]; // Creo copia del array
+
+        for (let i = 0; i < respuestasActualizadas.length; i++) { // Busco respuesta a actualizar
+
+            if (respuestasActualizadas[i].pregunta_id === preguntaId) {
+                if (nuevoTexto !== undefined) { // Para preg abierta
+                    respuestasActualizadas[i] = {
+                        ...respuestasActualizadas[i],
+                        texto: nuevoTexto,
+                        opcion_id: undefined,
+                    };
+                } else if (nuevaOpcionId !== undefined) { // Para preg cerrada
+                    respuestasActualizadas[i] = {
+                        ...respuestasActualizadas[i],
+                        opcion_id: nuevaOpcionId,
+                        texto: ''
+                    };
+                }
+
+                break;
+            }
+        }
+        
+        // Actualizo estado con respuestasActualizadas
+        setRespuestas(respuestasActualizadas);
     };
 
-    const todasRespondidas = plantillaFormulario?.preguntas?.length === respuestasEnviadas.length;
+    const enviarRespuestas = async () => {
+        setEnviando(true);
+        try {
+
+            // Eviar respuestas
+            for (const respuesta of respuestas) {
+                if (respuesta.texto?.trim() || respuesta.opcion_id) { // Verificar respuestas no vacías
+                    const payload = {
+                        ...respuesta,
+                    };
+
+                    const response = await fetch('http://127.0.0.1:8000/respuestas/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`Error en pregunta ${respuesta.pregunta_id}`);
+                }
+            }
+
+            const respuestasPivot = respuestas
+                .filter(r => r.texto?.trim() || r.opcion_id)
+                .map(({ pregunta_id, texto, opcion_id, formulario_id }) => ({
+                    pregunta_id,
+                    texto: texto?.trim() || null,
+                    opcion_id: opcion_id ?? null,
+                    formulario_id
+                }));
+
+
+            // Crear RespuestasFormulario
+            const nuevoRespuestasFormulario = {
+                materia_id: 'IF001',
+                usuario_id: USUARIO_ACTUAL.id,
+                instrumento_id: parseInt(instrumentoId!),
+                fecha_envio: new Date().toISOString().split('T')[0],
+                respuestas: respuestasPivot
+            };
+
+            const respuestasFormularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevoRespuestasFormulario)
+            });
+
+            if (!respuestasFormularioResponse.ok) throw new Error('Error al crear el RespuestasFormulario');
+
+            alert('¡Encuesta completada exitosamente!');
+            navigate('/seleccionar-materia');
+            
+        } catch (err: any) {
+            setError('Error al enviar las respuestas: ' + err.message);
+        } finally {
+            setEnviando(false);
+        }
+    };
+
+    // Verificar preguntas respondidas
+    const todasRespondidas = respuestas.every(respuesta => 
+        respuesta.texto?.trim() || respuesta.opcion_id
+    );
+
+    // Obtener respuesta para verificar estado
+    const obtenerRespuesta = (preguntaId: number) => {
+        return respuestas.find(r => r.pregunta_id === preguntaId);
+    };
         
     if (cargando) {
         return (
@@ -117,98 +208,129 @@ function ResponderInstrumento() {
 
     return (
         <>
-            <Container className="mt-4">
+            <Container className="mt-4" style={{ maxWidth: '900px' }}>
                 <Card className="border-0 shadow-sm" style={{ borderRadius: "1rem" }}>
                     <Card.Body className="p-4 p-md-5">
                         {/* Header */}
                         <div className="text-center mb-5">
-                            <h1 className="fw-bold mb-3">
+                            <h1 className="fw-bold mb-3" style={{ fontSize: '2rem' }}>
                                 {plantillaFormulario?.titulo || `Encuesta de ${materiaNombre}`}
                             </h1>
-                            <Badge bg="primary" className="px-3 py-2 mb-3">
-                                {respuestasEnviadas.length} de {plantillaFormulario?.preguntas?.length || 0} respondidas
-                            </Badge>
-                            <p className="text-muted mb-0">
-                                Complete todas las preguntas para finalizar la encuesta
+                            <p className="text-muted mb-0" style={{ fontSize: '1.1rem' }}>
+                                Complete todas las preguntas para finalizar la encuesta.
                             </p>
                         </div>
 
-                        {/* Barra de progreso */}
-                        {plantillaFormulario?.preguntas && (
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between text-muted small mb-2">
-                                    <span>Progreso</span>
-                                    <span>{Math.round((respuestasEnviadas.length / plantillaFormulario.preguntas.length) * 100)}%</span>
-                                </div>
-                                <div className="progress" style={{ height: '8px' }}>
-                                    <div 
-                                        className="progress-bar bg-success" 
-                                        style={{ width: `${(respuestasEnviadas.length / plantillaFormulario.preguntas.length) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Información del formulario */}
-                        {!respuestasFormularioId && (
-                            <Alert variant="warning" className="mb-4">
-                                <i className="fas fa-exclamation-triangle me-2"></i>
-                                Inicializando encuesta...
-                            </Alert>
-                        )}
-
-                        {/* Preguntas */}
-                        {plantillaFormulario?.preguntas?.map((pregunta: any, index: number) => (
+                        {/* Mostrando preguntas */}
+                        {plantillaFormulario?.preguntas
+                            ?.sort((a: any, b: any) => a.id - b.id) // Ordenar por ID
+                            ?.map((pregunta: any, index: number) => (
                             <div key={pregunta.id} className="mb-4">
-                                {pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? (
-                                    <ResponderPreguntaAbierta
-                                        pregunta={pregunta}
-                                        formularioId={respuestasFormularioId}
-                                        onRespuestaEnviada={() => manejarRespuestaEnviada(pregunta.id)}
-                                    />
-                                ) : (
-                                    <Card className="border-0 shadow-sm">
-                                        <Card.Body className="p-4">
-                                            <div className="d-flex align-items-start gap-3 mb-3">
+                                <Card className="border-0 shadow-sm" style={{ borderRadius: "0.75rem" }}>
+                                    <Card.Body className="p-4">
+                                        <div className="d-flex align-items-start gap-3 mb-4">
+                                            <Badge 
+                                                bg="secondary"
+                                                className="rounded-circle d-flex align-items-center justify-content-center"
+                                                style={{ 
+                                                    width: '40px', 
+                                                    height: '40px', 
+                                                    fontSize: '1rem', 
+                                                    flexShrink: 0 
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </Badge>
+                                            <div className="flex-grow-1">
+                                                <h5 className="fw-semibold mb-2" style={{ fontSize: '1.2rem', lineHeight: '1.4' }}>
+                                                    {pregunta.texto}
+                                                </h5>
                                                 <Badge 
-                                                    bg="secondary"
-                                                    className="rounded-circle d-flex align-items-center justify-content-center"
-                                                    style={{ width: '32px', height: '32px', fontSize: '0.875rem', flexShrink: 0 }}
+                                                    bg={pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? 'success' : 'info'} 
+                                                    className="px-2 py-1" 
+                                                    style={{ fontSize: '0.85rem' }}
                                                 >
-                                                    {index + 1}
+                                                    {pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? 'Pregunta Abierta' : 'Pregunta Cerrada'}
                                                 </Badge>
-                                                <div className="flex-grow-1">
-                                                    <h5 className="fw-semibold mb-2">{pregunta.texto}</h5>
-                                                    <Badge bg="info" className="px-2 py-1" style={{ fontSize: '0.75rem' }}>
-                                                        Pregunta Cerrada
-                                                    </Badge>
-                                                </div>
                                             </div>
-                                            <Alert variant="info" className="mt-3">
-                                                <i className="fas fa-info-circle me-2"></i>
-                                                Implementar preguntas cerradas :P
-                                            </Alert>
-                                        </Card.Body>
-                                    </Card>
-                                )}
+                                        </div>
+                                        
+                                        {/* Renderizar respuestas locales*/}
+                                        {pregunta.tipo === 'Abierta' || pregunta.tipo === 'abierta' ? (
+                                            <div className="ps-5">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={5}
+                                                    value={obtenerRespuesta(pregunta.id)?.texto || ''}
+                                                    onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value, undefined)}
+                                                    placeholder="Escriba su respuesta aquí..."
+                                                    className="border-2"
+                                                    style={{
+                                                        borderColor: "#e5e7eb",
+                                                        borderRadius: "0.5rem",
+                                                        fontSize: "1.1rem",
+                                                        padding: "1rem",
+                                                        resize: "vertical",
+                                                        minHeight: "150px"
+                                                    }}
+                                                />
+                                                {!obtenerRespuesta(pregunta.id)?.texto?.trim() && (
+                                                    <Form.Text className="text-danger" style={{ fontSize: '0.9rem' }}>
+                                                        * Esta pregunta es obligatoria
+                                                    </Form.Text>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="ps-5">
+                                                {pregunta.opciones?.map((opcion: any) => (
+                                                    <div key={opcion.id} className="mb-3">
+                                                        <Form.Check
+                                                            type="radio"
+                                                            name={`pregunta-${pregunta.id}`}
+                                                            id={`opcion-${opcion.id}`}
+                                                            label={opcion.texto}
+                                                            checked={obtenerRespuesta(pregunta.id)?.opcion_id === opcion.id}
+                                                            onChange={() => actualizarRespuesta(pregunta.id, undefined, opcion.id)}
+                                                            style={{ fontSize: '1.1rem' }}
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {!obtenerRespuesta(pregunta.id)?.opcion_id && (
+                                                    <Form.Text className="text-danger" style={{ fontSize: '0.9rem' }}>
+                                                        * Esta pregunta es obligatoria
+                                                    </Form.Text>
+                                                )}
+                                            </div>
+                                        )}
+                                    </Card.Body>
+                                </Card>
                             </div>
                         ))}
 
                         {/* Estado de completado */}
                         {todasRespondidas && (
-                            <Alert variant="success" className="text-center">
+                            <Alert variant="success" className="text-center" style={{ fontSize: '1.1rem' }}>
                                 <i className="fas fa-check-circle me-2"></i>
-                                Encuesta completada con éxito
+                                Listo para enviar tus respuestas.
+                            </Alert>
+                        )}
+
+                        {/* Mensaje si faltan respuestas */}
+                        {!todasRespondidas && (
+                            <Alert variant="warning" className="mt-3" style={{ fontSize: '1.1rem' }}>
+                                <i className="fas fa-exclamation-triangle me-2"></i>
+                                Por favor, responde todas las preguntas antes de enviar la encuesta.
                             </Alert>
                         )}
 
                         {/* Botones */}
-                        <Row className="mt-4">
+                        <Row className="mt-5">
                             <Col md={6}>
                                 <Button 
                                     variant="outline-secondary" 
                                     onClick={() => navigate('/seleccionar-materia')}
-                                    className="w-100 py-2"
+                                    className="w-100 py-3"
+                                    style={{ fontSize: '1.1rem' }}
                                 >
                                     <i className="fas fa-arrow-left me-2"></i>
                                     Volver a Materias
@@ -217,15 +339,24 @@ function ResponderInstrumento() {
                             <Col md={6}>
                                 <Button 
                                     variant="success"
-                                    disabled={!todasRespondidas}
-                                    className="w-100 py-2"
-                                    onClick={() => {
-                                        alert('¡Encuesta completada exitosamente!');
-                                        navigate('/seleccionar-materia');
-                                    }}
+                                    disabled={!todasRespondidas || enviando}
+                                    onClick={enviarRespuestas}
+                                    className="w-100 py-3"
+                                    style={{ fontSize: '1.1rem' }}
                                 >
-                                    <i className="fas fa-check me-2"></i>
-                                    Finalizar Encuesta
+                                    {enviando ? (
+                                        <>
+                                            <div className="spinner-border spinner-border-sm me-2" role="status">
+                                                <span className="visually-hidden">Enviando...</span>
+                                            </div>
+                                            Enviando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-paper-plane me-2"></i>
+                                            Enviar Formulario
+                                        </>
+                                    )}
                                 </Button>
                             </Col>
                         </Row>

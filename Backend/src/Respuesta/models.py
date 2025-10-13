@@ -9,7 +9,7 @@ from src.Pregunta.models import Pregunta, Opcion
 class Respuesta(ModeloBase):
     __tablename__ = "respuestas"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     texto: Mapped[str] = mapped_column(String(250), nullable=True)  # para respuestas abiertas
     opcion_id: Mapped[int | None] = mapped_column(ForeignKey("opciones.id"), nullable=True)  # para respuestas cerradas
     pregunta_id: Mapped[int] = mapped_column(ForeignKey("preguntas.id"), nullable=False)

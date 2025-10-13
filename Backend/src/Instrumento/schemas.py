@@ -59,6 +59,7 @@ class InstrumentoDetalle(BaseModel):
     plantilla_formulario_id: int
     respuestas: List[RespuestaDetalle]
     plantilla_formulario: PlantillaFormulario
+    materia: Materia 
 
 
 

@@ -57,6 +57,8 @@ class InstrumentoDetalle(BaseModel):
     #autor_nombre: str
     fecha_completado: date
     respuestas: List[RespuestaDetalle]
+    plantilla_formulario_id: PlantillaFormulario
+
 
 
 # cómo se ve cada opción con su conteo?

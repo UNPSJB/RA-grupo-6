@@ -11,6 +11,8 @@ import PaginaEncuestasEstudiantes from './components/Instrumento/pages/PaginaEnc
 import PaginaInformesCatedra from './components/Instrumento/pages/PaginaInformesCatedra.tsx';
 import { RespuestasFormulario } from './components/RespuestasFormulario/RespuestasFormulario.tsx';
 import Menu from './components/Menu.tsx';
+import ResponderInstrumento from './components/ResponderInstrumento';
+import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -18,7 +20,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Menu></Menu>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<RespuestasFormulario id_respuestas_formulario={1}/>} ></Route>
+        <Route path='/' element={<SeleccionarMateria />} ></Route>
+        <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route>
+        <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
+        {/* <Route path='/' element={<RespuestasFormulario id_respuestas_formulario={1}/>} ></Route> */}
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos/>}></Route>

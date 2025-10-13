@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
-import Menu from '../Menu';
+import { Card, Button, ListGroup, Badge, Spinner, Alert, Container } from 'react-bootstrap';
 
 interface Materia {
     id: string;
     nombre: string;
     tieneEncuestaActiva?: boolean;
     instrumentoId?: number;
-    formularioId?: number;
+    plantillaFormularioId?: number;
+    fechaCierre?: string;
 }
 
 function SeleccionarMateria() {
@@ -18,70 +18,70 @@ function SeleccionarMateria() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Cargar materias del usuario/alumno
-        fetch('http://127.0.0.1:8000/materias/')
-            .then(response => {
-                if (!response.ok) throw new Error('Error cargando materias');
-                return response.json();
-            })
-            .then(async (data: Materia[]) => {
-
-                // Asumo que todas las materias tienen encuesta activa
-
-                const materiasConEstado = data.map(materia => ({
-                    ...materia,
+        const cargarMateriasConEncuestas = async () => {
+            try {
+                // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
+                const response = await fetch('http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar encuestas');
+                }
+                
+                const instrumentos = await response.json();
+                
+                // Mapear instrumentos a materias con encuesta activa
+                // Revisar
+                const materiasConEncuesta = instrumentos.map((instrumento: any) => ({
+                    id: instrumento.materia.id,
+                    nombre: instrumento.materia.nombre,
                     tieneEncuestaActiva: true,
-                    instrumentoId: Math.floor(Math.random() * 100) + 1, // id simulado
-                    formularioId: Math.floor(Math.random() * 100) + 1   // id simulado
+                    instrumentoId: instrumento.id,
+                    plantillaFormularioId: instrumento.plantilla_formulario.id,
+                    fechaCierre: instrumento.fecha_cierre //??
                 }));
                 
-                setMaterias(materiasConEstado);
+                setMaterias(materiasConEncuesta);
                 setCargando(false);
-            })
-            .catch(error => {
+                
+            } catch (error) {
                 console.error('Error:', error);
-                setMensaje('Error de conexión al cargar materias');
-
-                // Datos de ejemplo
+                setMensaje('Error de conexión al cargar las encuestas activas');
+                
+                // Datos de ejemplo si el endpoint falla
                 setMaterias([
                     { 
                         id: "IF001", 
                         nombre: "Elementos de Informática",
                         tieneEncuestaActiva: true,
                         instrumentoId: 1,
-                        formularioId: 1
+                        plantillaFormularioId: 1
                     },
                     { 
                         id: "MA045", 
                         nombre: "Álgebra",
                         tieneEncuestaActiva: true,
                         instrumentoId: 2,
-                        formularioId: 1
-                    },
-                    { 
-                        id: "IF002", 
-                        nombre: "Expresión de Problemas y Algoritmos",
-                        tieneEncuestaActiva: true,
-                        instrumentoId: 3,
-                        formularioId: 1
-                    },
+                        plantillaFormularioId: 1
+                    }
                 ]);
                 setCargando(false);
-            });
+            }
+        };
+
+        cargarMateriasConEncuestas();
     }, []);
 
-    const handleResponderEncuesta = (materiaId: string, materiaNombre: string, instrumentoId?: number, formularioId?: number) => {
-        if (!instrumentoId || !formularioId) {
+    const handleResponderEncuesta = (materia: Materia) => {
+        if (!materia.instrumentoId) {
             setMensaje('No hay encuesta activa para esta materia');
             return;
         }
         
-        // Navegar a la encuesta
-        navigate(`/responder-encuesta/${instrumentoId}/${formularioId}`, { 
+        // Navegar al instrumento para responder encuesta
+        navigate(`/responder-instrumento/${materia.instrumentoId}`, { 
             state: { 
-                materiaId, 
-                materiaNombre,
-                redirectTo: '/alumno'
+                materiaNombre: materia.nombre,
+                materiaId: materia.id
             } 
         });
     };
@@ -89,8 +89,7 @@ function SeleccionarMateria() {
     if (cargando) {
         return (
             <>
-                <Menu />
-                <div className="container mt-4">
+                <Container className="mt-4">
                     <div className="row justify-content-center">
                         <div className="col-md-8">
                             <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
@@ -103,23 +102,22 @@ function SeleccionarMateria() {
                             </Card>
                         </div>
                     </div>
-                </div>
+                </Container>
             </>
         );
     }
 
     return (
         <>
-            <Menu />
-            <div className="container mt-4">
+            <Container className="mt-4">
                 <div className="row justify-content-center">
-                    <div className="col-md-8">
+                    <div className="col-md-10">
                         <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5">
-                                <div className="mb-5 text-center text-md-start">
+                                <div className="mb-5 text-center">
                                     <h1 className="fw-bold mb-2">Materias Cursadas</h1>
                                     <p className="text-muted mb-0">
-                                        Selecciona una materia para responder la encuesta.
+                                        Selecciona una materia para responder la encuesta correspondiente
                                     </p>
                                 </div>
                                 
@@ -135,41 +133,43 @@ function SeleccionarMateria() {
                                             <ListGroup.Item 
                                                 key={materia.id} 
                                                 action 
-                                                onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(
-                                                    materia.id, 
-                                                    materia.nombre, 
-                                                    materia.instrumentoId, 
-                                                    materia.formularioId
-                                                )}
-                                                className="d-flex justify-content-between align-items-center p-3"
-                                                style={{ cursor: materia.tieneEncuestaActiva ? 'pointer' : 'not-allowed' }}
+                                                onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(materia)}
+                                                className="d-flex justify-content-between align-items-center p-4"
+                                                style={{ 
+                                                    cursor: materia.tieneEncuestaActiva ? 'pointer' : 'not-allowed',
+                                                    borderBottom: '1px solid #e9ecef'
+                                                }}
                                             >
                                                 <div className="flex-grow-1">
-                                                    <div className="fw-bold">{materia.nombre}</div>
-                                                    <small className="text-muted">
-                                                        Código: {materia.id} 
+                                                    <div className="fw-bold fs-5 mb-1">{materia.nombre}</div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <small className="text-muted">
+                                                            Código: {materia.id} 
+                                                        </small>
                                                         {materia.tieneEncuestaActiva && (
-                                                            <Badge bg="success" className="ms-2">
-                                                                Encuesta Activa
-                                                            </Badge>
+                                                            <>
+                                                                <Badge bg="success" className="ms-2">
+                                                                    Encuesta Activa
+                                                                </Badge>
+                                                                <small className="text-muted">
+                                                                    Vence: {new Date(materia.fechaCierre!).toLocaleDateString()}
+                                                                </small>
+                                                            </>
                                                         )}
-                                                    </small>
+                                                    </div>
                                                 </div>
                                                 
                                                 {materia.tieneEncuestaActiva ? (
                                                     <Button 
-                                                        variant="outline-primary"
+                                                        variant="primary"
                                                         size="sm" 
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleResponderEncuesta(
-                                                                materia.id, 
-                                                                materia.nombre, 
-                                                                materia.instrumentoId, 
-                                                                materia.formularioId
-                                                            );
+                                                            handleResponderEncuesta(materia, );
                                                         }}
+                                                        className="px-4 py-2"
                                                     >
+                                                        <i className="fas fa-edit me-2"></i>
                                                         Responder Encuesta
                                                     </Button>
                                                 ) : (
@@ -185,15 +185,19 @@ function SeleccionarMateria() {
                                         ))}
                                     </ListGroup>
                                 ) : (
-                                    <p className="text-center text-muted fst-italic py-5">
-                                        No hay encuestas disponibles en este momento.
-                                    </p>
+                                    <div className="text-center py-5">
+                                        <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <h5 className="text-muted mb-3">No hay encuestas disponibles</h5>
+                                        <p className="text-muted">
+                                            No se encontraron encuestas pendientes para tus materias cursadas.
+                                        </p>
+                                    </div>
                                 )}
                             </Card.Body>
                         </Card>
                     </div>
                 </div>
-            </div>
+            </Container>
         </>
     );
 }

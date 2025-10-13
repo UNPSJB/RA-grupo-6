@@ -12,7 +12,16 @@ export const EnumTipoPregunta = Object.freeze({
     abierta: "Abierta"
 })
 
-export type RespuestaCerrada = {
-    pregunta_id: Number
-    opcion_id: Number
+export type RespuestaBase = {
+    pregunta_id: number
 }
+
+export type RespuestaCerrada = RespuestaBase & {
+    opcion_id: number
+}
+
+export type RespuestaAbierta = RespuestaBase & {
+    texto: string
+}
+
+export type RespuestaEnvio = RespuestaCerrada | RespuestaAbierta

@@ -5,7 +5,7 @@ from src.RespuestasFormulario import schemas, exceptions
 from src.RespuestasFormulario.models import RespuestasFormulario
 
 def crear_respuestas_formulario(db:Session, respuestas_formulario: schemas.RespuestasFormulario) -> schemas.RespuestasFormulario:
-    _respuestas_formulario = RespuestasFormulario(**respuestas_formulario.model__dump())
+    _respuestas_formulario = RespuestasFormulario(**respuestas_formulario.model_dump())
     db.add(_respuestas_formulario)
     db.commit()
     db.refresh(_respuestas_formulario)

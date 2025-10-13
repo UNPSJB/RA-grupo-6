@@ -13,10 +13,6 @@ router = APIRouter(prefix="/instrumentos", tags=["instrumentos"])
 
 @router.get("/{tipo_instrumento}", response_model=List[InstrumentoParaListado])
 def get_instrumentos_por_tipo(tipo_instrumento: TipoInstrumento, db: Session = Depends(get_db)):
-    """
-    Este endpoint devuelve una lista de instrumentos filtrada por su tipo.
-    """
-    print('Obteniendo instrumentos de tipo:', tipo_instrumento)
     instrumentos = db.query(InstrumentoModel).filter(
         InstrumentoModel.tipo == tipo_instrumento
     ).all()
@@ -25,10 +21,6 @@ def get_instrumentos_por_tipo(tipo_instrumento: TipoInstrumento, db: Session = D
 
 @router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)
 def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
-    """
-    Obtiene el detalle completo de un único instrumento para ser visualizado.
-    """
-    print('Obteniendo detalle del instrumento con ID:', instrumento_id)
     instrumento = db.query(InstrumentoModel).options(
         joinedload(InstrumentoModel.plantilla_formulario),
         joinedload(InstrumentoModel.respuestas_formulario)
@@ -65,5 +57,8 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         titulo_formulario=instrumento.titulo(),
         autor_nombre=autor_nombre_completo,
         fecha_completado=respuestas_form.fecha_envio,
-        respuestas=respuestas_procesadas
+        plantilla_formulario_id=instrumento.plantilla_formulario_id, 
+        respuestas=respuestas_procesadas,
+        plantilla_formulario=instrumento.plantilla_formulario,
+        materia=instrumento.materia
     )

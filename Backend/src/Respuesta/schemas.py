@@ -7,8 +7,7 @@ class RespuestaBase(BaseModel):
     texto: str | None = None  # para respuestas abiertas
     opcion_id: int | None = None  # para respuestas cerradas
     pregunta_id: int
-    pregunta: Pregunta | None = None
-    opcion: Opcion | None = None
+    formulario_id: int
 
 class RespuestaCreate(RespuestaBase):
     pass

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form, CardBody } from 'react-bootstrap';
+import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
+import ModalExito from "./ModalEnvio";
 
 // Usuario temporal
 const USUARIO_ACTUAL = {
@@ -95,65 +96,46 @@ function ResponderInstrumento() {
         setRespuestas(respuestasActualizadas);
     };
 
-    const enviarRespuestas = async () => {
-        setEnviando(true);
-        try {
-            // crear RespuestasFormulario (sin respuestas)
-            const nuevoRespuestasFormulario = {
-                materia_id: instrumento.materia.id,
-                usuario_id: USUARIO_ACTUAL.id,
-                instrumento_id: parseInt(instrumentoId!),
-                fecha_envio: new Date().toISOString().split('T')[0],
-                respuestas: [] // Array vacío - las respuestas se crearán después
-            };
+    const enviarRespuestas = (): Promise<boolean> => {
+    setEnviando(true);
 
-            const respuestasFormularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevoRespuestasFormulario)
-            });
-
-            if (!respuestasFormularioResponse.ok) {
-                const errorDetail = await respuestasFormularioResponse.json();
-                throw new Error('Error al crear RespuestasFormulario: ' + JSON.stringify(errorDetail));
-            }
-
-            const respuestasFormularioCreado = await respuestasFormularioResponse.json();
-            const formularioId = respuestasFormularioCreado.id;
-
-            // crear cada respuesta individual asociada al formulario
-            for (const respuesta of respuestas) {
-                if (respuesta.texto?.trim() || respuesta.opcion_id) {
-                    const payload = {
+    return fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            materia_id: instrumento.materia.id,
+            usuario_id: USUARIO_ACTUAL.id,
+            instrumento_id: parseInt(instrumentoId!),
+            fecha_envio: new Date().toISOString().split('T')[0],
+            respuestas: []
+        })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Error al crear el formulario");
+        return res.json();
+    })
+    .then(formularioCreado => {
+        respuestas.forEach(respuesta => {
+            if (respuesta.texto?.trim() || respuesta.opcion_id) {
+                fetch("http://127.0.0.1:8000/respuestas/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
                         pregunta_id: respuesta.pregunta_id,
                         texto: respuesta.texto?.trim() || null,
                         opcion_id: respuesta.opcion_id || null,
-                        formulario_id: formularioId  // Asociar al formulario recién creado
-                    };
-
-                    console.log("Enviando respuesta:", payload);
-
-                    const response = await fetch('http://127.0.0.1:8000/respuestas/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const errorDetail = await response.json();
-                        throw new Error(`Error en pregunta ${respuesta.pregunta_id}: ${JSON.stringify(errorDetail)}`);
-                    }
-                }
+                        formulario_id: formularioCreado.id,
+                    }),
+                });
             }
-
-            alert('¡Encuesta completada exitosamente!');
-            navigate('/seleccionar-materia');
-            
-        } catch (err: any) {
-            setError('Error al enviar las respuestas: ' + err.message);
-        } finally {
-            setEnviando(false);
-        }
+        });
+        return true; 
+    })
+    .catch(err => {
+        console.error(err);
+        return false; 
+    })
+    .finally(() => setEnviando(false));
     };
 
     // Verificar preguntas respondidas
@@ -277,20 +259,14 @@ function ResponderInstrumento() {
                                 Volver a Materias
                             </Button>
                         </Col>
-                        <Col md={6}>
-                            <Button
-                                variant="success"
-                                className="w-100"
-                                disabled={!todasRespondidas || enviando}
-                                onClick={enviarRespuestas}
-                            >
-                                {enviando ? 'Enviando...' : 'Enviar Formulario'}
-                            </Button>
+                        <Col md={6} className='mb-2'>
+                            <ModalExito onEnviar={enviarRespuestas} onExito={() => navigate('/seleccionar-materia')}/>
                         </Col>
                     </Row>
                 </Card.Body>
             </Card>
             </Container>
+
         </div>
 
         </>

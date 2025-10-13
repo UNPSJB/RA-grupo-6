@@ -7,3 +7,6 @@ class PreguntaNoEncontrada(NotFound):
 
 class PreguntaSinOpciones(NotFound):
     DETAIL = ErrorMessages.OPCION_NO_ENCONTRADA
+
+class PreguntaNoEliminable(NotFound):
+    DETAIL = ErrorMessages.PREGUNTA_NO_ELIMINABLE

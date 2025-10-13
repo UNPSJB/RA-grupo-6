@@ -50,8 +50,15 @@ def modificar_pregunta(db: Session, pregunta_id: int, pregunta: schemas.Pregunta
     return db_pregunta  
 
 def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
-    db_pregunta = obtner_pregunta(db, pregunta_id)
-    db.execute(delete(Pregunta).where(Pregunta.id == pregunta_id))
+    db_pregunta = db.query(Pregunta).filter(Pregunta.id == pregunta_id).first()
+    if not db_pregunta:
+        raise exceptions.PreguntaNoEncontrada()
+
+    if db_pregunta.formularios and len(db_pregunta.formularios) > 0:
+        raise exceptions.PreguntaNoEliminable()
+
+    db.delete(db_pregunta)
     db.commit()
-    return db_pregunta
+
+    return db_pregunta 
 

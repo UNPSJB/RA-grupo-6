@@ -2,19 +2,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form } from 'react-bootstrap';
 
-// Usuario temporal, requiere autenticación?
+// Usuario temporal
 const USUARIO_ACTUAL = {
     id: 1,
     nombre: "Alumno",
     apellido: "Demo"
 };
 
-// Tipo para las respuestas temporales
+
 interface RespuestaTemporal {
     pregunta_id: number;
     texto?: string;
     opcion_id?: number;
-    formulario_id: number;
 }
 
 function ResponderInstrumento() {
@@ -28,7 +27,6 @@ function ResponderInstrumento() {
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);
     
-    // useState para respuestas temporales
     const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
 
     const materiaNombre = location.state?.materiaNombre;
@@ -48,12 +46,6 @@ function ResponderInstrumento() {
                 const instrumentoData = await instrumentoResponse.json();
                 setInstrumento(instrumentoData);
 
-
-                console.log("plantilla_formulario_id:", instrumentoData.plantilla_formulario_id);
-                console.log(instrumentoData)
-                console.log("Instrumento cargado:", instrumentoData);
-                setInstrumento(instrumentoData);
-
                 // Obtener PlantillaFormulario
                 const plantillaResponse = await fetch(`http://127.0.0.1:8000/formularios/${instrumentoData.plantilla_formulario_id}`);
                 if (!plantillaResponse.ok) throw new Error('No se pudo cargar el formulario');
@@ -64,8 +56,7 @@ function ResponderInstrumento() {
                 const respuestasIniciales = plantillaData.preguntas.map((pregunta: any) => ({
                     pregunta_id: pregunta.id,
                     texto: '',
-                    opcion_id: undefined,
-                    formulario_id: instrumentoData.plantilla_formulario_id
+                    opcion_id: undefined
                 }));
                 setRespuestas(respuestasIniciales);
 
@@ -80,72 +71,43 @@ function ResponderInstrumento() {
     }, [instrumentoId]);
 
     const actualizarRespuesta = (preguntaId: number, nuevoTexto?: string, nuevaOpcionId?: number) => {
-        const respuestasActualizadas = [...respuestas]; // Creo copia del array
+        const respuestasActualizadas = [...respuestas];
 
-        for (let i = 0; i < respuestasActualizadas.length; i++) { // Busco respuesta a actualizar
-
+        for (let i = 0; i < respuestasActualizadas.length; i++) {
             if (respuestasActualizadas[i].pregunta_id === preguntaId) {
-                if (nuevoTexto !== undefined) { // Para preg abierta
+                if (nuevoTexto !== undefined) {
                     respuestasActualizadas[i] = {
                         ...respuestasActualizadas[i],
                         texto: nuevoTexto,
                         opcion_id: undefined,
                     };
-                } else if (nuevaOpcionId !== undefined) { // Para preg cerrada
+                } else if (nuevaOpcionId !== undefined) {
                     respuestasActualizadas[i] = {
                         ...respuestasActualizadas[i],
                         opcion_id: nuevaOpcionId,
                         texto: ''
                     };
                 }
-
                 break;
             }
         }
         
-        // Actualizo estado con respuestasActualizadas
         setRespuestas(respuestasActualizadas);
     };
 
     const enviarRespuestas = async () => {
         setEnviando(true);
         try {
-
-            // Eviar respuestas
-            for (const respuesta of respuestas) {
-                if (respuesta.texto?.trim() || respuesta.opcion_id) { // Verificar respuestas no vacías
-                    const payload = {
-                        ...respuesta,
-                    };
-
-                    const response = await fetch('http://127.0.0.1:8000/respuestas/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) throw new Error(`Error en pregunta ${respuesta.pregunta_id}`);
-                }
-            }
-
-            const respuestasPivot = respuestas
-                .filter(r => r.texto?.trim() || r.opcion_id)
-                .map(({ pregunta_id, texto, opcion_id, formulario_id }) => ({
-                    pregunta_id,
-                    texto: texto?.trim() || null,
-                    opcion_id: opcion_id ?? null,
-                    formulario_id
-                }));
-
-
-            // Crear RespuestasFormulario
+            // crear RespuestasFormulario (sin respuestas)
             const nuevoRespuestasFormulario = {
-                materia_id: 'IF001',
+                materia_id: instrumento.materia.id,
                 usuario_id: USUARIO_ACTUAL.id,
                 instrumento_id: parseInt(instrumentoId!),
                 fecha_envio: new Date().toISOString().split('T')[0],
-                respuestas: respuestasPivot
+                respuestas: [] // Array vacío - las respuestas se crearán después
             };
+
+            console.log("Creando RespuestasFormulario:", nuevoRespuestasFormulario);
 
             const respuestasFormularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
                 method: 'POST',
@@ -153,7 +115,40 @@ function ResponderInstrumento() {
                 body: JSON.stringify(nuevoRespuestasFormulario)
             });
 
-            if (!respuestasFormularioResponse.ok) throw new Error('Error al crear el RespuestasFormulario');
+            if (!respuestasFormularioResponse.ok) {
+                const errorDetail = await respuestasFormularioResponse.json();
+                throw new Error('Error al crear RespuestasFormulario: ' + JSON.stringify(errorDetail));
+            }
+
+            const respuestasFormularioCreado = await respuestasFormularioResponse.json();
+            const formularioId = respuestasFormularioCreado.id;
+
+            console.log("RespuestasFormulario creado con ID:", formularioId);
+
+            // crear cada respuesta individual asociada al formulario
+            for (const respuesta of respuestas) {
+                if (respuesta.texto?.trim() || respuesta.opcion_id) {
+                    const payload = {
+                        pregunta_id: respuesta.pregunta_id,
+                        texto: respuesta.texto?.trim() || null,
+                        opcion_id: respuesta.opcion_id || null,
+                        formulario_id: formularioId  // Asociar al formulario recién creado
+                    };
+
+                    console.log("Enviando respuesta:", payload);
+
+                    const response = await fetch('http://127.0.0.1:8000/respuestas/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorDetail = await response.json();
+                        throw new Error(`Error en pregunta ${respuesta.pregunta_id}: ${JSON.stringify(errorDetail)}`);
+                    }
+                }
+            }
 
             alert('¡Encuesta completada exitosamente!');
             navigate('/seleccionar-materia');
@@ -223,7 +218,7 @@ function ResponderInstrumento() {
 
                         {/* Mostrando preguntas */}
                         {plantillaFormulario?.preguntas
-                            ?.sort((a: any, b: any) => a.id - b.id) // Ordenar por ID
+                            ?.sort((a: any, b: any) => a.id - b.id)
                             ?.map((pregunta: any, index: number) => (
                             <div key={pregunta.id} className="mb-4">
                                 <Card className="border-0 shadow-sm" style={{ borderRadius: "0.75rem" }}>

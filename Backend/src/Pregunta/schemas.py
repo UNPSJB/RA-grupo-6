@@ -6,7 +6,7 @@ from .models import EnumTipoPregunta
 
 class PreguntaBase(BaseModel):
     texto: str
-    tipo: Optional[EnumTipoPregunta] = None
+    tipo: Optional[str] = None 
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
 
@@ -34,7 +34,8 @@ class Pregunta(PreguntaBase):
     opciones: List[Opcion] = []
 
     model_config = {
-        "from_attributes": True 
+        "from_attributes": True, 
+        "use_enum_values": True
     } # Habilita la conversión desde ORM a Pydantic
 
 

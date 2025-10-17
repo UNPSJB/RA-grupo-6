@@ -12,8 +12,8 @@ export type Pregunta = {
 }
 
 export const EnumTipoPregunta = Object.freeze({
-    cerrada: "Cerrada",
-    abierta: "Abierta"
+    cerrada: "cerrada",
+    abierta: "abierta"
 })
 export type TipoPregunta = typeof EnumTipoPregunta[keyof typeof EnumTipoPregunta];
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button, ListGroup, Badge, Spinner, Alert, Container } from 'react-bootstrap';
 
@@ -11,6 +11,12 @@ interface Materia {
     fechaCierre?: string;
 }
 
+const USUARIO_ACTUAL = {
+    id: 1,
+    nombre: "Alumno",
+    apellido: "Demo"
+};
+
 function SeleccionarMateria() {
     const [materias, setMaterias] = useState<Materia[]>([]);
     const [mensaje, setMensaje] = useState('');
@@ -21,7 +27,7 @@ function SeleccionarMateria() {
         const cargarMateriasConEncuestas = async () => {
             try {
                 // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
-                const response = await fetch('http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE');
+                const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=${USUARIO_ACTUAL.id}`);
                 
                 if (!response.ok) {
                     throw new Error('Error al cargar encuestas');
@@ -46,24 +52,6 @@ function SeleccionarMateria() {
             } catch (error) {
                 console.error('Error:', error);
                 setMensaje('Error de conexión al cargar las encuestas activas');
-                
-                // Datos de ejemplo si el endpoint falla
-                setMaterias([
-                    { 
-                        id: "IF001", 
-                        nombre: "Elementos de Informática",
-                        tieneEncuestaActiva: true,
-                        instrumentoId: 1,
-                        plantillaFormularioId: 1
-                    },
-                    { 
-                        id: "MA045", 
-                        nombre: "Álgebra",
-                        tieneEncuestaActiva: true,
-                        instrumentoId: 2,
-                        plantillaFormularioId: 1
-                    }
-                ]);
                 setCargando(false);
             }
         };

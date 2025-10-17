@@ -1,6 +1,7 @@
-from typing import List
-from fastapi import APIRouter, Depends
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import and_, exists
 
 from src.Instrumento.models import Instrumento as InstrumentoModel, TipoInstrumento 
 from src.Instrumento.schemas import InstrumentoParaListado
@@ -12,11 +13,32 @@ from fastapi import APIRouter, Depends, HTTPException
 router = APIRouter(prefix="/instrumentos", tags=["instrumentos"])
 
 @router.get("/{tipo_instrumento}", response_model=List[InstrumentoParaListado])
-def get_instrumentos_por_tipo(tipo_instrumento: TipoInstrumento, db: Session = Depends(get_db)):
-    instrumentos = db.query(InstrumentoModel).filter(
-        InstrumentoModel.tipo == tipo_instrumento
-    ).all()
+def get_instrumentos_por_tipo(
+    tipo_instrumento: str,
+    usuario_id: int,
+    mostrar_respondidos: bool = False,
+    db: Session = Depends(get_db)
+):
+    try:
+        tipo_enum = TipoInstrumento(tipo_instrumento)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Tipo de instrumento inválido: {tipo_instrumento}")
     
+    query = db.query(InstrumentoModel).filter(
+        InstrumentoModel.tipo == tipo_enum
+    )
+    
+    if not mostrar_respondidos:
+        tiene_respuesta = exists().where(
+            and_(
+                RespuestasFormularioModel.instrumento_id == InstrumentoModel.id,
+                RespuestasFormularioModel.usuario_id == usuario_id
+            )
+        )
+
+        query = query.filter(~tiene_respuesta)
+    
+    instrumentos = query.all()
     return instrumentos
 
 @router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)
@@ -36,10 +58,20 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
     if not instrumento:
         raise HTTPException(status_code=404, detail="Instrumento no encontrado")
 
-    if not instrumento.respuestas_formulario:
-         raise HTTPException(status_code=404, detail="El instrumento no tiene respuestas asociadas")
-
-    respuestas_form = instrumento.respuestas_formulario[0]
+  
+    if not instrumento.respuestas_formulario or len(instrumento.respuestas_formulario) == 0:
+        return InstrumentoDetalle(
+            id=instrumento.id,
+            titulo_formulario=instrumento.titulo(),
+            autor_nombre="Sin respuestas",
+            fecha_completado=None,
+            plantilla_formulario_id=instrumento.plantilla_formulario_id,
+            respuestas=[],  # Lista vacía
+            plantilla_formulario=instrumento.plantilla_formulario,
+            materia=instrumento.materia
+        )
+    
+    respuestas_form = instrumento.respuestas_formulario[0] 
     
     respuestas_procesadas = [
         RespuestaDetalle(

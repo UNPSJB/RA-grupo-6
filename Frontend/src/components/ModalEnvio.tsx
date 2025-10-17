@@ -4,9 +4,10 @@ import { Modal, Button } from "react-bootstrap";
 interface ModalExitoProps {
   onEnviar: () => Promise<boolean>; 
   onExito?: () => void;
+  desactivado: boolean;
 }
 
-export default function ModalExito({ onEnviar, onExito }: ModalExitoProps) {
+export default function ModalExito({ onEnviar, onExito, desactivado }: ModalExitoProps) {
     const [mostrar, setMostrar] = useState(false);
 
     const mostrarModal = () => {
@@ -27,7 +28,7 @@ export default function ModalExito({ onEnviar, onExito }: ModalExitoProps) {
 
     return (
         <>
-            <Button variant="success" className="w-100" onClick={mostrarModal}>
+            <Button variant="success" className="w-100" disabled={desactivado} onClick={mostrarModal}>
                 Enviar Formulario
             </Button>
 

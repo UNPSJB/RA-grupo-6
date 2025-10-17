@@ -36,6 +36,13 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       return
     }
 
+
+    if(opcionesSeleccionadas.length < 2){
+      alert("Ingrese al menos dos opciones");
+      return
+    }
+
+
     const seleccionadas = opcionesSeleccionadas.map(op => op.id);
 
     const nuevaPregunta: PreguntaCerrada = {

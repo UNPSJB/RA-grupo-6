@@ -55,7 +55,7 @@ class InstrumentoDetalle(BaseModel):
     id: int
     titulo_formulario: str
     #autor_nombre: str
-    fecha_completado: date
+    fecha_completado: Optional[date]
     plantilla_formulario_id: int
     respuestas: List[RespuestaDetalle]
     plantilla_formulario: PlantillaFormulario

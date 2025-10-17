@@ -108,8 +108,8 @@ function ResponderInstrumento() {
             materia_id: instrumento.materia.id,
             usuario_id: USUARIO_ACTUAL.id,
             instrumento_id: parseInt(instrumentoId!),
-            fecha_envio: new Date().toISOString().split('T')[0]
-            // NO incluir 'respuestas' aquí
+            fecha_envio: new Date().toISOString().split('T')[0],
+            respuestas: []
         })
     })
     .then(res => {
@@ -117,7 +117,6 @@ function ResponderInstrumento() {
         return res.json();
     })
     .then(async formularioCreado => {
-        // PASO 2: Crear cada respuesta individualmente
         const promesasRespuestas = respuestas
             .filter(respuesta => respuesta.texto?.trim() || respuesta.opcion_id)
             .map(respuesta => 
@@ -128,7 +127,7 @@ function ResponderInstrumento() {
                         pregunta_id: respuesta.pregunta_id,
                         texto: respuesta.texto?.trim() || null,
                         opcion_id: respuesta.opcion_id || null,
-                        formulario_id: formularioCreado.id,
+                        formulario_id: formularioCreado.id
                     }),
                 })
             );
@@ -143,13 +142,12 @@ function ResponderInstrumento() {
     })
     .finally(() => setEnviando(false));
 };
-
-    // Verificar preguntas respondidas
+    
     const todasRespondidas = respuestas.every(respuesta => 
         respuesta.texto?.trim() || respuesta.opcion_id
     );
 
-    // Obtener respuesta para verificar estado
+   
     const obtenerRespuesta = (preguntaId: number) => {
         return respuestas.find(r => r.pregunta_id === preguntaId);
     };
@@ -190,14 +188,14 @@ function ResponderInstrumento() {
             <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
             <Container style={{ maxWidth: '900px' }}>
                 <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                <div className="text-center mb-3"> {/* mb-5 -> mb-3 */}
+                <div className="text-center mb-3">
                     <h1 className="fw-bold mb-2" style={{ color: "#1f2937", fontSize: "1.875rem" }}>
                         {plantillaFormulario?.titulo || `Encuesta de ${materiaNombre}`}
                     </h1>
-                    <p className="text-muted mb-0">Complete todas las preguntas para finalizar la encuesta.</p> {/* mb-0 para quitar margen inferior */}
+                    <p className="text-muted mb-0">Complete todas las preguntas para finalizar la encuesta.</p>
                 </div>
 
-                <Card.Body className="p-3 p-md-4"> {/* p-4 p-md-5 -> p-3 p-md-4 */}
+                <Card.Body className="p-3 p-md-4"> 
                     {plantillaFormulario?.preguntas?.map((pregunta: any, idx: number) => (
                         <Card key={pregunta.id} className="border-0 shadow-sm w-100 mb-3" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-3"> {/* p-4 p-md-5 -> p-3 */}
@@ -225,7 +223,7 @@ function ResponderInstrumento() {
                                         onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value)}
                                         placeholder="Escriba su respuesta..."
                                         className="input-pregunta"
-                                        style={{ marginBottom: '0.5rem' }} // un poquito de espacio abajo
+                                        style={{ marginBottom: '0.5rem' }} 
                                     />
                                 ) : (
                                     <Form.Group>
@@ -266,7 +264,7 @@ function ResponderInstrumento() {
                             </Button>
                         </Col>
                         <Col md={6} className='mb-2'>
-                            <ModalExito onEnviar={enviarRespuestas} onExito={() => navigate('/seleccionar-materia')}/>
+                            <ModalExito onEnviar={enviarRespuestas} onExito={() => navigate('/seleccionar-materia')} desactivado={!todasRespondidas || enviando}/>
                         </Col>
                     </Row>
                 </Card.Body>

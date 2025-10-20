@@ -60,10 +60,14 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
   };
 
   function cambiarMostrar() {
-    setMostrar(!mostrar);
-    
-    mostrar? setTextoMostrar("Mostrar") : setTextoMostrar("Ocultar")
-  
+        const nuevoMostrar = !mostrar;
+        setMostrar(nuevoMostrar);
+        
+        if (nuevoMostrar) {
+            setTextoMostrar("Ocultar");
+        } else {
+            setTextoMostrar("Mostrar");
+        }
   }
 
   return (

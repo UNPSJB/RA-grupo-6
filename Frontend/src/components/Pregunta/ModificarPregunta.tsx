@@ -15,6 +15,7 @@ function ModificarPregunta({pregunta,onEditar}:Props){
     const [opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>(pregunta.opciones);
     const [grupoSeleccionado, setGrupoSeleccionado] = useState<number>(pregunta.grupo_pregunta_id);
     const [mostrar, setMostrar] = useState(false);
+    const [TextoMostrar, setTextoMostrar] = useState("Mostrar");
 
     const modificarPregunta = () =>{
         fetch(`http://127.0.0.1:8000/preguntas/${pregunta.id}`,{
@@ -39,9 +40,14 @@ function ModificarPregunta({pregunta,onEditar}:Props){
 
     
     function cambiarMostrar() {
-        setMostrar(!mostrar);
+        const nuevoMostrar = !mostrar;
+        setMostrar(nuevoMostrar);
         
-        mostrar? setTextoMostrar("Mostrar") : setTextoMostrar("Ocultar")
+        if (nuevoMostrar) {
+            setTextoMostrar("Ocultar");
+        } else {
+            setTextoMostrar("Mostrar");
+        }
     
     }
 
@@ -78,13 +84,14 @@ function ModificarPregunta({pregunta,onEditar}:Props){
                     </Form.Group>
 
                     {pregunta.tipo === "cerrada" && (
-                        <div  className="mb-3 d-flex justify-content-between align-items-center">
+                        <div  className="mb-2 d-flex justify-content-between align-items-center">
                             <h6>Gestión de opciones</h6>
                             <Button
                             className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
                             onClick={cambiarMostrar}
                             >
-                            <i className="fa-solid fa-gear text-dark" style={{ fontSize: "18px" }} />
+                            <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />
+                               {TextoMostrar}
                             </Button>
                         </div>
                     )}

@@ -5,10 +5,13 @@ export type Opcion = {
 };
 
 export type Pregunta = {
-    id: number
+    id: string
     texto: string
     opciones: Opcion[]
     tipo: string | null
+    grupo_pregunta_id: number
+    puede_modificarse: boolean
+    puede_eliminarse: boolean
 }
 
 export const EnumTipoPregunta = Object.freeze({
@@ -46,6 +49,7 @@ export type Materia = {
 }
 
 export type Rol = {
+    id: number  
     nombre: string
 }
 
@@ -132,4 +136,11 @@ export type PreguntaConRespuestas = {
 export type EncuestaAgregadaDetail = InstrumentoBase & {
   titulo_formulario: string;
   respuestas_agregadas: PreguntaConRespuestas[];
+};
+
+export type PreguntaCerrada = {
+  texto: string;
+  opciones: number[];
+  tipo: string;
+  grupo_pregunta_id: number;
 };

@@ -27,16 +27,12 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
         setOpciones(nuevasOpciones);
     };
 
-    function agregarOpcionSeleccionada(opcion : Opcion) {
-
-        if(opcionesSeleccionadas.includes(opcion)){
-            setOpcionesSeleccionadas(opcionesSeleccionadas.filter(opcionSeleccionada => opcionSeleccionada !== opcion))
-        }
-        else{
-            setOpcionesSeleccionadas([...opcionesSeleccionadas, opcion]);
-
-        }
-        
+    function agregarOpcionSeleccionada(opcion: Opcion) {
+    if(opcionesSeleccionadas.some(o => o.id === opcion.id)){
+        setOpcionesSeleccionadas(opcionesSeleccionadas.filter(o => o.id !== opcion.id));
+    } else {
+        setOpcionesSeleccionadas([...opcionesSeleccionadas, opcion]);
+    }
     }
 
     useEffect(() => {

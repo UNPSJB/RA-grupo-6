@@ -31,8 +31,7 @@ export function ElegirGrupoPregunta({ selectedGrupo, onChangeGrupo }: GrupoPregu
                     className="border-2"
                     required
                     style={{ 
-                        borderColor: "#dee2e6",
-                        padding: "0.75rem" 
+                        borderColor: "#dee2e6"
                     }}
                     >
                     <option value={0}>Seleccione un grupo de pregunta...</option>

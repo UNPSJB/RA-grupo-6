@@ -1,21 +1,12 @@
 import { useEffect, useState } from "react";
-import type { Opcion } from "../types";
 import Card from "react-bootstrap/Card";
-import { Badge, Button } from "react-bootstrap";
+import { Badge } from "react-bootstrap";
 import EliminarPregunta from "./EliminarPregunta";
 import { EnumTipoPregunta } from "../types";
+import ModificarPregunta from "./ModificarPregunta";
 const url_base = 'http://127.0.0.1:8000/preguntas/';
 
-type Pregunta = {
-    id: string;  
-    texto: string;
-    opciones: Opcion[];
-    tipo: string;
-};
-
-const editarPregunta = ({ eleccion }: { eleccion: string }) => {
-    window.location.href = `/EditarPregunta/${eleccion}`;
-};
+import type { Pregunta } from "../types";
 
 function VerPregunta() {
     const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -30,6 +21,12 @@ function VerPregunta() {
 
     const handleDeleted = (id: string) => {
         setPreguntas(prev => prev.filter(p => p.id !== id));
+    };
+
+    const handleEdited = (preguntaActualizada: Pregunta) => {
+        setPreguntas(prev =>
+            prev.map(p => (p.id === preguntaActualizada.id ? preguntaActualizada : p))
+         );
     };
 
     return (
@@ -66,18 +63,19 @@ function VerPregunta() {
                                     </div>
 
                                     <div className='d-flex gap-2 '>
-                                        <Button size="sm" className="bg-transparent border-secondary" onClick={() => editarPregunta({ eleccion: pregunta.id })}>
-                                            <i className="fa-solid fa-pencil" style={{ fontSize: '18px', color: 'black' }}></i>
-                                        </Button>
-
-                                        <EliminarPregunta preguntaId={pregunta.id} onDeleted={handleDeleted} />
+                                        {pregunta.puede_modificarse && (
+                                            <ModificarPregunta pregunta={pregunta} onEditar={handleEdited}/>
+                                        )}
+                                        {pregunta.puede_eliminarse && (
+                                            <EliminarPregunta preguntaId={pregunta.id} onDeleted={handleDeleted} />
+                                        )}
                                     </div>
 
                                 </Card.Title>
 
                                 <Card.Subtitle className="d-flex">{pregunta.texto}</Card.Subtitle>
 
-                                {pregunta.tipo.toLowerCase() === EnumTipoPregunta.cerrada &&
+                                {pregunta.tipo === EnumTipoPregunta.cerrada &&
                                     <Card.Text className="d-flex gap-2 flex-wrap">
                                         {pregunta.opciones.map((op) => (
                                             <span className="border rounded-3 p-2 d-inline-flex justify-content-center align-items-center" key={op.id}>

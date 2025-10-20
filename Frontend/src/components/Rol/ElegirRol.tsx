@@ -1,11 +1,8 @@
 
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form"
+import type { Rol } from "../types";
 
-type Rol = {
-    id: number;
-    nombre: string;
-}
 type ELegirRolProps = {
     selectedRol: string;
     onChangeRol: (rol: string) => void;

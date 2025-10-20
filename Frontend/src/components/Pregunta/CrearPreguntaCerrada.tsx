@@ -6,13 +6,7 @@ import { Button, Col } from "react-bootstrap";
 import { EnumTipoPregunta } from "../types";
 import IngresarPregunta from "./IngresarPregunta";
 import { ElegirGrupoPregunta } from "../GrupoPregunta/GrupoPregunta";
-
-type PreguntaCerrada = {
-  texto: string;
-  opciones: number[];
-  tipo: string;
-  grupo_pregunta_id: number;
-};
+import type { PreguntaCerrada } from "../types";
 
 type Props = {
   manejarPestaña: () => void;

@@ -133,3 +133,20 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
   titulo_formulario: string;
   respuestas_agregadas: PreguntaConRespuestas[];
 };
+
+
+export type PlantillaFormulario = {
+    id: number
+    rol: Rol
+    preguntas: PreguntaView[]
+  }
+
+export type PreguntaView = {
+    id: number
+    texto: string
+    opciones: Opcion[]
+    tipo: string | null
+    respuestas: Respuesta[]
+    grupo: GrupoPregunta
+}
+

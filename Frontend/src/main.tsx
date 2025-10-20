@@ -13,6 +13,7 @@ import { RespuestasFormulario } from './components/RespuestasFormulario/Respuest
 import Menu from './components/Menu.tsx';
 import ResponderInstrumento from './components/ResponderInstrumento';
 import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
+import { VerPorcentajes } from './components/VerPorcentajes.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -20,7 +21,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Menu></Menu>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<SeleccionarMateria />} ></Route>
+        {/* <Route path='/' element={<SeleccionarMateria />} ></Route> */}
+        <Route path='/' element={<VerPorcentajes id_plantilla_formulario={1} />} ></Route>
         <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 
         <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>

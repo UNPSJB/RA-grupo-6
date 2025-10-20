@@ -77,16 +77,17 @@ function ModificarPregunta({pregunta,onEditar}:Props){
                         />
                     </Form.Group>
 
-                    <div  className="mb-3 d-flex justify-content-between align-items-center">
-                        <h6>Gestión de opciones</h6>
-                        <Button
-                        className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
-                        onClick={cambiarMostrar}
-                        >
-                        <i className="fa-solid fa-gear text-dark" style={{ fontSize: "18px" }} />
-                        </Button>
-                    </div>
-
+                    {pregunta.tipo === "cerrada" && (
+                        <div  className="mb-3 d-flex justify-content-between align-items-center">
+                            <h6>Gestión de opciones</h6>
+                            <Button
+                            className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
+                            onClick={cambiarMostrar}
+                            >
+                            <i className="fa-solid fa-gear text-dark" style={{ fontSize: "18px" }} />
+                            </Button>
+                        </div>
+                    )}
                     {mostrar && pregunta.tipo === "cerrada" &&  (
                         <OpcionList 
                             opcionesSeleccionadas={opcionesSeleccionadas}

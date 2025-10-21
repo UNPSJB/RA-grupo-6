@@ -9,6 +9,7 @@ export type Pregunta = {
     texto: string
     opciones: Opcion[]
     tipo: string | null
+    grupo_pregunta: GrupoPregunta
 }
 
 export const EnumTipoPregunta = Object.freeze({
@@ -60,12 +61,12 @@ export type Usuario = {
 
 
 export type TypeRespuestasFormulario = {
-    materia: Materia
-    usuario: Usuario 
-    fecha_envio: Date
-    respuestas: Respuesta[]
-
+    materia: Materia;
+    usuario: Usuario; 
+    fecha_envio: Date;
+    respuestas: Respuesta[];
 }
+
 export type TipoInstrumento = 
   | 'ENCUESTA_ESTUDIANTE' 
   | 'INFORME_CATEDRA' 
@@ -136,17 +137,22 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
 
 
 export type PlantillaFormulario = {
-    id: number
-    rol: Rol
-    preguntas: PreguntaView[]
-  }
+  titulo: string;
+  fecha_creacion: Date;
+  preguntas: Pregunta[];
+  rol: Rol
+  instrumento: Instrumento[];
 
-export type PreguntaView = {
-    id: number
-    texto: string
-    opciones: Opcion[]
-    tipo: string | null
-    respuestas: Respuesta[]
-    grupo: GrupoPregunta
+}
+
+
+export type Instrumento = {
+  instrumento_fuente: Instrumento | null;
+  tipo: TipoInstrumento;
+  respuestas_formulario: TypeRespuestasFormulario[];
+  plantilla_formulario: PlantillaFormulario;
+  fecha_inicio: Date;
+  fecha_cierre: Date;
+
 }
 

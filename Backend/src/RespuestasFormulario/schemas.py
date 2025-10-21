@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 from src.Usuarios.schemas import Usuario
 from src.materias.schemas import Materia
-
+from src.Respuesta.schemas import Respuesta
 
 class RespuestasFormularioBase(BaseModel):
     materia_id: str
@@ -23,7 +23,7 @@ class RespuestasFormulario(RespuestasFormularioBase):
     id: int
     materia: Materia
     usuario: Usuario
-    respuestas: List['Respuesta'] = []  
+    respuestas: List[Respuesta] = []  
 
     model_config = ConfigDict(from_attributes=True)
 

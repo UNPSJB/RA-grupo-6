@@ -9,6 +9,7 @@ class PreguntaBase(BaseModel):
     texto: str
     tipo: Optional[EnumTipoPregunta] = None
     opciones: Optional[List[int]] = None
+    grupo_pregunta: GrupoPregunta
 
 
 class PreguntaAbiertaCreate(PreguntaBase):

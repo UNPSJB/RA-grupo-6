@@ -1,3 +1,5 @@
+// InstrumentoList.tsx
+
 import { Card, Button, ListGroup } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 
@@ -25,7 +27,7 @@ const INSTRUMENTO_CONFIG = {
 type ListaInstrumentosProps = {
   instrumentos: instrumentoList[]; 
   tipo: TipoInstrumento;
-  onSeleccionar: (id: number) => void; 
+  onSeleccionar: (instrumento: instrumentoList) => void; 
 };
 
 export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: ListaInstrumentosProps) {
@@ -42,7 +44,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
         {instrumentos.length > 0 ? (
           <ListGroup variant="flush">
             {instrumentos.map((instrumento) => (
-              <ListGroup.Item key={instrumento.id} action onClick={() => onSeleccionar(instrumento.id)} className="d-flex justify-content-between align-items-center p-3">
+              <ListGroup.Item key={instrumento.id} className="d-flex justify-content-between align-items-center p-3">
                 <div>
                   <div className="fw-bold">{instrumento.plantilla_formulario.titulo}</div>
                   {instrumento.docente && (
@@ -50,14 +52,14 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                       Realizado por: {instrumento.docente.nombre} {instrumento.docente.apellido}
                     </small>
                   )}
-                  <small className="text-muted">
+                  <small className="text-muted d-block"> 
                     {instrumento.materia.nombre} | Período {new Date(instrumento.fecha_inicio).toLocaleDateString()} al {new Date(instrumento.fecha_cierre).toLocaleDateString()}
                   </small>
                 </div>
                 <Button 
                   variant={`outline-${config.variant}`}
                   size="sm" 
-                  onClick={(e) => { e.stopPropagation(); onSeleccionar(instrumento.id); }}
+                  onClick={() => onSeleccionar(instrumento)}
                 >
                   Ver Detalle
                 </Button>

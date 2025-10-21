@@ -66,3 +66,24 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
   titulo_formulario: string;
   respuestas_agregadas: PreguntaConRespuestas[];
 };
+
+
+
+export type RespuestaAbierta = {
+  pregunta_texto: string;
+  respuesta_texto: string;
+};
+
+export type GrupoRespuestasAbiertas = {
+  grupo: string;
+  titulo_grupo: string;
+  respuestas: RespuestaAbierta[];
+};
+
+export type DetalleInformeCompleto = {
+  id: number;
+  titulo_formulario: string;
+  fecha_completado: string;
+  estadisticas: EstadisticaPregunta[];
+  respuestas_abiertas_agrupadas: GrupoRespuestasAbiertas[];
+};

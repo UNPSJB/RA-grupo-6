@@ -1,5 +1,5 @@
 
-import { Badge, Button, ListGroup } from "react-bootstrap"
+import { Badge, Button, ListGroup} from "react-bootstrap"
 import { useEffect, useState } from "react"
 import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta} from "./types"
 
@@ -10,16 +10,18 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
 
     const url_base = `http://127.0.0.1:8000/instrumentos/${id_instrumento}/detail`
 
+
     useEffect( () => {
 
         fetch(url_base)
         .then((response) => response.json())    
         .then((data) => setInstrumento(data))
         .catch((err) => console.log(err))
-        
+
     }, [])
 
     const [respuestasMostradas, setRespuestasMostradas] = useState<Pregunta[]>([])
+
 
     function obtenerCantRespuestas(id_pregunta : number, id_opcion : number){
 
@@ -31,7 +33,6 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
     }
 
     const cantidadRespuestas = instrumento?.respuestas_formulario.length
-
 
     function obtenerGrupos(){
 
@@ -49,6 +50,7 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
     
     }
 
+
     return(
 
 
@@ -64,8 +66,7 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
                         <Button key={grupo.id} onClick={() => setRespuestasMostradas(  instrumento?.plantilla_formulario.preguntas.filter((pregunta) => pregunta.grupo_pregunta.id === grupo.id) ?? [] )}>
                             Grupo {grupo.letra}
                         </Button>
-                    )
-                }
+                    )}
 
                 </div>
 
@@ -104,7 +105,22 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
                     )
                         :
 
-                        <p>Respuestas</p>
+                        instrumento?.respuestas_formulario.map((respuestaFormulario) => 
+                            respuestaFormulario.respuestas.map((respuesta) => 
+                            
+                                respuesta.pregunta.id == pregunta.id &&
+                                
+                                <ListGroup.Item>
+                                    <p className="mb-0">
+                                        {respuesta.texto}
+                                    </p>
+                                </ListGroup.Item>
+                                
+                            )
+                        
+                        )
+                        
+                    
                     
                     }
 

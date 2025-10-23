@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src.PlantillaFormulario.models import PlantillaFormulario
 # Nota: Este import debería ser del modelo, no del schema
 from src.RespuestasFormulario.models import RespuestasFormulario 
-from src.materias.models import Materia
+from src.Materias.models import Materia
 from src.models import ModeloBase
 
 class TipoInstrumento(str, enum.Enum):

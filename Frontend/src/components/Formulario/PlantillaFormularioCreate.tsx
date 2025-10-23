@@ -103,6 +103,7 @@ function CrearPlantillaFormulario() {
 
   const cambiarRol = (valor: string) => {
     setRolSeleccionado(valor);
+    setPreguntasSeleccionadas([]); 
     if(intentoEnvio && errores.rol){
       setErrores(prev => ({...prev, rol: undefined}));
     }

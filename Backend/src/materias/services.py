@@ -1,8 +1,8 @@
 from typing import List
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from src.materias.models import Materia
-from src.materias import schemas
+from src.Materias.models import Materia
+from src.Materias import schemas
 
 
 def listar_materias(db: Session) -> List[schemas.Materia]:

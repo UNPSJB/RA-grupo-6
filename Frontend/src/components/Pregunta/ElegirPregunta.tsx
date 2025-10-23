@@ -29,7 +29,8 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
 
   useEffect(() => {
     refrescarPreguntas();
-  }, [rolSeleccionado]);
+    setPreguntaSeleccionadaId("");
+  }, [rolSeleccionado, setPreguntasSeleccionadas]);
   
   const agregarPregunta = () => {
 

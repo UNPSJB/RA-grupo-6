@@ -40,7 +40,7 @@ function VerPregunta() {
                 </div>
                 <Container className="pb-5">
 
-                    <div className="container mt-4 p-0 d-flex flex-wrap justify-content-between">
+                    <div className="container mt-4 p-0 d-flex flex-wrap justify-content-center">
                         {preguntas.map((pregunta) => (
                             <Card style={{ width: '20rem' }} key={pregunta.id}>
                                 <Card.Body className="d-flex flex-column gap-3">

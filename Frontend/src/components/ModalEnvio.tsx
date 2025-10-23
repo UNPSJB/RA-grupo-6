@@ -44,7 +44,7 @@ function ModalExito({ onEnviar, onExito, desactivado, textoBoton, variante, clas
                     <Modal.Title>¡Éxito!</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Formulario enviado!
+                    Operación exitosa!
                 </Modal.Body>
             </Modal>
         </>

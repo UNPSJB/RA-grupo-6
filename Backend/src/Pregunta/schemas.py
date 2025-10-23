@@ -9,7 +9,8 @@ class PreguntaBase(BaseModel):
     tipo: Optional[str] = None 
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
-
+    estadistica: bool
+    rol_id: int 
 
 
 class PreguntaAbiertaCreate(PreguntaBase):

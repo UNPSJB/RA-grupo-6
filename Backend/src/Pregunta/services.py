@@ -6,7 +6,7 @@ from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id)
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -25,7 +25,7 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
 
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id)
+    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)
@@ -45,6 +45,8 @@ def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
                 tipo = preg.tipo,
                 opciones= preg.opciones,
                 grupo_pregunta_id= preg.grupo_pregunta_id,
+                rol_id = preg.rol_id,
+                estadistica = preg.estadistica,
                 puede_eliminarse= not en_formulario,
                 puede_modificarse= not en_formulario
             )

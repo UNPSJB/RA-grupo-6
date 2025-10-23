@@ -6,9 +6,10 @@ import type { Rol } from "../types";
 type ELegirRolProps = {
     selectedRol: string;
     onChangeRol: (rol: string) => void;
+    error?: string;
 };
 
-function ELegirRol({ selectedRol, onChangeRol }: ELegirRolProps){
+function ELegirRol({ selectedRol, onChangeRol, error }: ELegirRolProps){
 
     const [roles, setRoles] = useState<Rol[]>([])
 
@@ -32,8 +33,7 @@ function ELegirRol({ selectedRol, onChangeRol }: ELegirRolProps){
         onChange={(e) => onChangeRol(e.target.value)}
         className="border-2"
         style={{ 
-            borderColor: "#dee2e6",
-            padding: "0.75rem" 
+            borderColor: error? "#dc3545" : "#dee2e6", borderWidth: "2px"
         }}
         >
         <option value="">Seleccione un rol...</option>
@@ -43,6 +43,19 @@ function ELegirRol({ selectedRol, onChangeRol }: ELegirRolProps){
             </option>
         ))}
         </Form.Select>
+
+        {error && (
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.25rem',
+                color: '#dc3545',
+                fontSize: '0.875rem',
+                marginTop: '0.25rem'
+            }}>
+                {error}
+            </div>
+        )}
     </div>
     )
 }

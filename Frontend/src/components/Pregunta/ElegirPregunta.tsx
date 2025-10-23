@@ -8,11 +8,14 @@ import { EnumTipoPregunta } from "../types";
 type Props = {
   preguntasSeleccionadas: Pregunta[];
   setPreguntasSeleccionadas: (pregs: Pregunta[]) => void;
+  rolSeleccionado: string;
+  error?: string;
+  onCrearFormulario?: () => void;
 };
 
-function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: Props) {
+function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rolSeleccionado, error, onCrearFormulario }: Props) {
   const [preguntasDisponibles, setPreguntasDisponibles] = useState<Pregunta[]>([]);
-  const [preguntaSeleccionadaId, setPreguntaSeleccionadaId] = useState<number>();
+  const [preguntaSeleccionadaId, setPreguntaSeleccionadaId] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
   
   const refrescarPreguntas = () => {
@@ -25,26 +28,27 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
 
   useEffect(() => {
     refrescarPreguntas();
-  }, []);
-
+  }, [rolSeleccionado]);
+  
   const agregarPregunta = () => {
 
-    const pregunta = preguntasDisponibles.find(p => p.id === preguntaSeleccionadaId);
+    const pregunta = preguntasDisponibles.find((p) => String(p.id) === preguntaSeleccionadaId);
     if (!pregunta) return;
 
     setPreguntasSeleccionadas([...preguntasSeleccionadas, pregunta]);
-    setPreguntaSeleccionadaId(undefined);
+    setPreguntaSeleccionadaId("");
+    
   };
   
-  const eliminarPregunta = (id: number) => {
-    setPreguntasSeleccionadas(preguntasSeleccionadas.filter(p => p.id !==id));
+  const eliminarPregunta = (id: string) => {
+    setPreguntasSeleccionadas(preguntasSeleccionadas.filter(p => p.id !== id));
   };
 
 
-  const preguntasParaSelect = preguntasDisponibles.filter(
-    p => !preguntasSeleccionadas.some(s => s.id === p.id)
-  );
-
+  const preguntasParaSelect = preguntasDisponibles
+    .filter((p) => !preguntasSeleccionadas.some((s) => s.id === p.id))
+    .filter((p) => rolSeleccionado === "" || Number(p.rol_id) === Number(rolSeleccionado));
+  
   return (
     <div>
       <div>
@@ -64,7 +68,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
             variant="outline-primary" 
             size="sm"
             onClick={() => setShowModal(true)}
-            className="d-flex align-items-center gap-2"
+            className="d-flex align-items-center gap-2 mb-3"
           >
             <i className="fa-solid fa-plus"></i>
             Nueva Pregunta
@@ -145,26 +149,28 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
         <div
           className="text-center mb-3 rounded"
           style={{
-            backgroundColor: "#f8f9fa",
-            border: "2px dashed #dee2e6",
+            backgroundColor: error? "#fff5f5":"#f8f9fa",
+            border: `2px dashed ${error ? "#dc3545" : "#dee2e6"}`,
             padding: "2rem 1rem",
           }}
         >
           <div style={{ fontSize: "2rem", opacity: 0.3 }}></div>
-          <p className="text-muted mb-0 mt-2" style={{ fontSize: "0.85rem" }}>
-            No hay preguntas agregadas aún
+          <p className="text-muted mb-0 mt-2" style={{ color: error?"#dc3545" : "#6c757d", fontSize: "0.85rem" }}>
+            {error||"No hay preguntas agregadas aún"}
           </p>
-          <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-            Selecciona una pregunta del menú de abajo
-          </small>
+          {!error && (
+            <small className="text-muted" style={{ fontSize: "0.75rem" }}>
+              Selecciona una pregunta del menú de abajo
+            </small>
+          )}
         </div>
       )}
 
       <Form.Select
         value={preguntaSeleccionadaId}
-        onChange={(e) => setPreguntaSeleccionadaId(Number(e.target.value))}
+        onChange={(e) => setPreguntaSeleccionadaId(e.target.value)}
         className="border-2 mb-3"
-        style={{ borderColor: "#dee2e6", padding: "0.75rem" }}
+        style={{ borderColor: "#dee2e6"}}
       >
         <option value="">Seleccione una pregunta...</option>
         {preguntasParaSelect.map((p) => (
@@ -173,13 +179,19 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas }: P
           </option>
         ))}
       </Form.Select>
-
-      <div className="d-grid">
-        <Button onClick={agregarPregunta}>+ Agregar</Button>
+      <div className="d-flex gap-2">
+        <Button onClick={agregarPregunta} style={{ flex: 1 }}>
+          + Agregar
+        </Button>
+        {onCrearFormulario && (
+          <Button className="btn-success" onClick={onCrearFormulario} style={{ flex: 1 }}>
+            <i className="fa-solid fa-check me-2"></i> Crear Formulario
+          </Button>
+        )}
       </div>
       <CrearPregunta
         mostrar={showModal}
-        manejarPestaña={() => setShowModal(false)}
+        manejarPestania={() => setShowModal(false)}
         refrescarPreguntas={refrescarPreguntas}
       />
     </div>

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
+
 
 type Materia = {
     id:string;
@@ -38,7 +40,7 @@ function MateriaList(){
                                 <h5 className="card-subtitle"> Cod. {materia.id}</h5>
                                 <div className="button-container">
 
-                                    <button className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</button>
+                                    <Button className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</button>
                                 </div>
                                 {/* <a href="#" className="card-link"> Realizar informe </a> */}
                             </div>

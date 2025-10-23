@@ -10,6 +10,8 @@ export type Pregunta = {
     opciones: Opcion[]
     tipo: string | null
     grupo_pregunta_id: number
+    rol_id: number
+    estadistica: boolean
     puede_modificarse: boolean
     puede_eliminarse: boolean
 }
@@ -143,4 +145,31 @@ export type PreguntaCerrada = {
   opciones: number[];
   tipo: string;
   grupo_pregunta_id: number;
+  rol_id: string;
+  estadistica: boolean;
+};
+
+export type Formulario = {
+  titulo: string;
+  rol: string;
+  preguntas: number[];
+};
+
+export type ErrorValidacion ={
+  titulo?: string;
+  rol?: string;
+  preguntas?: string;
+};
+
+export type ErrorPreguntaCerrada = {
+  texto?: string;
+  grupo?: string;
+  opciones?: string;
+  rol?: string;
+};
+
+export type ErrorPreguntaAbierta = {
+  texto?: string;
+  grupo?: string;
+  rol?: string;
 };

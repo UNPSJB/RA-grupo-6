@@ -3,6 +3,7 @@ import { Form, Button, Card, Badge} from "react-bootstrap";
 import type { Pregunta} from "../types";
 import CrearPregunta from "./CrearPregunta";
 import { EnumTipoPregunta } from "../types";
+import ModalExito from "../ModalEnvio";
 
 
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
   setPreguntasSeleccionadas: (pregs: Pregunta[]) => void;
   rolSeleccionado: string;
   error?: string;
-  onCrearFormulario?: () => void;
+  onCrearFormulario?: () => boolean;
 };
 
 function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rolSeleccionado, error, onCrearFormulario }: Props) {
@@ -184,9 +185,13 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
           + Agregar
         </Button>
         {onCrearFormulario && (
-          <Button className="btn-success" onClick={onCrearFormulario} style={{ flex: 1 }}>
-            <i className="fa-solid fa-check me-2"></i> Crear Formulario
-          </Button>
+          <ModalExito
+            onEnviar={onCrearFormulario}
+            desactivado={false}
+            variante="success"
+            className="btn-success"
+            textoBoton="Crear Formulario"
+          />
         )}
       </div>
       <CrearPregunta

@@ -264,7 +264,7 @@ function ResponderInstrumento() {
                             </Button>
                         </Col>
                         <Col md={6} className='mb-2'>
-                            <ModalExito onEnviar={enviarRespuestas} onExito={() => navigate('/seleccionar-materia')} desactivado={!todasRespondidas || enviando}/>
+                            <ModalExito onEnviar={enviarRespuestas} onExito={() => navigate('/seleccionar-materia')} desactivado={!todasRespondidas || enviando} variante='success' textoBoton='Enviar Formulario' className='w-100'/>
                         </Col>
                     </Row>
                 </Card.Body>

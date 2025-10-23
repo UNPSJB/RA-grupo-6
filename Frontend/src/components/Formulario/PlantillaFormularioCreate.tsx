@@ -81,6 +81,19 @@ function CrearPlantillaFormulario() {
     });
   };
 
+    const manejarCrearFormulario = (): boolean => {
+    setIntentoEnvio(true);
+
+    const formularioValido = validarFormulario();
+
+    if (!formularioValido) {
+      mostrarErrorTemporal();
+      return false;
+    }
+    crearFormularioNuevo();
+    return true;
+  };
+
   const cambiarTitulo = (valor: string) =>{
     setTitulo(valor);
     if(intentoEnvio && errores.titulo){
@@ -189,7 +202,7 @@ function CrearPlantillaFormulario() {
                       setPreguntasSeleccionadas={cambiarPreguntas}
                       rolSeleccionado={rolSeleccionado}
                       error={errores.preguntas}
-                      onCrearFormulario={crearFormularioNuevo}
+                      onCrearFormulario={manejarCrearFormulario}
                       />
               </div>
             </Card.Body>

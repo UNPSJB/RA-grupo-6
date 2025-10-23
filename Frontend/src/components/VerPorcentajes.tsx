@@ -2,15 +2,16 @@
 import { Badge, Button, ListGroup} from "react-bootstrap"
 import { useEffect, useState } from "react"
 import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta} from "./types"
+import { ModalRespuestasAbiertas } from "./ModalRespuestasAbiertas"
 
 
-export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
+
+
+export function Llamadora({id_instrumento} :{id_instrumento : number}){
 
     const [instrumento, setInstrumento] = useState<Instrumento>()
-
     const url_base = `http://127.0.0.1:8000/instrumentos/${id_instrumento}/detail`
-
-
+    
     useEffect( () => {
 
         fetch(url_base)
@@ -20,19 +21,50 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
 
     }, [])
 
+    return(
+        instrumento? <VerPorcentajes instrumento={instrumento}></VerPorcentajes> : <></>
+        
+    )
+
+}
+
+
+export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
+
     const [respuestasMostradas, setRespuestasMostradas] = useState<Pregunta[]>([])
 
+    const [mostrar, setMostrar] = useState(false)
 
-    function obtenerCantRespuestas(id_pregunta : number, id_opcion : number){
+    const todasLasRespuestas = instrumento?.respuestas_formulario.flatMap((respuestaFormulario) => respuestaFormulario.respuestas);
+
+    useEffect(() => {
+        if(instrumento){
+            const grupos = obtenerGrupos()
+            if(grupos.length > 0){ 
+                
+                const primerGrupo = grupos[0];
+                setRespuestasMostradas(instrumento.plantilla_formulario.preguntas.filter((pregunta) => pregunta.grupo_pregunta.id === primerGrupo.id));
+            
+            }
+    }}, [instrumento]);
+
+    function obtenerCantRespuestasOpcion(id_pregunta : number, id_opcion : number){
+
+        const cantRespuestasOpcion = instrumento?.respuestas_formulario?.reduce((cantidad, respuestas_formulario) => {
+            return cantidad + (respuestas_formulario.respuestas?.filter( (respuesta) => respuesta.pregunta?.id === id_pregunta && respuesta.opcion?.id === id_opcion).length ?? 0);
+        }, 0) ?? 0;
+        
+        return cantRespuestasOpcion
+    }
+
+    function obtenerCantRespuestas(id_pregunta : number){
 
         const cantRespuestas = instrumento?.respuestas_formulario?.reduce((cantidad, respuestas_formulario) => {
-            return cantidad + (respuestas_formulario.respuestas?.filter( (respuesta) => respuesta.pregunta?.id === id_pregunta && respuesta.opcion?.id === id_opcion).length ?? 0);
+            return cantidad + (respuestas_formulario.respuestas?.filter( (respuesta) => respuesta.pregunta?.id === id_pregunta).length ?? 0);
         }, 0) ?? 0;
         
         return cantRespuestas
     }
-
-    const cantidadRespuestas = instrumento?.respuestas_formulario.length
 
     function obtenerGrupos(){
 
@@ -47,17 +79,15 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
         )
 
         return grupos
-    
     }
 
 
     return(
 
-
         <div className="container border rounded p-3">
-                <div className="d-flex align-items-center justify-content-between m-3">
+                <div className="d-flex align-items-end justify-content-between m-3">
                     <h3><i className="fa-solid fa-graduation-cap m-3"></i> Respuestas de los estudiantes </h3>
-                    <h3> {instrumento?.plantilla_formulario.preguntas.length} preguntas</h3>
+                    <h4> {instrumento?.plantilla_formulario.preguntas.length} preguntas</h4>
                 </div>
 
                 <div className="choose-group d-flex gap-3 m-3">
@@ -66,20 +96,21 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
                         <Button key={grupo.id} onClick={() => setRespuestasMostradas(  instrumento?.plantilla_formulario.preguntas.filter((pregunta) => pregunta.grupo_pregunta.id === grupo.id) ?? [] )}>
                             Grupo {grupo.letra}
                         </Button>
+
                     )}
 
                 </div>
 
-                {respuestasMostradas.map((pregunta) => 
+                {respuestasMostradas.map((pregunta, numero) => 
                 <ListGroup key={pregunta.id} className="border p-3 mb-3" > 
                     <div className="d-flex gap-3">
 
                         <Badge className="p-2 align-content-center">
-                            {pregunta.grupo_pregunta.letra}#
+                            {pregunta.grupo_pregunta.letra}{numero + 1}
                         </Badge>
 
                         <Badge className="p-2 align-content-center">
-                            {pregunta.tipo}
+                            Pregunta {pregunta.tipo}
                         </Badge>
                     </div>
                     <p className="mb-3 mt-3">
@@ -94,39 +125,43 @@ export function VerPorcentajes({id_instrumento} :{id_instrumento : number}){
                                 <p className="mb-0">{opcion.texto} </p>
                                 <div className="d-flex gap-3">
                                     <p className="mb-0">
-                                        ({obtenerCantRespuestas(pregunta.id, opcion.id) ?? 0} respuestas)
+                                        ({obtenerCantRespuestasOpcion(pregunta.id, opcion.id) ?? 0} respuestas)
                                     </p>
                                 <Badge className="p-2">
-                                    {((obtenerCantRespuestas(pregunta.id, opcion.id) ?? 0)  * 100) / (cantidadRespuestas? cantidadRespuestas : 1)}%
+                                    {((obtenerCantRespuestasOpcion(pregunta.id, opcion.id) ?? 0)  * 100) / obtenerCantRespuestas(pregunta.id)}%
                                 </Badge>
                                 </div>
                             </ListGroup.Item>   
                         )
                     )
                         :
+                        <>
+                            {todasLasRespuestas.filter((respuesta) => respuesta.pregunta.id === pregunta.id).slice(0, 3).map((respuesta) => 
+                                
+                                    respuesta.pregunta.id == pregunta.id && 
+                                    <>
+                                        <ListGroup.Item className="mb-3 border rounded p-3">
+                                            <p className="mb-0">
+                                                {respuesta.texto}
+                                            </p>
+                                        </ListGroup.Item>
+                                        
+                                    </>
+                                )
 
-                        instrumento?.respuestas_formulario.map((respuestaFormulario) => 
-                            respuestaFormulario.respuestas.map((respuesta) => 
                             
-                                respuesta.pregunta.id == pregunta.id &&
-                                
-                                <ListGroup.Item>
-                                    <p className="mb-0">
-                                        {respuesta.texto}
-                                    </p>
-                                </ListGroup.Item>
-                                
-                            )
-                        
-                        )
-                        
-                    
-                    
-                    }
+                            }
 
+                            <Button onClick={() => setMostrar(true)}> Ver todas las respuestas ({obtenerCantRespuestas(pregunta.id)})</Button>
+                            
+                            {mostrar && (
+                                <ModalRespuestasAbiertas ListaRespuestas={todasLasRespuestas} numeroPregunta={numero} pregunta={pregunta} mostrar={mostrar}    setMostrar={setMostrar}></ModalRespuestasAbiertas>)
+                            }
 
+                        </>
+
+                        }
                 </ListGroup>
-                    
                 ) 
             } 
             </div>

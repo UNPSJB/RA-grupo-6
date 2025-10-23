@@ -13,7 +13,7 @@ import { RespuestasFormulario } from './components/RespuestasFormulario/Respuest
 import Menu from './components/Menu.tsx';
 import ResponderInstrumento from './components/ResponderInstrumento';
 import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
-import { Llamadora} from './components/VerPorcentajes.tsx';
+import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 

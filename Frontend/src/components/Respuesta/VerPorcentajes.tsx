@@ -1,12 +1,12 @@
 
 import { Badge, Button, ListGroup} from "react-bootstrap"
 import { useEffect, useState } from "react"
-import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta} from "./types"
+import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta} from "../types"
 import { ModalRespuestasAbiertas } from "./ModalRespuestasAbiertas"
 
 
 
-
+// Usado para probar - Eliminar
 export function Llamadora({id_instrumento} :{id_instrumento : number}){
 
     const [instrumento, setInstrumento] = useState<Instrumento>()
@@ -32,9 +32,7 @@ export function Llamadora({id_instrumento} :{id_instrumento : number}){
 export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
 
     const [respuestasMostradas, setRespuestasMostradas] = useState<Pregunta[]>([])
-
     const [mostrar, setMostrar] = useState(false)
-
     const todasLasRespuestas = instrumento?.respuestas_formulario.flatMap((respuestaFormulario) => respuestaFormulario.respuestas);
 
     useEffect(() => {
@@ -49,23 +47,15 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
     }}, [instrumento]);
 
     function obtenerCantRespuestasOpcion(id_pregunta : number, id_opcion : number){
-
-        const cantRespuestasOpcion = instrumento?.respuestas_formulario?.reduce((cantidad, respuestas_formulario) => {
-            return cantidad + (respuestas_formulario.respuestas?.filter( (respuesta) => respuesta.pregunta?.id === id_pregunta && respuesta.opcion?.id === id_opcion).length ?? 0);
-        }, 0) ?? 0;
         
-        return cantRespuestasOpcion
+        return todasLasRespuestas.filter((respuesta) => respuesta.pregunta.id == id_pregunta && respuesta.opcion.id == id_opcion).length
     }
 
     function obtenerCantRespuestas(id_pregunta : number){
-
-        const cantRespuestas = instrumento?.respuestas_formulario?.reduce((cantidad, respuestas_formulario) => {
-            return cantidad + (respuestas_formulario.respuestas?.filter( (respuesta) => respuesta.pregunta?.id === id_pregunta).length ?? 0);
-        }, 0) ?? 0;
-        
-        return cantRespuestas
+        return todasLasRespuestas.filter((respuesta) => respuesta.pregunta.id == id_pregunta).length
     }
 
+    
     function obtenerGrupos(){
 
         let grupos: GrupoPregunta[] = [];
@@ -93,7 +83,8 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
                 <div className="choose-group d-flex gap-3 m-3">
 
                     {obtenerGrupos().map((grupo) => 
-                        <Button key={grupo.id} onClick={() => setRespuestasMostradas(  instrumento?.plantilla_formulario.preguntas.filter((pregunta) => pregunta.grupo_pregunta.id === grupo.id) ?? [] )}>
+                        <Button key={grupo.id} onClick={() => setRespuestasMostradas( instrumento?.plantilla_formulario.preguntas.filter((pregunta) => pregunta.grupo_pregunta.id === grupo.id) ?? [] )}>
+
                             Grupo {grupo.letra}
                         </Button>
 
@@ -148,18 +139,15 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
                                         
                                     </>
                                 )
-
-                            
                             }
 
                             <Button onClick={() => setMostrar(true)}> Ver todas las respuestas ({obtenerCantRespuestas(pregunta.id)})</Button>
                             
-                            {mostrar && (
-                                <ModalRespuestasAbiertas ListaRespuestas={todasLasRespuestas} numeroPregunta={numero} pregunta={pregunta} mostrar={mostrar}    setMostrar={setMostrar}></ModalRespuestasAbiertas>)
+                            {mostrar && 
+                                <ModalRespuestasAbiertas ListaRespuestas={todasLasRespuestas} numeroPregunta={numero} pregunta={pregunta} mostrar={mostrar}setMostrar={setMostrar} />
+                                
                             }
-
                         </>
-
                         }
                 </ListGroup>
                 ) 

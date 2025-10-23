@@ -1,11 +1,10 @@
 import { Badge, Button, ListGroup, Modal } from "react-bootstrap";
-import type { Pregunta, Respuesta} from "./types";
+import type { Pregunta, Respuesta} from "../types";
 
 import "./RespuestasAbiertas.css"
 
 export function ModalRespuestasAbiertas({ListaRespuestas, pregunta, numeroPregunta, mostrar, setMostrar} : {ListaRespuestas : Respuesta[], pregunta : Pregunta, numeroPregunta: number, mostrar : boolean, setMostrar : (logico : boolean) => void}){
 
-    
     return (
         <Modal size="xl" show={mostrar} onHide={() => setMostrar(false)} centered>
                 <Modal.Header closeButton className=" m-3 align-items-start">

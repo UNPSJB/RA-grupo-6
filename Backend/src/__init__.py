@@ -6,3 +6,4 @@ from src.Materias.schemas import Materia
 from src.PlantillaFormulario.schemas import PlantillaFormulario
 from src.Instrumento.schemas import Instrumento
 from src.Departamento.schemas import Departamento
+from src.PeriodoVinculado.schemas import PeriodoVinculado

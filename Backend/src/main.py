@@ -79,3 +79,7 @@ app.include_router(instrumento_router)
 #Route de Departamentos
 from src.Departamento.router import router as departamento_router
 app.include_router(departamento_router)
+
+#Route de PeriodosVinculados
+from src.PeriodoVinculado.router import router as periodo_router
+app.include_router(periodo_router)

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento
     from src.RespuestasFormulario.models import RespuestasFormulario
     from src.Departamento.models import Departamento
+
 class Materia(ModeloBase):
     __tablename__ = "materia"
     instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="materia")
@@ -18,4 +19,6 @@ class Materia(ModeloBase):
     respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
     departamento: Mapped["Departamento"] = relationship("Departamento",back_populates="materias")
 
-    
+    periodo_vinculado: Mapped["src.PeriodoVinculado.models.PeriodoVinculado"] = relationship("src.PeriodoVinculado.models.PeriodoVinculado", back_populates="materia")
+
+

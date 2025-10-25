@@ -3,7 +3,7 @@ from datetime import date
 from typing import List, Optional
 
 from src.PlantillaFormulario.schemas import PlantillaFormulario
-from src.Materias.schemas import Materia
+from src.materias.schemas import Materia
 
 from .models import TipoInstrumento 
 

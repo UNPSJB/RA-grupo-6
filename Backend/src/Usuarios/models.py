@@ -1,9 +1,17 @@
-from typing import List
+from typing import List, Optional
+
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.models import ModeloBase
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey
 
+
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.UsuarioDepartamento.models import UsuarioDepartamento
+    
 class Usuario(ModeloBase):
     __tablename__ = "usuarios"
 
@@ -16,3 +24,10 @@ class Usuario(ModeloBase):
 
     rol: Mapped["src.Roles.models.Rol"] = relationship("src.Roles.models.Rol", back_populates="usuarios")
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="usuario")
+
+    departamento_info: Mapped[Optional["UsuarioDepartamento"]] = relationship(
+        "UsuarioDepartamento",
+        back_populates="usuario",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )

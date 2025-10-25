@@ -9,8 +9,9 @@ from src.Pregunta import models
 from src.Usuarios import models
 from src.Respuesta import models
 from src.PlantillaFormulario import models
-from src.Materias import models
+from src.materias import models
 from src.RespuestasFormulario import models
+from src.UsuarioDepartamento import models
 from src.Opciones import models
 from src.Roles import models
 DATABASE_URL = "sqlite:///mi-db-sqlite.db" 

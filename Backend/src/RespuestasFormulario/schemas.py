@@ -5,7 +5,7 @@ from datetime import date
 from pydantic import BaseModel, ConfigDict
 
 from src.Usuarios.schemas import Usuario
-from src.Materias.schemas import Materia
+from src.materias.schemas import Materia
 
 
 class RespuestasFormularioBase(BaseModel):

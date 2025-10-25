@@ -13,6 +13,7 @@ import { RespuestasFormulario } from './components/RespuestasFormulario/Respuest
 import Menu from './components/Menu.tsx';
 import ResponderInstrumento from './components/ResponderInstrumento';
 import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
+import SeleccionarRespuestasFormularios from './components/SeleccionarRespuestasFormularios.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<SeleccionarMateria />} ></Route>
+        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={1}/>}> </Route>
         <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 
         <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>

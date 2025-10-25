@@ -4,11 +4,12 @@ from typing import List
 from datetime import date
 from pydantic import BaseModel, ConfigDict
 
-from src.Usuarios.schemas import Usuario
 from src.Materias.schemas import Materia
 
 
+
 class RespuestasFormularioBase(BaseModel):
+    id: int
     materia_id: str
     usuario_id: int
     instrumento_id: int
@@ -22,7 +23,7 @@ class RespuestasFormularioCreate(RespuestasFormularioBase):
 class RespuestasFormulario(RespuestasFormularioBase):
     id: int
     materia: Materia
-    usuario: Usuario
+    usuario: 'UsuarioBase'
     respuestas: List['Respuesta'] = []  
 
     model_config = ConfigDict(from_attributes=True)
@@ -30,4 +31,5 @@ class RespuestasFormulario(RespuestasFormularioBase):
 
 
 from src.Respuesta.schemas import Respuesta
+from src.Usuarios.schemas import UsuarioBase
 RespuestasFormulario.model_rebuild()

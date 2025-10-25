@@ -47,6 +47,7 @@ export type Respuesta = {
 }
 
 export type Materia = {
+    id: string
     nombre: string
 }
 
@@ -57,15 +58,18 @@ export type Rol = {
 
 
 export type Usuario = {
+    id: number
     nombre: string
     apellido: string
     legajo: number
     email: string
     rol: Rol
+    respuestas_formulario: TypeRespuestasFormulario[]
 }
 
 
 export type TypeRespuestasFormulario = {
+    id: number
     materia: Materia
     usuario: Usuario 
     fecha_envio: Date

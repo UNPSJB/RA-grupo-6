@@ -1,4 +1,4 @@
-import type { Respuesta } from "../types";
+import type { Pregunta, Respuesta } from "../types";
 import { Badge, Col, Row } from "react-bootstrap";
 import { EnumTipoPregunta } from "../types";
 import type { Opcion } from "../types";
@@ -7,6 +7,7 @@ type RespuestaViewProps = {
     respuesta: Respuesta,
     numeroPregunta: number,
     cantidadPreguntas: number,
+    pregunta: Pregunta
 }
 
 type mostrarOpcionesProp = {

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
-import type {TypeRespuestasFormulario } from "../types"
 import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import RespuestaView from "../Respuesta/RespuestaView";
+import type { TypeRespuestasFormulario } from "../types";
+import { useParams } from "react-router-dom";
 
+export function RespuestasFormulario(){
 
-
-export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_formulario : number}){
-
-    const url_base = `http://127.0.0.1:8000/RespuestasFormulario/${id_respuestas_formulario}`
+    const { id } = useParams<{ id: string }>();
+    const url_base = `http://127.0.0.1:8000/RespuestasFormulario/${id}`
 
     const [respuestasFormulario, setRespuestasFormulario] = useState<TypeRespuestasFormulario>()
 
@@ -24,11 +24,13 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
     const numeroPreguntas = respuestasFormulario?.respuestas.length? respuestasFormulario?.respuestas.length : 0;
 
-    return(
-        <>
-        
-        <Container className="pb-5">
+    if(!respuestasFormulario){
+        return <p>Hola</p>
+    }
 
+    return(        
+        
+        <Container className="pb-5 w-50">
 
             <ListGroup className="mb-4 pt-4">
                 <h2> Tus respuestas </h2>
@@ -82,7 +84,7 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
                 <RespuestaView respuesta={respuestasFormulario?.respuestas? respuestasFormulario?.respuestas[indiceRespuestaElegida]  : {
                     texto: "",
                     opcion: {id: 0, texto:""},
-                    pregunta: {  id: 0, texto: "", tipo: "", opciones: []}
+                    pregunta: {  id: 0, texto: "", tipo: "", opciones: [], grupo_pregunta_id: 0, rol_id: 0, estadistica:false, puede_modificarse:false, puede_eliminarse:false}
                 } } numeroPregunta={indiceRespuestaElegida + 1} cantidadPreguntas={numeroPreguntas}/>
                 
                 <Row className="d-flex gap-5">
@@ -105,7 +107,6 @@ export function RespuestasFormulario({id_respuestas_formulario} :{id_respuestas_
 
 
         </Container>
-        </>
 
     )
 }

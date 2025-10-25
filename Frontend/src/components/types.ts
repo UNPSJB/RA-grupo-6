@@ -5,7 +5,7 @@ export type Opcion = {
 };
 
 export type Pregunta = {
-    id: string
+    id: number
     texto: string
     opciones: Opcion[]
     tipo: string | null

@@ -22,12 +22,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<SeleccionarMateria />} ></Route>
-        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={1}/>}> </Route>
         <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 
         <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
-        <Route path='/RespuestaFormulario' element={<RespuestasFormulario id_respuestas_formulario={1}/>} ></Route>
+        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={1}/>}></Route>
+        <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos/>}></Route>
         <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>
         <Route path='/VerInformesCatedra' element={<PaginaInformesCatedra/>}></Route>

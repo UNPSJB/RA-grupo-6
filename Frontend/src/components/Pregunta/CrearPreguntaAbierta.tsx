@@ -1,84 +1,115 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
 import { EnumTipoPregunta } from "../types";
-import { ElegirGrupoPregunta } from '../GrupoPregunta/GrupoPregunta';
+import ElegirGrupoPregunta from '../GrupoPregunta/GrupoPregunta';
+import ELegirRol from '../Rol/ElegirRol';
+import type { ErrorPreguntaAbierta } from '../types';
 
 type Props = {
-    manejarPestaña: () => void;
+    manejarPestania: () => void;
     refrescarPreguntas: () => void;
 };
 
-function CrearPreguntaAbierta({ manejarPestaña, refrescarPreguntas}: Props) {
-    const [texto, setTexto] = useState('');
-    
-    const [mensaje, setMensaje] = useState('');
+function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
+    const [texto, setTexto] = useState(''); 
     const [grupoSeleccionado, setGrupoSeleccionado] = useState(0)
+    const [rolSeleccionado, setRolSeleccionado] = useState<string>("");
+    const [estadisticaSeleccionada, setEstadistica] = useState<boolean>(false);
+    const [errores, setErrores] = useState<ErrorPreguntaAbierta>({});
 
+    const crearPregunta = (event: React.FormEvent) => {
+        const nuevosErrores: ErrorPreguntaAbierta = {};
+        event.preventDefault();
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault(); 
+        let erroresTotales = 0;
 
-        if (!texto.trim()) {
-            setMensaje('Por favor, escriba el texto de la pregunta.');
-            return;
-        }
+        if (!texto.trim()){
+            nuevosErrores.texto = "El texto de la pregunta es obligatorio";
+            erroresTotales++;
+        };
+        if (grupoSeleccionado === 0){
+            nuevosErrores.grupo = "Debes seleccionar un grupo";
+            erroresTotales++;
+        };
+        if (!rolSeleccionado) {
+            nuevosErrores.rol = "Debes seleccionar un rol";
+            erroresTotales++;
+    }
+
+        setErrores(nuevosErrores);
+
+        if (erroresTotales > 0) return;
+         
         
         const nuevaPregunta = {
             texto: texto,
             tipo: EnumTipoPregunta.abierta,
-            grupo_pregunta_id: grupoSeleccionado
+            grupo_pregunta_id: grupoSeleccionado,
+            rol_id: rolSeleccionado,
+            estadistica: estadisticaSeleccionada
         };
 
-        if(grupoSeleccionado == 0){
-            alert("Ingrese el grupo al que pertenece la pregunta");
-            return
-        }
         
-        try {
-            
-
-            const response = await fetch("http://127.0.0.1:8000/preguntas/abierta", {
-                method: 'POST',
-                headers: {
-        
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(nuevaPregunta),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setMensaje(`Pregunta guardada con éxito`);
-                setTexto(''); 
-                refrescarPreguntas();
-                manejarPestaña();
-            } else {
-                setMensaje('Error al guardar la pregunta.');
-            }
-        } catch (error) {
-            setMensaje('Error de conexión. Verificar configuracion de backend...');
-            console.error('Error de conexión:', error);
-        }
+        fetch("http://127.0.0.1:8000/preguntas/abierta",{
+            method: "POST",
+            headers:{ "Content-Type": "application/json" },
+            body: JSON.stringify(nuevaPregunta),
+        }).then(() =>{
+            setTexto("");
+            setRolSeleccionado("");
+            setGrupoSeleccionado(0);
+            setEstadistica(false);
+            setErrores({});
+            refrescarPreguntas();
+            manejarPestania();
+        });
     };
 
+      useEffect(() => {
+        const nuevosErrores = { ...errores };
+        let huboCambios = false;
+    
+        if (texto.trim() && nuevosErrores.texto) {
+          delete nuevosErrores.texto;
+          huboCambios = true;
+        }
+    
+        if (grupoSeleccionado !== 0 && nuevosErrores.grupo) {
+          delete nuevosErrores.grupo;
+          huboCambios = true;
+        }
+    
+        if (rolSeleccionado && nuevosErrores.rol) {
+          delete nuevosErrores.rol;
+          huboCambios = true;
+        }
+    
+        if (huboCambios) {
+          setErrores(nuevosErrores);
+        }
+      }, [texto, grupoSeleccionado, rolSeleccionado, errores]);
+    
     return (
         <>
-            <Form onSubmit={handleSubmit}>
-                
-                <IngresarPregunta texto={texto} setTexto={setTexto} />
-                <ElegirGrupoPregunta selectedGrupo={grupoSeleccionado} onChangeGrupo={setGrupoSeleccionado}></ElegirGrupoPregunta>
-
-                <Col className="d-flex justify-content-center">
-                <Button className="mt-3" variant="primary" type="submit" onClick={handleSubmit} size='sm'>
-                    Crear Pregunta
+        <Form>
+            <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto} />
+            <ElegirGrupoPregunta
+                selectedGrupo={grupoSeleccionado}
+                onChangeGrupo={setGrupoSeleccionado}
+                error={errores.grupo}
+            />
+            <ELegirRol selectedRol={rolSeleccionado} onChangeRol={setRolSeleccionado} error={errores.rol} />
+            
+            <Col className="d-flex justify-content-center">
+                <Button className="mt-3" type="submit" size="sm" onClick={crearPregunta}>
+                Crear Pregunta
                 </Button>
-                </Col>
-            </Form>
+            </Col>
+        </Form>
 
-            {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
         </>
         
     );

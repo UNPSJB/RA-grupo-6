@@ -9,7 +9,8 @@ class PreguntaBase(BaseModel):
     tipo: Optional[str] = None 
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
-
+    estadistica: bool
+    rol_id: int 
 
 
 class PreguntaAbiertaCreate(PreguntaBase):
@@ -21,8 +22,10 @@ class PreguntaCerradaCreate(PreguntaBase):
     tipo : EnumTipoPregunta = EnumTipoPregunta.cerrada
 
 
-class PreguntaUpdate(PreguntaBase):
-    pass
+class PreguntaUpdate(BaseModel):
+    texto: str
+    opciones: Optional[List[int]] = None
+    grupo_pregunta_id: int
 
 
 class PreguntaDelete(BaseModel):
@@ -32,6 +35,8 @@ class PreguntaDelete(BaseModel):
 class Pregunta(PreguntaBase):
     id: int
     opciones: List[Opcion] = []
+    puede_eliminarse: bool = True
+    puede_modificarse: bool = True
 
     model_config = {
         "from_attributes": True, 

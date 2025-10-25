@@ -1,5 +1,5 @@
 from typing import List
-from src.materias.constants import ErrorCode
+from src.Materias.constants import ErrorCode
 from src.exceptions import NotFound, BadRequest
 
 

@@ -5,9 +5,10 @@ import Form from "react-bootstrap/Form";
 type Props = {
     texto: string;
     setTexto: (v: string) => void;
+    error?: string;
 };
 
-function IngresarPregunta({texto, setTexto} : Props){
+function IngresarPregunta({texto, setTexto, error} : Props){
 
     return (
 
@@ -20,7 +21,10 @@ function IngresarPregunta({texto, setTexto} : Props){
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
                 className="input-pregunta"
+                style={{ borderColor: error? "#dc3545" : "#dee2e6", borderWidth: "2px"
+        }}
             />
+            {error && <div className="form-text text-danger">{error}</div>}
         </Form.Group>
 
     );

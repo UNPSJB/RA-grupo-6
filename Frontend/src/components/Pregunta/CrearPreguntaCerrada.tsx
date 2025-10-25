@@ -1,18 +1,14 @@
-import {useState } from "react";
+import {useState, useEffect } from "react";
 import type { Opcion } from "../types";
 
 import OpcionList from "../Opcion/OpcionList";
-import { Button, Col } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import { EnumTipoPregunta } from "../types";
 import IngresarPregunta from "./IngresarPregunta";
-import { ElegirGrupoPregunta } from "../GrupoPregunta/GrupoPregunta";
-
-type PreguntaCerrada = {
-  texto: string;
-  opciones: number[];
-  tipo: string;
-  grupo_pregunta_id: number;
-};
+import ElegirGrupoPregunta from "../GrupoPregunta/GrupoPregunta";
+import type { PreguntaCerrada } from "../types";
+import ELegirRol from "../Rol/ElegirRol";
+import type { ErrorPreguntaCerrada } from "../types";
 
 type Props = {
   manejarPestaña: () => void;
@@ -28,19 +24,36 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
   const [TextoMostrar, setTextoMostrar] = useState("Mostrar");
   const[opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>([])
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(0)
+  const [rolSeleccionado, setRolSeleccionado] = useState<string>("")
+  const [estadisticaSeleccionada, setEstadisticaSeleccionada] = useState<boolean>(true)
+
+  const [errores, setErrores] = useState<ErrorPreguntaCerrada>({});
 
   const crearPregunta = () => {
+    const nuevosErrores: ErrorPreguntaCerrada = {};
 
-    if(grupoSeleccionado == 0){
-      alert("Ingrese el grupo al que pertenece la pregunta");
-      return
-    }
+    let erroresTotales = 0;
 
+    if (!texto.trim()){
+      nuevosErrores.texto = "El texto de la pregunta es obligatorio";
+      erroresTotales++;
+    };
+    if (grupoSeleccionado === 0){
+      nuevosErrores.grupo = "Debes seleccionar un grupo";
+      erroresTotales++;
+    };
+    if (opcionesSeleccionadas.length < 2){ 
+      nuevosErrores.opciones = "Debes agregar al menos dos opciones";
+      erroresTotales++;
+    };
+    if (!rolSeleccionado) {
+      nuevosErrores.rol = "Debes seleccionar un rol";
+      erroresTotales++;
+  }
 
-    if(opcionesSeleccionadas.length < 2){
-      alert("Ingrese al menos dos opciones");
-      return
-    }
+    setErrores(nuevosErrores);
+
+    if (erroresTotales > 0) return;
 
 
     const seleccionadas = opcionesSeleccionadas.map(op => op.id);
@@ -50,6 +63,8 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       opciones: seleccionadas,
       tipo: EnumTipoPregunta.cerrada,
       grupo_pregunta_id: grupoSeleccionado,
+      estadistica: estadisticaSeleccionada,
+      rol_id: rolSeleccionado,
     };
 
     fetch("http://127.0.0.1:8000/preguntas/cerrada", {
@@ -60,48 +75,107 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       setTexto("");
       setOpcionesSeleccionadas([]);
       setGrupoSeleccionado(0);
+      setRolSeleccionado("");
+      setEstadisticaSeleccionada(true);
+      setErrores({});
       refrescarPreguntas();
       manejarPestaña();
     });
   };
 
+  useEffect(() => {
+    const nuevosErrores = { ...errores };
+    let huboCambios = false;
+
+    if (texto.trim() && nuevosErrores.texto) {
+      delete nuevosErrores.texto;
+      huboCambios = true;
+    }
+
+    if (grupoSeleccionado !== 0 && nuevosErrores.grupo) {
+      delete nuevosErrores.grupo;
+      huboCambios = true;
+    }
+
+    if (rolSeleccionado && nuevosErrores.rol) {
+      delete nuevosErrores.rol;
+      huboCambios = true;
+    }
+
+    if (opcionesSeleccionadas.length >= 2 && nuevosErrores.opciones) {
+      delete nuevosErrores.opciones;
+      huboCambios = true;
+    }
+
+    if (huboCambios) {
+      setErrores(nuevosErrores);
+    }
+  }, [texto, grupoSeleccionado, rolSeleccionado, opcionesSeleccionadas, errores]);
+
   function cambiarMostrar() {
-    setMostrar(!mostrar);
-    
-    mostrar? setTextoMostrar("Mostrar") : setTextoMostrar("Ocultar")
-  
+        const nuevoMostrar = !mostrar;
+        setMostrar(nuevoMostrar);
+        
+        if (nuevoMostrar) {
+            setTextoMostrar("Ocultar");
+        } else {
+            setTextoMostrar("Mostrar");
+        }
   }
 
   return (
     <div>
-      <IngresarPregunta texto={texto} setTexto={setTexto} />
 
-      <ElegirGrupoPregunta selectedGrupo={grupoSeleccionado} onChangeGrupo={setGrupoSeleccionado}></ElegirGrupoPregunta>
+      <div className="contenedor-scroll"style={{maxHeight: '400px', 
+          overflowY: 'auto',  padding: '1.25rem'}}>
+      <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto}/>
 
+      <ElegirGrupoPregunta selectedGrupo={grupoSeleccionado} onChangeGrupo={setGrupoSeleccionado} error={errores.grupo}></ElegirGrupoPregunta>
 
-      <div  className="mb-3 d-flex justify-content-between align-items-center">
-        <h6>Gestión de opciones</h6>
-        <Button
-          className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
-          onClick={cambiarMostrar}
-        >
-          <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />
-          {TextoMostrar}
-        </Button>
-      </div>
+      <ELegirRol selectedRol={rolSeleccionado} onChangeRol={setRolSeleccionado} error={errores.rol}></ELegirRol>
+
+      <Form.Group className="mb-3 text-start mt-3" >
+        <Form.Label className="fw-semibold mb-3">Estadisticas</Form.Label>
+        <div className="d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm">
+          <span className="fw-semibold">Incluir en estadísticas</span>
+          <Form.Check
+            type="switch"
+            id="pregunta-cerrada"
+            checked={estadisticaSeleccionada}
+            onChange={(e) => setEstadisticaSeleccionada(e.target.checked)}
+          />
+        </div>
+      </Form.Group>
+
+      <Form.Group className="mb-4 mt-3 text-start">
+        <div className="d-flex justify-content-between align-items-center">
+          <h6>Gestión de opciones</h6>
+          <Button
+            className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
+            onClick={cambiarMostrar}
+            >
+            <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />
+            {TextoMostrar}
+          </Button>
+        </div>
+        {errores.opciones && <div style={{ color: "#dc3545", fontSize: "0.85rem", marginTop: "0.25rem" }}>{errores.opciones}</div>}
+      </Form.Group>
+
 
       {mostrar && (
         <OpcionList
-          opcionesSeleccionadas={opcionesSeleccionadas}
-          setOpcionesSeleccionadas={setOpcionesSeleccionadas}
+        opcionesSeleccionadas={opcionesSeleccionadas}
+        setOpcionesSeleccionadas={setOpcionesSeleccionadas}
         />
       )}
+      
 
       <Col className="d-flex justify-content-center">
         <Button className="mt-3" onClick={crearPregunta} size="sm">
           Crear Pregunta
         </Button>
       </Col>
+      </div>
     </div>
   );
 }

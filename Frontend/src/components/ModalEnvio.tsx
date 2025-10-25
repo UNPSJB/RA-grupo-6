@@ -2,34 +2,41 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 interface ModalExitoProps {
-  onEnviar: () => Promise<boolean>; 
+  onEnviar: () => boolean | Promise<boolean>; 
   onExito?: () => void;
   desactivado: boolean;
+  textoBoton?: string;
+  variante?: string;
+  className?: string;
 }
 
-export default function ModalExito({ onEnviar, onExito, desactivado }: ModalExitoProps) {
+function ModalExito({ onEnviar, onExito, desactivado, textoBoton, variante, className }: ModalExitoProps) {
     const [mostrar, setMostrar] = useState(false);
 
-    const mostrarModal = () => {
-        onEnviar()
-        .then((exito) => {
+    const [enviando, setEnviando] = useState(false);
+
+    const mostrarModal = async () => {
+        setEnviando(true);
+        try {
+            const exito = await onEnviar();
             if (exito) {
                 setMostrar(true);
                 setTimeout(() => {
                     setMostrar(false);
-                    if (onExito) onExito(); 
+                    if (onExito) onExito();
                 }, 1500);
-            } else {
-                alert("Error al enviar el formulario");
             }
-        })
-        .catch(() => alert("Error al conectar con el servidor"));
+        } catch {
+            alert("Ocurrió un error al ejecutar la acción");
+        } finally {
+            setEnviando(false);
+        }
     };
 
     return (
         <>
-            <Button variant="success" className="w-100" disabled={desactivado} onClick={mostrarModal}>
-                Enviar Formulario
+            <Button variant={variante} className={className} disabled={desactivado || enviando} onClick={mostrarModal} style={{flex:1}}>
+                <i className="fa-solid fa-check me-2"></i>{textoBoton}
             </Button>
 
             <Modal show={mostrar}>
@@ -37,9 +44,11 @@ export default function ModalExito({ onEnviar, onExito, desactivado }: ModalExit
                     <Modal.Title>¡Éxito!</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Formulario enviado!
+                    Operación exitosa!
                 </Modal.Body>
             </Modal>
         </>
     );
 }
+
+export default ModalExito;

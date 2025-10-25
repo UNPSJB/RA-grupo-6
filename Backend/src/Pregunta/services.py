@@ -6,7 +6,7 @@ from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id)
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -25,7 +25,7 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
 
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id)
+    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)
@@ -34,7 +34,24 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
     return _nueva
 
 def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
-    return db.scalars(select(Pregunta)).all()
+    db_preguntas = db.scalars(select(Pregunta)).all()
+    resultado = []
+    for preg in db_preguntas:
+        en_formulario = bool(preg.formularios and len(preg.formularios) > 0)
+        resultado.append(
+            schemas.Pregunta(
+                id= preg.id,
+                texto= preg.texto,
+                tipo = preg.tipo,
+                opciones= preg.opciones,
+                grupo_pregunta_id= preg.grupo_pregunta_id,
+                rol_id = preg.rol_id,
+                estadistica = preg.estadistica,
+                puede_eliminarse= not en_formulario,
+                puede_modificarse= not en_formulario
+            )
+        )
+    return resultado
 
 def obtner_pregunta(db: Session, pregunta_id: int) -> schemas.Pregunta:
     db_pregunta = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_id))
@@ -44,7 +61,26 @@ def obtner_pregunta(db: Session, pregunta_id: int) -> schemas.Pregunta:
 
 def modificar_pregunta(db: Session, pregunta_id: int, pregunta: schemas.PreguntaUpdate) -> Pregunta:
     db_pregunta = obtner_pregunta(db, pregunta_id)
-    db.execute(update(Pregunta).where(Pregunta.id == pregunta_id).values(**pregunta.model_dump()))
+    if not db_pregunta:
+        raise exceptions.PreguntaNoEncontrada()
+    
+    if db_pregunta.formularios and len(db_pregunta.formularios) > 0:
+        raise exceptions.PreguntaNoModificable()
+
+    data_update = pregunta.model_dump(exclude={"opciones"}, exclude_unset=True)
+    db.execute(
+        update(Pregunta)
+        .where(Pregunta.id == pregunta_id)
+        .values(**data_update)
+    )
+
+    if pregunta.opciones is not None:
+        db_pregunta.opciones = (
+            db.query(Opcion)
+            .filter(Opcion.id.in_(pregunta.opciones))
+            .all()
+        )
+
     db.commit()
     db.refresh(db_pregunta)
     return db_pregunta  

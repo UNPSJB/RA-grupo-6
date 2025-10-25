@@ -7,17 +7,17 @@ import { Form, Modal, Button } from 'react-bootstrap';
 
 type Props = {
     mostrar: boolean;
-    manejarPestaña: () => void;
+    manejarPestania: () => void;
     refrescarPreguntas: () => void;
 };
 
 import "./pregunta.css";
 
-function CrearPregunta({ mostrar, manejarPestaña, refrescarPreguntas }: Props) {
+function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) {
     const [tipoPregunta, setTipoPregunta] = useState<TipoPregunta>(EnumTipoPregunta.abierta);
 
     return (
-        <Modal show={mostrar} onHide={manejarPestaña} size="lg" centered>
+        <Modal show={mostrar} onHide={manejarPestania} size="lg" centered>
             <Modal.Header closeButton className="border-bottom" style={{ padding: "1.5rem" }}>
                 <Modal.Title className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </Modal.Title>
             </Modal.Header>
@@ -68,19 +68,22 @@ function CrearPregunta({ mostrar, manejarPestaña, refrescarPreguntas }: Props) 
 
                     {tipoPregunta === EnumTipoPregunta.abierta ? (
                         <CrearPreguntaAbierta
-                            manejarPestaña={manejarPestaña}
+                            manejarPestania={manejarPestania}
                             refrescarPreguntas={refrescarPreguntas}
                         />
                     ) : (
+
                         <CrearPreguntaCerrada
-                            manejarPestaña={manejarPestaña}
+                            manejarPestaña={manejarPestania}
                             refrescarPreguntas={refrescarPreguntas}
-                        />
+                            />
+
                     )}
                 </Form>
+
             </Modal.Body>
             <Modal.Footer className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
-                <Button variant="outline-secondary" onClick={manejarPestaña}>
+                <Button variant="outline-secondary" onClick={manejarPestania}>
                     Cerrar
                 </Button>
             </Modal.Footer>

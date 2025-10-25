@@ -1,6 +1,6 @@
 from __future__ import annotations 
 import enum
-from sqlalchemy import Enum,Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Enum,Column, Integer, String, ForeignKey, Table, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from src.Opciones.models import Opcion
@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  
     from src.PlantillaFormulario.models import PlantillaFormulario
     from src.Respuesta.models import Respuesta
+    from src.GrupoPregunta.models import GrupoPregunta
+    from src.Roles.models import Rol
 
 class EnumTipoPregunta(str, enum.Enum):
     abierta = "abierta"
@@ -32,9 +34,13 @@ class Pregunta(ModeloBase):
         default=EnumTipoPregunta.abierta
     )
 
-    grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"), nullable=True)
+    grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"), nullable=False)
 
-    grupo_pregunta: Mapped["src.GrupoPregunta.models.GrupoPregunta"] = relationship(back_populates="preguntas")
+    grupo_pregunta: Mapped["GrupoPregunta"] = relationship(back_populates="preguntas")
+
+    rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False)
+
+    rol: Mapped["Rol"] = relationship("Rol", back_populates="preguntas")
 
     formularios: Mapped[list["PlantillaFormulario"]] = relationship(
     "PlantillaFormulario",
@@ -52,6 +58,10 @@ class Pregunta(ModeloBase):
         back_populates="pregunta",
         cascade="all, delete-orphan"
     )
+
+    estadistica: Mapped[bool] = mapped_column(Boolean, nullable= False)
+
+
 
     
 

@@ -6,9 +6,10 @@ import { Form } from "react-bootstrap";
 type GrupoPreguntaProps = {
     selectedGrupo: number;
     onChangeGrupo: (grupo: number) => void;
+    error?: string;
 };
 
-export function ElegirGrupoPregunta({ selectedGrupo, onChangeGrupo }: GrupoPreguntaProps){
+function ElegirGrupoPregunta({ selectedGrupo, onChangeGrupo, error }: GrupoPreguntaProps){
 
     const [gruposPregunta, setGruposPregunta] = useState<GrupoPregunta[]>([])
 
@@ -30,10 +31,7 @@ export function ElegirGrupoPregunta({ selectedGrupo, onChangeGrupo }: GrupoPregu
                     onChange={(e) => onChangeGrupo(parseInt(e.target.value))}
                     className="border-2"
                     required
-                    style={{ 
-                        borderColor: "#dee2e6",
-                        padding: "0.75rem" 
-                    }}
+                    style={{ borderColor: error ? "#dc3545" : "#dee2e6" }}
                     >
                     <option value={0}>Seleccione un grupo de pregunta...</option>
                     {gruposPregunta.map((grupo_pregunta) => (
@@ -42,9 +40,11 @@ export function ElegirGrupoPregunta({ selectedGrupo, onChangeGrupo }: GrupoPregu
                         </option>
                     ))}
                 </Form.Select>
-
+                {error && <div className="form-text text-danger">{error}</div>}
             </Form.Group>
         </>
 
     )
 }
+
+export default ElegirGrupoPregunta;

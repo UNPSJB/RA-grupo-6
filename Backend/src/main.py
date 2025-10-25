@@ -7,7 +7,7 @@ from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
-from src.materias.router import router as materias_router
+from src.Materias.router import router as materias_router
 
 
 
@@ -75,3 +75,7 @@ app.include_router(respuestas_formulario_router)
 #Route de Instrumentos
 from src.Instrumento.router import router as instrumento_router
 app.include_router(instrumento_router)
+
+#Route de Departamentos
+from src.Departamento.router import router as departamento_router
+app.include_router(departamento_router)

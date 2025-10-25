@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento
     from src.Usuarios.models import Usuario
     from src.Respuesta.models import Respuesta
+    from src.Materias.models import Materia
 
 class RespuestasFormulario(ModeloBase):
     __tablename__ = "respuestas_formulario"
@@ -20,7 +21,7 @@ class RespuestasFormulario(ModeloBase):
     
     usuario: Mapped["Usuario"] = relationship(back_populates="respuestas_formulario")
     instrumento: Mapped["Instrumento"] = relationship(back_populates="respuestas_formulario")
-    materia: Mapped["src.materias.models.Materia"] = relationship(back_populates="respuestas_formulario")
+    materia: Mapped["Materia"] = relationship(back_populates="respuestas_formulario")
     respuestas: Mapped[List["Respuesta"]] = relationship(back_populates="formulario")
 
     # TODO: Recordar borrar esta columna y hacer la migración en la base de datos

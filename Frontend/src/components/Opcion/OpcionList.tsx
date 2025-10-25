@@ -14,9 +14,7 @@ type Props ={
 function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
 
     const [opciones, setOpciones] = useState<Opcion[]>([])
-
-    // const[OpcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>([])
-    
+  
     const agregarOpcion = (nueva: Opcion) => {
         setOpciones((prev) => [...prev, nueva]);
     };
@@ -27,16 +25,12 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
         setOpciones(nuevasOpciones);
     };
 
-    function agregarOpcionSeleccionada(opcion : Opcion) {
-
-        if(opcionesSeleccionadas.includes(opcion)){
-            setOpcionesSeleccionadas(opcionesSeleccionadas.filter(opcionSeleccionada => opcionSeleccionada !== opcion))
-        }
-        else{
-            setOpcionesSeleccionadas([...opcionesSeleccionadas, opcion]);
-
-        }
-        
+    function agregarOpcionSeleccionada(opcion: Opcion) {
+    if(opcionesSeleccionadas.some(o => o.id === opcion.id)){
+        setOpcionesSeleccionadas(opcionesSeleccionadas.filter(o => o.id !== opcion.id));
+    } else {
+        setOpcionesSeleccionadas([...opcionesSeleccionadas, opcion]);
+    }
     }
 
     useEffect(() => {
@@ -55,10 +49,11 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
           <p className="text-muted mb-3" style={{ fontSize: "0.875rem" }}>
             Selecciona las opciones disponibles:
           </p>
+          <div>
           {opciones.map((opcion) => (
             <ListGroup.Item
-              key={opcion.id}
-              className="d-flex align-items-center justify-content-between mb-2 border rounded p-2"
+            key={opcion.id}
+            className="d-flex align-items-center justify-content-between mb-2 border rounded p-2"
             >
               <Form.Check
                 type="checkbox"
@@ -70,6 +65,7 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
               <EliminarOpcion opcionId={opcion.id} onDeleted={eliminarOpcion} />
             </ListGroup.Item>
           ))}
+          </div>
         </ListGroup>
       )}
     </>

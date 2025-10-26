@@ -9,12 +9,10 @@ from src.Materias.schemas import Materia
 
 
 class RespuestasFormularioBase(BaseModel):
-    id: int
     materia_id: str
     usuario_id: int
     instrumento_id: int
     fecha_envio: date
-
 
 class RespuestasFormularioCreate(RespuestasFormularioBase):
     pass

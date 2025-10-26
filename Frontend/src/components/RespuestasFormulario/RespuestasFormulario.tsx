@@ -84,7 +84,7 @@ export function RespuestasFormulario(){
                                         {respuesta.opcion.texto}
                                     </p>
                                 </Row>   
-                            
+                        
                             }
                             
                         </div>

@@ -208,10 +208,10 @@ function ResponderInstrumento() {
                                         {idx + 1}
                                     </Badge>
                                     <div>
+                                        <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
                                         <Badge bg={pregunta.tipo.toLowerCase() === EnumTipoPregunta.abierta ? 'success' : 'info'}>
                                             {pregunta.tipo === EnumTipoPregunta.abierta ? EnumTipoPregunta.abierta : EnumTipoPregunta.cerrada}
                                         </Badge>
-                                        <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
                                     </div>
                                 </div>
 

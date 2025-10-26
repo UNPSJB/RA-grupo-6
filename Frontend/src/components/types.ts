@@ -70,19 +70,12 @@ export type Usuario = {
 
 
 export type TypeRespuestasFormulario = {
-<<<<<<< HEAD
     id: number
     materia: Materia
     usuario: Usuario 
     fecha_envio: Date
     respuestas: Respuesta[]
 
-=======
-    materia: Materia;
-    usuario: Usuario; 
-    fecha_envio: Date;
-    respuestas: Respuesta[];
->>>>>>> Respuesta
 }
 
 export type TipoInstrumento = 
@@ -153,7 +146,6 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
   respuestas_agregadas: PreguntaConRespuestas[];
 };
 
-<<<<<<< HEAD
 export type PreguntaCerrada = {
   texto: string;
   opciones: number[];
@@ -187,7 +179,6 @@ export type ErrorPreguntaAbierta = {
   grupo?: string;
   rol?: string;
 };
-=======
 
 export type PlantillaFormulario = {
   titulo: string;
@@ -209,4 +200,3 @@ export type Instrumento = {
 
 }
 
->>>>>>> Respuesta

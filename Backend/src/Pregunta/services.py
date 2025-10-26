@@ -45,6 +45,7 @@ def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
                 tipo = preg.tipo,
                 opciones= preg.opciones,
                 grupo_pregunta_id= preg.grupo_pregunta_id,
+                grupo_pregunta= preg.grupo_pregunta,
                 rol_id = preg.rol_id,
                 estadistica = preg.estadistica,
                 puede_eliminarse= not en_formulario,

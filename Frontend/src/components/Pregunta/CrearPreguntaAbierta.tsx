@@ -49,7 +49,7 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
             tipo: EnumTipoPregunta.abierta,
             grupo_pregunta_id: grupoSeleccionado,
             rol_id: rolSeleccionado,
-            estadistica: estadisticaSeleccionada
+            estadistica: estadisticaSeleccionada,
         };
 
         

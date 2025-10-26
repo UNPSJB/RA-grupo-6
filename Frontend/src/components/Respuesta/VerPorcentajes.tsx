@@ -33,7 +33,7 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
 
     const [respuestasMostradas, setRespuestasMostradas] = useState<Pregunta[]>([])
     const [mostrar, setMostrar] = useState(false)
-    const todasLasRespuestas = instrumento?.respuestas_formulario.flatMap((respuestaFormulario) => respuestaFormulario.respuestas);
+    const todasLasRespuestas = instrumento?.respuestas_formulario?.flatMap((respuestaFormulario) => respuestaFormulario.respuestas);
 
     useEffect(() => {
         if(instrumento){

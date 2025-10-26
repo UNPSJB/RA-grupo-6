@@ -58,7 +58,7 @@ class RespuestaDetalle(BaseModel):
 class InstrumentoDetalle(BaseModel):
     id: int
     titulo_formulario: str
-    #autor_nombre: str
+    # autor_nombre: str
     fecha_completado: Optional[date]
     plantilla_formulario_id: int
     respuestas: List[RespuestaDetalle]
@@ -76,3 +76,6 @@ class EstadisticaPregunta(BaseModel):
     pregunta_id: int
     pregunta_texto: str
     opciones: List[EstadisticaOpcion]
+
+
+ 

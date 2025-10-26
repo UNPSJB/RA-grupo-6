@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING, List
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ConfigDict
 
 from src.Roles.schemas import Rol
 
@@ -13,10 +13,12 @@ class UsuarioBase(BaseModel):
     email: str
     rol: Rol
     legajo: int
+    model_config = ConfigDict(from_attributes =  True)
+
 
 class Usuario(UsuarioBase):
     respuestas_formulario: List['RespuestasFormulario']
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes =  True)
 
 from src.RespuestasFormulario.schemas import RespuestasFormulario
 Usuario.model_rebuild()

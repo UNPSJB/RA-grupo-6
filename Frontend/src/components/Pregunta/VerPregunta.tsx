@@ -4,6 +4,8 @@ import { Badge, Container } from "react-bootstrap";
 import EliminarPregunta from "./EliminarPregunta";
 import { EnumTipoPregunta } from "../types";
 import ModificarPregunta from "./ModificarPregunta";
+
+
 const url_base = 'http://127.0.0.1:8000/preguntas/';
 
 import type { Pregunta } from "../types";
@@ -26,7 +28,7 @@ function VerPregunta() {
     const handleEdited = (preguntaActualizada: Pregunta) => {
         setPreguntas(prev =>
             prev.map(p => (p.id === preguntaActualizada.id ? preguntaActualizada : p))
-         );
+        );
     };
 
     return (

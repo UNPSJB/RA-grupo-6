@@ -16,3 +16,6 @@ class Usuario(ModeloBase):
 
     rol: Mapped["src.Roles.models.Rol"] = relationship("src.Roles.models.Rol", back_populates="usuarios")
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="usuario")
+
+    periodo_vinculado: Mapped["src.PeriodoVinculado.models.PeriodoVinculado"] = relationship("src.PeriodoVinculado.models.PeriodoVinculado", back_populates="usuario")
+

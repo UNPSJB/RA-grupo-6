@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from src.RespuestasFormulario.models import RespuestasFormulario
     from src.Departamento.models import Departamento
     from src.Carrera.models import Carrera
+
 class Materia(ModeloBase):
     __tablename__ = "materia"
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
@@ -20,3 +21,7 @@ class Materia(ModeloBase):
     respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
     departamento: Mapped["Departamento"] = relationship("Departamento", back_populates="materias")
     carrera: Mapped["Carrera"] = relationship("Carrera", back_populates="materias")
+
+    periodo_vinculado: Mapped["src.PeriodoVinculado.models.PeriodoVinculado"] = relationship("src.PeriodoVinculado.models.PeriodoVinculado", back_populates="materia")
+
+

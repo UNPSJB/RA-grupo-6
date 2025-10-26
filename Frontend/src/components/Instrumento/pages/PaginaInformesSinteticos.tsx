@@ -1,16 +1,16 @@
 // PaginaInformesSinteticos.tsx
 
 import { useState, useEffect } from "react";
-import DetalleInforme from "../components/DetalleInforme";
 import InstrumentoList from "../components/InstrumentoList";
 import type { instrumentoList } from "../types";
+import DetalleInformeSintetico from "../components/DetalleInformeSintetico";
 
 const mockSinteticos: instrumentoList[] = [
   { id: 101, tipo: 'INFORME_SINTETICO', 
     fecha_inicio: '2025-08-01', 
     fecha_cierre: '2025-08-31', 
     materia: { id: 'ALG', nombre: 'Álgebra' }, 
-    plantilla_formulario: { id: 1, titulo: 'Informe Sintético de Álgebra - 2C 2025' } },
+    plantilla_formulario: { id: 1, titulo: 'Informe Sintético  2C 2025' } },
   { id: 102, 
     tipo: 'INFORME_SINTETICO', 
     fecha_inicio: '2025-08-01', 
@@ -41,7 +41,7 @@ export default function PaginaInformesSinteticos() {
   if (cargando) return <p>Cargando informes sintéticos...</p>;
 
   if (seleccionado) {
-    return <DetalleInforme informe={seleccionado} onVolver={() => setSeleccionado(null)} />;
+    return <DetalleInformeSintetico informe={seleccionado} onVolver={() => setSeleccionado(null)} />;
   }
 
   return <InstrumentoList tipo={TIPO_INSTRUMENTO} instrumentos={instrumentos} onSeleccionar={handleSeleccionar} />;

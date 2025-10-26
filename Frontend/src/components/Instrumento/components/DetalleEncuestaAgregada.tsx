@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
 import { Card, Button, ListGroup, Badge, Spinner, Alert } from "react-bootstrap";
-import type { instrumentoList, EstadisticaPregunta, PreguntaConRespuestas } from "../types";
+import type { instrumentoList, EstadisticaPregunta,  DetalleEncuestaCompleto, GrupoPreguntasAbiertas } from "../types";
 import Estadisticas from "./Estadisticas";
 
-type GrupoPreguntasAbiertas = {
-  grupo: string;
-  titulo_grupo: string;
-  preguntas: PreguntaConRespuestas[];
-};
 
-type DetalleEncuestaCompleto = {
-  id: number;
-  titulo_formulario: string;
-  estadisticas: EstadisticaPregunta[];
-  respuestas_abiertas_agrupadas: GrupoPreguntasAbiertas[];
-};
+
 
 const mockDetalleCompleto: DetalleEncuestaCompleto = { 
   id: 301, 

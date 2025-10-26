@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from '@react-pdf/renderer'; 
 import { Card, Button, ListGroup, Badge, Spinner } from "react-bootstrap";
-import type { instrumentoList, EstadisticaPregunta, DetalleInformeCompleto } from "../types"; 
+import type { instrumentoList, EstadisticaPregunta, DetalleInformeCatedraCompleto } from "../types"; 
 import InformePDFDocument from './InformePDFDocument';
 import Estadisticas from "./Estadisticas";
 
-const mockDetalleCompleto: DetalleInformeCompleto = {
+const mockDetalleCompleto: DetalleInformeCatedraCompleto = {
   id: 101,
   titulo_formulario: "Informe de Actividad Curricular - Álgebra - 2C 2025",
   fecha_completado: "2025-09-05",
@@ -82,7 +82,7 @@ export default function DetalleInforme({ informe, onVolver }: DetalleInformeProp
   
   if (!informe) return null;
 
-  const [detalleCompleto, setDetalleCompleto] = useState<DetalleInformeCompleto | null>(null);
+  const [detalleCompleto, setDetalleCompleto] = useState<DetalleInformeCatedraCompleto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -1,7 +1,7 @@
 // InformePDFDocument.tsx
 
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import type { DetalleInformeCompleto, EstadisticaPregunta, GrupoRespuestasAbiertas, RespuestaAbierta } from "../types"; 
+import type { DetalleInformeCatedraCompleto, EstadisticaPregunta, GrupoRespuestasAbiertas, RespuestaAbierta } from "../types"; 
 
 // --- Estilos para el PDF ---
 const styles = StyleSheet.create({
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   progressBar: { height: 8, backgroundColor: '#28a745', borderRadius: 4 },
 });
 
-export default function InformePDFDocument({ informe }: { informe: DetalleInformeCompleto }) { 
+export default function InformePDFDocument({ informe }: { informe: DetalleInformeCatedraCompleto }) { 
 
   return (
     <Document>

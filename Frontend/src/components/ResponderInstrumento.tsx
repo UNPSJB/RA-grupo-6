@@ -183,10 +183,11 @@ function ResponderInstrumento() {
         );
     }
 
-       return (
+        return (
         <>
             <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
             <Container style={{ maxWidth: '900px' }}>
+
                 <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                 <div className="text-center mb-3">
                     <h1 className="fw-bold mb-2" style={{ color: "#1f2937", fontSize: "1.875rem" }}>

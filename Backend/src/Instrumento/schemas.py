@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import date
 from typing import List, Optional
 
+from src.RespuestasFormulario.schemas import RespuestasFormulario
 from src.PlantillaFormulario.schemas import PlantillaFormulario
 from src.Materias.schemas import Materia
 
@@ -13,6 +14,9 @@ class InstrumentoBase(BaseModel):
     tipo: TipoInstrumento
     plantilla_formulario_id: int
     materia_id: str
+    materia: Materia
+    plantilla_formulario: PlantillaFormulario
+    respuestas_formulario: RespuestasFormulario
 
 class InstrumentoCreate(InstrumentoBase):
     pass 
@@ -58,10 +62,9 @@ class InstrumentoDetalle(BaseModel):
     fecha_completado: Optional[date]
     plantilla_formulario_id: int
     respuestas: List[RespuestaDetalle]
+    respuestas_formulario: List[RespuestasFormulario]
     plantilla_formulario: PlantillaFormulario
     materia: Materia 
-
-
 
 # cómo se ve cada opción con su conteo?
 class EstadisticaOpcion(BaseModel):

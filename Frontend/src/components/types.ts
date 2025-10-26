@@ -14,6 +14,7 @@ export type Pregunta = {
     estadistica: boolean
     puede_modificarse: boolean
     puede_eliminarse: boolean
+    grupo_pregunta: GrupoPregunta
 }
 
 export const EnumTipoPregunta = Object.freeze({
@@ -69,13 +70,21 @@ export type Usuario = {
 
 
 export type TypeRespuestasFormulario = {
+<<<<<<< HEAD
     id: number
     materia: Materia
     usuario: Usuario 
     fecha_envio: Date
     respuestas: Respuesta[]
 
+=======
+    materia: Materia;
+    usuario: Usuario; 
+    fecha_envio: Date;
+    respuestas: Respuesta[];
+>>>>>>> Respuesta
 }
+
 export type TipoInstrumento = 
   | 'ENCUESTA_ESTUDIANTE' 
   | 'INFORME_CATEDRA' 
@@ -144,6 +153,7 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
   respuestas_agregadas: PreguntaConRespuestas[];
 };
 
+<<<<<<< HEAD
 export type PreguntaCerrada = {
   texto: string;
   opciones: number[];
@@ -177,3 +187,26 @@ export type ErrorPreguntaAbierta = {
   grupo?: string;
   rol?: string;
 };
+=======
+
+export type PlantillaFormulario = {
+  titulo: string;
+  fecha_creacion: Date;
+  preguntas: Pregunta[];
+  rol: Rol
+  instrumento: Instrumento[];
+
+}
+
+
+export type Instrumento = {
+  instrumento_fuente: Instrumento | null;
+  tipo: TipoInstrumento;
+  respuestas_formulario: TypeRespuestasFormulario[];
+  plantilla_formulario: PlantillaFormulario;
+  fecha_inicio: Date;
+  fecha_cierre: Date;
+
+}
+
+>>>>>>> Respuesta

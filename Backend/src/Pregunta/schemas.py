@@ -2,6 +2,7 @@ from click import Option
 from pydantic import BaseModel
 from typing import List, Optional
 from src.Opciones.schemas import Opcion
+from src.GrupoPregunta.schemas import GrupoPregunta
 from .models import EnumTipoPregunta 
 
 class PreguntaBase(BaseModel):
@@ -11,6 +12,7 @@ class PreguntaBase(BaseModel):
     grupo_pregunta_id: int
     estadistica: bool
     rol_id: int 
+    grupo_pregunta: GrupoPregunta
 
 
 class PreguntaAbiertaCreate(PreguntaBase):

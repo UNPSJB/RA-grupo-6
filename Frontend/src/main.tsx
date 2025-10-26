@@ -13,7 +13,7 @@ import { RespuestasFormulario } from './components/RespuestasFormulario/Respuest
 import Menu from './components/Menu.tsx';
 import ResponderInstrumento from './components/ResponderInstrumento';
 import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
-import SeleccionarRespuestasFormularios from './components/SeleccionarRespuestasFormularios.tsx';
+import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

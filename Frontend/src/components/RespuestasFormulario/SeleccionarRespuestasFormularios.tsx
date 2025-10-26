@@ -1,6 +1,6 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
 import { Card, ListGroup, Container } from 'react-bootstrap';
-import type { TypeRespuestasFormulario, Usuario } from './types';
+import type { TypeRespuestasFormulario, Usuario } from '../types';
 import { Link } from 'react-router-dom';
 
 export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : number}) {
@@ -69,11 +69,6 @@ export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : 
                                                         </small>
                                                     </div>
                                                 </div>
-{/*                                                 
-                                                <Button variant="primary" size="sm" onClick={() => navigate("/respuestaFormulario", {state: {respuestaFormulario}} ) }
-                                                className="px-4 py-2">
-                                                    Ver respuestas
-                                                </Button> */}
 
                                                 <Link to={`/RespuestaFormulario/${respuestaFormulario.id}`}>
                                                     Ver respuestas

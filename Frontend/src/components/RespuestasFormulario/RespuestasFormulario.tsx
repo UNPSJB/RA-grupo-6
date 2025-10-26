@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
-import { Button, Col, Container, ListGroup, ListGroupItem, Row } from "react-bootstrap";
-import RespuestaView from "../Respuesta/RespuestaView";
-import type { TypeRespuestasFormulario } from "../types";
+import { Badge, Button, Container, ListGroup, ListGroupItem, Row, Stack } from "react-bootstrap";
+import { EnumTipoPregunta, type TypeRespuestasFormulario } from "../types";
 import { useParams } from "react-router-dom";
 
 export function RespuestasFormulario(){
@@ -11,100 +10,92 @@ export function RespuestasFormulario(){
 
     const [respuestasFormulario, setRespuestasFormulario] = useState<TypeRespuestasFormulario>()
 
-    let [indiceRespuestaElegida, setIndiceRespuestaElegida] = useState(0);
-
     useEffect( () => {
 
         fetch(url_base)
         .then((response) => response.json())
         .then((data) => setRespuestasFormulario(data))
         .catch(error => console.log(error))
-    
+
     }, []);
 
-    const numeroPreguntas = respuestasFormulario?.respuestas.length? respuestasFormulario?.respuestas.length : 0;
+    useEffect( () => {
+        setRespuestasMostradas(respuestasFormulario?.respuestas)
+    }, [respuestasFormulario])
 
-    if(!respuestasFormulario){
-        return <p>Hola</p>
-    }
+    const numeroPreguntas = respuestasFormulario?.respuestas.length? respuestasFormulario?.respuestas.length : 0;
+    const respuestasAbiertas = respuestasFormulario?.respuestas.filter((respuesta) => respuesta.pregunta.tipo == EnumTipoPregunta.abierta)
+    const respuestasCerradas = respuestasFormulario?.respuestas.filter((respuesta) => respuesta.pregunta.tipo == EnumTipoPregunta.cerrada)
+    const [respuestasMostradas, setRespuestasMostradas] = useState(respuestasFormulario?.respuestas)
 
     return(        
         
-        <Container className="pb-5 w-50">
+        <Container className="pb-5 w-50 mt-5">
 
-            <ListGroup className="mb-4 pt-4">
+            <div className="title mb-4 p-4 pb-0 border-bottom ">
                 <h2> Tus respuestas </h2>
                 
-                <ListGroupItem>
-                    <h4 className="d-flex gap-3 align-items-center"><i className="fa-solid fa-book"></i> Materia</h4>
-                    <p className="m-0">
-                        {respuestasFormulario?.materia.nombre}
-                    </p>
-                </ListGroupItem>
+                <p className="ms-2 mb-1">
+                    <i className="fa-solid fa-book"></i> Asignatura: {respuestasFormulario?.materia.nombre + " "}                 
+                </p>
+                <p className="ms-2 mb-0">
+                    <i className="fa-solid fa-calendar"></i> Completada: {new Date(respuestasFormulario?.fecha_envio || new Date()).toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"})}
+                </p>
 
-                <ListGroupItem>
-                    <h4 className="d-flex gap-3 align-items-center"><i className="fa-regular fa-clock "></i> Completada</h4>
-                    <p className="m-0">
-                        {new Date(respuestasFormulario?.fecha_envio || new Date()).toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"})}
-                    </p>
-                    
-                </ListGroupItem>
+                <Stack className="pt-3 pb-3 " direction="horizontal" gap={5}>
+                    <Button onClick={() => setRespuestasMostradas(respuestasFormulario?.respuestas)}> Todas ({numeroPreguntas}) </Button>
+                    <Button onClick={() => setRespuestasMostradas(respuestasAbiertas)}> Abiertas ({respuestasAbiertas?.length}) </Button>
+                    <Button onClick={() => setRespuestasMostradas(respuestasCerradas)}> Cerradas ({respuestasCerradas?.length}) </Button>
+                </Stack>
 
-            </ListGroup>
+            </div>
             
             <div className="mb-4">
 
-                <h5 className="mb-3"> <i className="fa-regular fa-comment" ></i> Preguntas</h5>
+                <ListGroup className="d-flex gap-3">
 
-                {respuestasFormulario?.respuestas.map((respuesta, indice) =>
-                    <>
-                        <Row className="mb-3 ms-2 me-2">
-                            <Button variant="outline-dark" className="d-flex flex-wrap " onClick={() => setIndiceRespuestaElegida(indice)}> 
-                                <Col xs={12} className="d-flex justify-content-between ps-3 pe-3 pt-2">
-                                    <p className="text-decoration-underline">
-                                        Pregunta {indice + 1}
-                                        
+                {respuestasMostradas?.map((respuesta, indice) =>
+                    <ListGroupItem className="ms-3 me-3 mb-2 d-flex border rounded align-items-start gap-3 p-3 ">
+
+                        <Badge bg="primary" className="rounded-circle" style={{ width: '30px', height: '30px', fontSize: '1rem', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                            {indice + 1}
+                        </Badge>
+
+                        <div>
+                            <Badge bg={respuesta.pregunta.tipo?.toLowerCase() === EnumTipoPregunta.abierta ? 'success' : 'info'}>
+                                {respuesta.pregunta.tipo === EnumTipoPregunta.abierta ? EnumTipoPregunta.abierta : EnumTipoPregunta.cerrada}
+                            </Badge>
+
+                            <h5 className="fw-semibold mb-1 mb-2 mt-2"> {respuesta.pregunta.texto}</h5>
+
+                            {respuesta.pregunta.tipo == EnumTipoPregunta.abierta? 
+                                <Row  className="mb-3 mt-2 ms-1 rounded p-2 " style={{border: "1px solid #dee2e6", borderLeft: "5px solid #6284bf", backgroundColor: "#fbfafe"}} >
+                                    
+                                    <p className="mb-0">
+                                        <span className="" style={{color:"grey", fontSize:"12px"}}> TU RESPUESTA: </span>
+                                        <br />
+                                        "{respuesta.texto}"
                                     </p>
-                                    <i className="fa-regular fa-circle-check"></i>
-                                </Col>
-                                <Col xs={12} className="d-flex ps-3 pb-2">
-                                    <p>
-                                        {respuesta.pregunta.texto}
+                                </Row>                            
+                            :
+
+                                <Row className="mb-3 mt-2 ms-1 rounded p-2" style={{border: "1px solid #dee2e6", borderLeft: "5px solid #11ba82", backgroundColor: "#fbfafe"}} >
+                                    <p className="mb-0 ">
+                                        {respuesta.opcion.texto}
                                     </p>
-                                </Col>
-                            </Button>
-                        </Row>
-                    
-                    </>
+                                </Row>   
+                            
+                            }
+                            
+                        </div>
+
+
+                    </ListGroupItem>
+                
                 )}
 
+                </ListGroup>
             </div>
-
-            <div className="border border-dark rounded pb-3 ms-2 me-2">
-                <RespuestaView respuesta={respuestasFormulario?.respuestas? respuestasFormulario?.respuestas[indiceRespuestaElegida]  : {
-                    texto: "",
-                    opcion: {id: 0, texto:""},
-                    pregunta: {  id: 0, texto: "", tipo: "", opciones: [], grupo_pregunta_id: 0, rol_id: 0, estadistica:false, puede_modificarse:false, puede_eliminarse:false}
-                } } numeroPregunta={indiceRespuestaElegida + 1} cantidadPreguntas={numeroPreguntas}/>
-                
-                <Row className="d-flex gap-5">
-
-                    <Col className="d-flex justify-content-center ms-5 rounded">
-                        <Button onClick={() => (indiceRespuestaElegida == 0)? null : setIndiceRespuestaElegida(--indiceRespuestaElegida)} className="w-100" disabled={indiceRespuestaElegida == 0}>
-                            Anterior
-                        </Button>
-                    </Col>
-
-                    <Col className="d-flex justify-content-center me-5 rounded">
-                        <Button onClick={() => (indiceRespuestaElegida + 1 == respuestasFormulario?.respuestas.length)? null : setIndiceRespuestaElegida(++indiceRespuestaElegida)} className="w-100" disabled={(indiceRespuestaElegida + 1 == respuestasFormulario?.respuestas.length)} > 
-                            Siguiente
-                        </Button>
-                    </Col>
-                </Row>
-
-            </div>
-
-
 
         </Container>
 

@@ -43,7 +43,6 @@ export type RespuestaDetalle = {
   grupo?: string;
 };
 
-// tipos para las Estadísticas ---
 
 export type EstadisticaOpcion = {
   texto_opcion: string;
@@ -58,7 +57,6 @@ export type EstadisticaPregunta = {
 
 export type PreguntaConRespuestas = {
   pregunta_texto: string;
-  // lista con todas las respuestas de texto para esta pregunta
   respuestas_abiertas: (string | null)[]; 
 };
 
@@ -66,3 +64,87 @@ export type EncuestaAgregadaDetail = InstrumentoBase & {
   titulo_formulario: string;
   respuestas_agregadas: PreguntaConRespuestas[];
 };
+
+
+
+export type RespuestaAbierta = {
+  pregunta_texto: string;
+  respuesta_texto: string;
+};
+
+export type GrupoRespuestasAbiertas = {
+  grupo: string;
+  titulo_grupo: string;
+  respuestas: RespuestaAbierta[];
+};
+
+export type DetalleInformeCatedraCompleto = {
+  id: number;
+  titulo_formulario: string;
+  fecha_completado: string;
+  estadisticas: EstadisticaPregunta[];
+  respuestas_abiertas_agrupadas: GrupoRespuestasAbiertas[];
+};
+
+export type GrupoPreguntasAbiertas = {
+  grupo: string;
+  titulo_grupo: string;
+  preguntas: PreguntaConRespuestas[];
+};
+
+
+export type DetalleEncuestaCompleto = {
+  id: number;
+  titulo_formulario: string;
+  estadisticas: EstadisticaPregunta[];
+  respuestas_abiertas_agrupadas: GrupoPreguntasAbiertas[];
+};
+
+
+
+// Las respuestas del administrativo
+export type RespuestaSintesis = {
+  pregunta_texto: string| null;
+  respuesta_texto: string | null;
+};
+
+export type DetalleInformeCompleto = {
+  id: number;
+  titulo_formulario: string;
+  fecha_completado: string;
+  estadisticas: EstadisticaPregunta[];
+  respuestas_abiertas_agrupadas: GrupoRespuestasAbiertas[];
+};
+
+export type ResumenInformeAcademico = {
+  id: number; 
+  titulo_formulario: string;
+  docente_nombre: string;
+  respuestas_abiertas_agrupadas: GrupoRespuestasAbiertas[];
+};
+
+export type DetalleInformeSinteticoCompleto = {
+  id: number;
+  titulo_formulario: string;
+  fecha_completado: string;
+  autor_administrativo: string; 
+  respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
+  informes_academicos_base: ResumenInformeAcademico[];
+};
+
+export type InformeSinteticoList = {
+  id: number;
+  titulo_formulario: string;
+  autor_nombre: string;
+  fecha_completado: string;
+};
+
+export type GrupoRespuestasSintesis = {
+  grupo: string;
+  titulo_grupo: string;
+  respuestas: {
+    pregunta_texto: string;
+    respuesta_texto: string | null;
+  }[];
+};
+

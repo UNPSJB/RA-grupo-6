@@ -4,23 +4,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List, Optional
 from datetime import date
 
-# Asumo que tenés una clase base como esta
-from sqlalchemy.ext.declarative import declarative_base
 
 from src.PlantillaFormulario.models import PlantillaFormulario
-# Nota: Este import debería ser del modelo, no del schema
 from src.RespuestasFormulario.models import RespuestasFormulario 
-from src.Materias.models import Materia
+from src.materias.models import Materia
 from src.models import ModeloBase
 
 class TipoInstrumento(str, enum.Enum):
     
     def __new__(cls, value, display_name):
-        # Esta parte crea el objeto como un string normal
         obj = str.__new__(cls, value)
-        # Le asignamos el valor que se guardará en la BD
         obj._value_ = value
-        # Le añadimos nuestra propiedad personalizada
         obj.display = display_name
         return obj
 
@@ -39,8 +33,6 @@ class Instrumento(ModeloBase):
     plantilla_formulario_id: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
 
-    # --- RELACIÓN RECURSIVA ---
-    # columna que apunta al instrumento "fuente" o "base".
     instrumento_fuente_id: Mapped[Optional[int]] = mapped_column( 
         ForeignKey("instrumento.id"), unique=True, nullable=True
     )

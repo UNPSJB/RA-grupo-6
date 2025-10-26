@@ -7,7 +7,7 @@ from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
-from src.Materias.router import router as materias_router
+from src.materias.router import router as materias_router
 
 
 
@@ -87,3 +87,7 @@ app.include_router(carrera_router)
 #Route de PeriodosVinculados
 from src.PeriodoVinculado.router import router as periodo_router
 app.include_router(periodo_router)
+
+#Route de UsuarioDepartamento
+from src.UsuarioDepartamento.router import router as usuariodepartamento_router
+app.include_router(usuariodepartamento_router)

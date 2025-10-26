@@ -26,7 +26,7 @@ export default function PaginaInformesCatedra() {
     setTimeout(() => {
       setInstrumentos(mockCatedra);
       setCargando(false);
-    }, 500);
+    }, 100);
   }, []);
   const handleSeleccionar = (instrumento: instrumentoList) => {
     console.log(`Seleccionando instrumento con ID: ${instrumento.id}`);

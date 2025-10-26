@@ -52,7 +52,7 @@ export default function DetalleEncuestaAgregada({ instrumento, onVolver }: Props
       setEstadisticas(mockDetalleCompleto.estadisticas);
       setGruposDeRespuestas(mockDetalleCompleto.respuestas_abiertas_agrupadas);
       setLoading(false);
-    }, 500);
+    }, 100);
     
   }, [instrumento.id]);
 

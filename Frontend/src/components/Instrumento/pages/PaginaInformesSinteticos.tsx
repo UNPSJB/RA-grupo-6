@@ -30,7 +30,7 @@ export default function PaginaInformesSinteticos() {
     setTimeout(() => {
       setInstrumentos(mockSinteticos);
       setCargando(false);
-    }, 500);
+    }, 100);
   }, []);
 
   const handleSeleccionar = (instrumento: instrumentoList) => {

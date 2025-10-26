@@ -32,7 +32,7 @@ export default function PaginaEncuestasEstudiantes() {
     setTimeout(() => {
       setInstrumentos(mockEncuestas);
       setCargando(false);
-    }, 500);
+    }, 100);
   }, []);
 
   const handleSeleccionar = (instrumento: instrumentoList) => {

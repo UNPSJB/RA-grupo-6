@@ -119,7 +119,7 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
     setTimeout(() => { 
       setDetalleCompleto(mockInformeSinteticoCompleto);
       setLoading(false);
-    }, 500);
+    }, 100);
   }, [informe.id]);
 
   if (loading || !detalleCompleto) {

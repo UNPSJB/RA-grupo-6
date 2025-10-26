@@ -94,7 +94,7 @@ export default function DetalleInforme({ informe, onVolver }: DetalleInformeProp
     setTimeout(() => { 
       setDetalleCompleto(mockDetalleCompleto);
       setLoading(false);
-    }, 500);
+    }, 100);
     
   }, [informe.id]);
 

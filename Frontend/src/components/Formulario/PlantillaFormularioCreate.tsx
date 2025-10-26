@@ -20,7 +20,7 @@ function CrearPlantillaFormulario() {
     setMostrarError(true);
     setTimeout(() => {
       setMostrarError(false);
-    }, 1000); 
+    }, 100); 
   };
 
   const validarFormulario = () => {

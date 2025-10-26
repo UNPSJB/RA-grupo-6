@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import  Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.RespuestasFormulario.models import RespuestasFormulario
-from src.materias import models
+from src.Materias import models
 from src.models import ModeloBase
 from src.Pregunta.models import Pregunta, Opcion
 

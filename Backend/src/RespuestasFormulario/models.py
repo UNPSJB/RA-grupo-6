@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento
     from src.Usuarios.models import Usuario
     from src.Respuesta.models import Respuesta
-    from src.materias.models import Materia
+    from src.Materias.models import Materia
 
 class RespuestasFormulario(ModeloBase):
     __tablename__ = "respuestas_formulario"

@@ -71,7 +71,6 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
         return grupos
     }
 
-
     return(
 
         <div className="container border rounded p-3">
@@ -128,24 +127,24 @@ export function VerPorcentajes({instrumento} : {instrumento : Instrumento}){
                         :
                         <>
                             {todasLasRespuestas.filter((respuesta) => respuesta.pregunta.id === pregunta.id).slice(0, 3).map((respuesta) => 
-                                
-                                    respuesta.pregunta.id == pregunta.id && 
-                                    <>
-                                        <ListGroup.Item className="mb-3 border rounded p-3">
-                                            <p className="mb-0">
-                                                {respuesta.texto}
-                                            </p>
-                                        </ListGroup.Item>
-                                        
-                                    </>
+                                respuesta.pregunta.id == pregunta.id && 
+                                    <ListGroup.Item className="mb-3 border rounded p-3">
+                                        <p className="mb-0">
+                                            {respuesta.texto}
+                                        </p>
+                                    </ListGroup.Item>
                                 )
                             }
 
-                            <Button onClick={() => setMostrar(true)}> Ver todas las respuestas ({obtenerCantRespuestas(pregunta.id)})</Button>
-                            
-                            {mostrar && 
-                                <ModalRespuestasAbiertas ListaRespuestas={todasLasRespuestas} numeroPregunta={numero} pregunta={pregunta} mostrar={mostrar}setMostrar={setMostrar} />
-                                
+                            {todasLasRespuestas.filter((respuesta) => respuesta.pregunta.id === pregunta.id).length >= 3 &&
+                                <>
+
+                                    <Button onClick={() => setMostrar(true)}> Ver todas las respuestas ({obtenerCantRespuestas(pregunta.id)})</Button>
+                        
+                                    {mostrar && 
+                                    <ModalRespuestasAbiertas ListaRespuestas={todasLasRespuestas} numeroPregunta={numero} pregunta={pregunta} mostrar={mostrar}setMostrar={setMostrar} />
+                                    }
+                                </>
                             }
                         </>
                         }

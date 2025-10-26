@@ -58,17 +58,18 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
     if not instrumento:
         raise HTTPException(status_code=404, detail="Instrumento no encontrado")
 
-    # if not instrumento.respuestas_formulario or len(instrumento.respuestas_formulario) == 0:
-    #     return InstrumentoDetalle(
-    #         id=instrumento.id,
-    #         titulo_formulario=instrumento.titulo(),
-    #         autor_nombre="Sin respuestas",
-    #         fecha_completado=None,
-    #         plantilla_formulario_id=instrumento.plantilla_formulario_id,
-    #         respuestas=[],  # Lista vacía
-    #         plantilla_formulario=instrumento.plantilla_formulario,
-    #         materia=instrumento.materia
-    #     )
+    if not instrumento.respuestas_formulario or len(instrumento.respuestas_formulario) == 0:
+        return InstrumentoDetalle(
+            id=instrumento.id,
+            titulo_formulario=instrumento.titulo(),
+            autor_nombre="Sin respuestas",
+            fecha_completado=None,
+            plantilla_formulario_id=instrumento.plantilla_formulario_id,
+            respuestas=[],  # Lista vacía
+            plantilla_formulario=instrumento.plantilla_formulario,
+            respuestas_formulario=instrumento.respuestas_formulario,
+            materia=instrumento.materia
+        )
     
     respuestas_form = instrumento.respuestas_formulario[0] 
     
@@ -91,6 +92,6 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         plantilla_formulario_id=instrumento.plantilla_formulario_id, 
         respuestas=respuestas_procesadas,
         plantilla_formulario=instrumento.plantilla_formulario,
-        respuestas_formulario=instrumento.respuestas_formulario, 
+        respuestas_formulario=instrumento.respuestas_formulario or [], 
         materia=instrumento.materia
     )

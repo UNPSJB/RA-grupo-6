@@ -62,7 +62,7 @@ class InstrumentoDetalle(BaseModel):
     fecha_completado: Optional[date]
     plantilla_formulario_id: int
     respuestas: List[RespuestaDetalle]
-    respuestas_formulario: List[RespuestasFormulario]
+    respuestas_formulario: List[RespuestasFormulario] 
     plantilla_formulario: PlantillaFormulario
     materia: Materia 
 

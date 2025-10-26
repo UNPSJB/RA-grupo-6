@@ -79,3 +79,7 @@ app.include_router(instrumento_router)
 #Route de Departamentos
 from src.Departamento.router import router as departamento_router
 app.include_router(departamento_router)
+
+#Route de Carreras
+from src.Carrera.router import router as carrera_router
+app.include_router(carrera_router)

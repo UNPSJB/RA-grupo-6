@@ -5,9 +5,11 @@ from src.models import ModeloBase
 
 if TYPE_CHECKING:
     from src.Materias.models import Materia
+    from src.Carrera.models import Carrera
 class Departamento(ModeloBase):
     __tablename__ = "departamento"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, index=True)
 
-    materias: Mapped[List["Materia"]] = relationship("Materia",back_populates="departamento")
+    materias: Mapped[List["Materia"]] = relationship("Materia", back_populates="departamento")
+    carreras: Mapped[List["Carrera"]] = relationship("Carrera", back_populates="departamento")

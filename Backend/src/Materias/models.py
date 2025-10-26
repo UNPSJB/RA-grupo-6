@@ -8,14 +8,15 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento
     from src.RespuestasFormulario.models import RespuestasFormulario
     from src.Departamento.models import Departamento
+    from src.Carrera.models import Carrera
 class Materia(ModeloBase):
     __tablename__ = "materia"
-    instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="materia")
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, index=True)
     departamento_id: Mapped[int] = mapped_column(ForeignKey("departamento.id"))
+    carrera_id: Mapped[int] = mapped_column(ForeignKey("carrera.id"))
 
+    instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="materia")
     respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
-    departamento: Mapped["Departamento"] = relationship("Departamento",back_populates="materias")
-
-    
+    departamento: Mapped["Departamento"] = relationship("Departamento", back_populates="materias")
+    carrera: Mapped["Carrera"] = relationship("Carrera", back_populates="materias")

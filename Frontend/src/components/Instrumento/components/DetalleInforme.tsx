@@ -13,7 +13,7 @@ const mockDetalleCompleto: DetalleInformeCatedraCompleto = {
   fecha_completado: "2025-09-05",
   estadisticas: [
     { pregunta_id: 1, pregunta_texto: "¿El material de estudio fue suficiente para comprender el contenido?", opciones: [{ texto_opcion: "Sí", cantidad: 15 }, { texto_opcion: "Parcialmente", cantidad: 8 }, { texto_opcion: "No", cantidad: 2 }] },
-    { pregunta_id: 2, pregunta_texto: "¿La dificultad...?", opciones: [{ texto_opcion: "Adecuada", cantidad: 20 }, { texto_opcion: "Demasiado difícil", cantidad: 5 }] },
+    { pregunta_id: 2, pregunta_texto: "¿La dificultad fue...?", opciones: [{ texto_opcion: "Adecuada", cantidad: 20 }, { texto_opcion: "Demasiado difícil", cantidad: 5 }] },
   ],
   respuestas_abiertas_agrupadas: [
     {

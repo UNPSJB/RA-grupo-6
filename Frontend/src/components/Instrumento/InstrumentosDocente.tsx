@@ -95,7 +95,7 @@ function InstrumentosDocente() {
                     }
                 ];
                 setInstrumentos(datosEjemplo);
-                console.log('🔄 Usando datos de ejemplo para desarrollo');
+                console.log('Usando datos de ejemplo para desarrollo');
             }
         };
 
@@ -103,7 +103,7 @@ function InstrumentosDocente() {
     }, []);
 
     const handleSeleccionarInstrumento = (instrumento: InstrumentoDocente) => {
-        console.log('🎯 Instrumento seleccionado:', instrumento);
+        console.log('Instrumento seleccionado:', instrumento);
         navigate(`/responder-instrumento/${instrumento.id}`, {
             state: {
                 materiaNombre: instrumento.materia.nombre,

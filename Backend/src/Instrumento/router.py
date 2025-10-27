@@ -33,7 +33,7 @@ def get_instrumentos_por_tipo(
 
     todos = db.query(InstrumentoModel).all()
     print(">>> Todos los instrumentos en DB:", [(i.id, i.tipo) for i in todos])
-    # ⚡ FIX: comparar contra el .value, no contra el Enum
+    # FIX: comparar contra el .value, no contra el Enum
     query = db.query(InstrumentoModel).filter(
         InstrumentoModel.tipo == tipo_enum.value
     )

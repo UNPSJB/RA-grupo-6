@@ -33,14 +33,14 @@ export default function ResponderInstrumento() {
   const esAlumno = rol === 'alumno';
   const esDocente = rol === 'docente';
 
-  // Si hay instrumentoId en los parámetros, cargarlo directamente
+  // Cargar instrumentoId desde params
   useEffect(() => {
     if (instrumentoIdParam) {
       cargarInstrumento(parseInt(instrumentoIdParam));
     }
   }, [instrumentoIdParam]);
 
-  // Cargar datos del instrumento seleccionado
+  // Cargar datos del instrumento
   const cargarInstrumento = async (instrumentoId: number) => {
     setCargando(true);
     setError('');
@@ -83,7 +83,7 @@ export default function ResponderInstrumento() {
 
   const todasRespondidas = respuestas.every(r => r.texto?.trim() || r.opcion_id);
 
-  // 🔹 Enviar respuestas
+  // Enviar respuestas
   const enviarRespuestas = async (): Promise<boolean> => {
     if (!instrumentoSeleccionado) return false;
     setEnviando(true);
@@ -130,7 +130,7 @@ export default function ResponderInstrumento() {
     }
   };
 
-  // 🔹 Si hay instrumento seleccionado, mostrar formulario
+  // Si hay instrumento seleccionado, mostrar formulario
   if (cargando) {
     return (
       <Container className="mt-4 text-center">

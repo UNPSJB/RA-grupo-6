@@ -27,7 +27,7 @@ function SeleccionarMateria() {
         const cargarMateriasConEncuestas = async () => {
             try {
                 // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
-                const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=1`);
+                const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=${USUARIO_ACTUAL.id}&mostrar_respondidos=false`);
                 
                 if (!response.ok) {
                     throw new Error('Error al cargar encuestas');

@@ -42,7 +42,7 @@ export default function SeleccionarRol() {
     const handleSeleccionarRol = (rol: Rol) => {
         setRolSeleccionado(rol);
         
-        // Navegar según el rol seleccionado
+        // Navegar según rol
         setTimeout(() => {
             navigate(ROLES[rol].ruta);
         }, 300);

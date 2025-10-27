@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { Container, Card, Row, Col } from 'react-bootstrap';
+import type { Usuario } from './types';
 
 type Rol = 'alumno' | 'docente' | 'departamento' | 'secretaria';
 
@@ -35,14 +36,64 @@ const ROLES = {
   }
 };
 
+const USUARIOS_ROLES: Record<'alumno' | 'docente', Usuario> = {
+    alumno: { 
+        id: 1, 
+        nombre: 'Pepe', 
+        apellido: 'Flores', 
+        legajo: 21, 
+        email: 'example@gmail.com', 
+        rol: 'alumno', 
+        respuestas_formulario: []  
+    },
+    docente: { 
+        id: 2, 
+        nombre: 'Leo', 
+        apellido: 'Sidocente', 
+        legajo: 122133, 
+        email: 'docente.demo@unpsjb.edu', 
+        rol: 'docente', 
+        respuestas_formulario: []  
+    }
+};
+
 export default function SeleccionarRol() {
     const navigate = useNavigate();
     const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
+    const [usuarioActual, setUsuarioActual] = useState<Usuario | null>(null);
+    
+    useEffect(() => {
+        const rolString = localStorage.getItem('rol_actual');
+        const rol = (rolString && ['alumno','docente','departamento','secretaria'].includes(rolString) ? rolString as Rol : null);
+
+        const usuarioGuardado = localStorage.getItem('usuario_actual');
+
+        if (usuarioGuardado) {
+            setUsuarioActual(JSON.parse(usuarioGuardado) as Usuario);
+        } else if (rol && (rol === 'alumno' || rol === 'docente')) {
+            const usuario = USUARIOS_ROLES[rol];
+            if (usuario) {
+                setUsuarioActual(usuario);
+                localStorage.setItem('usuario_actual', JSON.stringify(usuario));
+            }
+        }
+
+        if (rol) setRolSeleccionado(rol);
+    }, []);
 
     const handleSeleccionarRol = (rol: Rol) => {
         setRolSeleccionado(rol);
-        
-        // Navegar según rol
+
+        if (rol === 'alumno' || rol === 'docente') {
+            const usuario = USUARIOS_ROLES[rol];
+            if (usuario) {
+                setUsuarioActual(usuario);
+                localStorage.setItem('usuario_actual', JSON.stringify(usuario));
+            }
+        }
+
+        localStorage.setItem('rol_actual', rol);
+
         setTimeout(() => {
             navigate(ROLES[rol].ruta);
         }, 300);

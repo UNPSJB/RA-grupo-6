@@ -25,7 +25,7 @@ class PreguntaUpdate(BaseModel):
     texto: str
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
-    grupo_pregunta: GrupoPregunta
+    # grupo_pregunta: GrupoPregunta
 
 
 class PreguntaDelete(BaseModel):

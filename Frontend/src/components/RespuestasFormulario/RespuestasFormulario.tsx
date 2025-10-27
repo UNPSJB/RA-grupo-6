@@ -17,7 +17,7 @@ export function RespuestasFormulario(){
         .then((data) => setRespuestasFormulario(data))
         .catch(error => console.log(error))
 
-    }, []);
+    }, [url_base]);
 
     useEffect( () => {
         setRespuestasMostradas(respuestasFormulario?.respuestas)

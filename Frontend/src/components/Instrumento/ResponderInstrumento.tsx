@@ -2,14 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Badge, Spinner, Row, Col, Form, Tabs, Tab } from 'react-bootstrap';
 import ModalExito from "../ModalEnvio";
-import { EnumTipoPregunta, DetalleEncuestaCompleto } from "../types";
-
-// Usuario temporal
-const USUARIO_ACTUAL = {
-    id: 2,
-    nombre: "Docente",
-    apellido: "Demo"
-};
+import { EnumTipoPregunta } from "../types";
+import type { DetalleEncuestaCompleto } from "./types";
+import { VerPorcentajes, Llamadora } from '../Respuesta/VerPorcentajes';
 
 interface RespuestaTemporal {
     pregunta_id: number;
@@ -52,48 +47,35 @@ export default function ResponderInstrumento() {
     const [enviando, setEnviando] = useState(false);
     const [estadisticasAlumnos, setEstadisticasAlumnos] = useState<DetalleEncuestaCompleto | null>(null);
     const [cargandoEstadisticas, setCargandoEstadisticas] = useState(false);
+    const [usuarioActual, setUsuarioActual] = useState<any>(null);
 
-    const { materiaNombre, materiaId, rol } = location.state || {};
-    const esDocente = rol === 'docente';
-    const esAlumno = rol === 'alumno';
-
-    // Definir RutaVolver según el rol
-    const getRutaVolver = () => {
-        if (esDocente) {
-            return '/instrumentos-docente';
-        } else if (esAlumno) {
-            return '/materias';
-        } else {
-            return '/';
-        }
-    };
-
-    const rutaVolver = getRutaVolver();
-
-    // Si hay instrumentoId en params, cargarlo directamente
     useEffect(() => {
-        if (instrumentoIdParam) {
-            cargarInstrumento(parseInt(instrumentoIdParam));
-        }
+        const usuario = localStorage.getItem('usuario_actual');
+        if (usuario) setUsuarioActual(JSON.parse(usuario));
+    }, []);
+
+    const locationState = location.state || {};
+    const rolActual = locationState.rol || localStorage.getItem('rol_actual');
+    const esDocente = rolActual === 'docente';
+    const esAlumno = rolActual === 'alumno';
+    const materiaNombre = locationState.materiaNombre || '';
+    const rutaVolver = esDocente ? '/instrumentos-docente' : esAlumno ? '/materias' : '/';
+
+    useEffect(() => {
+        if (instrumentoIdParam) cargarInstrumento(parseInt(instrumentoIdParam));
     }, [instrumentoIdParam]);
 
-    // Cargar estadísticas de respuestas de alumnos
     useEffect(() => {
-        if (materiaId && esDocente) {
-            cargarEstadisticasAlumnos(materiaId);
-        }
-    }, [materiaId, esDocente]);
+    if (esDocente) {
+        cargarEstadisticasAlumnos();
+    }
+    }, [esDocente]);
 
-    const cargarEstadisticasAlumnos = async (materiaId: string) => {
+
+    const cargarEstadisticasAlumnos = async () => {
         setCargandoEstadisticas(true);
         try {
-            // TODO: Reemplazar con endpoint real de estadísticas de respuestas de alumnos
-            console.log(`Cargando estadísticas para materia: ${materiaId}`);
-            
-            // delay
             await new Promise(resolve => setTimeout(resolve, 800));
-            
-            // mock
             setEstadisticasAlumnos(mockEstadisticasAlumnos);
         } catch (error) {
             console.error('Error cargando estadísticas:', error);
@@ -102,7 +84,6 @@ export default function ResponderInstrumento() {
         }
     };
 
-    // Cargar datos del instrumento
     const cargarInstrumento = async (instrumentoId: number) => {
         setCargando(true);
         setError('');
@@ -130,7 +111,6 @@ export default function ResponderInstrumento() {
         }
     };
 
-    // Actualizar respuesta
     const actualizarRespuesta = (preguntaId: number, texto?: string, opcionId?: number) => {
         setRespuestas((prev) =>
             prev.map((r) =>
@@ -142,27 +122,20 @@ export default function ResponderInstrumento() {
     };
 
     const obtenerRespuesta = (preguntaId: number) => respuestas.find(r => r.pregunta_id === preguntaId);
-
     const todasRespondidas = respuestas.every(r => r.texto?.trim() || r.opcion_id);
 
-    // Enviar respuestas
     const enviarRespuestas = async (): Promise<boolean> => {
-        if (!instrumentoSeleccionado) return false;
+        if (!instrumentoSeleccionado || !usuarioActual) return false;
         setEnviando(true);
 
         try {
-            console.log('Enviando respuestas...');
-
-            // Cuerpo de la petición
             const cuerpoFormulario = {
                 materia_id: instrumentoSeleccionado.materia?.id,
-                usuario_id: USUARIO_ACTUAL.id,
+                usuario_id: usuarioActual.id, // <- ahora usamos usuarioActual
                 instrumento_id: instrumentoSeleccionado.id,
                 fecha_envio: new Date().toISOString().split('T')[0],
                 respuestas: []
             };
-
-            console.log('Enviando formulario principal:', cuerpoFormulario);
 
             const formularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
                 method: 'POST',
@@ -170,51 +143,27 @@ export default function ResponderInstrumento() {
                 body: JSON.stringify(cuerpoFormulario)
             });
 
-            console.log('Respuesta del formulario:', formularioResponse.status);
-
-            if (!formularioResponse.ok) {
-                const errorText = await formularioResponse.text();
-                console.error('Error en formulario:', errorText);
-                throw new Error(`Error al crear el formulario: ${formularioResponse.status} - ${errorText}`);
-            }
-
+            if (!formularioResponse.ok) throw new Error(`Error al crear el formulario: ${formularioResponse.status}`);
             const formularioCreado = await formularioResponse.json();
-            console.log('Formulario creado:', formularioCreado);
 
-            // Enviar respuestas individuales
             const respuestasFiltradas = respuestas.filter(r => r.texto?.trim() || r.opcion_id);
-            console.log(`Enviando ${respuestasFiltradas.length} respuestas individuales`);
-
-            const promesasRespuestas = respuestasFiltradas.map(async (r, index) => {
+            await Promise.all(respuestasFiltradas.map(async (r) => {
                 const cuerpoRespuesta = {
                     pregunta_id: r.pregunta_id,
                     texto: r.texto?.trim() || null,
                     opcion_id: r.opcion_id || null,
                     formulario_id: formularioCreado.id,
                 };
-
-                console.log(`Enviando respuesta ${index + 1}:`, cuerpoRespuesta);
-
                 const respuestaResponse = await fetch('http://127.0.0.1:8000/respuestas/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(cuerpoRespuesta)
                 });
+                if (!respuestaResponse.ok) throw new Error(`Error al enviar respuesta ${r.pregunta_id}`);
+            }));
 
-                if (!respuestaResponse.ok) {
-                    const errorText = await respuestaResponse.text();
-                    console.error(`Error en respuesta ${index + 1}:`, errorText);
-                    throw new Error(`Error al enviar respuesta ${index + 1}: ${respuestaResponse.status}`);
-                }
-
-                return respuestaResponse.json();
-            });
-
-            await Promise.all(promesasRespuestas);
-            console.log('Todas las respuestas enviadas correctamente');
             return true;
         } catch (err: any) {
-            console.error('Error completo:', err);
             alert('Error al enviar las respuestas: ' + err.message);
             return false;
         } finally {
@@ -222,31 +171,24 @@ export default function ResponderInstrumento() {
         }
     };
 
-    // Si hay instrumento seleccionado, mostrar formulario
-    if (cargando) {
-        return (
-            <Container className="mt-4 text-center">
-                <Spinner animation="border" role="status" className="mb-3" />
-                <p>Cargando informe de cátedra...</p>
-            </Container>
-        );
-    }
+    if (cargando) return (
+        <Container className="mt-4 text-center">
+            <Spinner animation="border" role="status" className="mb-3" />
+            <p>Cargando informe de cátedra...</p>
+        </Container>
+    );
 
-    if (error) {
-        return (
-            <Container className="mt-4">
-                <Alert variant="danger">
-                    <i className="fas fa-exclamation-triangle me-2"></i>
-                    {error}
-                    <div className="mt-3">
-                        <Button variant="outline-danger" onClick={() => navigate(rutaVolver)}>
-                            Volver atrás
-                        </Button>
-                    </div>
-                </Alert>
-            </Container>
-        );
-    }
+    if (error) return (
+        <Container className="mt-4">
+            <Alert variant="danger">
+                <i className="fas fa-exclamation-triangle me-2"></i>
+                {error}
+                <div className="mt-3">
+                    <Button variant="outline-danger" onClick={() => navigate(rutaVolver)}>Volver atrás</Button>
+                </div>
+            </Alert>
+        </Container>
+    );
 
     return (
         <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
@@ -269,9 +211,13 @@ export default function ResponderInstrumento() {
                     </div>
 
                     <Card.Body className="p-3 p-md-4">
-                        {esDocente && (
+                        {esDocente &&(
                             <Tabs defaultActiveKey="formulario" className="mb-4">
                                 <Tab eventKey="formulario" title="📝 Completar Informe">
+
+                                    <div className='mb-4'>
+                                        <Llamadora id_instrumento={instrumentoSeleccionado?.id} />
+                                    </div>
                                     {/* Formulario del docente */}
                                     {plantillaFormulario?.preguntas?.map((pregunta: any, idx: number) => (
                                         <Card key={pregunta.id} className="border-0 shadow-sm w-100 mb-3" style={{ borderRadius: "1rem" }}>
@@ -321,8 +267,8 @@ export default function ResponderInstrumento() {
                                     ))}
                                 </Tab>
 
-                                <Tab eventKey="estadisticas" title="📊 Respuestas de Estudiantes">
-                                    {/* Estadísticas de alumnos */}
+                                {/* <Tab eventKey="estadisticas" title="📊 Respuestas de Estudiantes">
+                                    {/* Estadísticas de alumnos }
                                     {cargandoEstadisticas ? (
                                         <div className="text-center py-4">
                                             <Spinner animation="border" role="status" className="mb-3" />
@@ -330,18 +276,18 @@ export default function ResponderInstrumento() {
                                         </div>
                                     ) : estadisticasAlumnos ? (
                                         <div>
-                                            <h4 className="mb-3">Respuestas de los Estudiantes - {materiaNombre}</h4>
+                                            {/* <h4 className="mb-3">Respuestas de los Estudiantes - {materiaNombre}</h4>
                                             {/* Integración DetalleEncuestaAgregada */}
-                                            <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                                            {/* <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                                                 <Card.Body className="p-4">
                                                     <div className="mb-4">
                                                         <h5 className="fw-bold mb-2">{estadisticasAlumnos.titulo_formulario}</h5>
                                                         <p className="text-muted mb-0">Resultados agregados de la encuesta de estudiantes</p>
                                                     </div>
                                                     
-                                                    <hr className="my-4" />
+                                                    <hr className="my-4" />  */}
 
-                                                    {/* Estadísticas de preguntas cerradas */}
+                                                    {/* Estadísticas de preguntas cerradas
                                                     {estadisticasAlumnos.estadisticas.map((estadistica) => (
                                                         <div key={estadistica.pregunta_id} className="mb-4">
                                                             <h6 className="fw-semibold mb-3">{estadistica.pregunta_texto}</h6>
@@ -372,7 +318,7 @@ export default function ResponderInstrumento() {
                                                         </div>
                                                     ))}
                                                     
-                                                    {/* Respuestas abiertas */}
+                                                    {/* Respuestas abiertas 
                                                     {estadisticasAlumnos.respuestas_abiertas_agrupadas.map(grupo => (
                                                         <div key={grupo.grupo}>
                                                             <hr className="my-4" />
@@ -396,13 +342,13 @@ export default function ResponderInstrumento() {
                                                                                 {pregunta.respuestas_abiertas.length} respuestas
                                                                             </Badge>
                                                                         </div>
-                                                                    )}
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     ))}
-                                                </Card.Body>
-                                            </Card>
+                                                                    )} */}
+                                                {/* </Card.Body>
+                                            </Card> }
                                         </div>
                                     ) : (
                                         <Alert variant="warning">
@@ -410,7 +356,7 @@ export default function ResponderInstrumento() {
                                             No se pudieron cargar las respuestas de los estudiantes para esta materia.
                                         </Alert>
                                     )}
-                                </Tab>
+                                </Tab> */}
                             </Tabs>
                         )}
 

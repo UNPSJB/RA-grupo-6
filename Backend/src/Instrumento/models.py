@@ -7,7 +7,7 @@ from datetime import date
 
 from src.PlantillaFormulario.models import PlantillaFormulario
 from src.RespuestasFormulario.models import RespuestasFormulario 
-from src.materias.models import Materia
+from src.Materias.models import Materia
 from src.models import ModeloBase
 
 class TipoInstrumento(str, enum.Enum):

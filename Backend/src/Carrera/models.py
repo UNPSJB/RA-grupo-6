@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 
 if TYPE_CHECKING:
-    from src.materias.models import Materia
+    from src.Materias.models import Materia
     from src.Departamento.models import Departamento
 class Carrera(ModeloBase):
     __tablename__ = "carrera"

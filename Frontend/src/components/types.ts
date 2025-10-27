@@ -64,7 +64,7 @@ export type Usuario = {
     apellido: string
     legajo: number
     email: string
-    rol: Rol
+    rol: string
     respuestas_formulario: TypeRespuestasFormulario[]
 }
 

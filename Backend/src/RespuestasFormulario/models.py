@@ -8,12 +8,12 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento
     from src.Usuarios.models import Usuario
     from src.Respuesta.models import Respuesta
-    from src.materias.models import Materia
+    from src.Materias.models import Materia
 
 class RespuestasFormulario(ModeloBase):
     __tablename__ = "respuestas_formulario"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     fecha_envio: Mapped[date] = mapped_column(Date)
 
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)

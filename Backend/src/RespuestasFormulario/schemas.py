@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, List
 from datetime import date
 from pydantic import BaseModel, ConfigDict
 
-from src.Materias.schemas import Materia
+from src.materias.schemas import Materia
 from src.Respuesta.schemas import Respuesta
 
 if TYPE_CHECKING:

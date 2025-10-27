@@ -12,7 +12,7 @@ from src.Respuesta.models import Respuesta
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.PlantillaFormulario.models import PlantillaFormulario
 from src.Opciones.models import Opcion
-from src.Materias.models import Materia 
+from src.materias.models import Materia 
 from src.Roles.models import Rol 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

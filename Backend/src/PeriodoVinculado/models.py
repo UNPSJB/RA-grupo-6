@@ -15,6 +15,6 @@ class PeriodoVinculado(ModeloBase):
     materia_id: Mapped[int] = mapped_column(ForeignKey("materia.id"))
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
 
-    materia: Mapped["src.Materias.models.Materia"] = relationship("src.Materias.models.Materia", back_populates="periodo_vinculado")
+    materia: Mapped["src.Materias.models.Materia"] = relationship("src.Materias.models.Materia", back_populates="periodos_vinculados")
     usuario: Mapped["src.Usuarios.models.Usuario"] = relationship("src.Usuarios.models.Usuario", back_populates="periodo_vinculado")
 

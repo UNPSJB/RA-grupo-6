@@ -3,10 +3,11 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, exists
 
+from src.Instrumento import services
 from src.Instrumento.models import Instrumento as InstrumentoModel, TipoInstrumento 
 from src.Instrumento.schemas import InstrumentoParaListado
 from src.database import get_db
-from .schemas import InstrumentoDetalle, RespuestaDetalle
+from .schemas import InstrumentoDetalle, RespuestaDetalle, TasaRespuesta
 from src.RespuestasFormulario.models import RespuestasFormulario as RespuestasFormularioModel
 from src.Respuesta.models import Respuesta as RespuestaModel
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -49,6 +50,12 @@ def get_instrumentos_por_tipo(
 
     instrumentos = query.all()
     return instrumentos
+
+
+@router.get("/ObtenerTasaRespuestas/{instrumento_id}", response_model=TasaRespuesta)
+def get_tasa_respuestas(instrumento_id: int, db:Session = Depends(get_db)):
+    return services.obtenerTasaRespuestas(db,instrumento_id)
+
 
 
 @router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)

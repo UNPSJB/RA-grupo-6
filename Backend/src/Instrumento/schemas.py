@@ -78,4 +78,6 @@ class EstadisticaPregunta(BaseModel):
     opciones: List[EstadisticaOpcion]
 
 
- 
+class TasaRespuesta(BaseModel):
+    no_respondieron: int
+    respondidos: int

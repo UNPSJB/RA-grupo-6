@@ -84,6 +84,25 @@ def getInstrumentosUltDictado(db: Session):
     return ultimo_dictado.instrumentos
     
 
-def getCantInstrumentosUltDic(db: Session):
+#Obtiene la cantidad de respuestas de los instrumentos del ultimo dictado. 
+def getCantRespInstUltDic(db: Session):
 
-    return len(getInstrumentosUltDictado(db))
+    instrumentos = getInstrumentosUltDictado(db)
+
+    # estadisticas = {}
+    # estadisticas["Total"] = 0
+
+    estadisticas = {"Total": 0}
+
+    for instrumento in instrumentos:
+
+        cantidad_respuestas = len(instrumento.respuestas_formulario)
+        rol = instrumento.plantilla_formulario.rol.nombre
+        estadisticas[rol] = cantidad_respuestas
+        estadisticas["Total"] += cantidad_respuestas
+
+        # estadisticas[f"{instrumento.plantilla_formulario.rol.nombre}"] = instrumento.respuestas_formulario
+        # estadisticas["Total"]  = estadisticas["Total"]  + len(instrumento.respuestas_formulario)
+
+
+    return estadisticas

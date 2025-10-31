@@ -21,6 +21,6 @@ def get_materias_ult_dictado(db:Session = Depends(get_db)):
 def get_instrumentos_ult_dictado(db:Session = Depends(get_db)):
     return services.getInstrumentosUltDictado(db)
 
-@router.get("/CantidadRespuestas", response_model=int)
+@router.get("/CantidadRespuestas", response_model=dict)
 def get_cantidad_respondidos(db:Session = Depends(get_db)):
-    return services.getCantInstrumentosUltDic(db)
+    return services.getCantRespInstUltDic(db)

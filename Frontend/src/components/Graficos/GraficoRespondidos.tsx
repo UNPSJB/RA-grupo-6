@@ -21,14 +21,34 @@ const data = {
             'rgba(75, 192, 192, 1)',
         ],
         borderWidth: 1,
+
         },
     ],
     };
 
+    const options = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom' as const,
+                    onClick: () => {},
+                    align: 'center' as const,
+                    labels: {
+                        padding: 20,
+                        boxWidth: 15,
+                        boxHeight: 15
+                        // usePointStyle: true, 
+                        // pointStyle: 'circle'
+                    }
+                }
+            }
+        }
+
     return (
     <div className='w-75 align-text-center'>
-        <p className='mb-0'>{titulo}</p>
-        <Doughnut data={data} />
+        <h5 >{titulo}</h5>
+        <br />
+        <Doughnut data={data} options={options}/>
     </div>
     )
 }

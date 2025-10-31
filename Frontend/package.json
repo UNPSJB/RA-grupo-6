@@ -12,10 +12,12 @@
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
     "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
     "pako": "^2.1.0",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
     "react-bootstrap-icons": "^1.11.6",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.1",
     "react-select": "^5.10.2"

@@ -17,8 +17,9 @@ import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
+import { GraficoRespondidos } from './components/Graficos/GraficoRespondidos.tsx';
+import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 // createRoot(document.getElementById('root')!).render(
-
 
 
 
@@ -30,7 +31,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
-        <Route path='/' element={<SeleccionarRol/>}></Route>
+        {/* <Route path='/' element={<SeleccionarRol/>}></Route> */}
+        <Route path='/' element={<MostrarEstadisticas/>} ></Route>
         <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
         <Route path='/materias' element={<SeleccionarMateria/>}></Route>
         <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>

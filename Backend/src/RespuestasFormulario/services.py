@@ -23,12 +23,12 @@ def crear_respuestas_formulario(
 def obtener_respuestas_formulario(
     db: Session, 
     respuestas_formulario_id: int
-) -> schemas.RespuestasFormulario:
+) -> schemas.RespuestasFormularioBase:
     db_respuestas = db.scalar(
         select(RespuestasFormulario)
         .where(RespuestasFormulario.id == respuestas_formulario_id)
         .options(
-            joinedload(RespuestasFormulario.materia),
+            # joinedload(RespuestasFormulario.materia),
             joinedload(RespuestasFormulario.usuario),
             joinedload(RespuestasFormulario.respuestas)
                 .joinedload(Respuesta.pregunta)

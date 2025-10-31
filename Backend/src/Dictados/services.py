@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.Materias.models import Materia, EnumTipoDictado
-from src.Dictados.models import Dictado
+from src.Dictados.models import Dictado, MateriaDictado
 from src.Dictados import schemas,exceptions
 
 
@@ -53,3 +53,37 @@ def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dict
 
     return nuevoDictado
 
+
+def getUltimoDictado(db: Session):
+
+    ultimo_dictado = db.query(Dictado).order_by(Dictado.fecha_cierre.desc()).first()
+
+    if ultimo_dictado is None:
+        raise exceptions.DictadoNoEncontrado
+
+    return ultimo_dictado
+
+
+def getMateriasUltimoDictado(db: Session):
+    
+    ultimo_dictado = getUltimoDictado(db)
+
+    materias_dictados = db.scalars(select(MateriaDictado).where(MateriaDictado.dictado_id == ultimo_dictado.id)).all()
+
+    materia_list = []
+    for materia_dictado in materias_dictados:
+        materia_list.append(materia_dictado.materia)
+
+    return materia_list
+
+
+def getInstrumentosUltDictado(db: Session):
+
+    ultimo_dictado = getUltimoDictado(db)
+
+    return ultimo_dictado.instrumentos
+    
+
+def getCantInstrumentosUltDic(db: Session):
+
+    return len(getInstrumentosUltDictado(db))

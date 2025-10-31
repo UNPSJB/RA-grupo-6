@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from src.Usuarios.schemas import UsuarioBase
 
 class RespuestasFormularioBase(BaseModel):
-    materia_id: str
+    # materia_id: str
     usuario_id: int
     instrumento_id: int
     fecha_envio: date
@@ -22,7 +22,7 @@ class RespuestasFormularioCreate(RespuestasFormularioBase):
 
 class RespuestasFormulario(RespuestasFormularioBase):
     id: int
-    materia: Materia
+    # materia: Materia
     respuestas: List['Respuesta'] = []  
     usuario: 'UsuarioBase'
     model_config = ConfigDict(from_attributes=True)

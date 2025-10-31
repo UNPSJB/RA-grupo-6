@@ -16,7 +16,7 @@ class InstrumentoBase(BaseModel):
     materia_id: str
     materia: Materia
     plantilla_formulario: PlantillaFormulario
-    respuestas_formulario: RespuestasFormulario
+    respuestas_formulario: List[RespuestasFormulario]
 
 class InstrumentoCreate(InstrumentoBase):
     pass 

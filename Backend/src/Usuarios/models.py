@@ -5,31 +5,32 @@ from src.models import ModeloBase
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey
 
-
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.UsuarioDepartamento.models import UsuarioDepartamento
-    
+    from src.Roles.models import Rol
+    from src.PeriodoVinculado.models import PeriodoVinculado
+
 class Usuario(ModeloBase):
     __tablename__ = "usuarios"
 
+    #Atributos 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String(50), index=False)
     apellido: Mapped[str] = mapped_column(String(30), index=False)
     legajo: Mapped[int] = mapped_column(Integer, index=False)
     email: Mapped[str] = mapped_column(String(30), index=False)
+
+    #Foraneas
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
 
-    rol: Mapped["src.Roles.models.Rol"] = relationship("src.Roles.models.Rol", back_populates="usuarios")
+    #Relaciones
+
+    rol: Mapped["Rol"] = relationship("Rol", back_populates="usuarios")
+    
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="usuario")
+    
+    periodo_vinculado: Mapped["PeriodoVinculado"] = relationship("PeriodoVinculado", back_populates="usuario")
 
-    periodo_vinculado: Mapped["src.PeriodoVinculado.models.PeriodoVinculado"] = relationship("src.PeriodoVinculado.models.PeriodoVinculado", back_populates="usuario")
-
-    departamento_info: Mapped[Optional["UsuarioDepartamento"]] = relationship(
-        "UsuarioDepartamento",
-        back_populates="usuario",
-        uselist=False,
-        cascade="all, delete-orphan"
-    )
+    departamento_info: Mapped[Optional["UsuarioDepartamento"]] = relationship("UsuarioDepartamento", back_populates="usuario", uselist=False, cascade="all, delete-orphan")

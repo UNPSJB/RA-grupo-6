@@ -24,7 +24,7 @@ def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dict
     FIN_SEGUNDO_CUATRIMESTRE = date(ANIO_PERIODO_NUEVO, 12, 31)
 
     if ((dictado.fecha_inicio >= INICIO_PRIMER_CUATRIMESTRE) & (dictado.fecha_cierre <= INICIO_SEGUNDO_CUATRIMESTRE)):
-        db_dictado = db.scalars(select(Dictado).where((dictado.fecha_inicio >= INICIO_PRIMER_CUATRIMESTRE) & (dictado.fecha_cierre <= INICIO_SEGUNDO_CUATRIMESTRE))).first() 
+        db_dictado = db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_PRIMER_CUATRIMESTRE) & (Dictado.fecha_cierre <= INICIO_SEGUNDO_CUATRIMESTRE))).first() 
         
         if(db_dictado is None):
             materias = db.scalars(select(Materia).where(Materia.dictado == EnumTipoDictado.PRIMER_CUATRIMESTRE)).all()    
@@ -33,18 +33,20 @@ def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dict
             raise exceptions.PrimerDictadoAnualExiste
 
     elif((dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE)):
-        db_dictado = db.scalars(select(Dictado).where((dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE))).first() 
+        db_dictado = db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (Dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE))).first() 
 
         if(db_dictado is None):
-            materias = db.scalars(select(Materia).where((Materia.dictado == EnumTipoDictado.SEGUNDO_CUATRIMESTRE) or (Materia.dictado == EnumTipoDictado.ANUAL))).all()    
+            materias = db.scalars(select(Materia).where((Materia.dictado == EnumTipoDictado.SEGUNDO_CUATRIMESTRE) | (Materia.dictado == EnumTipoDictado.ANUAL))).all()    
 
         else:
             raise exceptions.SegundoDictadoAnualExiste
     else:
         raise exceptions.DictadoEnPeriodoInvalido
 
-    nuevoDictado = Dictado(fecha_inicio=dictado.fecha_inicio, fecha_cierre=dictado.fecha_cierre, materias=materias)
+    nuevoDictado = Dictado(fecha_inicio=dictado.fecha_inicio, fecha_cierre=dictado.fecha_cierre)
 
+    for m in materias:
+        nuevoDictado.materias.append(m)
     db.add(nuevoDictado)
     db.commit()
     db.refresh(nuevoDictado)

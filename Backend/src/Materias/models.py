@@ -41,5 +41,5 @@ class Materia(ModeloBase):
         back_populates="materias"
     )
 
-    dictado: Mapped[EnumTipoDictado] = mapped_column(Enum(EnumTipoDictado), nullable=False)
+    dictado: Mapped[EnumTipoDictado] = mapped_column(Enum(EnumTipoDictado, native_enum=False), nullable=False)
 

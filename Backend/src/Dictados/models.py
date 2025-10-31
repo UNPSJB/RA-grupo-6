@@ -2,7 +2,7 @@ import enum
 from typing import TYPE_CHECKING, List, Optional
 
 from src.models import ModeloBase
-from sqlalchemy import Column, Date, ForeignKey, Integer, Table
+from sqlalchemy import Column, Date, ForeignKey, Integer, Table, String
 from datetime import date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 materia_dictado = Table(
     'materia_dictado',
     ModeloBase.metadata,
-    Column("materia_id", Integer, ForeignKey("materia.id"), primary_key=True),
+    Column("materia_id", String, ForeignKey("materia.id"), primary_key=True),
     Column("dictados_id", Integer, ForeignKey("dictados.id"), primary_key=True)
 )
 

@@ -7,7 +7,7 @@ from src.Materias.schemas import Materia
 class DictadoBase(BaseModel):
     fecha_inicio: date
     fecha_cierre: date
-    materias: List[Materia] = []
+    materias: List[Materia] = None
 
 class DictadoCreate(DictadoBase):
     pass

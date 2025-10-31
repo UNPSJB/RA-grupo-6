@@ -10,7 +10,7 @@ class PeriodoVinculado(ModeloBase):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     fecha_desde: Mapped[date] = mapped_column(Date)
-    fecha_hasta: Mapped[date] = mapped_column(Date)
+    fecha_hasta: Mapped[date] = mapped_column(Date, nullable=True)
 
     materia_id: Mapped[int] = mapped_column(ForeignKey("materia.id"))
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))

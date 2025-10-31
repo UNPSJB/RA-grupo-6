@@ -1,7 +1,10 @@
 from datetime import date
-from sqlalchemy import select
+from sqlalchemy import null, select
 from sqlalchemy.orm import Session
 
+from src.Departamento.models import Departamento
+from src.PeriodoVinculado.schemas import PeriodoVinculado
+from src.Usuarios.models import Usuario
 from src.Materias.models import Materia, EnumTipoDictado
 from src.Dictados.models import Dictado, MateriaDictado
 from src.Dictados import schemas,exceptions
@@ -84,25 +87,52 @@ def getInstrumentosUltDictado(db: Session):
     return ultimo_dictado.instrumentos
     
 
+def esAsignado(periodo_vinculado : PeriodoVinculado, dictado: Dictado):
+    
+    if ((periodo_vinculado.fecha_desde <= dictado.fecha_inicio) and (periodo_vinculado.fecha_hasta == dictado.fecha_cierre)):
+        return True
+
+    return False
+
 #Obtiene la cantidad de respuestas de los instrumentos del ultimo dictado. 
 def getCantRespInstUltDic(db: Session):
 
     instrumentos = getInstrumentosUltDictado(db)
+    dictado = getUltimoDictado(db)
 
-    # estadisticas = {}
-    # estadisticas["Total"] = 0
-
-    estadisticas = {"Total": 0}
-
+    estadisticas = {}
+    estadisticas['Respondidas_Alumno'] = 0
+    estadisticas['Asignadas_Alumno'] = 0
+    estadisticas['Respondidas_Docente'] = 0
+    estadisticas['Asignadas_Docente'] = 0
+    estadisticas['Respondidas_Departamento'] = 0
+    estadisticas['Asignadas_Departamento'] = 0
+    
+    #Obtengo el numero de respuestas por cada rol.
     for instrumento in instrumentos:
 
-        cantidad_respuestas = len(instrumento.respuestas_formulario)
-        rol = instrumento.plantilla_formulario.rol.nombre
-        estadisticas[rol] = cantidad_respuestas
-        estadisticas["Total"] += cantidad_respuestas
+        rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
 
-        # estadisticas[f"{instrumento.plantilla_formulario.rol.nombre}"] = instrumento.respuestas_formulario
-        # estadisticas["Total"]  = estadisticas["Total"]  + len(instrumento.respuestas_formulario)
+        match(rol_usuario_encuestado):
+            case ("estudiante"):
+                estadisticas['Respondidas_Alumno'] = estadisticas['Respondidas_Alumno'] + len(instrumento.respuestas_formulario)
 
+                asignados = list(filter(lambda x: esAsignado(x, dictado), instrumento.materia.periodos_vinculados))
+                estudiantes = list(filter(lambda x: x.usuario.rol.nombre.lower() == "estudiante", asignados)) 
+                estadisticas['Asignadas_Alumno'] = estadisticas['Asignadas_Alumno'] + len(estudiantes) 
+
+            case ("docente"):
+                
+                estadisticas['Respondidas_Docente'] = estadisticas['Respondidas_Docente'] + len(instrumento.respuestas_formulario)
+
+                docentes = list(filter(lambda x: x.fecha_hasta == null, instrumento.materia.periodos_vinculados))
+                estadisticas['Asignadas_Docente'] = estadisticas['Asignadas_Docente'] + len(docentes) 
+            
+            case ("departamento"):
+                estadisticas['Respondidas_Departamento'] = estadisticas['Respondidas_Departamento'] + len(instrumento.respuestas_formulario)
+
+                departamentos_historicos = list(filter(lambda x: x.usuario.nombre.lower() == "departamento" ,instrumento.materia.departamento.usuarios_info))
+                departamentos_actuales = list(filter(lambda x: x.fecha_hasta == null , departamentos_historicos))
+                estadisticas['Asignadas_Departamento'] = estadisticas['Asignadas_Departamento'] + len(departamentos_actuales) 
 
     return estadisticas

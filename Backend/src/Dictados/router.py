@@ -24,3 +24,7 @@ def get_instrumentos_ult_dictado(db:Session = Depends(get_db)):
 @router.get("/CantidadRespuestas", response_model=dict)
 def get_cantidad_respondidos(db:Session = Depends(get_db)):
     return services.getCantRespInstUltDic(db)
+
+@router.get("/PromediosDocentes", response_model=list[dict])
+def get_promedios_docentes(db:Session = Depends(get_db)):
+    return services.getPromedioDocentes(db)

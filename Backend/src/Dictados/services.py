@@ -2,6 +2,7 @@ from datetime import date
 from sqlalchemy import null, select
 from sqlalchemy.orm import Session
 
+from src.Instrumento.models import Instrumento
 from src.Departamento.models import Departamento
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Usuarios.models import Usuario
@@ -110,7 +111,7 @@ def getCantRespInstUltDic(db: Session):
     
     #Obtengo el numero de respuestas por cada rol.
     for instrumento in instrumentos:
-
+        
         rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
 
         match(rol_usuario_encuestado):
@@ -137,3 +138,84 @@ def getCantRespInstUltDic(db: Session):
                 estadisticas['Asignadas_Departamento'] = estadisticas['Asignadas_Departamento'] + len(departamentos_actuales) 
 
     return estadisticas
+
+def getPromedioDocentes(db: Session):
+    
+    instrumentos = getInstrumentosUltDictado(db)
+    dictado = getUltimoDictado(db)
+
+
+    promedios = []
+    for instrumento in instrumentos:
+        
+        rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
+
+        match(rol_usuario_encuestado):
+            case("estudiante"):
+                periodos= instrumento.materia.periodos_vinculados
+
+                for periodo in periodos:
+                    if periodo.fecha_hasta is None:
+                        docente_nombre = periodo.usuario.nombre
+                        docente_apellido = periodo.usuario.apellido
+
+                respuestas_formularios = instrumento.respuestas_formulario
+                
+                grupos_valores = {}
+
+                for respuesta_formulario in respuestas_formularios:
+                    respuestas = respuesta_formulario.respuestas
+
+                    
+                    
+                    for respuesta in respuestas:
+
+                       if respuesta.pregunta.tipo == "cerrada":
+                           
+                            grupo_pregunta = respuesta.pregunta.grupo_pregunta.letra
+                            texto_opcion = respuesta.opcion.texto.strip()
+
+                            valor = None
+                            match(texto_opcion):
+                                case ("Malo, No satisfactorio"):
+                                    valor = 1
+                                case ("Regular, Poco satisfactorio"):
+                                    valor = 2
+                                case ("Bueno, Satisfactorio"):
+                                    valor = 3
+                                case ("Muy Bueno, Muy Satisfactorio"):
+                                    valor = 4
+                            
+                            if valor is not None:
+                                grupos_valores.setdefault(grupo_pregunta, []).append(valor)
+
+                promedios_por_grupo = {}
+
+                for grupo, valores in grupos_valores.items():
+                    if valores:
+                        promedio = sum(valores) / len(valores)
+                        promedio_redondeado = round(promedio,2)
+                        promedios_por_grupo[grupo] = promedio_redondeado
+
+                todos_los_valores = []
+                for valores in grupos_valores.values():
+                    todos_los_valores.extend(valores)
+
+                if len(todos_los_valores) > 0:
+                    promedio_general = round(sum(todos_los_valores) /len(todos_los_valores),2)
+                else:
+                    promedio_general = 0
+
+
+                promedios.append({
+                    "id": instrumento.materia.id,
+                    "nombre": instrumento.materia.nombre,
+                    "docente_apellido": docente_apellido,
+                    "docente_nombre": docente_nombre,
+                    "promedios_por_grupo": promedios_por_grupo,
+                    "promedio_general": promedio_general
+                })
+        
+     
+
+    return promedios

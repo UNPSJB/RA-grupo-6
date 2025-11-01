@@ -125,14 +125,15 @@ def getCantRespInstUltDic(db: Session):
                 
                 estadisticas['Respondidas_Docente'] = estadisticas['Respondidas_Docente'] + len(instrumento.respuestas_formulario)
 
-                docentes = list(filter(lambda x: x.fecha_hasta == null, instrumento.materia.periodos_vinculados))
+                docentes = list(filter(lambda x: x.fecha_hasta is None, instrumento.materia.periodos_vinculados))
                 estadisticas['Asignadas_Docente'] = estadisticas['Asignadas_Docente'] + len(docentes) 
             
             case ("departamento"):
                 estadisticas['Respondidas_Departamento'] = estadisticas['Respondidas_Departamento'] + len(instrumento.respuestas_formulario)
 
-                departamentos_historicos = list(filter(lambda x: x.usuario.nombre.lower() == "departamento" ,instrumento.materia.departamento.usuarios_info))
-                departamentos_actuales = list(filter(lambda x: x.fecha_hasta == null , departamentos_historicos))
+                departamentos_historicos = list(filter(lambda x: x.usuario.rol.nombre.strip().lower() == "departamento" ,instrumento.materia.departamento.usuarios_info))
+                departamentos_actuales = list(filter(lambda x: x.fecha_hasta is None, departamentos_historicos))
+
                 estadisticas['Asignadas_Departamento'] = estadisticas['Asignadas_Departamento'] + len(departamentos_actuales) 
 
     return estadisticas

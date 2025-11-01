@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel, field_validator
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Materias import exceptions
@@ -9,7 +10,7 @@ from src.Materias import exceptions
 class MateriaBase(BaseModel):
     id: str
     nombre: str
-    periodos_vinculados: PeriodoVinculado
+    periodos_vinculados: List[PeriodoVinculado]
 
 class Materia(MateriaBase):
     model_config = {"from_attributes": True}

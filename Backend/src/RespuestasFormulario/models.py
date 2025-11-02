@@ -27,6 +27,6 @@ class RespuestasFormulario(ModeloBase):
     instrumento: Mapped["Instrumento"] = relationship(back_populates="respuestas_formulario")
 
     # TODO: Recordar borrar esta columna y hacer la migración en la base de datos
-    materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
-    materia: Mapped["Materia"] = relationship(back_populates="respuestas_formulario")
+    # materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
+    # materia: Mapped["Materia"] = relationship(back_populates="respuestas_formulario")
     

@@ -163,11 +163,13 @@ def getPromedioDocentes(db: Session):
 
                 # Obtener docente actual
                 periodos = instrumento.materia.periodos_vinculados
-                
+
                 for periodo in periodos:
                     if periodo.fecha_hasta is None:
+                        
                         docente_nombre = periodo.usuario.nombre
                         docente_apellido = periodo.usuario.apellido
+
 
                 respuestas_formularios = instrumento.respuestas_formulario
 

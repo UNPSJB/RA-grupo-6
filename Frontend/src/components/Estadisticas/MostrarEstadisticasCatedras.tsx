@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import { CheckCircle, ExclamationCircle, ExclamationTriangle, ChevronRight } from "react-bootstrap-icons";
 import { DetalleMateria } from "../materias/DetalleMateria";
+import { capitalizarCadena } from "../Funciones";
 
 export interface GrupoEstadistica {
     letra: string;
@@ -68,24 +69,19 @@ export function EstadisticasCatedras() {
                 </div>
 
                 {/* Estadísticas generales */}
-                <Row className="g-4 justify-content-center mb-4">
-                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
-                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
-                            <small className="text-muted d-block mb-2">Total Cátedras</small>
-                            <h2 className="fw-bold mb-0">{totalCatedras}</h2>
-                        </Card>
+                
+                <Row className="g-4 justify-content-center mb-4 mt-4 border rounded-5 p-4" style={{backgroundColor: "white"}}>
+                    <Col xs={4} className="text-center mt-0">
+                        <small className="text-muted d-block mb-2">Total Cátedras</small>
+                        <h2 className="fw-bold mb-0">{totalCatedras}</h2>
                     </Col>
-                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
-                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
-                            <small className="text-muted d-block mb-2">Promedio General</small>
-                            <h2 className="fw-bold mb-0 text-primary">{promedioGeneral}</h2>
-                        </Card>
+                    <Col xs={4} className="text-center mt-0">
+                        <small className="text-muted d-block mb-2">Promedio General</small>
+                        <h2 className="fw-bold mb-0 text-primary">{promedioGeneral}</h2>
                     </Col>
-                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
-                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
-                            <small className="text-muted d-block mb-2">Requieren Atención</small>
-                            <h2 className="fw-bold mb-0 text-danger">{requierenAtencion}</h2>
-                        </Card>
+                    <Col xs={4} className="text-center mt-0">
+                        <small className="text-muted d-block mb-2">Requieren Atención</small>
+                        <h2 className="fw-bold mb-0 text-danger">{requierenAtencion}</h2>
                     </Col>
                 </Row>
 
@@ -105,28 +101,27 @@ export function EstadisticasCatedras() {
                                 : "0";
 
                             return (
-                                <Col key={materia.id} xs={12} md={6} xl={4}>
-                                    <Card
-                                        className="h-100 border-0 shadow-sm"
-                                        style={{ cursor: 'pointer', transition: 'all 0.2s', minHeight: '280px' }}
-                                        onClick={() => setMateriaSeleccionada(materia)}
-                                    >
-                                        <Card.Body className="p-3 d-flex flex-column justify-content-between">
+
+                                <Col onClick={() => setMateriaSeleccionada(materia)} style={{ cursor: 'pointer', transition: 'all 0.2s', minHeight: '280px', backgroundColor:"white"}} className="border rounded-4 p-3" key={materia.id} xs={6} >
+
+                                        <div className="p-3 d-flex flex-column justify-content-between">
                                             <div className="d-flex justify-content-between align-items-start mb-3 flex-wrap">
                                                 <div className="flex-grow-1">
-                                                    <Card.Title className="fw-semibold mb-1" style={{ fontSize: "18px" }}>
-                                                        {materia.nombre} ({materia.id})
-                                                    </Card.Title>
-                                                    <Card.Subtitle className="text-muted" style={{ fontSize: "14px" }}>
+                                                    <h3 className="fw-semibold mb-1" style={{ fontSize: "18px"}}>
+                                                        {capitalizarCadena(materia.nombre)} ({materia.id})
+                                                    </h3>
+                                                    <h4 className="text-muted" style={{ fontSize: "14px" }}>
                                                         {materia.docente_apellido}, {materia.docente_nombre}
-                                                    </Card.Subtitle>
+                                                    </h4>
                                                 </div>
-                                                <ChevronRight size={24} className="text-muted" />
+
+                                                <ChevronRight size={24} className="text-muted"/>
+
                                             </div>
 
-                                            <div className={`bg-${estado.color}-subtle rounded p-3 mb-3 d-flex align-items-center gap-3 flex-wrap`}>
+                                            <div className={`bg-${estado.color}-subtle rounded-4 p-3 mb-3 d-flex align-items-center gap-4 justify-content-center flex-wrap`}>
                                                 <Icon size={24} className={`text-${estado.color}`} />
-                                                <div className="flex-grow-1 text-start">
+                                                <div className="flex-grow-1 text-center">
                                                     <div className="fw-bold" style={{ fontSize: "28px", lineHeight: "1" }}>
                                                         {materia.promedio_general.toFixed(1)} / 4.0
                                                     </div>
@@ -146,8 +141,7 @@ export function EstadisticasCatedras() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </Card.Body>
-                                    </Card>
+                                        </div>
                                 </Col>
                             );
                         })}

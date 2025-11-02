@@ -28,7 +28,7 @@ def obtener_respuestas_formulario(
         select(RespuestasFormulario)
         .where(RespuestasFormulario.id == respuestas_formulario_id)
         .options(
-            joinedload(RespuestasFormulario.materia),
+            # joinedload(RespuestasFormulario.materia),
             joinedload(RespuestasFormulario.usuario),
             joinedload(RespuestasFormulario.respuestas)
                 .joinedload(Respuesta.pregunta)

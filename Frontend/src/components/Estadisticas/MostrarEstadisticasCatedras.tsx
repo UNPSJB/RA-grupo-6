@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import { CheckCircle, ExclamationCircle, ExclamationTriangle, ChevronRight } from "react-bootstrap-icons";
 import { DetalleMateria } from "../materias/DetalleMateria";
 import { capitalizarCadena } from "../Funciones";
@@ -52,7 +52,7 @@ export function EstadisticasCatedras() {
     const promedioGeneral = materias.length > 0
         ? (materias.reduce((sum, m) => sum + m.promedio_general, 0) / materias.length).toFixed(1)
         : "0.0";
-    const requierenAtencion = materias.filter(m => m.promedio_general < 2.5).length;
+    const requierenAtencion = materias.filter(m => parseFloat(m.promedio_general.toFixed(1)) < 2.5).length;
     const cuatrimestre = materias[0]?.cuatrimestre ?? "-";
 
     return (

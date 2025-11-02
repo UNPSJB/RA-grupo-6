@@ -179,24 +179,26 @@ def getPromedioDocentes(db: Session):
                     for respuesta in respuesta_formulario.respuestas:
                         if respuesta.pregunta.tipo == "cerrada":
                             letra = respuesta.pregunta.grupo_pregunta.letra
-                            titulo = respuesta.pregunta.grupo_pregunta.titulo
-                            texto_opcion = respuesta.opcion.texto.strip()
 
-                            valor = None
-                            match texto_opcion:
-                                case "Malo, No satisfactorio":
-                                    valor = 1
-                                case "Regular, Poco satisfactorio":
-                                    valor = 2
-                                case "Bueno, Satisfactorio":
-                                    valor = 3
-                                case "Muy Bueno, Muy Satisfactorio":
-                                    valor = 4
+                            if letra != "A":
+                                titulo = respuesta.pregunta.grupo_pregunta.titulo
+                                texto_opcion = respuesta.opcion.texto.strip()
 
-                            if valor is not None:
-                                if letra not in grupos_valores:
-                                    grupos_valores[letra] = {"titulo": titulo, "valores": []}
-                                grupos_valores[letra]["valores"].append(valor)
+                                valor = None
+                                match texto_opcion:
+                                    case "Malo, No satisfactorio":
+                                        valor = 1
+                                    case "Regular, Poco satisfactorio":
+                                        valor = 2
+                                    case "Bueno, Satisfactorio":
+                                        valor = 3
+                                    case "Muy Bueno, Muy Satisfactorio":
+                                        valor = 4
+
+                                if valor is not None:
+                                    if letra not in grupos_valores:
+                                        grupos_valores[letra] = {"titulo": titulo, "valores": []}
+                                    grupos_valores[letra]["valores"].append(valor)
 
                 # Calcular promedios por grupo 
                 promedios_por_grupo = []

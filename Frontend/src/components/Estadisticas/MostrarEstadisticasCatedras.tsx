@@ -1,0 +1,158 @@
+import { useEffect, useState } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
+import { CheckCircle, ExclamationCircle, ExclamationTriangle, ChevronRight } from "react-bootstrap-icons";
+import { DetalleMateria } from "../materias/DetalleMateria";
+
+export interface GrupoEstadistica {
+    letra: string;
+    titulo: string;
+    promedio: number;
+}
+
+export interface MateriaEstadistica {
+    id: string;
+    nombre: string;
+    docente_nombre: string;
+    docente_apellido: string;
+    promedios_por_grupo: GrupoEstadistica[];
+    promedio_general: number;
+    tasa_de_respuesta: { Respondidas_Alumno: number; Asignadas_Alumno: number };
+    cuatrimestre: string;
+}
+
+function getEstado(promedio: number) {
+    if (promedio >= 3.0) return { color: "success", icon: CheckCircle, label: "Bueno" };
+    if (promedio >= 2.0) return { color: "warning", icon: ExclamationTriangle, label: "Regular" };
+    return { color: "danger", icon: ExclamationCircle, label: "Requiere atención" };
+}
+
+export function EstadisticasCatedras() {
+    const url_base = "http://127.0.0.1:8000/Dictados/PromediosDocentes";
+    const [materias, setMaterias] = useState<MateriaEstadistica[]>([]);
+    const [materiaSeleccionada, setMateriaSeleccionada] = useState<MateriaEstadistica | null>(null);
+
+    useEffect(() => {
+        fetch(url_base)
+            .then(res => res.json())
+            .then(data => setMaterias(data))
+            .catch(err => console.log(err));
+    }, []);
+
+    if (materiaSeleccionada) {
+        return (
+            <DetalleMateria
+                materia={materiaSeleccionada}
+                onVolver={() => setMateriaSeleccionada(null)}
+            />
+        );
+    }
+
+    const totalCatedras = materias.length;
+    const promedioGeneral = materias.length > 0
+        ? (materias.reduce((sum, m) => sum + m.promedio_general, 0) / materias.length).toFixed(1)
+        : "0.0";
+    const requierenAtencion = materias.filter(m => m.promedio_general < 2.5).length;
+    const cuatrimestre = materias[0]?.cuatrimestre ?? "-";
+
+    return (
+        <Container fluid className="py-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+            <Container className="mx-auto px-3" style={{ maxWidth: "1200px" }}>
+                
+                <div className="mb-4 text-center">
+                    <h1 className="fw-bold mb-2" style={{ fontSize: "32px" }}>
+                        Evaluación de Cátedras
+                    </h1>
+                    <p className="text-muted mb-0" style={{ fontSize: "16px" }}>
+                        Cuatrimestre {cuatrimestre}
+                    </p>
+                </div>
+
+                {/* Estadísticas generales */}
+                <Row className="g-4 justify-content-center mb-4">
+                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
+                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
+                            <small className="text-muted d-block mb-2">Total Cátedras</small>
+                            <h2 className="fw-bold mb-0">{totalCatedras}</h2>
+                        </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
+                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
+                            <small className="text-muted d-block mb-2">Promedio General</small>
+                            <h2 className="fw-bold mb-0 text-primary">{promedioGeneral}</h2>
+                        </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center">
+                        <Card className="text-center shadow-sm p-3 border-0" style={{ minWidth: '180px' }}>
+                            <small className="text-muted d-block mb-2">Requieren Atención</small>
+                            <h2 className="fw-bold mb-0 text-danger">{requierenAtencion}</h2>
+                        </Card>
+                    </Col>
+                </Row>
+
+                {/* Listado de materias */}
+                <h3 className="fw-semibold mb-3" style={{ fontSize: "22px" }}>
+                    Cátedras (ordenadas por prioridad de atención)
+                </h3>
+
+                <Row className="g-4">
+                    {materias
+                        .sort((a, b) => a.promedio_general - b.promedio_general)
+                        .map(materia => {
+                            const estado = getEstado(materia.promedio_general);
+                            const Icon = estado.icon;
+                            const tasaRespuesta = materia.tasa_de_respuesta?.Asignadas_Alumno
+                                ? ((materia.tasa_de_respuesta.Respondidas_Alumno / materia.tasa_de_respuesta.Asignadas_Alumno) * 100).toFixed(0)
+                                : "0";
+
+                            return (
+                                <Col key={materia.id} xs={12} md={6} xl={4}>
+                                    <Card
+                                        className="h-100 border-0 shadow-sm"
+                                        style={{ cursor: 'pointer', transition: 'all 0.2s', minHeight: '280px' }}
+                                        onClick={() => setMateriaSeleccionada(materia)}
+                                    >
+                                        <Card.Body className="p-3 d-flex flex-column justify-content-between">
+                                            <div className="d-flex justify-content-between align-items-start mb-3 flex-wrap">
+                                                <div className="flex-grow-1">
+                                                    <Card.Title className="fw-semibold mb-1" style={{ fontSize: "18px" }}>
+                                                        {materia.nombre} ({materia.id})
+                                                    </Card.Title>
+                                                    <Card.Subtitle className="text-muted" style={{ fontSize: "14px" }}>
+                                                        {materia.docente_apellido}, {materia.docente_nombre}
+                                                    </Card.Subtitle>
+                                                </div>
+                                                <ChevronRight size={24} className="text-muted" />
+                                            </div>
+
+                                            <div className={`bg-${estado.color}-subtle rounded p-3 mb-3 d-flex align-items-center gap-3 flex-wrap`}>
+                                                <Icon size={24} className={`text-${estado.color}`} />
+                                                <div className="flex-grow-1 text-start">
+                                                    <div className="fw-bold" style={{ fontSize: "28px", lineHeight: "1" }}>
+                                                        {materia.promedio_general.toFixed(1)} / 4.0
+                                                    </div>
+                                                    <small>{estado.label}</small>
+                                                </div>
+                                            </div>
+
+                                            <div className="d-flex justify-content-between pt-3 flex-wrap" style={{ borderTop: "1px solid #e9ecef" }}>
+                                                <div>
+                                                    <small className="text-muted d-block mb-1" style={{ fontSize: "12px" }}>Tasa de Respuesta</small>
+                                                    <div className="fw-semibold" style={{ fontSize: "18px" }}>{tasaRespuesta}%</div>
+                                                </div>
+                                                <div className="text-end">
+                                                    <small className="text-muted d-block mb-1" style={{ fontSize: "12px" }}>Respondieron</small>
+                                                    <div className="fw-semibold" style={{ fontSize: "18px" }}>
+                                                        {materia.tasa_de_respuesta?.Respondidas_Alumno ?? 0} / {materia.tasa_de_respuesta?.Asignadas_Alumno ?? 0}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })}
+                </Row>
+            </Container>
+        </Container>
+    );
+}

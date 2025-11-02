@@ -23,12 +23,13 @@ function Menu(){
                 <Navbar.Collapse id="menu-navbar-nav">
                     <Nav>
                         <Nav.Link href='/'> <i className="fa-solid fa-house"></i> Volver al inicio </Nav.Link>
+                        <Nav.Link href="/EstadisticasDeDocente"> Ver Estadisticas Catedra</Nav.Link>
                         <Nav.Link href='/RespuestasFormularios'> Ver Respuestas </Nav.Link>
                         <Nav.Link href="/VerPregunta">Ver preguntas</Nav.Link>
                         <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>  
-                        <Nav.Link href="/VerInformesSinteticos">Informes sintéticos</Nav.Link>  
+                        <Nav.Link href="/VerInformesSinteticos">Informes Sintéticos</Nav.Link>  
                         <Nav.Link href="/VerInformeActividadCurricular">Ver Informes de Actividad Curricular</Nav.Link>  
-                        <Nav.Link href="/VerEncuestasEstudiante">Encuestas de estudiante</Nav.Link>
+                        <Nav.Link href="/VerEncuestasEstudiante">Encuestas de Estudiante</Nav.Link>
                         <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

@@ -139,73 +139,84 @@ def getCantRespInstUltDic(db: Session):
 
     return estadisticas
 
+#Obtine los porcentajes de los promedios que tuvieron los docentes en las encuestas de los alumnos en el ultimo cuatrimestre
 def getPromedioDocentes(db: Session):
-    
     instrumentos = getInstrumentosUltDictado(db)
     dictado = getUltimoDictado(db)
 
-
     promedios = []
     for instrumento in instrumentos:
-        
+
         rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
+        estadisticas = {
+            "Respondidas_Alumno": 0,
+            "Asignadas_Alumno": 0
+        }
 
-        match(rol_usuario_encuestado):
-            case("estudiante"):
-                periodos= instrumento.materia.periodos_vinculados
+        match rol_usuario_encuestado:
+            case "estudiante":
+                estadisticas["Respondidas_Alumno"] += len(instrumento.respuestas_formulario)
 
+                asignados = list(filter(lambda x: esAsignado(x, dictado), instrumento.materia.periodos_vinculados))
+                estudiantes = list(filter(lambda x: x.usuario.rol.nombre.lower() == "estudiante", asignados))
+                estadisticas["Asignadas_Alumno"] += len(estudiantes)
+
+                # Obtener docente actual
+                periodos = instrumento.materia.periodos_vinculados
+                
                 for periodo in periodos:
                     if periodo.fecha_hasta is None:
                         docente_nombre = periodo.usuario.nombre
                         docente_apellido = periodo.usuario.apellido
 
                 respuestas_formularios = instrumento.respuestas_formulario
-                
+
+                # Agrupar valores por letra y título
                 grupos_valores = {}
-
                 for respuesta_formulario in respuestas_formularios:
-                    respuestas = respuesta_formulario.respuestas
-
-                    
-                    
-                    for respuesta in respuestas:
-
-                       if respuesta.pregunta.tipo == "cerrada":
-                           
-                            grupo_pregunta = respuesta.pregunta.grupo_pregunta.letra
+                    for respuesta in respuesta_formulario.respuestas:
+                        if respuesta.pregunta.tipo == "cerrada":
+                            letra = respuesta.pregunta.grupo_pregunta.letra
+                            titulo = respuesta.pregunta.grupo_pregunta.titulo
                             texto_opcion = respuesta.opcion.texto.strip()
 
                             valor = None
-                            match(texto_opcion):
-                                case ("Malo, No satisfactorio"):
+                            match texto_opcion:
+                                case "Malo, No satisfactorio":
                                     valor = 1
-                                case ("Regular, Poco satisfactorio"):
+                                case "Regular, Poco satisfactorio":
                                     valor = 2
-                                case ("Bueno, Satisfactorio"):
+                                case "Bueno, Satisfactorio":
                                     valor = 3
-                                case ("Muy Bueno, Muy Satisfactorio"):
+                                case "Muy Bueno, Muy Satisfactorio":
                                     valor = 4
-                            
+
                             if valor is not None:
-                                grupos_valores.setdefault(grupo_pregunta, []).append(valor)
+                                if letra not in grupos_valores:
+                                    grupos_valores[letra] = {"titulo": titulo, "valores": []}
+                                grupos_valores[letra]["valores"].append(valor)
 
-                promedios_por_grupo = {}
+                # Calcular promedios por grupo 
+                promedios_por_grupo = []
+                for letra, data in grupos_valores.items():
+                    valores = data["valores"]
+                    promedio = round(sum(valores) / len(valores), 2) if valores else 0
+                    promedios_por_grupo.append({
+                        "letra": letra,
+                        "tirtulo": data["titulo"],  
+                        "promedio": promedio
+                    })
 
-                for grupo, valores in grupos_valores.items():
-                    if valores:
-                        promedio = sum(valores) / len(valores)
-                        promedio_redondeado = round(promedio,2)
-                        promedios_por_grupo[grupo] = promedio_redondeado
+                
+                total = 0
+                cantidad = 0
 
-                todos_los_valores = []
-                for valores in grupos_valores.values():
-                    todos_los_valores.extend(valores)
+                for data in grupos_valores.values():
+                    valores = data["valores"]
+                    total += sum(valores)
+                    cantidad += len(valores)
 
-                if len(todos_los_valores) > 0:
-                    promedio_general = round(sum(todos_los_valores) /len(todos_los_valores),2)
-                else:
-                    promedio_general = 0
-
+                promedio_general = round(total / cantidad, 2) if cantidad > 0 else 0
 
                 promedios.append({
                     "id": instrumento.materia.id,
@@ -213,9 +224,9 @@ def getPromedioDocentes(db: Session):
                     "docente_apellido": docente_apellido,
                     "docente_nombre": docente_nombre,
                     "promedios_por_grupo": promedios_por_grupo,
-                    "promedio_general": promedio_general
+                    "promedio_general": promedio_general,
+                    "tasa_de_respuesta": estadisticas,
+                    "cuatrimestre": dictado.fecha_inicio.year
                 })
-        
-     
 
     return promedios

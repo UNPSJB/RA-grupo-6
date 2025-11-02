@@ -137,3 +137,4 @@ def getCantRespInstUltDic(db: Session):
                 estadisticas['Asignadas_Departamento'] = estadisticas['Asignadas_Departamento'] + len(departamentos_actuales) 
 
     return estadisticas
+

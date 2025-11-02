@@ -31,3 +31,7 @@ def obtenerTasaRespuestas(db: Session, instrumento_id: int) -> TasaRespuesta:
     return tasa_respuestas
 
 
+def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrumento]:
+
+    return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
+

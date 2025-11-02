@@ -15,6 +15,7 @@ import ResponderInstrumento from './components/ResponderInstrumento';
 import SeleccionarMateria from './components/materias/SeleccionarMateria.tsx';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
+import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path='/' element={<SeleccionarMateria />} ></Route>
         {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
+        <Route path='/seleccionar-informe-sintetico' element= {<SeleccionarInformeSintetico/>} ></Route>
         <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 
         <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>

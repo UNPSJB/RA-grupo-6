@@ -5,6 +5,6 @@ from src.Usuarios import schemas, services
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
-@router.get("/{usuario_id}", response_model= schemas.Usuario)
-def read_usuario(usuario_id: int , db: Session = Depends(get_db)):
-    return services.leer_usuario(db, usuario_id)
+@router.get("/{usuario_id}", response_model= list[dict])
+def leer_respuestas_de_usuario(usuario_id: int , db: Session = Depends(get_db)):
+    return services.leer_respuestas_usuario(db, usuario_id)

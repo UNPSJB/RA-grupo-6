@@ -71,7 +71,7 @@ export type Usuario = {
 
 export type TypeRespuestasFormulario = {
     id: number
-    materia: Materia
+    instrumento: instrumentoList
     usuario: Usuario 
     fecha_envio: Date
     respuestas: Respuesta[]

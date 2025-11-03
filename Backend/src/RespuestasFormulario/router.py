@@ -13,9 +13,9 @@ def crear_respuestas_formulario(
 ):
     return services.crear_respuestas_formulario(db, respuestas_formulario)
 
-@router.get("/{respuestas_formulario_id}", response_model=schemas.RespuestasFormulario)
+@router.get("/{respuestas_formulario_id}", response_model=dict)
 def leer_respuestas_formulario(
     respuestas_formulario_id: int, 
     db: Session = Depends(get_db)
-) -> schemas.RespuestasFormulario:
+):
     return services.obtener_respuestas_formulario(db, respuestas_formulario_id)

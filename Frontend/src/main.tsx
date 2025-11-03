@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
-        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={1}/>}></Route>
+        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>
         <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos/>}></Route>
         <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>

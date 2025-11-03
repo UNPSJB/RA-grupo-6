@@ -60,9 +60,9 @@ class Pregunta(ModeloBase):
     )
 
     estadistica: Mapped[bool] = mapped_column(Boolean, nullable= False)
+    obligatoria: Mapped[bool] = mapped_column(Boolean, nullable= False)
 
 
 
-    
 
 

@@ -1,9 +1,11 @@
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
+from src.Instrumento.schemas import TasaRespuesta
 from src.PlantillaFormulario import schemas, exceptions
 from src.PlantillaFormulario.models import PlantillaFormulario
 from src.Pregunta.models import Pregunta
+from src.Instrumento.services import getTasaRespuestasInstrumentos, getCompletitud
 
 def crear_plantilla_formulario(db: Session, plantilla_formulario: schemas.FormularioCreate):
     
@@ -27,3 +29,20 @@ def obtener_plantilla_formulario(db: Session, formulario_id: int) -> schemas.Pla
     return db_plantilla_formulario
 
 
+def getComparacionPlantillas(db:Session) -> list:
+    db_plantilla_formulario = db.scalars(select(PlantillaFormulario)).all()
+
+    estadisticas = []
+
+    for plantilla  in db_plantilla_formulario:
+        
+        estadisticas.append({
+            "Titulo": plantilla.titulo,  
+            "CantPreguntas": len(plantilla.preguntas),
+            "CantObligatorias": len([pregunta for pregunta in plantilla.preguntas if pregunta.obligatoria]),
+            "Grupos": len(set([pregunta.grupo_pregunta.id for pregunta in plantilla.preguntas])),
+            "TasaRespuestas": getTasaRespuestasInstrumentos(db, plantilla.instrumentos),
+            "Completitud": getCompletitud(db, plantilla.instrumentos),
+        })
+        
+    return estadisticas

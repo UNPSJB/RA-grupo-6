@@ -16,7 +16,8 @@ import ResponderInstrumento from './components/Instrumento/ResponderInstrumento'
 import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
-import { CompararPeriodos } from './components/Estadisticas/CompararPeriodos.tsx';
+import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
+import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 
@@ -31,7 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
         {/* <Route path='/' element={<SeleccionarRol/>}></Route> */}
         {/* <Route path='/' element={<MostrarEstadisticas/>} ></Route> */}
-        <Route path='/' element={<CompararPeriodos/>} ></Route>
+        <Route path='/' element={<CompararPlantillas/>} ></Route>
         <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
         <Route path='/materias' element={<SeleccionarMateria/>}></Route>
         <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>

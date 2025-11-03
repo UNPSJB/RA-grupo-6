@@ -38,6 +38,7 @@ class Pregunta(PreguntaBase):
     puede_eliminarse: bool = True
     puede_modificarse: bool = True
     grupo_pregunta: GrupoPregunta
+    obligatoria: bool
 
     model_config = {
         "from_attributes": True, 

@@ -138,3 +138,4 @@ def getCantRespInstUltDic(db: Session):
 
     return estadisticas
 
+    

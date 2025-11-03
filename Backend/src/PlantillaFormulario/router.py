@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.database import get_db
@@ -18,6 +19,14 @@ def leer_plantilla_formulario(db: Session = Depends(get_db)) -> list[schemas.Pla
 def leer_un_plantilla_formulario(formulario_id: int, db: Session = Depends(get_db)) -> schemas.PlantillaFormulario:
     return services.obtener_plantilla_formulario(db, formulario_id)
 
-@router.get("/EstadisticasFormularios/", response_model=list)
-def get_Estadisticas_Formularios(db: Session = Depends(get_db)):
-    return services.getComparacionPlantillas(db)
+@router.get("/EstadisticasFormularios/rol_{rol_id}", response_model=list)
+def get_Estadisticas_Formularios(rol_id: int, db: Session = Depends(get_db)):
+    return services.getComparacionPlantillas(db, rol_id)
+
+@router.get("/MejorPlantilla/rol_{rol_id}", response_model=Optional[schemas.PlantillaFormulario])
+def get_mejor_plantilla(rol_id: int, db: Session = Depends(get_db)):
+    return services.getMejorPlantilla(db, rol_id)
+
+@router.get("/TasaRespuestasPlantillas/rol_{rol_id}", response_model=float)
+def get_tasa_resp_plantillas(rol_id: int, db: Session = Depends(get_db)):
+    return services.getTasaRespuestasPlantillas(db, rol_id)

@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import select, update
+from sqlalchemy import null, select, update
 from src.Instrumento.schemas import TasaRespuesta
 from src.PlantillaFormulario import schemas, exceptions
 from src.PlantillaFormulario.models import PlantillaFormulario
@@ -29,8 +29,8 @@ def obtener_plantilla_formulario(db: Session, formulario_id: int) -> schemas.Pla
     return db_plantilla_formulario
 
 
-def getComparacionPlantillas(db:Session) -> list:
-    db_plantilla_formulario = db.scalars(select(PlantillaFormulario)).all()
+def getComparacionPlantillas(db:Session, rol_id:int) -> list:
+    db_plantilla_formulario = db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
 
     estadisticas = []
 
@@ -46,3 +46,38 @@ def getComparacionPlantillas(db:Session) -> list:
         })
         
     return estadisticas
+
+def getMejorPlantilla(db:Session, rol_id:int) -> schemas.PlantillaFormulario:
+    db_plantilla_formulario = db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
+
+    if len(db_plantilla_formulario) == 0:
+        return None
+
+    mejorPlantilla = db_plantilla_formulario[0]
+    mejorScore = (0.55 * getTasaRespuestasInstrumentos(db, db_plantilla_formulario[0].instrumentos)) + (0.45 * getCompletitud(db, db_plantilla_formulario[0].instrumentos))
+    
+    for plantilla in db_plantilla_formulario:
+        
+        scorePlantilla = (0.55 * getTasaRespuestasInstrumentos(db, plantilla.instrumentos)) + (0.45 * getCompletitud(db, plantilla.instrumentos))
+        
+        if (scorePlantilla > mejorScore):
+            mejorScore = scorePlantilla
+            mejorPlantilla = plantilla
+            
+
+    return mejorPlantilla
+
+
+def getTasaRespuestasPlantillas(db:Session, rol_id:int) -> float:
+    db_plantilla_formulario = db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
+
+    instrumentos = []
+
+    for plantilla in db_plantilla_formulario:
+        
+        instrumentos = instrumentos + (plantilla.instrumentos)
+
+    return getTasaRespuestasInstrumentos(db, instrumentos)
+
+
+

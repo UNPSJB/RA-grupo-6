@@ -1,4 +1,3 @@
-
 import './index.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -16,36 +15,42 @@ import ResponderInstrumento from './components/Instrumento/ResponderInstrumento'
 import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
-import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
-// createRoot(document.getElementById('root')!).render(
-
-
-
+import { Llamadora } from './components/Respuesta/VerPorcentajes.tsx';
+import { AuthProvider } from './context/AuthContext.tsx';
+import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
+import Login from './context/Login.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-
-
-  <>
-    <Menu></Menu>
-    <BrowserRouter>
+  <BrowserRouter>
+    <AuthProvider>
       <Routes>
-        {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
-        <Route path='/' element={<SeleccionarRol/>}></Route>
-        <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
-        <Route path='/materias' element={<SeleccionarMateria/>}></Route>
-        <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>
-        <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
-        <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
-        <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
-        <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
-        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={1}/>}></Route>
-        <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
-        <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos/>}></Route>
-        <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>
-        <Route path='/VerInformeActividadCurricular' element={<PaginaInformesCatedra/>}></Route>
+        {/* 🔐 Pantalla de login sin menú */}
+        <Route path="/login" element={<Login />} />
+
+        {/* 🔒 Rutas protegidas con menú */}
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Menu />
+              <Routes>
+                <Route path="/" element={<SeleccionarRol />} />
+                <Route path="/seleccionar-rol" element={<SeleccionarRol />} />
+                <Route path="/materias" element={<SeleccionarMateria />} />
+                <Route path="/instrumentos-docente" element={<InstrumentosDocente />} />
+                <Route path="/responder-instrumento/:instrumentoId" element={<ResponderInstrumento />} />
+                <Route path="/VerPregunta" element={<VerPregunta />} />
+                <Route path="/CrearFormulario" element={<CrearPlantillaFormulario />} />
+                <Route path="/RespuestasFormularios" element={<SeleccionarRespuestasFormularios usuario_id={1} />} />
+                <Route path="/RespuestaFormulario/:id" element={<RespuestasFormulario />} />
+                <Route path="/VerInformesSinteticos" element={<PaginaInformesSinteticos />} />
+                <Route path="/VerEncuestasEstudiante" element={<PaginaEncuestasEstudiantes />} />
+                <Route path="/VerInformeActividadCurricular" element={<PaginaInformesCatedra />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-    </BrowserRouter>
-    </>
-
-)
-
+    </AuthProvider>
+  </BrowserRouter>
+);

@@ -8,7 +8,7 @@ from src.models import ModeloBase
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
 from src.Materias.router import router as materias_router
-
+from src.GrupoCuadro.models import GrupoCuadro
 
 
 load_dotenv()

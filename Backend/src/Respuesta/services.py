@@ -18,6 +18,8 @@ def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.
         raise exceptions.RespuestaInvalida("La pregunta es abierta, se requiere 'texto'")
     if pregunta.tipo == "cerrada" and not respuesta.opcion_id:
         raise exceptions.RespuestaInvalida("La pregunta es cerrada, se requiere 'opcion_id'")
+    if pregunta.multiple_respuestas and respuesta.instancia_respuestas:
+        raise exceptions.RespuestaInvalida("La pegunta permite múltiple respuestas, se requiere 'instancia_respuesta")
     
 
     # Crear nueva respuesta

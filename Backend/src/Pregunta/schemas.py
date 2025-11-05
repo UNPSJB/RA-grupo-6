@@ -12,6 +12,9 @@ class PreguntaBase(BaseModel):
     grupo_pregunta_id: int
     estadistica: bool
     rol_id: int     
+    multiple_respuestas: bool
+    grupo_cuadro_id: Optional[int] = None
+    orden_en_grupo: Optional[int] = 1
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo :EnumTipoPregunta = EnumTipoPregunta.abierta
@@ -25,7 +28,9 @@ class PreguntaUpdate(BaseModel):
     texto: str
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
-    # grupo_pregunta: GrupoPregunta
+    grupo_cuadro_id: Optional[int] = None
+    orden_en_grupo: Optional[int] = None
+    multiple_respuestas: Optional[bool] = None
 
 
 class PreguntaDelete(BaseModel):

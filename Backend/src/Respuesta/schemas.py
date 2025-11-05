@@ -9,6 +9,7 @@ class RespuestaBase(BaseModel):
     opcion_id: int | None = None  
     pregunta_id: int
     formulario_id: int
+    instancia_respuestas: int | None = None
 
 class RespuestaCreate(RespuestaBase):
     pass

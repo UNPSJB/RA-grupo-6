@@ -14,6 +14,7 @@ class RespuestasFormularioBase(BaseModel):
     instrumento_id: int
     fecha_envio: date
 
+
 class RespuestasFormularioCreate(RespuestasFormularioBase):
     pass
 

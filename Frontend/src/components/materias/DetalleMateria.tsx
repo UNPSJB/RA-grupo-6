@@ -53,7 +53,10 @@ export function DetalleMateria({ materia, onVolver }: Props) {
                     <Row className="border rounded p-3" style={{backgroundColor:"white"}} key={indice}>
                         <Col xs={12} >
                             <div className="d-flex justify-content-between align-items-center flex-wrap mb-3">
-                                <Badge className="p-2"> {g.letra} - {g.titulo}</Badge>
+                                <p >
+                                    <Badge className="p-2"> {g.letra} </Badge>
+                                    <span> {g.titulo} </span>
+                                </p>
                                 <span className={`fw-bold text-${getEstado(g.promedio).color}`}>{g.promedio} / 4.0</span>
                             </div>
                             <ProgressBar now={(g.promedio / 4) * 100} label={`${((g.promedio / 4) * 100).toFixed(1)}%`} variant={getEstado(g.promedio).color} />

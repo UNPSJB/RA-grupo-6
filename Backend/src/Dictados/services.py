@@ -207,7 +207,7 @@ def getPromedioDocentes(db: Session):
                     promedio = round(sum(valores) / len(valores), 2) if valores else 0
                     promedios_por_grupo.append({
                         "letra": letra,
-                        "tirtulo": data["titulo"],  
+                        "titulo": data["titulo"],  
                         "promedio": promedio
                     })
 

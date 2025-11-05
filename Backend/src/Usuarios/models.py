@@ -33,3 +33,6 @@ class Usuario(ModeloBase):
         uselist=False,
         cascade="all, delete-orphan"
     )
+    username: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    disabled: Mapped[Optional[bool]] = mapped_column(Integer, nullable=True, default=None)
+    hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)

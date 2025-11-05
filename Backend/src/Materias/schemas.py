@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator
-from src.Materias import exceptions
+from src.materias import exceptions
 
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.

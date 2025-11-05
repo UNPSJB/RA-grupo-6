@@ -3,31 +3,42 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, exists
 
+from src.Instrumento import services
 from src.Instrumento.models import Instrumento as InstrumentoModel, TipoInstrumento 
 from src.Instrumento.schemas import InstrumentoParaListado
 from src.database import get_db
-from .schemas import InstrumentoDetalle, RespuestaDetalle
+from .schemas import InstrumentoDetalle, RespuestaDetalle, TasaRespuesta
 from src.RespuestasFormulario.models import RespuestasFormulario as RespuestasFormularioModel
 from src.Respuesta.models import Respuesta as RespuestaModel
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 router = APIRouter(prefix="/instrumentos", tags=["instrumentos"])
 
 @router.get("/{tipo_instrumento}", response_model=List[InstrumentoParaListado])
 def get_instrumentos_por_tipo(
     tipo_instrumento: str,
     usuario_id: int,
-    mostrar_respondidos: bool = False,
+    mostrar_respondidos: bool = Query(False),
     db: Session = Depends(get_db)
 ):
     try:
         tipo_enum = TipoInstrumento(tipo_instrumento)
     except ValueError:
-        raise HTTPException(status_code=400, detail=f"Tipo de instrumento inválido: {tipo_instrumento}")
-    
+        # compatibilidad temporal con valores antiguos
+        if tipo_instrumento == "ENCUESTA_DOCENTE":
+            tipo_enum = TipoInstrumento.INFORME_CATEDRA
+        else:
+            raise HTTPException(status_code=400, detail=f"Tipo de instrumento inválido: {tipo_instrumento}")
+
+    print(">>> tipo_instrumento recibido:", tipo_instrumento)
+    print(">>> tipo_enum.value:", tipo_enum.value)
+
+    todos = db.query(InstrumentoModel).all()
+    print(">>> Todos los instrumentos en DB:", [(i.id, i.tipo) for i in todos])
+    # FIX: comparar contra el .value, no contra el Enum
     query = db.query(InstrumentoModel).filter(
-        InstrumentoModel.tipo == tipo_enum
+        InstrumentoModel.tipo == tipo_enum.value
     )
-    
+
     if not mostrar_respondidos:
         tiene_respuesta = exists().where(
             and_(
@@ -35,11 +46,17 @@ def get_instrumentos_por_tipo(
                 RespuestasFormularioModel.usuario_id == usuario_id
             )
         )
-
         query = query.filter(~tiene_respuesta)
-    
+
     instrumentos = query.all()
     return instrumentos
+
+
+@router.get("/ObtenerTasaRespuestas/{instrumento_id}", response_model=TasaRespuesta)
+def get_tasa_respuestas(instrumento_id: int, db:Session = Depends(get_db)):
+    return services.obtenerTasaRespuestas(db,instrumento_id)
+
+
 
 @router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)
 def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):

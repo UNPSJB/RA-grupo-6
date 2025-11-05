@@ -10,6 +10,9 @@ from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Materias.models import Materia
 from src.models import ModeloBase
 
+from src.Dictados.models import Dictado
+
+
 class TipoInstrumento(str, enum.Enum):
     
     def __new__(cls, value, display_name):
@@ -25,32 +28,31 @@ class TipoInstrumento(str, enum.Enum):
 class Instrumento(ModeloBase):
     __tablename__ = "instrumento"
 
+    #Atributos
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     fecha_inicio: Mapped[date] = mapped_column(Date, nullable=False)
     fecha_cierre: Mapped[date] = mapped_column(Date, nullable=False)
     tipo: Mapped[TipoInstrumento] = mapped_column(Enum(TipoInstrumento), nullable=False)
 
+    #Foraneas
     plantilla_formulario_id: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
-
-    instrumento_fuente_id: Mapped[Optional[int]] = mapped_column( 
-        ForeignKey("instrumento.id"), unique=True, nullable=True
-    )
+    dictado_id: Mapped[int] = mapped_column(ForeignKey("dictados.id"))
+    instrumento_fuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("instrumento.id"), unique=True, nullable=True)
     
-    # relación para obtener el instrumento "derivado" de este.
-    instrumento_derivado: Mapped[Optional["Instrumento"]] = relationship(
-        back_populates="instrumento_fuente", uselist=False 
-    )
-
-    # relación para obtener el instrumento "fuente" de este.
-    instrumento_fuente: Mapped[Optional["Instrumento"]] = relationship(
-        back_populates="instrumento_derivado", remote_side=[id]
-    )
-    
+    #Relaciones
     plantilla_formulario: Mapped["PlantillaFormulario"] = relationship(back_populates="instrumentos")
     materia: Mapped["Materia"] = relationship(back_populates="instrumentos")
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="instrumento")
+    dictado: Mapped["Dictado"] = relationship("Dictado", back_populates="instrumentos")
+    
+    # relación para obtener el instrumento "derivado" de este.
+    instrumento_derivado: Mapped[Optional["Instrumento"]] = relationship(back_populates="instrumento_fuente", uselist=False)
 
+    # relación para obtener el instrumento "fuente" de este.
+    instrumento_fuente: Mapped[Optional["Instrumento"]] = relationship(back_populates="instrumento_derivado", remote_side=[id])
+    
+    
     def titulo(self):
         return f'Informe Sintético N°{self.id}'
     

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, ListGroup, Button, Spinner, Alert, Badge, Row, Col } from "react-bootstrap";
-import type { instrumentoList } from "../types";
+import type { InformeSinteticoList } from "../types"; // Revisar InformeSinteticoList
 
 // Usuario para DepartamentoAlumnos (Lucy)
 const USUARIO_DEPARTAMENTO_ALUMNOS = {
@@ -12,53 +12,29 @@ const USUARIO_DEPARTAMENTO_ALUMNOS = {
 };
 
 // Mock data temporal
-const mockInformesSinteticosPendientes: instrumentoList[] = [
+const mockInformesSinteticosPendientes: InformeSinteticoList[] = [ // Revisar InformeSinteticoList
     {
-        id: 5,
-        tipo: 'INFORME_SINTETICO',
-        fecha_inicio: '2025-10-01',
-        fecha_cierre: '2025-10-31',
-        materia: {
-            id: 'IF043',
-            nombre: 'INGENIERÍA DE SOFTWARE II'
-        },
-        plantilla_formulario: {
-            id: 1,
-            titulo: 'Informe Sintético - Departamento de Informática - 2C 2025'
-        }
+        id: 123,
+        titulo_formulario: "Informe Sintético - Departamento de Informática - 2C 2025",
+        autor_nombre: "Lucy Marticoneta",
+        fecha_completado: "" // Sin fecha = no completado (para el mock)
     },
     {
-        id: 6,
-        tipo: 'INFORME_SINTETICO',
-        fecha_inicio: '2025-10-01',
-        fecha_cierre: '2025-10-31',
-        materia: {
-            id: 'IF001',
-            nombre: 'Elementos de Informatica'
-        },
-        plantilla_formulario: {
-            id: 1,
-            titulo: 'Informe Sintético - Elementos de Informática - 2C 2025'
-        }
+        id: 124,
+        titulo_formulario: "Informe Sintético - Elementos de Informática - 2C 2025",
+        autor_nombre: "Lucy Marticoneta",
+        fecha_completado: ""
     },
     {
-        id: 7,
-        tipo: 'INFORME_SINTETICO',
-        fecha_inicio: '2025-10-01',
-        fecha_cierre: '2025-10-31',
-        materia: {
-            id: 'MA045',
-            nombre: 'ÁLGEBRA'
-        },
-        plantilla_formulario: {
-            id: 1,
-            titulo: 'Informe Sintético - Álgebra - 2C 2025'
-        }
+        id: 125,
+        titulo_formulario: "Informe Sintético - Álgebra - 2C 2025",
+        autor_nombre: "Lucy Marticoneta",
+        fecha_completado: ""
     }
 ];
 
 export default function SeleccionarInformeSintetico() {
-    const [informes, setInformes] = useState<instrumentoList[]>([]);
+    const [informes, setInformes] = useState<InformeSinteticoList[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -72,7 +48,7 @@ export default function SeleccionarInformeSintetico() {
             setLoading(true);
             setError(null);
 
-            // TODO: Borrar el mock y descomentar el fetch cuando se tengan los datos de Informe Sintético
+            // TODO: Borrar el mock y descomentar el fetch
             /*
             const response = await fetch(
                 `http://127.0.0.1:8000/instrumentos/INFORME_SINTETICO?usuario_id=${USUARIO_DEPARTAMENTO_ALUMNOS.id}&mostrar_respondidos=false`
@@ -99,15 +75,15 @@ export default function SeleccionarInformeSintetico() {
         }
     };
 
-    const handleSeleccionarInforme = (informe: instrumentoList) => {
+    const handleSeleccionarInforme = (informe: InformeSinteticoList) => {
         console.log('Informe sintético seleccionado:', informe);
         
         // Navegar a responder-instrumento
         navigate(`/responder-instrumento/${informe.id}`, {
             state: {
                 rol: USUARIO_DEPARTAMENTO_ALUMNOS.rol,
-                materiaNombre: informe.materia.nombre,
-                materiaId: informe.materia.id
+                tituloFormulario: informe.titulo_formulario,
+                autorNombre: informe.autor_nombre
             }
         });
     };
@@ -168,29 +144,20 @@ export default function SeleccionarInformeSintetico() {
                         >
                             <div className="flex-grow-1">
                                 <div className="d-flex align-items-center mb-2">
-                                    <h5 className="mb-0 me-3">{informe.plantilla_formulario.titulo}</h5>
+                                    <h5 className="mb-0 me-3">{informe.titulo_formulario}</h5>
                                     <Badge bg="primary" className="ms-2">
                                         Informe Sintético
                                     </Badge>
                                 </div>
                                 
-                                {/* TODO: Reemplazar por datos de Informe SIntético cuando se tengan */}
                                 <div className="text-muted">
                                     <Row>
                                         <Col md={6}>
                                             <small className="d-block">
-                                                <strong>Materia:</strong> {informe.materia.nombre}
-                                            </small>
-                                        </Col>
-                                        <Col md={6}>
-                                            <small className="d-block">
-                                                <strong>Período:</strong> {new Date(informe.fecha_inicio).toLocaleDateString()} - {new Date(informe.fecha_cierre).toLocaleDateString()}
+                                                <strong>Autor:</strong> {informe.autor_nombre}
                                             </small>
                                         </Col>
                                     </Row>
-                                    <small className="d-block mt-1"> 
-                                        <strong> Código materia:</strong> {informe.materia.id}
-                                    </small>
                                 </div>
                             </div>
                             
@@ -205,11 +172,6 @@ export default function SeleccionarInformeSintetico() {
                                 >
                                     Completar
                                 </Button>
-                                <div className="mt-1">
-                                    <small className="text-muted">
-                                        Vence: {new Date(informe.fecha_cierre).toLocaleDateString()}
-                                    </small>
-                                </div>
                             </div>
                         </ListGroup.Item>
                     ))}

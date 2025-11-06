@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DetalleEncuestaAgregada from "../components/DetalleEncuestaAgregada";
 import InstrumentoList from "../components/InstrumentoList";
-import type { instrumentoList, EncuestaAgregadaDetail } from "../types";
+import type { instrumentoList} from "../types";
 
 // --- Datos hardcodeados para la lista de encuestas ---
 const mockEncuestas: instrumentoList[] = [

@@ -1,23 +1,8 @@
-// PaginaInformesSinteticos.tsx
-
 import { useState, useEffect } from "react";
 import InstrumentoList from "../components/InstrumentoList";
 import type { instrumentoList } from "../types";
 import DetalleInformeSintetico from "../components/DetalleInformeSintetico";
-
-const mockSinteticos: instrumentoList[] = [
-  { id: 101, tipo: 'INFORME_SINTETICO', 
-    fecha_inicio: '2025-08-01', 
-    fecha_cierre: '2025-08-31', 
-    materia: { id: 'ALG', nombre: 'Álgebra' }, 
-    plantilla_formulario: { id: 1, titulo: 'Informe Sintético  2C 2025' } },
-  { id: 102, 
-    tipo: 'INFORME_SINTETICO', 
-    fecha_inicio: '2025-08-01', 
-    fecha_cierre: '2025-08-31', 
-    materia: { id: 'AM1', nombre: 'Análisis Matemático I' }, 
-    plantilla_formulario: { id: 2, titulo: 'Informe Sintético de Análisis Matemático I - 2C 2025' } }
-];
+import { mockSinteticos } from "../MockInformes";
 
 
 export default function PaginaInformesSinteticos() {

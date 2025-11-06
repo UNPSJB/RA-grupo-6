@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from '@react-pdf/renderer'; 
 import { Card, Button, ListGroup, Badge, Spinner } from "react-bootstrap";
-import type { instrumentoList, EstadisticaPregunta, DetalleInformeCatedraCompleto } from "../types"; 
+import type { DetalleInformeCatedraCompleto, DetalleInformeProps } from "../types"; 
 import InformePDFDocument from './InformePDFDocument';
 import Estadisticas from "./Estadisticas";
 
 const mockDetalleCompleto: DetalleInformeCatedraCompleto = {
   id: 101,
-  titulo_formulario: "Informe de Actividad Curricular - Álgebra - 2C 2025",
+  titulo_formulario: "Informe de Actividad Curricular",
+  materia: "Algebra",
   fecha_completado: "2025-09-05",
   estadisticas: [
     { pregunta_id: 1, pregunta_texto: "¿El material de estudio fue suficiente para comprender el contenido?", opciones: [{ texto_opcion: "Sí", cantidad: 15 }, { texto_opcion: "Parcialmente", cantidad: 8 }, { texto_opcion: "No", cantidad: 2 }] },
@@ -71,11 +72,6 @@ const mockDetalleCompleto: DetalleInformeCatedraCompleto = {
       ]
     }
   ]
-};
-
-type DetalleInformeProps = {
-  informe: instrumentoList; 
-  onVolver: () => void;
 };
 
 export default function DetalleInforme({ informe, onVolver }: DetalleInformeProps) {
@@ -160,6 +156,7 @@ export default function DetalleInforme({ informe, onVolver }: DetalleInformeProp
             </Button>
           ) : (
             <PDFDownloadLink
+              key={detalleCompleto?.id || Math.random()}
               document={<InformePDFDocument informe={detalleCompleto}  />}
               fileName={`${informe.plantilla_formulario.titulo}-${informe.id}.pdf`}
               className="btn btn-primary"

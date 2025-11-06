@@ -1,113 +1,9 @@
-// DetalleInformeSintetico.tsx 
-
 import { useState, useEffect } from "react";
-import { PDFDownloadLink } from '@react-pdf/renderer'; 
 import { Card, Button, ListGroup, Badge, Spinner, Accordion } from "react-bootstrap";
-import type { instrumentoList, DetalleInformeSinteticoCompleto, GrupoRespuestasAbiertas } from "../types"; 
-// import InformeSinteticoPDFDocument from './InformeSinteticoPDFDocument';
-const mockInformeSinteticoCompleto: DetalleInformeSinteticoCompleto = {
-  id: 201,
-  titulo_formulario: "Informe Sintético - Departamento de Informática - 2C 2025",
-  fecha_completado: "2025-10-01",
-  autor_administrativo: "Personal Administrativo",
-  respuestas_sintesis_agrupadas: [
-    {
-      "grupo": "A",
-      "titulo_grupo": "Análisis de Patrones y Dificultades",
-      "respuestas": [
-        {
-          "pregunta_texto": "Identifique patrones o dificultades recurrentes observadas en los informes de cátedra.",
-          "respuesta_texto": "Se observa una dificultad generalizada en la retención de alumnos de primer año..."
-        }
-      ]
-    },
-    {
-      "grupo": "B",
-      "titulo_grupo": "Propuestas de Mejora Departamentales",
-      "respuestas": [
-         {
-          "pregunta_texto": "Describa las propuestas de mejora o acompañamiento que el Departamento implementará.",
-          "respuesta_texto": "Se propondrá un taller de 'Nuevas Estrategias de Evaluación'..."
-        }
-      ]
-    },
-    {
-      "grupo": "C",
-      "titulo_grupo": "Gestión de Recursos",
-      "respuestas": [
-        {
-          "pregunta_texto": "Reflexión sobre los recursos solicitados por las cátedras (software, equipamiento, etc.).",
-          "respuesta_texto": "Es recurrente la solicitud de actualización de software de laboratorios..."
-        }
-      ]
-    }
-  ],
-  informes_academicos_base: [
-    {
-      id: 101,
-      titulo_formulario: "Informe de Actividad Curricular - Álgebra - 2C 2025",
-      docente_nombre: "Dr. Juan Pérez",
-      respuestas_abiertas_agrupadas: [
-        {
-          "grupo": "A",
-          "titulo_grupo": "Planificación de la enseñanza...",
-          "respuestas": [
-            {
-              "pregunta_texto": "¿En qué medida pudo cumplir con el cronograma...?",
-              "respuesta_texto": "Se logró cubrir el 90% del programa..."
-            },
-            {
-              "pregunta_texto": "Reflexione sobre las estrategias pedagógicas...",
-              "respuesta_texto": "La modalidad de taller en las últimas unidades..."
-            }
-          ]
-        },
-        {
-          "grupo": "B",
-          "titulo_grupo": "Régimen de cursada...",
-          "respuestas": [
-            {
-              "pregunta_texto": "Analice los resultados de la cursada...",
-              "respuesta_texto": "La promoción fue baja (15%)..."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 102,
-      titulo_formulario: "Informe de Actividad Curricular - Algoritmos - 2C 2025",
-      docente_nombre: "Ing. Ana Gómez",
-      respuestas_abiertas_agrupadas: [
-        {
-          "grupo": "A",
-          "titulo_grupo": "Planificación de la enseñanza...",
-          "respuestas": [
-            {
-              "pregunta_texto": "¿En qué medida pudo cumplir con el cronograma...?",
-              "respuesta_texto": "Tuvimos que acortar la Unidad 4 por el paro."
-            }
-          ]
-        },
-        {
-          "grupo": "C",
-          "titulo_grupo": "Material didáctico y bibliografía",
-          "respuestas": [
-            {
-              "pregunta_texto": "¿Qué recursos considera necesarios...",
-              "respuesta_texto": "Se solicita un ayudante de segunda adicional..."
-            }
-          ]
-        }
-      ]
-    }
-  ]
-};
-
-type DetalleInformeProps = {
-  informe: instrumentoList; 
-  onVolver: () => void;
-};
+import type {DetalleInformeSinteticoCompleto, DetalleInformeProps } from "../types"; 
+import { mockInformeSinteticoCompleto } from "../MockInformes";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InformePDFDocument from "./InformePDFDocument";
 
 export default function DetalleInformeSintetico({ informe, onVolver }: DetalleInformeProps) {
   
@@ -202,7 +98,29 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
           </div>
         ))}
 
+
+        
         <div className="d-grid gap-2 mt-5">
+          {loading || !detalleCompleto ? (
+            <Button variant="primary" disabled>
+              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+              <span className="ms-2">Cargando datos para PDF...</span>
+            </Button>
+          ) : (
+            <PDFDownloadLink
+              key={detalleCompleto?.id || Math.random()}
+              document={<InformePDFDocument informe={detalleCompleto}  />}
+              fileName={`${informe.plantilla_formulario.titulo}-${informe.id}.pdf`}
+              className="btn btn-primary"
+            >
+              {({ loading: pdfLoading }) => 
+                pdfLoading 
+                  ? <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Generando PDF...</>
+                  : 'Descargar Informe en PDF'
+              }
+            </PDFDownloadLink>
+          )}
+                  
           <Button variant="secondary" onClick={onVolver}>
             Volver al Listado
           </Button>

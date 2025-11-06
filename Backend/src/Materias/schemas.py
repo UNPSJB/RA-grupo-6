@@ -1,4 +1,5 @@
 from pydantic import BaseModel, field_validator
+from Backend.src.Departamento.schemas import Departamento
 from src.Materias import exceptions
 
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
@@ -8,6 +9,7 @@ from src.Materias import exceptions
 class MateriaBase(BaseModel):
     id: str
     nombre: str
+    departamento: Departamento
 
 class Materia(MateriaBase):
     model_config = {"from_attributes": True}

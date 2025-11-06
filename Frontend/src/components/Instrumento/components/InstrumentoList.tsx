@@ -1,34 +1,7 @@
-// InstrumentoList.tsx
-
 import { Card, Button, ListGroup } from "react-bootstrap";
-import type { instrumentoList, TipoInstrumento } from "../types";
+import type {ListaInstrumentosProps} from "../types";
+import { INSTRUMENTO_CONFIG } from "../MockInformes";
 
-const INSTRUMENTO_CONFIG = {
-  INFORME_SINTETICO: {
-    titulo: "Informes Sintéticos",
-    subtitulo: "Seleccione un informe para visualizar su contenido y estadísticas.",
-    emptyState: "No hay informes sintéticos disponibles en este momento.",
-    variant: "primary",
-  },
-  INFORME_CATEDRA: {
-    titulo: "Informes de Cátedra",
-    subtitulo: "Seleccione un informe de cátedra para revisar los detalles.",
-    emptyState: "No se encontraron informes de cátedra.",
-    variant: "primary",
-  },
-  ENCUESTA_ESTUDIANTE: {
-    titulo: "Encuestas de Estudiantes",
-    subtitulo: "Seleccione una encuesta para analizar las respuestas individuales.",
-    emptyState: "No hay encuestas de estudiantes para mostrar.",
-    variant: "primary",
-  },
-};
-
-type ListaInstrumentosProps = {
-  instrumentos: instrumentoList[]; 
-  tipo: TipoInstrumento;
-  onSeleccionar: (instrumento: instrumentoList) => void; 
-};
 
 export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: ListaInstrumentosProps) {
   const config = INSTRUMENTO_CONFIG[tipo];

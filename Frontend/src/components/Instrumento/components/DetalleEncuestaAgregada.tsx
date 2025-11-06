@@ -1,29 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, Button, ListGroup, Badge, Spinner, Alert } from "react-bootstrap";
-import type { instrumentoList, EstadisticaPregunta,  DetalleEncuestaCompleto, GrupoPreguntasAbiertas } from "../types";
+import type { instrumentoList, EstadisticaPregunta, GrupoPreguntasAbiertas } from "../types";
 import Estadisticas from "./Estadisticas";
+import { mockDetalleCompleto } from "../MockInformes";
 
-
-
-
-const mockDetalleCompleto: DetalleEncuestaCompleto = { 
-  id: 301, 
-  titulo_formulario: 'Encuesta de fin de cursada - Algorítmica y Programación I', 
-  estadisticas: [
-    { pregunta_id: 1, pregunta_texto: "¿El material de estudio proporcionado fue claro y útil?", opciones: [{ texto_opcion: "Sí, completamente", cantidad: 85 }, { texto_opcion: "Parcialmente", cantidad: 30 }, { texto_opcion: "No, fue confuso", cantidad: 5 }] },
-    { pregunta_id: 2, pregunta_texto: "¿La dificultad de las evaluaciones fue adecuada?", opciones: [{ texto_opcion: "Demasiado fácil", cantidad: 10 }, { texto_opcion: "Adecuada", cantidad: 105 }, { texto_opcion: "Demasiado difícil", cantidad: 5 }] },
-  ],
-  respuestas_abiertas_agrupadas: [
-    {
-      grupo: 'GENERAL',
-      titulo_grupo: 'Respuestas Abiertas',
-      preguntas: [ 
-        { pregunta_texto: '¿Qué tema te resultó más interesante?', respuestas_abiertas: [ 'El manejo de punteros.', 'La recursividad.', 'Entender arrays por dentro.' ] }, 
-        { pregunta_texto: 'Sugerencias para el próximo cuatrimestre', respuestas_abiertas: [ 'Más ejercicios prácticos.', 'Un proyecto final más grande.', 'Ninguna, todo perfecto.' ] } 
-      ]
-    }
-  ] 
-};
 // --------------------------------------------------------------------------------
 
 type Props = {
@@ -31,11 +11,12 @@ type Props = {
   onVolver: () => void;
 };
 
+// --------------------------------------------------------------------------------
+
 export default function DetalleEncuestaAgregada({ instrumento, onVolver }: Props) {
   if (!instrumento) {
     return null; 
   }
-  // ------------------------------------------
 
   const [estadisticas, setEstadisticas] = useState<EstadisticaPregunta[]>([]);
   const [gruposDeRespuestas, setGruposDeRespuestas] = useState<GrupoPreguntasAbiertas[]>([]);

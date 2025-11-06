@@ -18,6 +18,7 @@ import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 import {EstadisticasCatedras} from './components/Estadisticas/MostrarEstadisticasCatedras.tsx'
+import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 
@@ -37,7 +38,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path='/Materias' element={<SeleccionarMateria/>}></Route>
         <Route path='/Instrumentos-docente' element={<InstrumentosDocente/>}></Route>
         <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
-        <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
+        <Route path='/seleccionar-informe-sintetico' element= {<SeleccionarInformeSintetico/>} ></Route>
+        <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 
+        <Route path='/responder-instrumento/:instrumentoId' element={<ResponderInstrumento />} ></Route>
         <Route path='/VerPregunta' element={<VerPregunta/>}></Route>
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario/>}></Route>
         <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>

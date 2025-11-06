@@ -6,6 +6,7 @@ from src.Roles.schemas import Rol
 
 class UsuarioBase(BaseModel):
     id: int
+    username: str
     nombre: str
     apellido: str
     email: str
@@ -14,30 +15,28 @@ class UsuarioBase(BaseModel):
     model_config = ConfigDict(from_attributes =  True)
 
 
-class Usuario(UsuarioBase):
+class UsuarioSchema(UsuarioBase):
     respuestas_formulario: List['RespuestasFormulario']
     model_config = ConfigDict(from_attributes =  True)
 
 from src.RespuestasFormulario.schemas import RespuestasFormulario
-Usuario.model_rebuild()
+UsuarioSchema.model_rebuild()
 
 
-class User(BaseModel):
+class AuthUsuarioSchema(BaseModel):
     username: str
-    email: Optional[str] = None
-    nombre: Optional[str] = None
-    
-    disabled: Optional[bool] = None
-
-class UserInDB(User):
     hashed_password: str
+    disabled: Optional[bool] = None
+    is_active: bool
+    model_config = ConfigDict(from_attributes =  True)
+    
 
-class UserCreate(BaseModel):
+class UserCreateSchema(BaseModel):
     username: str
     email: str
     nombre: str
     apellido: str
     legajo: str
     password: str
-
+    
 

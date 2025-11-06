@@ -1,12 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+const API_URL = '/api'; 
+
+// --- ¡IMPORTANTE! ---
+// Este tipo DEBE COINCIDIR con el UsuarioSchema del backend
+type Rol = {
+  id: number;
+  nombre: string;
+};
+
 type User = {
+  id: number;
   username: string;
-  role: string;
+  nombre: string;
+  apellido: string;
+  email: string;
+  legajo: number;
+  rol: Rol; 
 };
 
 type AuthContextType = {
   user: User | null;
+  loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 };
@@ -15,36 +30,72 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Recupera sesión guardada
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const fetchUserOnLoad = async () => {
+      try {
+        const response = await fetch(`${API_URL}/users/me`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!response.ok) throw new Error('No hay sesión activa');
+        const userData: User = await response.json();
+        setUser(userData);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserOnLoad();
   }, []);
 
-  // 🔐 Login hardcodeado
   const login = async (username: string, password: string) => {
-    // Esto luego se reemplazará por un fetch al backend
-    if (username === 'docente' && password === '1234') {
-      const loggedUser = { username: 'docente', role: 'DOCENTE' };
-      localStorage.setItem('user', JSON.stringify(loggedUser));
-      setUser(loggedUser);
-    } else if (username === 'estudiante' && password === '1234') {
-      const loggedUser = { username: 'estudiante', role: 'ESTUDIANTE' };
-      localStorage.setItem('user', JSON.stringify(loggedUser));
-      setUser(loggedUser);
-    } else {
-      throw new Error('Credenciales inválidas');
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+
+    try {
+      const response = await fetch(`${API_URL}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Usuario o contraseña incorrectos');
+      }
+
+      const userData: User = await response.json();
+      setUser(userData);
+
+
+    } catch (error) {
+      console.error("Error en el login:", error);
+      setUser(null);
+      throw error; 
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,85 +1,58 @@
-from datetime import datetime, timedelta
-from typing import Optional
-from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-
-from src.Usuarios import services
-from src.Usuarios.schemas import User, UserInDB, Usuario
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, Request, status
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+
+from src.Usuarios import services
+from src.Usuarios.schemas import UsuarioSchema
 from src.database import get_db
-# Configuration
-SECRET_KEY = "your-secret-key-here" 
+
+SECRET_KEY = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-"""
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # secret
-        "disabled": False,
-    }
-}
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password[:72], hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password[:72])
-
-
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
-
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
-"""
-
-def convert_db_user_to_user(db_user: Usuario) -> User:
-    """Convert database user to Pydantic user model."""
-    return User(
-        username=db_user.username,
-        email=db_user.email,
-        full_name=db_user.full_name,
-        disabled=not db_user.is_active,
-        roles=[role.name for role in db_user.roles]
-    )
-
+# --- Función de Creación de Token ---
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Create a JWT access token."""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM) 
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    """Get the current user from the JWT token."""
+# --- Dependencias de Autenticación por Cookie ---
+
+def get_token_from_cookie(request: Request) -> str:
+    """
+    Dependencia para extraer el token de la cookie HttpOnly.
+    """
+    token = request.cookies.get("access_token") 
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No estás autenticado (token no encontrado en cookie)",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token
+
+async def get_current_user_from_cookie(
+    token: str = Depends(get_token_from_cookie), 
+    db: Session = Depends(get_db)
+) -> UsuarioSchema: 
+    """
+    Decodifica el token de la cookie y obtiene el usuario de la DB.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="No se pudieron validar las credenciales (token inválido)",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -94,10 +67,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     db_user = services.get_user_by_username(db, username=username)
     if db_user is None:
         raise credentials_exception
-    return convert_db_user_to_user(db_user)
+    return db_user
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    """Get the current active user (not disabled)."""
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
+async def get_current_active_user_from_cookie(
+    current_user: UsuarioSchema = Depends(get_current_user_from_cookie)
+):
+    """
+    Toma el usuario de la cookie y verifica si está activo.
+    """
+    is_active = getattr(current_user, 'is_active', True)
+    disabled = getattr(current_user, 'disabled', False)
+
+    if not is_active or disabled:
+        raise HTTPException(status_code=400, detail="Usuario inactivo")
     return current_user

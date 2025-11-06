@@ -24,10 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <AuthProvider>
       <Routes>
-        {/* 🔐 Pantalla de login sin menú */}
         <Route path="/login" element={<Login />} />
-
-        {/* 🔒 Rutas protegidas con menú */}
         <Route
           path="/*"
           element={

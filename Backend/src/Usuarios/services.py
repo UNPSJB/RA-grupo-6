@@ -6,11 +6,11 @@ from src.Usuarios import schemas
 from src.Usuarios.exceptions import Usuario_No_Encontrado
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from .schemas import UserCreate
+from .schemas import UserCreateSchema
 from typing import Optional
 
 
-def leer_usuario(db: Session, usuario_id: int) -> schemas.Usuario:
+def leer_usuario(db: Session, usuario_id: int) -> schemas.UsuarioSchema:
 
     db_usuario = db.scalar(select(Usuario).where(Usuario.id == usuario_id))
 
@@ -34,7 +34,7 @@ def get_user_by_email(db: Session, email: str):
     """Get user by email."""
     return db.query(Usuario).filter(Usuario.email == email).first()
 
-def create_user(db: Session, user: UserCreate):
+def create_user(db: Session, user: UserCreateSchema):
     """Create a new user."""
     hashed_password = pwd_context.hash(user.password)
     db_user = Usuario(
@@ -44,7 +44,8 @@ def create_user(db: Session, user: UserCreate):
         apellido=user.apellido,
         legajo=user.legajo,
         rol_id=1,
-        hashed_password=hashed_password
+        hashed_password=hashed_password,
+        is_active=True
     )
 
     # Assign default user role

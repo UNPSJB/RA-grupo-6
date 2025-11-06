@@ -128,6 +128,7 @@ export type ResumenInformeAcademico = {
 export type DetalleInformeSinteticoCompleto = {
   id: number;
   titulo_formulario: string;
+  departamento: string;
   fecha_completado: string;
   autor_administrativo: string; 
   respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];

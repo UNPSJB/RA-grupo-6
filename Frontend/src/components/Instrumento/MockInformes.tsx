@@ -6,6 +6,7 @@ export const mockInformeSinteticoCompleto: DetalleInformeSinteticoCompleto = {
     id: 201,
     titulo_formulario: "Informe Sintético",
     fecha_completado: "2025-10-01",
+    departamento: "informatica",
     autor_administrativo: "Personal Administrativo",
     estadisticas: [
     { pregunta_id: 1, pregunta_texto: "¿El material de estudio fue suficiente para comprender el contenido?", opciones: [{ texto_opcion: "Sí", cantidad: 15 }, { texto_opcion: "Parcialmente", cantidad: 8 }, { texto_opcion: "No", cantidad: 2 }] },

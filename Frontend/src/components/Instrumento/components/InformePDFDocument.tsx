@@ -33,9 +33,8 @@ export default function InformePDFDocument({ informe }: { informe: DetalleInform
           <Image src={Logo} style={styles.headerImage}></Image>
           <View wrap={true}>
             <Text style={styles.title}>{informe.titulo_formulario}</Text>
-            <Text style={styles.subtitle}> Materia: {"materia" in informe? informe.materia : "-"}</Text>
+            <Text style={styles.subtitle}> {"materia" in informe? "Materia: " + informe.materia : "Departamento: " + informe.departamento}</Text>
             <Text style={styles.subtitle}> Fecha de finalización: {new Date(informe.fecha_completado).toLocaleDateString()}</Text>
-            
           </View >
         </View>
         

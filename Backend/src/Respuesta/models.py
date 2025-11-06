@@ -20,4 +20,4 @@ class Respuesta(ModeloBase):
     formulario_id: Mapped[int] = mapped_column(ForeignKey("respuestas_formulario.id"))
     formulario: Mapped["RespuestasFormulario"] = relationship(back_populates="respuestas")
 
-    instancia_repuesta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    instancia_respuesta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

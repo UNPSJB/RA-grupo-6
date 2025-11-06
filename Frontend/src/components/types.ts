@@ -153,6 +153,9 @@ export type PreguntaCerrada = {
   grupo_pregunta_id: number;
   rol_id: string;
   estadistica: boolean;
+  multiple_respuestas: boolean;
+  grupo_cuadro_id?: number | null; 
+  orden_en_grupo?: number | null;
 };
 
 export type Formulario = {
@@ -200,3 +203,9 @@ export type Instrumento = {
 
 }
 
+export type GrupoCuadro = {
+    id: number;
+    nombre: string;
+    descripcion?: string;
+    orden: number;
+};

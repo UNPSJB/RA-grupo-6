@@ -8,7 +8,7 @@ from src.models import ModeloBase
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
 from src.Materias.router import router as materias_router
-from src.GrupoCuadro.models import GrupoCuadro
+# from src.GrupoCuadro.models import GrupoCuadro
 
 
 load_dotenv()
@@ -95,4 +95,8 @@ app.include_router(usuariodepartamento_router)
 #Route de Dictados
 from src.Dictados.router import router as dictados_router
 app.include_router(dictados_router)
+
+#Route de GrupoCuadro
+from src.GrupoCuadro.router import router as grupo_cuadro_router
+app.include_router(grupo_cuadro_router)
 

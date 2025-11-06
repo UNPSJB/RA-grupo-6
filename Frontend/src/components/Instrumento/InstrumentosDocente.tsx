@@ -250,17 +250,6 @@ function InstrumentosDocente() {
                                     </Button>
                                 </div>
                             )}
-
-                            {/* <div className="mt-4 pt-3 border-top">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <small className="text-muted">
-                                        Total: {instrumentos.length} informe(s) de cátedra
-                                    </small>
-                                    <Badge bg="info">
-                                        {instrumentos.filter(inst => estaActivo(inst)).length} activos
-                                    </Badge>
-                                </div>
-                            </div> */}
                         </Card.Body>
                     </Card>
                 </div>

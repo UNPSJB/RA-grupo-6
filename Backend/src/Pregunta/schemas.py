@@ -1,5 +1,5 @@
 from click import Option
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from src.Opciones.schemas import Opcion
 from src.GrupoPregunta.schemas import GrupoPregunta
@@ -13,8 +13,8 @@ class PreguntaBase(BaseModel):
     estadistica: bool
     rol_id: int     
     multiple_respuestas: bool
-    grupo_cuadro_id: Optional[int] = None
-    orden_en_grupo: Optional[int] = 1
+    grupo_cuadro_id: Optional[int] = Field(default=None)
+    orden_en_grupo: Optional[int] = Field(default=None)
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo :EnumTipoPregunta = EnumTipoPregunta.abierta
@@ -28,8 +28,8 @@ class PreguntaUpdate(BaseModel):
     texto: str
     opciones: Optional[List[int]] = None
     grupo_pregunta_id: int
-    grupo_cuadro_id: Optional[int] = None
-    orden_en_grupo: Optional[int] = None
+    grupo_cuadro_id: Optional[int] = Field(default=None)
+    orden_en_grupo: Optional[int] = Field(default=None)
     multiple_respuestas: Optional[bool] = None
 
 
@@ -43,6 +43,8 @@ class Pregunta(PreguntaBase):
     puede_eliminarse: bool = True
     puede_modificarse: bool = True
     grupo_pregunta: GrupoPregunta
+    grupo_cuadro_id: Optional[int] = None
+    orden_en_grupo: Optional[int] = None
 
     model_config = {
         "from_attributes": True, 

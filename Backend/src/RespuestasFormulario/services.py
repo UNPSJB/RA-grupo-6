@@ -38,11 +38,11 @@ def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int):
                 "pregunta_id": respuesta.pregunta_id,
                 "opcion_id": respuesta.opcion_id,
                 "texto_respuesta": respuesta.texto,
-                "instancia_respuesta": respuesta.instancia_repuesta,
+                "instancia_respuesta": respuesta.instancia_respuesta,
                 "pregunta": {
                     "tipo": respuesta.pregunta.tipo,
                     "texto": respuesta.pregunta.texto,
-                    "multiples_respuestas": respuesta.pregunta.multiple_respuestas,
+                    "multiple_respuestas": respuesta.pregunta.multiple_respuestas,
                     "grupo_cuadro_id": respuesta.pregunta.grupo_cuadro_id,
                     "orden_en_grupo": respuesta.pregunta.orden_en_grupo,
                 } if respuesta.pregunta else None,

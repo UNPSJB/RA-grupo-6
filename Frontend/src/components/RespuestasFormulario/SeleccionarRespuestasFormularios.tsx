@@ -8,6 +8,7 @@ export interface Respuestas {
     pregunta_id: number;
     opcion_id: number;
     texto_respuesta: string;
+    
 }
 
 export interface RespuestasFormularios{

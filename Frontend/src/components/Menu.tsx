@@ -30,6 +30,8 @@ function Menu(){
                         <Nav.Link href="/VerInformesSinteticos">Informes Sintéticos</Nav.Link>  
                         <Nav.Link href="/VerInformeActividadCurricular">Ver Informes de Actividad Curricular</Nav.Link>  
                         <Nav.Link href="/VerEncuestasEstudiante">Encuestas de Estudiante</Nav.Link>
+                        <Nav.Link href="/seleccionar-informe-sintetico">Responder Informe Sintetico</Nav.Link>
+                        <Nav.Link href="/instrumentos-docente">Responder Informe Catedra</Nav.Link>
                         <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

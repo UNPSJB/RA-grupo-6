@@ -34,9 +34,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/* <Route path='/' element={<SeleccionarRol/>}></Route> */}
         <Route path='/' element={<MostrarEstadisticas/>} ></Route>
         <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
-        <Route path='/Seleccionar-rol' element={<SeleccionarRol/>}></Route>
+        <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
         <Route path='/Materias' element={<SeleccionarMateria/>}></Route>
-        <Route path='/Instrumentos-docente' element={<InstrumentosDocente/>}></Route>
+        <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>
         <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
         <Route path='/seleccionar-informe-sintetico' element= {<SeleccionarInformeSintetico/>} ></Route>
         <Route path='/seleccionar-materia' element={<SeleccionarMateria />} ></Route> 

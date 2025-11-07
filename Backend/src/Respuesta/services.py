@@ -15,11 +15,11 @@ def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.
     
     # Validar tipo de respuesta
     if pregunta.tipo == "abierta" and not respuesta.texto:
-        raise exceptions.RespuestaInvalida("La pregunta es abierta, se requiere 'texto'")
+        raise exceptions.RespuestaInvalida()
     if pregunta.tipo == "cerrada" and not respuesta.opcion_id:
-        raise exceptions.RespuestaInvalida("La pregunta es cerrada, se requiere 'opcion_id'")
-    if pregunta.multiple_respuestas and respuesta.instancia_respuesta:
-        raise exceptions.RespuestaInvalida("La pegunta permite múltiple respuestas, se requiere 'instancia_respuesta")
+        raise exceptions.RespuestaInvalida()
+    if pregunta.multiple_respuestas and not respuesta.instancia_respuesta:
+        raise exceptions.RespuestaInvalida()
     
 
     # Crear nueva respuesta

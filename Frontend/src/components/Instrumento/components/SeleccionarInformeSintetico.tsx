@@ -1,7 +1,25 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, ListGroup, Button, Spinner, Alert, Badge, Row, Col } from "react-bootstrap";
-import type { InformeSinteticoList } from "../types"; // Revisar InformeSinteticoList
+import { Container, ListGroup, Button, Spinner, Alert, Badge, Card } from "react-bootstrap";
+import { capitalizarCadena } from "../../Funciones";
+
+
+interface InstrumentoDepartamento {
+    id: number;
+    tipo: 'INFORME_SINTETICO';
+    fecha_inicio: string;
+    fecha_cierre: string;
+    materia: {
+        id: string;
+        nombre: string;
+    };
+    plantilla_formulario: {
+        id: number;
+        titulo: string;
+    };
+    plantilla_formulario_id: number;
+    materia_id: string;
+}
 
 // Usuario para DepartamentoAlumnos (Lucy)
 const USUARIO_DEPARTAMENTO_ALUMNOS = {
@@ -12,31 +30,34 @@ const USUARIO_DEPARTAMENTO_ALUMNOS = {
 };
 
 // Mock data temporal
-const mockInformesSinteticosPendientes: InformeSinteticoList[] = [ // Revisar InformeSinteticoList
+const mockInformesSinteticosPendientes: InstrumentoDepartamento[] = [ // Revisar InformeSinteticoList
     {
-        id: 123,
-        titulo_formulario: "Informe Sintético - Departamento de Informática - 2C 2025",
-        autor_nombre: "Lucy Marticoneta",
-        fecha_completado: "" // Sin fecha = no completado (para el mock)
+        id: 201,
+        tipo: 'INFORME_SINTETICO',
+        fecha_inicio: '2024-01-01',
+        fecha_cierre: '2025-10-20',
+        materia: { id: 'FIS1', nombre: 'Física I' },
+        plantilla_formulario: { id: 3, titulo: 'Informe de Sintetico - Física I - 2024' },
+        plantilla_formulario_id: 3,
+        materia_id: 'FIS1'
     },
     {
-        id: 124,
-        titulo_formulario: "Informe Sintético - Elementos de Informática - 2C 2025",
-        autor_nombre: "Lucy Marticoneta",
-        fecha_completado: ""
-    },
-    {
-        id: 125,
-        titulo_formulario: "Informe Sintético - Álgebra - 2C 2025",
-        autor_nombre: "Lucy Marticoneta",
-        fecha_completado: ""
+        id: 202,
+        tipo: 'INFORME_SINTETICO',
+        fecha_inicio: '2024-01-01', 
+        fecha_cierre: '2025-10-20',
+        materia: { id: 'MAT1', nombre: 'Matemática I' },
+        plantilla_formulario: { id: 4, titulo: 'Informe de Sintetico - Matemática I - 2024' },
+        plantilla_formulario_id: 4,
+        materia_id: 'MAT1'
     }
 ];
 
 export default function SeleccionarInformeSintetico() {
-    const [informes, setInformes] = useState<InformeSinteticoList[]>([]);
+    const [informes, setInformes] = useState<InstrumentoDepartamento[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [mensaje, setMensaje] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,22 +91,29 @@ export default function SeleccionarInformeSintetico() {
         } catch (err: any) {
             setError(err.message);
             console.error("Error cargando informes sintéticos:", err);
+            setMensaje("Error al cargar los informes sinteticos");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSeleccionarInforme = (informe: InformeSinteticoList) => {
+    const handleSeleccionarInforme = (informe: InstrumentoDepartamento) => {
         console.log('Informe sintético seleccionado:', informe);
         
         // Navegar a responder-instrumento
         navigate(`/responder-instrumento/${informe.id}`, {
             state: {
-                rol: USUARIO_DEPARTAMENTO_ALUMNOS.rol,
-                tituloFormulario: informe.titulo_formulario,
-                autorNombre: informe.autor_nombre
+                materiaNombre: informe.materia.nombre,
+                materiaId: informe.materia.id,
+                rol: 'departamento'
             }
         });
+    };
+
+    const estaActivo = (instrumento: InstrumentoDepartamento) => {
+        const hoy = new Date('2025-10-20')
+        return new Date(instrumento.fecha_inicio) <= new Date(hoy) && 
+               new Date(instrumento.fecha_cierre) >= new Date(hoy);
     };
 
     if (loading) {
@@ -115,68 +143,106 @@ export default function SeleccionarInformeSintetico() {
 
     return (
         <Container className="mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 className="mb-2">Seleccionar Informe Sintético</h1>
-                    <p className="text-muted mb-0">
-                        Seleccione un informe sintético para completar.
-                    </p>
-                </div>
-                <Badge bg="primary" className="fs-6">
-                    {informes.length} disponible(s)
-                </Badge>
-            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-10">
+                    <Card className="border-0 shadow-sm w-100" style={{borderRadius: "1rem"}}>
+                        <Card.Body className="p-4 p-md-5">
+                            <div className="mb-4">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h1 className="fw-bold mb-2">Informes Sintéticos Pendientes</h1>
+                                        <p className="text-muted mb-0">
+                                            Selecciona un informe sintético para completar.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-            {informes.length === 0 ? (
-                <Alert variant="info">
-                    <i className="fas fa-info-circle me-2"></i>
-                    No hay informes sintéticos disponibles para completar en este momento.
-                </Alert>
-            ) : (
-                <ListGroup variant="flush">
-                    {informes.map((informe) => (
-                        <ListGroup.Item 
-                            key={informe.id} 
-                            className="d-flex justify-content-between align-items-center p-4 border-bottom"
-                            action
-                            onClick={() => handleSeleccionarInforme(informe)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <div className="flex-grow-1">
-                                <div className="d-flex align-items-center mb-2">
-                                    <h5 className="mb-0 me-3">{informe.titulo_formulario}</h5>
-                                    <Badge bg="primary" className="ms-2">
-                                        Informe Sintético
-                                    </Badge>
+                            {mensaje && (
+                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                                    {mensaje}
+                                </Alert>
+                            )}
+
+                           {informes.length > 0 ? (
+                                <ListGroup variant="flush">
+                                    {informes.map((informe) => {
+                                        const activo = estaActivo(informe);
+                                        return (
+                                            <ListGroup.Item 
+                                                key={informe.id} 
+                                                action 
+                                                onClick={() => activo && handleSeleccionarInforme(informe)}
+                                                className="d-flex justify-content-between align-items-center p-4"
+                                                style={{ 
+                                                    cursor: activo ? 'pointer' : 'not-allowed',
+                                                    borderBottom: '1px solid #e9ecef',
+                                                }}
+                                            >
+                                                <div className="flex-grow-1">
+                                                    <div className="fw-bold fs-5 mb-1">
+                                                        {capitalizarCadena(informe.materia.nombre)}
+                                                    </div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <small className="text-muted">
+                                                            Código: {informe.materia.id}
+                                                        </small>
+                                                        {activo ? (
+                                                            <>
+                                                                <Badge bg="success" className="ms-2">
+                                                                   Informe Activo
+                                                                </Badge>
+                                                                <small className="text-muted">
+                                                                    Vence: {new Date(informe.fecha_cierre).toLocaleDateString()}
+                                                                </small>
+                                                            </>
+                                                        ) : (
+                                                            <Badge bg="secondary" className="ms-2">
+                                                                Inactivo
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                
+                                                {activo ? (
+                                                    <Button 
+                                                        variant="primary"
+                                                        size="sm" 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleSeleccionarInforme(informe);
+                                                        }}
+                                                        className="px-4 py-2"
+                                                    >
+                                                        <i className="fas fa-edit me-2"></i>
+                                                        Completar Informe
+                                                    </Button>
+                                                ) : (
+                                                    <Button 
+                                                        variant="outline-secondary" 
+                                                        size="sm"
+                                                        disabled
+                                                    >
+                                                        No Disponible
+                                                    </Button>
+                                                )}
+                                            </ListGroup.Item>
+                                        );
+                                    })}
+                                </ListGroup>
+                            ) : (
+                                <div className="text-center py-5">
+                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 className="text-muted mb-3">No hay informes sinteticos pendientes</h5>
+                                    <p className="text-muted">
+                                        No se encontraron informes sinteticos pendientes para completar.
+                                    </p>
                                 </div>
-                                
-                                <div className="text-muted">
-                                    <Row>
-                                        <Col md={6}>
-                                            <small className="d-block">
-                                                <strong>Autor:</strong> {informe.autor_nombre}
-                                            </small>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            </div>
-                            
-                            <div className="text-end ms-3">
-                                <Button 
-                                    variant="primary" 
-                                    size="sm"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleSeleccionarInforme(informe);
-                                    }}
-                                >
-                                    Completar
-                                </Button>
-                            </div>
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
-            )}
+                            )}
+                        </Card.Body>
+                    </Card>
+                </div>
+            </div>
         </Container>
     );
 }

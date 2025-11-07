@@ -1,6 +1,8 @@
+// InstrumentosDocente.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
+import {capitalizarCadena} from "../Funciones";
 
 interface InstrumentoDocente {
     id: number;
@@ -19,13 +21,6 @@ interface InstrumentoDocente {
     materia_id: string;
 }
 
-// Usuario temporal (DOC)
-const USUARIO_DOCENTE = {
-    id: 2, // ID diferente al alumno para testing unu
-    nombre: "Docente",
-    apellido: "Demo"
-};
-
 function InstrumentosDocente() {
     const [instrumentos, setInstrumentos] = useState<InstrumentoDocente[]>([]);
     const [cargando, setCargando] = useState(true);
@@ -37,8 +32,7 @@ function InstrumentosDocente() {
             try {
                 console.log('Cargando informes de cátedra...');
                 
-                // URL con params
-                const url = `http://127.0.0.1:8000/instrumentos/INFORME_CATEDRA?usuario_id=${USUARIO_DOCENTE.id}&mostrar_respondidos=false`;
+                const url = `http://127.0.0.1:8000/instrumentos/INFORME_CATEDRA?usuario_id=${2}&mostrar_respondidos=false`;
                 console.log('URL:', url);
                 
                 const response = await fetch(url);
@@ -48,8 +42,7 @@ function InstrumentosDocente() {
                     const instrumentosData: InstrumentoDocente[] = await response.json();
                     console.log('Datos recibidos:', instrumentosData);
                     
-                    // Filtrar por fecha instrumentos actvios
-                    const hoy = new Date().toISOString().split('T')[0];
+                    const hoy = new Date('2025-10-20')
                     const instrumentosActivos = instrumentosData.filter(instr => 
                         new Date(instr.fecha_inicio) <= new Date(hoy) && 
                         new Date(instr.fecha_cierre) >= new Date(hoy)
@@ -58,7 +51,6 @@ function InstrumentosDocente() {
                     console.log('Instrumentos activos:', instrumentosActivos);
                     setInstrumentos(instrumentosActivos);
                 } else {
-                    // Si falla, mostrar error específico
                     const errorText = await response.text();
                     console.error('Error del servidor:', errorText);
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -71,7 +63,6 @@ function InstrumentosDocente() {
                 setMensaje(`Error al cargar los informes de cátedra: ${error.message}`);
                 setCargando(false);
                 
-                // Datos de ejemplo por si falla la DB
                 const datosEjemplo: InstrumentoDocente[] = [
                     {
                         id: 201,
@@ -113,9 +104,8 @@ function InstrumentosDocente() {
         });
     };
 
-    // Verificar instrumento activo
     const estaActivo = (instrumento: InstrumentoDocente) => {
-        const hoy = new Date().toISOString().split('T')[0];
+        const hoy = new Date('2025-10-20')
         return new Date(instrumento.fecha_inicio) <= new Date(hoy) && 
                new Date(instrumento.fecha_cierre) >= new Date(hoy);
     };
@@ -153,19 +143,11 @@ function InstrumentosDocente() {
                                             Selecciona un informe de cátedra para completar
                                         </p>
                                     </div>
-                                    <Button 
-                                        variant="outline-secondary" 
-                                        size="sm"
-                                        onClick={() => navigate('/seleccionar-rol')}
-                                    >
-                                        <i className="fas fa-arrow-left me-2"></i>
-                                        Cambiar Rol
-                                    </Button>
                                 </div>
                             </div>
                             
                             {mensaje && (
-                                <Alert variant="warning" className="mb-4">
+                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
                                     {mensaje}
                                 </Alert>
                             )}
@@ -183,29 +165,30 @@ function InstrumentosDocente() {
                                                 style={{ 
                                                     cursor: activo ? 'pointer' : 'not-allowed',
                                                     borderBottom: '1px solid #e9ecef',
-                                                    opacity: activo ? 1 : 0.6
                                                 }}
                                             >
                                                 <div className="flex-grow-1">
                                                     <div className="fw-bold fs-5 mb-1">
-                                                        {instrumento.plantilla_formulario.titulo}
+                                                        {capitalizarCadena(instrumento.materia.nombre)}
                                                     </div>
-                                                    <div className="d-flex align-items-center gap-3 flex-wrap">
+                                                    <div className="d-flex align-items-center gap-3">
                                                         <small className="text-muted">
-                                                            Materia: <strong>{instrumento.materia.nombre}</strong> (Código: {instrumento.materia.id})
+                                                            Código: {instrumento.materia.id}
                                                         </small>
                                                         {activo ? (
-                                                            <Badge bg="success" className="ms-2">
-                                                                Activo
-                                                            </Badge>
+                                                            <>
+                                                                <Badge bg="success" className="ms-2">
+                                                                   Informe Activo
+                                                                </Badge>
+                                                                <small className="text-muted">
+                                                                    Vence: {new Date(instrumento.fecha_cierre).toLocaleDateString()}
+                                                                </small>
+                                                            </>
                                                         ) : (
                                                             <Badge bg="secondary" className="ms-2">
                                                                 Inactivo
                                                             </Badge>
                                                         )}
-                                                        <small className="text-muted">
-                                                            Período: {new Date(instrumento.fecha_inicio).toLocaleDateString()} - {new Date(instrumento.fecha_cierre).toLocaleDateString()}
-                                                        </small>
                                                     </div>
                                                 </div>
                                                 
@@ -242,12 +225,6 @@ function InstrumentosDocente() {
                                     <p className="text-muted">
                                         No se encontraron informes de cátedra pendientes para completar.
                                     </p>
-                                    <Button 
-                                        variant="outline-primary"
-                                        onClick={() => navigate('/seleccionar-rol')}
-                                    >
-                                        Volver a Selección de Rol
-                                    </Button>
                                 </div>
                             )}
                         </Card.Body>

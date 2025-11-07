@@ -20,6 +20,7 @@ import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
 import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 import { GraficoRespondidos } from './components/Graficos/GraficoRespondidos.tsx';
 import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
+import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
         {/* <Route path='/' element={<SeleccionarRol/>}></Route> */}
+        <Route path='/ver-encuestados-departamento' element= {<MostrarEstadisticasDepartamento/>} ></Route>
         <Route path='/seleccionar-informe-sintetico' element= {<SeleccionarInformeSintetico/>} ></Route>
         <Route path='/' element={<MostrarEstadisticas/>} ></Route>
         <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>

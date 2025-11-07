@@ -40,7 +40,7 @@ class Materia(ModeloBase):
     periodos_vinculados: Mapped[Optional[List["PeriodoVinculado"]]] = relationship("PeriodoVinculado", back_populates="materia")
     materias_dictados: Mapped[Optional[List["MateriaDictado"]]] = relationship("MateriaDictado", back_populates="materia")
 
-    respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
+    #respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
     # dictados: Mapped[list["Dictado"]] = relationship(
     #      "Dictado",
     #      secondary="materias_dictado",

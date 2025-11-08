@@ -36,7 +36,7 @@ class UserCreateSchema(BaseModel):
     email: str
     nombre: str
     apellido: str
-    legajo: str
+    legajo: int
     password: str
     
 

@@ -15,6 +15,7 @@ class PreguntaBase(BaseModel):
     multiple_respuestas: bool
     grupo_cuadro_id: Optional[int] = Field(default=None)
     orden_en_grupo: Optional[int] = Field(default=None)
+    pregunta_fuente_id: Optional[int] = Field(default=None)
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo :EnumTipoPregunta = EnumTipoPregunta.abierta
@@ -45,6 +46,7 @@ class Pregunta(PreguntaBase):
     grupo_pregunta: GrupoPregunta
     grupo_cuadro_id: Optional[int] = None
     orden_en_grupo: Optional[int] = None
+    pregunta_fuente: Optional["Pregunta"] = None
 
     model_config = {
         "from_attributes": True, 

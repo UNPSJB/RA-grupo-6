@@ -33,7 +33,6 @@ export default function ResponderInstrumento() {
     const [enviando, setEnviando] = useState(false);
     const [usuarioActual, setUsuarioActual] = useState<any>(null);
     
-    
     const [paginaActual, setPaginaActual] = useState(0);
     const [mostrarResumen, setMostrarResumen] = useState(false);
 
@@ -67,15 +66,48 @@ export default function ResponderInstrumento() {
             const plantillaData = await plantillaResponse.json();
             setPlantillaFormulario(plantillaData);
 
-            const respuestasIniciales = plantillaData.preguntas
-                .filter((p: any) => !p.multiple_respuestas)
-                .map((pregunta: any) => ({
-                    pregunta_id: pregunta.id,
-                    texto: '',
-                    opcion_id: undefined,
-                }));
-            setRespuestas(respuestasIniciales);
+            const preguntasSimples = plantillaData.preguntas.filter((p: any) => !p.multiple_respuestas);
+            
+            const respuestasConPrefill = await Promise.all(
+            preguntasSimples.map(async (pregunta: any) => {
+                const textosPrefill: string[] = [];
+                const opcionesPrefill: (number | null)[] = [];
 
+                if (pregunta.pregunta_fuente_id) {
+                try {
+                    console.log(`Cargando prefill para pregunta ${pregunta.id}`);
+                    const prefillResponse = await fetch(
+                    `http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`
+                    );
+
+                    if (prefillResponse.ok) {
+                    const prefillData = await prefillResponse.json();
+                    console.log(`Prefill data para pregunta ${pregunta.id}:`, prefillData);
+
+                    if (prefillData.respuestas && prefillData.respuestas.length > 0) {
+                        prefillData.respuestas.forEach((r: any) => {
+                        textosPrefill.push(r.texto || '');
+                        opcionesPrefill.push(r.opcion_id ?? null);
+                        });
+                    } else {
+                        console.log(`No hay respuestas en prefillData`);
+                    }
+                    }
+                } catch (error) {
+                    console.error(`Error al cargar prefill para pregunta ${pregunta.id}:`, error);
+                }
+                }
+
+                return {
+                pregunta_id: pregunta.id,
+                textos: textosPrefill,      
+                opciones: opcionesPrefill,  
+                };
+            })
+            );
+
+            setRespuestas(respuestasConPrefill);
+            
             const preguntasMultiples = plantillaData.preguntas.filter((p: any) => p.multiple_respuestas);
             const gruposCuadro = new Set<number>(
                 preguntasMultiples
@@ -84,22 +116,88 @@ export default function ResponderInstrumento() {
             );
 
             const respuestasMultiplesIniciales: any = {};
-            gruposCuadro.forEach((grupoCuadroId: number) => {
-                const preguntasDelGrupo = preguntasMultiples.filter((p: any) => p.grupo_cuadro_id === grupoCuadroId);
-                const primeraInstancia: InstanciaRespuestas = {};
+
+            for (const grupoCuadroId of gruposCuadro) {
+                const preguntasDelGrupo = preguntasMultiples
+                    .filter((p: any) => p.grupo_cuadro_id === grupoCuadroId)
+                    .sort((a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0));
                 
-                preguntasDelGrupo.forEach((pregunta: any) => {
-                    primeraInstancia[pregunta.id] = {
-                        pregunta_id: pregunta.id,
-                        texto: '',
-                        opcion_id: undefined,
-                        instancia_respuesta: 1,
-                    };
-                });
+                let instanciasCargadas: InstanciaRespuestas[] = [];
                 
-                respuestasMultiplesIniciales[grupoCuadroId] = [primeraInstancia];
-            });
+                const preguntaConFuente = preguntasDelGrupo.find((p: any) => p.pregunta_fuente_id);
+                
+                if (preguntaConFuente) {
+                    try {
+                        console.log(`🔍 Cargando prefill múltiple para grupo ${grupoCuadroId}`);
+                        const prefillResponse = await fetch(
+                            `http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${preguntaConFuente.id}&instrumento_id=${instrumentoId}`
+                        );
+                        
+                        if (prefillResponse.ok) {
+                            const prefillData = await prefillResponse.json();
+                            console.log(`Prefill múltiple para grupo ${grupoCuadroId}:`, prefillData);
+                            
+                            if (prefillData.respuestas && prefillData.respuestas.length > 0 && prefillData.multiple) {
+                                const respuestasPorInstancia = new Map<number, any[]>();
+                                
+                                for (const respuesta of prefillData.respuestas) {
+                                    const instancia = respuesta.instancia || 1;
+                                    if (!respuestasPorInstancia.has(instancia)) {
+                                        respuestasPorInstancia.set(instancia, []);
+                                    }
+                                    respuestasPorInstancia.get(instancia)!.push(respuesta);
+                                }
+                                
+                                console.log(`Respuestas agrupadas por instancia:`, respuestasPorInstancia);
+                                
+
+                                let instanciaNum = 1;
+                                respuestasPorInstancia.forEach((respuestasInstancia) => {
+                                    const instancia: InstanciaRespuestas = {};
+                                    
+                                    preguntasDelGrupo.forEach((pregunta: any, idx: number) => {
+                                        const respuestaExistente = respuestasInstancia[idx];
+                                        
+                                        instancia[pregunta.id] = {
+                                            pregunta_id: pregunta.id,
+                                            texto: respuestaExistente?.texto || '',
+                                            opcion_id: respuestaExistente?.opcion_id,
+                                            instancia_respuesta: instanciaNum,
+                                        };
+                                    });
+                                    
+                                    instanciasCargadas.push(instancia);
+                                    instanciaNum++;
+                                });
+                                
+                                console.log(`Instancias cargadas: ${instanciasCargadas.length}`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(` Error al cargar múltiple para grupo ${grupoCuadroId}:`, error);
+                    }
+                }
+                
+                if (instanciasCargadas.length === 0) {
+                    const primeraInstancia: InstanciaRespuestas = {};
+                    
+                    preguntasDelGrupo.forEach((pregunta: any) => {
+                        primeraInstancia[pregunta.id] = {
+                            pregunta_id: pregunta.id,
+                            texto: '',
+                            opcion_id: undefined,
+                            instancia_respuesta: 1,
+                        };
+                    });
+                    
+                    instanciasCargadas = [primeraInstancia];
+                }
+                
+                respuestasMultiplesIniciales[grupoCuadroId] = instanciasCargadas;
+            }
+            
             setRespuestasMultiples(respuestasMultiplesIniciales);
+            
         } catch (err: unknown) {
             const mensaje = err instanceof Error ? err.message : 'Error desconocido';
             setError(mensaje);
@@ -121,13 +219,12 @@ export default function ResponderInstrumento() {
     const obtenerRespuesta = (preguntaId: number) => respuestas.find((r) => r.pregunta_id === preguntaId);
 
     const instanciaEstaCompleta = (instancia: InstanciaRespuestas): boolean => {
-    for (const key in instancia) {
-        const r = instancia[key];
-        if (!(r.texto?.trim() || r.opcion_id)) return false;
-    }
-    return true;
+        for (const key in instancia) {
+            const r = instancia[key];
+            if (!(r.texto?.trim() || r.opcion_id)) return false;
+        }
+        return true;
     };
-
 
     const agregarInstanciaRespuestas = (grupoCuadroId: number, preguntasDelGrupo: any[]) => {
         setRespuestasMultiples((prev) => {
@@ -201,7 +298,6 @@ export default function ResponderInstrumento() {
             return true;
         })();
 
-
         return simplesCompletas && multiplesCompletas;
     };
 
@@ -274,7 +370,7 @@ export default function ResponderInstrumento() {
                     }
                 }
             }
-        return true;
+            return true;
 
         } catch (err: unknown) {
             const mensaje = err instanceof Error ? err.message : 'Error desconocido';
@@ -285,38 +381,12 @@ export default function ResponderInstrumento() {
         }
     };
 
-    const preguntasPorGrupoCuadro = () => {
-        if (!plantillaFormulario) return {};
-
-        const grupos: any = {};
-
-        for (const pregunta of plantillaFormulario.preguntas) {
-            if (pregunta.multiple_respuestas && pregunta.grupo_cuadro_id) {
-                if (!grupos[pregunta.grupo_cuadro_id]) {
-                    grupos[pregunta.grupo_cuadro_id] = [];
-                }
-                grupos[pregunta.grupo_cuadro_id].push(pregunta);
-            }
-        }
-
-        for (const grupoId in grupos) {
-            grupos[grupoId].sort(
-                (a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0)
-            );
-        }
-
-        return grupos;
-    };
-
-
-    
     const organizarPreguntasEnGrupos = (): GrupoPreguntas[] => {
         if (!plantillaFormulario) return [];
         
         const grupos: GrupoPreguntas[] = [];
         const preguntasSimples = plantillaFormulario.preguntas.filter((p: any) => !p.multiple_respuestas);
         const preguntasMultiples = plantillaFormulario.preguntas.filter((p: any) => p.multiple_respuestas);
-        
         
         const preguntasSimplesPorGrupo = new Map<number | null, any[]>();
         preguntasSimples.forEach((pregunta: any) => {
@@ -327,11 +397,9 @@ export default function ResponderInstrumento() {
             preguntasSimplesPorGrupo.get(grupoId)!.push(pregunta);
         });
         
-        
         let contadorGrupo = 1;
         preguntasSimplesPorGrupo.forEach((preguntas, grupoId) => {
             if (grupoId !== null && preguntas.length > 0) {
-                
                 grupos.push({
                     id: grupoId,
                     nombre: `Sección ${contadorGrupo}`,
@@ -340,7 +408,6 @@ export default function ResponderInstrumento() {
                 });
                 contadorGrupo++;
             } else if (grupoId === null) {
-               
                 for (let i = 0; i < preguntas.length; i += PREGUNTAS_POR_PAGINA) {
                     grupos.push({
                         id: -contadorGrupo,
@@ -352,7 +419,6 @@ export default function ResponderInstrumento() {
                 }
             }
         });
-        
         
         const gruposCuadro = new Set<number>(
             preguntasMultiples
@@ -380,7 +446,6 @@ export default function ResponderInstrumento() {
     const gruposOrganizados = organizarPreguntasEnGrupos();
     const totalPaginas = gruposOrganizados.length;
 
-    
     const paginaActualCompleta = (): boolean => {
         if (paginaActual >= gruposOrganizados.length) return false;
 
@@ -403,18 +468,15 @@ export default function ResponderInstrumento() {
         }
     };
 
-
     const calcularProgreso = (): number => {
         let totalPreguntas = 0;
         let preguntasRespondidas = 0;
 
-        
         respuestas.forEach((r) => {
             totalPreguntas++;
             if (r.texto?.trim() || r.opcion_id) preguntasRespondidas++;
         });
 
-        
         for (const grupoId in respuestasMultiples) {
             const instancias = respuestasMultiples[grupoId];
 
@@ -428,7 +490,6 @@ export default function ResponderInstrumento() {
                 }
             }
         }
-
 
         return totalPreguntas > 0 ? (preguntasRespondidas / totalPreguntas) * 100 : 0;
     };
@@ -501,7 +562,6 @@ export default function ResponderInstrumento() {
                             </p>
                         </div>
 
-                        
                         <div className="mb-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <small className="text-muted fw-semibold">Progreso general</small>
@@ -514,7 +574,6 @@ export default function ResponderInstrumento() {
                             />
                         </div>
 
-                        
                         {!mostrarResumen && (
                             <div className="d-flex justify-content-center align-items-center gap-2 mb-4 flex-wrap">
                                 {gruposOrganizados.map((grupo, index) => {
@@ -548,11 +607,11 @@ export default function ResponderInstrumento() {
                             </div>
                         )}
 
-                        {esDocente && paginaActual === 0 && !mostrarResumen && (
+                        {esDocente && paginaActual === 0 && !mostrarResumen && instrumentoSeleccionado && (
                             <Tabs defaultActiveKey="formulario" className="mb-4">
                                 <Tab eventKey="formulario" title="Completar Informe">
                                     <div className="mb-4">
-                                        <Llamadora id_instrumento={instrumentoSeleccionado?.id}/>
+                                        <Llamadora id_instrumento={instrumentoSeleccionado.id}/>
                                     </div>
                                 </Tab>
                             </Tabs>
@@ -560,11 +619,9 @@ export default function ResponderInstrumento() {
                     </Card.Body>
                 </Card>
 
-                
                 {!mostrarResumen && grupoActual && (
                     <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
                         <Card.Body className="p-4">
-                           
                             <div 
                                 className="mb-4 p-3 rounded"
                                 style={{
@@ -584,7 +641,6 @@ export default function ResponderInstrumento() {
                             </div>
 
                             {grupoActual.tipo === 'simple' ? (
-                                
                                 grupoActual.preguntas.map((pregunta: any, idx: number) => (
                                     <Card
                                         key={pregunta.id}
@@ -607,11 +663,19 @@ export default function ResponderInstrumento() {
                                                 >
                                                     {idx + 1}
                                                 </Badge>
-                                                <div>
+                                                <div className="flex-grow-1">
                                                     <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
-                                                    <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
-                                                        {pregunta.tipo}
-                                                    </Badge>
+                                                    <div className="d-flex gap-2 align-items-center">
+                                                        <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
+                                                            {pregunta.tipo}
+                                                        </Badge>
+                                                        {pregunta.pregunta_fuente_id && (
+                                                            <Badge bg="warning" text="dark">
+                                                                <i className="fas fa-link me-1"></i>
+                                                                Autocompletada
+                                                            </Badge>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -645,7 +709,6 @@ export default function ResponderInstrumento() {
                                     </Card>
                                 ))
                             ) : (
-                                
                                 <div>
                                     {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
                                         <div key={instanciaIdx} className="mb-4">
@@ -782,7 +845,6 @@ export default function ResponderInstrumento() {
                                 </div>
                             )}
 
-                            
                             <div className="mt-4 pt-3 border-top">
                                 <Row className="align-items-center">
                                     <Col xs={6}>
@@ -817,7 +879,6 @@ export default function ResponderInstrumento() {
                     </Card>
                 )}
 
-                
                 {mostrarResumen && (
                     <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
                         <Card.Body className="p-4">
@@ -857,7 +918,6 @@ export default function ResponderInstrumento() {
                                 </Alert>
                             )}
 
-                            
                             <div className="mt-4">
                                 <h5 className="fw-bold mb-3">Progreso por sección</h5>
                                 {gruposOrganizados.map((grupo, index) => {
@@ -883,7 +943,6 @@ export default function ResponderInstrumento() {
                                             }
                                         }
                                     }
-
 
                                     const porcentaje = total > 0 ? (completadas / total) * 100 : 0;
                                     const completo = completadas === total;
@@ -930,7 +989,6 @@ export default function ResponderInstrumento() {
                                 })}
                             </div>
 
-                            
                             <Row className="mt-4">
                                 <Col md={6} className="mb-2">
                                     <Button

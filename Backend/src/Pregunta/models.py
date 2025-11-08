@@ -70,8 +70,18 @@ class Pregunta(ModeloBase):
 
     multiple_respuestas : Mapped[bool] = mapped_column(Boolean, nullable= False)
 
+    pregunta_fuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("preguntas.id"), nullable=True)
 
+    pregunta_fuente: Mapped[Optional["Pregunta"]] = relationship(
+        "Pregunta",
+        remote_side=[id],
+        foreign_keys=[pregunta_fuente_id],
+        back_populates="preguntas_que_la_usan",
+        uselist=False
+    )
 
-    
-
-
+    preguntas_que_la_usan: Mapped[list["Pregunta"]] = relationship(
+        "Pregunta",
+        back_populates="pregunta_fuente",
+        foreign_keys=[pregunta_fuente_id]
+    )

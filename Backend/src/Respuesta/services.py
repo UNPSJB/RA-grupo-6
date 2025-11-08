@@ -138,75 +138,65 @@ def obtener_respuesta_fuente(db: Session, pregunta_id: int, instrumento_actual_i
     
     pregunta_fuente = db.scalar(select(Pregunta).where(Pregunta.id == pregunta.pregunta_fuente_id))
     
+    if not pregunta_fuente:
+        return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+    
     instrumento_actual = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_actual_id))
     
     if not instrumento_actual or not instrumento_actual.instrumento_fuente_id:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     
-
-    if pregunta_fuente and pregunta_fuente.tipo == "cerrada":
-        respuestas_fuente = db.scalars(
-            select(Respuesta)
-            .join(RespuestasFormulario)
-            .where(
-                Respuesta.pregunta_id == pregunta.pregunta_fuente_id,
-                RespuestasFormulario.instrumento_id == instrumento_actual.instrumento_fuente_id
-            )
-        ).all()
-        
-        total_respuestas = len(respuestas_fuente)
-        
-        if total_respuestas == 0:
-            return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
-        
+    grupo_pregunta_id_fuente = pregunta_fuente.grupo_pregunta_id
+    
+    preguntas_del_grupo = db.scalars(
+        select(Pregunta)
+        .where(
+            Pregunta.grupo_pregunta_id == grupo_pregunta_id_fuente,
+            Pregunta.tipo == "cerrada",
+            Pregunta.estadistica == True
+        )
+        .order_by(Pregunta.id)
+    ).all()
+    
+    if not preguntas_del_grupo:
+        return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+    
+    conteo_total_por_opcion = {}
+    total_respuestas_general = 0
+    
+    for pregunta_grupo in preguntas_del_grupo:
         conteo_opciones = db.execute(
             select(Opcion.texto, func.count(Respuesta.id))
             .join(Respuesta, Respuesta.opcion_id == Opcion.id)
             .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
             .where(
-                Respuesta.pregunta_id == pregunta.pregunta_fuente_id,
+                Respuesta.pregunta_id == pregunta_grupo.id,
                 RespuestasFormulario.instrumento_id == instrumento_actual.instrumento_fuente_id
             )
             .group_by(Opcion.id, Opcion.texto)
         ).all()
         
-        estadisticas_texto = []
         for opcion_texto, count in conteo_opciones:
-            porcentaje = round((count / total_respuestas) * 100, 1)
-            estadisticas_texto.append(f"{opcion_texto}: {porcentaje}%")
-        
-        texto_final = ", ".join(estadisticas_texto)
-        
-        return {
-            "respuestas": [{
-                "texto": texto_final,
-                "instancia": None,
-                "opcion_id": None
-            }],
-            "multiple": False  
-        }
-
-    respuestas_fuente = db.scalars(
-        select(Respuesta)
-        .join(RespuestasFormulario)
-        .where(
-            Respuesta.pregunta_id == pregunta.pregunta_fuente_id,
-            RespuestasFormulario.instrumento_id == instrumento_actual.instrumento_fuente_id
-        )
-        .order_by(Respuesta.instancia_respuesta)
-    ).all()
+            if opcion_texto not in conteo_total_por_opcion:
+                conteo_total_por_opcion[opcion_texto] = 0
+            conteo_total_por_opcion[opcion_texto] += count
+            total_respuestas_general += count
     
-    respuestas_procesadas = []
-    for respuesta in respuestas_fuente:
-        texto = respuesta.texto or (respuesta.opcion.texto if respuesta.opcion else None)
-        if texto:
-            respuestas_procesadas.append({
-                "texto": texto,
-                "instancia": respuesta.instancia_respuesta,
-                "opcion_id": respuesta.opcion_id
-            })
+    if total_respuestas_general == 0:
+        return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+    
+    estadisticas_generales = []
+    for opcion_texto, count in sorted(conteo_total_por_opcion.items()):
+        porcentaje = round((count / total_respuestas_general) * 100, 1)
+        estadisticas_generales.append(f"{opcion_texto}: {porcentaje}%")
+    
+    texto_final = ", ".join(estadisticas_generales)
     
     return {
-        "respuestas": respuestas_procesadas,
-        "multiple": pregunta.multiple_respuestas
+        "respuestas": [{
+            "texto": texto_final,
+            "instancia": None,
+            "opcion_id": None
+        }],
+        "multiple": False
     }

@@ -69,45 +69,45 @@ export default function ResponderInstrumento() {
             const preguntasSimples = plantillaData.preguntas.filter((p: any) => !p.multiple_respuestas);
             
             const respuestasConPrefill = await Promise.all(
-            preguntasSimples.map(async (pregunta: any) => {
-                const textosPrefill: string[] = [];
-                const opcionesPrefill: (number | null)[] = [];
-
-                if (pregunta.pregunta_fuente_id) {
-                try {
-                    console.log(`Cargando prefill para pregunta ${pregunta.id}`);
-                    const prefillResponse = await fetch(
-                    `http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`
-                    );
-
-                    if (prefillResponse.ok) {
-                    const prefillData = await prefillResponse.json();
-                    console.log(`Prefill data para pregunta ${pregunta.id}:`, prefillData);
-
-                    if (prefillData.respuestas && prefillData.respuestas.length > 0) {
-                        prefillData.respuestas.forEach((r: any) => {
-                        textosPrefill.push(r.texto || '');
-                        opcionesPrefill.push(r.opcion_id ?? null);
-                        });
-                    } else {
-                        console.log(`No hay respuestas en prefillData`);
+                preguntasSimples.map(async (pregunta: any) => {
+                    let textoPrefill = '';
+                    let opcionPrefill = undefined;
+                    
+                    if (pregunta.pregunta_fuente_id) {
+                        try {
+                            console.log(`argando prefill para pregunta ${pregunta.id}`);
+                            const prefillResponse = await fetch(
+                                `http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`
+                            );
+                            
+                            if (prefillResponse.ok) {
+                                const prefillData = await prefillResponse.json();
+                                console.log(`Prefill data para pregunta ${pregunta.id}:`, prefillData);
+                                
+                                if (prefillData.respuestas && prefillData.respuestas.length > 0) {
+                                    const primeraRespuesta = prefillData.respuestas[0];
+                                    textoPrefill = primeraRespuesta.texto || '';
+                                    opcionPrefill = primeraRespuesta.opcion_id;
+                                    console.log(`Prefill cargado: texto="${textoPrefill}", opcion=${opcionPrefill}`);
+                                } else {
+                                    console.log(`No hay respuestas en prefillData`);
+                                }
+                            }
+                        } catch (error) {
+                            console.error(` Error al cargar prefill para pregunta ${pregunta.id}:`, error);
+                        }
                     }
-                    }
-                } catch (error) {
-                    console.error(`Error al cargar prefill para pregunta ${pregunta.id}:`, error);
-                }
-                }
-
-                return {
-                pregunta_id: pregunta.id,
-                textos: textosPrefill,      
-                opciones: opcionesPrefill,  
-                };
-            })
+                    
+                    return {
+                        pregunta_id: pregunta.id,
+                        texto: textoPrefill,
+                        opcion_id: opcionPrefill,
+                    };
+                })
             );
-
-            setRespuestas(respuestasConPrefill);
             
+            setRespuestas(respuestasConPrefill);
+
             const preguntasMultiples = plantillaData.preguntas.filter((p: any) => p.multiple_respuestas);
             const gruposCuadro = new Set<number>(
                 preguntasMultiples

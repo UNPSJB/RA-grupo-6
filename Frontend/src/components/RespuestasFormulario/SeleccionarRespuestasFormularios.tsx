@@ -67,7 +67,7 @@ export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : 
             <Container className="mt-4">
                 <div className="row justify-content-center ">
                     <div className="col-md-10">
-                        <Card className="border-0 shadow-sm w-100 " style={{ borderRadius: "1rem" }}>
+                        <Card className=" w-100 " style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5">
                                 <div className="mb-5 text-center">
                                     <h1 className="fw-bold mb-2"> Formularios completados </h1>

@@ -205,7 +205,7 @@ export default function ResponderInstrumento() {
                     {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
                 </Button>
 
-                <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                <Card className=" w-100 mb-4" style={{ borderRadius: '1rem' }}>
                     <Card.Body className="p-4">
                         <div className="text-center mb-4">
                             <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>

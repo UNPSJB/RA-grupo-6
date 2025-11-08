@@ -1,7 +1,6 @@
 import { Card, Alert, Row, Col, Button, Badge, ProgressBar } from 'react-bootstrap';
 import ModalExito from '../ModalEnvio';
 import type { GrupoPreguntas, RespuestaTemporal, InstanciaRespuestas } from '../types';
-import { validarInstanciaCompleta } from '../Respuesta/ValidarRespuestas';
 
 type Props = {
     gruposOrganizados: GrupoPreguntas[];
@@ -102,66 +101,70 @@ function ResumenRespuestas({
                     </Alert>
                 )}
 
-                <div className="mt-4">
+                <div className="mt-4 mb-5">
                     <h5 className="fw-bold mb-3">Progreso por sección</h5>
-                    {gruposOrganizados.map((grupo, index) => {
-                        const { completadas, total, porcentaje, completo } = calcularProgresoGrupo(grupo);
+                    <Row className="g-3">
+                        {gruposOrganizados.map((grupo, index) => {
+                            const { completadas, total, porcentaje, completo } = calcularProgresoGrupo(grupo);
 
-                        return (
-                            <Card
-                                key={grupo.id}
-                                className="mb-3 border"
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => onIrAPagina(index)}
-                            >
-                                <Card.Body className="p-3">
-                                    <Row className="align-items-center">
-                                        <Col xs={8}>
-                                            <div className="d-flex align-items-center gap-2">
-                                                <Badge bg={completo ? 'success' : 'warning'}>
-                                                    {completo ? (
-                                                        <i className="fa-solid fa-check"></i>
-                                                    ) : (
-                                                        <i
-                                                            className="fa-solid fa-triangle-exclamation"
-                                                            style={{ color: '#FFD43B' }}
-                                                        ></i>
-                                                    )}
-                                                </Badge>
-                                                <div>
-                                                    <h6 className="mb-0 fw-semibold">{grupo.nombre}</h6>
-                                                    <small className="text-muted">
-                                                        {completadas} de {total} preguntas respondidas
-                                                    </small>
+                            return (
+                                <Col xs={12} md={6} key={grupo.id}>
+                                    <Card
+                                        className="h-100 border"
+                                        style={{ cursor: 'pointer', transition: 'all 0.2s', minHeight: '120px' }}
+                                        onClick={() => onIrAPagina(index)}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <Card.Body className="p-4">
+                                            <div className="d-flex align-items-start justify-content-between mb-3">
+                                                <div className="d-flex align-items-center gap-2 flex-grow-1">
+                                                    <Badge bg={completo ? 'success' : 'warning'} className="py-2 px-2">
+                                                        {completo ? (
+                                                            <i className="fa-solid fa-check"></i>
+                                                        ) : (
+                                                            <i className="fa-solid fa-triangle-exclamation"></i>
+                                                        )}
+                                                    </Badge>
+                                                    <div className="flex-grow-1">
+                                                        <h6 className="mb-1 fw-semibold" style={{ fontSize: '1.05rem' }}>{grupo.nombre}</h6>
+                                                        <small className="text-muted" style={{ fontSize: '0.9rem' }}>
+                                                            {completadas} de {total} preguntas respondidas
+                                                        </small>
+                                                    </div>
                                                 </div>
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onIrAPagina(index);
+                                                    }}
+                                                    style={{ minWidth: '90px' }}
+                                                >
+                                                    {completo ? 'Revisar' : 'Completar'}
+                                                </Button>
                                             </div>
-                                        </Col>
-                                        <Col xs={4} className="text-end">
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onIrAPagina(index);
-                                                }}
-                                            >
-                                                {completo ? 'Revisar' : 'Completar'}
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                    <ProgressBar
-                                        now={porcentaje}
-                                        variant={completo ? 'success' : 'warning'}
-                                        className="mt-2"
-                                        style={{ height: '6px' }}
-                                    />
-                                </Card.Body>
-                            </Card>
-                        );
-                    })}
+                                            <ProgressBar
+                                                now={porcentaje}
+                                                variant={completo ? 'success' : 'warning'}
+                                                style={{ height: '8px' }}
+                                            />
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })}
+                    </Row>
                 </div>
 
-                <Row className="mt-4">
+                <Row className="mt-5 pt-3" style={{ borderTop: '2px solid #e9ecef' }}>
                     <Col md={6} className="mb-2">
                         <Button variant="outline-secondary" className="w-100" onClick={onRetroceder}>
                             <i className="fa-solid fa-arrow-left"></i> Volver a editar

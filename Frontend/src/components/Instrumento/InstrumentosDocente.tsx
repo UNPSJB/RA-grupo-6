@@ -1,4 +1,3 @@
-// InstrumentosDocente.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';

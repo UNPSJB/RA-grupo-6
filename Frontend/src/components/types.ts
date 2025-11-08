@@ -221,3 +221,9 @@ export interface RespuestaTemporal {
     instancia_respuesta?: number;
 }
 
+export interface GrupoPreguntas {
+    id: number;
+    nombre: string;
+    preguntas: any[];
+    tipo: 'simple' | 'multiple';
+}

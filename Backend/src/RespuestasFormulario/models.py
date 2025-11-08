@@ -25,5 +25,3 @@ class RespuestasFormulario(ModeloBase):
     respuestas: Mapped[List["Respuesta"]] = relationship(back_populates="formulario")
     usuario: Mapped["Usuario"] = relationship(back_populates="respuestas_formulario")
     instrumento: Mapped["Instrumento"] = relationship(back_populates="respuestas_formulario")
-
-    

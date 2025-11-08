@@ -15,9 +15,9 @@ import ResponderInstrumento from './components/Instrumento/ResponderInstrumento'
 import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
+import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 import {EstadisticasCatedras} from './components/Estadisticas/MostrarEstadisticasCatedras.tsx'
-import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 // createRoot(document.getElementById('root')!).render(
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';

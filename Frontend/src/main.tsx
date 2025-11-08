@@ -22,6 +22,7 @@ import {EstadisticasCatedras} from './components/Estadisticas/MostrarEstadistica
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
 import Login from './context/Login.tsx';
+import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -32,7 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ProtectedRoute>
               <Menu />
               <Routes>
-                <Route path='/' element={<MostrarEstadisticas/>} ></Route>
+                <Route path='/' element={<MostrarEstadisticasDepartamento/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>

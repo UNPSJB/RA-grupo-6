@@ -21,6 +21,7 @@ import SeleccionarInformeSintetico from './components/Instrumento/components/Sel
 import { GraficoRespondidos } from './components/Graficos/GraficoRespondidos.tsx';
 import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
+import { MonitoreoRecordatorios } from './components/MonitoreoRecordatorios'
 // createRoot(document.getElementById('root')!).render(
 
 
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         {/* <Route path='/' element={<Llamadora id_instrumento={1}  />} ></Route> */}
         {/* <Route path='/' element={<SeleccionarRol/>}></Route> */}
+        <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
         <Route path='/ver-encuestados-departamento' element= {<MostrarEstadisticasDepartamento/>} ></Route>
         <Route path='/seleccionar-informe-sintetico' element= {<SeleccionarInformeSintetico/>} ></Route>
         <Route path='/' element={<MostrarEstadisticas/>} ></Route>

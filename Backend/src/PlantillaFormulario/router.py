@@ -17,3 +17,7 @@ def leer_plantilla_formulario(db: Session = Depends(get_db)) -> list[schemas.Pla
 @router.get("/{formulario_id}", response_model=schemas.PlantillaFormulario)
 def leer_un_plantilla_formulario(formulario_id: int, db: Session = Depends(get_db)) -> schemas.PlantillaFormulario:
     return services.obtener_plantilla_formulario(db, formulario_id)
+
+@router.get("/rol/{rol_id}", response_model= list[schemas.PlantillaFormulario])
+def get_plantillas_rol(rol_id:int, db:Session = Depends(get_db)) -> list[schemas.PlantillaFormulario]:
+    return services.get_plantillas_rol(db, rol_id)

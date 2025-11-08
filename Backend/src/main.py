@@ -91,3 +91,7 @@ app.include_router(periodo_router)
 #Route de UsuarioDepartamento
 from src.UsuarioDepartamento.router import router as usuariodepartamento_router
 app.include_router(usuariodepartamento_router)
+
+#Route de planificacion
+from src.Planificacion.router import router as planificacion_router
+app.include_router(planificacion_router)

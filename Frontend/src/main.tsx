@@ -17,7 +17,7 @@ import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import { Llamadora} from './components/Respuesta/VerPorcentajes.tsx';
-import { PlanificarPeriodos } from './components/Periodos/PlanificarPeriodos.tsx';
+import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
 // createRoot(document.getElementById('root')!).render(
 
 

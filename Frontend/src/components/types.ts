@@ -181,6 +181,7 @@ export type ErrorPreguntaAbierta = {
 };
 
 export type PlantillaFormulario = {
+  id: number
   titulo: string;
   fecha_creacion: Date;
   preguntas: Pregunta[];
@@ -200,3 +201,10 @@ export type Instrumento = {
 
 }
 
+
+export type Planificacion = {
+    fecha_inicio: Date
+    fecha_cierre: Date
+    plantilla_formulario_id: number
+    plantilla_formulario: PlantillaFormulario
+}

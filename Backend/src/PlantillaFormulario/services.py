@@ -27,3 +27,8 @@ def obtener_plantilla_formulario(db: Session, formulario_id: int) -> schemas.Pla
     return db_plantilla_formulario
 
 
+def get_plantillas_rol(db:Session, rol_id:int) -> List[schemas.PlantillaFormulario]:
+    return db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
+
+
+

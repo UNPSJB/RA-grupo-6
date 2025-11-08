@@ -209,3 +209,15 @@ export type GrupoCuadro = {
     descripcion?: string;
     orden: number;
 };
+
+export interface InstanciaRespuestas {
+    [preguntaId: number]: RespuestaTemporal;
+}
+
+export interface RespuestaTemporal {
+    pregunta_id: number;
+    texto?: string;
+    opcion_id?: number;
+    instancia_respuesta?: number;
+}
+

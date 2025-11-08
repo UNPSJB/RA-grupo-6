@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Badge, Spinner, Form, Tabs, Tab, Row, Col } from 'react-bootstrap';
+import { Container, Card, Button, Alert, Badge, Spinner, Form, Tabs, Tab, Row, Col, ProgressBar } from 'react-bootstrap';
 import ModalExito from "../ModalEnvio";
-import { EnumTipoPregunta } from "../types";
-import {Llamadora } from '../Respuesta/VerPorcentajes';
+import type {InstanciaRespuestas, RespuestaTemporal } from "../types";
+import { Llamadora } from '../Respuesta/VerPorcentajes';
+import {EnumTipoPregunta} from "../types"
 
-export interface InstanciaRespuestas {
-    [preguntaId: number]: RespuestaTemporal;
+export interface GrupoPreguntas {
+    id: number;
+    nombre: string;
+    preguntas: any[];
+    tipo: 'simple' | 'multiple';
 }
 
-export interface RespuestaTemporal {
-    pregunta_id: number;
-    texto?: string;
-    opcion_id?: number;
-    instancia_respuesta?: number;
-}
+const PREGUNTAS_POR_PAGINA = 5;
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -33,6 +32,10 @@ export default function ResponderInstrumento() {
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);
     const [usuarioActual, setUsuarioActual] = useState<any>(null);
+    
+    
+    const [paginaActual, setPaginaActual] = useState(0);
+    const [mostrarResumen, setMostrarResumen] = useState(false);
 
     useEffect(() => {
         const usuario = localStorage.getItem('usuario_actual');
@@ -118,8 +121,13 @@ export default function ResponderInstrumento() {
     const obtenerRespuesta = (preguntaId: number) => respuestas.find((r) => r.pregunta_id === preguntaId);
 
     const instanciaEstaCompleta = (instancia: InstanciaRespuestas): boolean => {
-        return Object.values(instancia).every((r: RespuestaTemporal) => r.texto?.trim() || r.opcion_id);
+    for (const key in instancia) {
+        const r = instancia[key];
+        if (!(r.texto?.trim() || r.opcion_id)) return false;
+    }
+    return true;
     };
+
 
     const agregarInstanciaRespuestas = (grupoCuadroId: number, preguntasDelGrupo: any[]) => {
         setRespuestasMultiples((prev) => {
@@ -178,15 +186,21 @@ export default function ResponderInstrumento() {
                 .filter((id: any): id is number => id !== null && id !== undefined)
         );
 
-        const multiplesCompletas = Array.from(gruposCuadro).every((grupoCuadroId: number) => {
-            const instancias = respuestasMultiples[grupoCuadroId] || [];
-            return (
-                instancias.length > 0 &&
-                instancias.every((instancia) =>
-                    Object.values(instancia).every((r: RespuestaTemporal) => r.texto?.trim() || r.opcion_id)
-                )
-            );
-        });
+        const multiplesCompletas = (() => {
+            for (const grupoCuadroId of gruposCuadro) {
+                const instancias = respuestasMultiples[grupoCuadroId] || [];
+                if (instancias.length === 0) return false;
+
+                for (const instancia of instancias) {
+                    for (const key in instancia) {
+                        const r = instancia[key];
+                        if (!(r.texto?.trim() || r.opcion_id)) return false;
+                    }
+                }
+            }
+            return true;
+        })();
+
 
         return simplesCompletas && multiplesCompletas;
     };
@@ -230,10 +244,14 @@ export default function ResponderInstrumento() {
                 })
             );
 
-            for (const [grupoCuadroId, instancias] of Object.entries(respuestasMultiples)) {
+            for (const grupoCuadroId in respuestasMultiples) {
+                const instancias = respuestasMultiples[grupoCuadroId] || [];
+
                 for (let instanciaIndex = 0; instanciaIndex < instancias.length; instanciaIndex++) {
                     const instancia = instancias[instanciaIndex];
-                    for (const [preguntaId, respuesta] of Object.entries(instancia)) {
+
+                    for (const preguntaId in instancia) {
+                        const respuesta = instancia[preguntaId];
                         if (respuesta.texto?.trim() || respuesta.opcion_id) {
                             const cuerpoRespuesta = {
                                 pregunta_id: parseInt(preguntaId),
@@ -242,18 +260,22 @@ export default function ResponderInstrumento() {
                                 formulario_id: formularioCreado.id,
                                 instancia_respuesta: instanciaIndex + 1,
                             };
+
                             const respuestaResponse = await fetch('http://127.0.0.1:8000/respuestas/', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(cuerpoRespuesta),
                             });
-                            if (!respuestaResponse.ok)
+
+                            if (!respuestaResponse.ok) {
                                 throw new Error(`Error al enviar respuesta múltiple ${preguntaId}`);
+                            }
                         }
                     }
                 }
             }
-            return true;
+        return true;
+
         } catch (err: unknown) {
             const mensaje = err instanceof Error ? err.message : 'Error desconocido';
             alert('Error al enviar las respuestas: ' + mensaje);
@@ -265,17 +287,175 @@ export default function ResponderInstrumento() {
 
     const preguntasPorGrupoCuadro = () => {
         if (!plantillaFormulario) return {};
+
         const grupos: any = {};
-        plantillaFormulario.preguntas.forEach((pregunta: any) => {
+
+        for (const pregunta of plantillaFormulario.preguntas) {
             if (pregunta.multiple_respuestas && pregunta.grupo_cuadro_id) {
-                if (!grupos[pregunta.grupo_cuadro_id]) grupos[pregunta.grupo_cuadro_id] = [];
+                if (!grupos[pregunta.grupo_cuadro_id]) {
+                    grupos[pregunta.grupo_cuadro_id] = [];
+                }
                 grupos[pregunta.grupo_cuadro_id].push(pregunta);
             }
-        });
-        Object.keys(grupos).forEach((key) => {
-            grupos[key].sort((a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0));
-        });
+        }
+
+        for (const grupoId in grupos) {
+            grupos[grupoId].sort(
+                (a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0)
+            );
+        }
+
         return grupos;
+    };
+
+
+    
+    const organizarPreguntasEnGrupos = (): GrupoPreguntas[] => {
+        if (!plantillaFormulario) return [];
+        
+        const grupos: GrupoPreguntas[] = [];
+        const preguntasSimples = plantillaFormulario.preguntas.filter((p: any) => !p.multiple_respuestas);
+        const preguntasMultiples = plantillaFormulario.preguntas.filter((p: any) => p.multiple_respuestas);
+        
+        
+        const preguntasSimplesPorGrupo = new Map<number | null, any[]>();
+        preguntasSimples.forEach((pregunta: any) => {
+            const grupoId = pregunta.grupo_cuadro_id;
+            if (!preguntasSimplesPorGrupo.has(grupoId)) {
+                preguntasSimplesPorGrupo.set(grupoId, []);
+            }
+            preguntasSimplesPorGrupo.get(grupoId)!.push(pregunta);
+        });
+        
+        
+        let contadorGrupo = 1;
+        preguntasSimplesPorGrupo.forEach((preguntas, grupoId) => {
+            if (grupoId !== null && preguntas.length > 0) {
+                
+                grupos.push({
+                    id: grupoId,
+                    nombre: `Sección ${contadorGrupo}`,
+                    preguntas: preguntas,
+                    tipo: 'simple'
+                });
+                contadorGrupo++;
+            } else if (grupoId === null) {
+               
+                for (let i = 0; i < preguntas.length; i += PREGUNTAS_POR_PAGINA) {
+                    grupos.push({
+                        id: -contadorGrupo,
+                        nombre: `Página ${contadorGrupo}`,
+                        preguntas: preguntas.slice(i, i + PREGUNTAS_POR_PAGINA),
+                        tipo: 'simple'
+                    });
+                    contadorGrupo++;
+                }
+            }
+        });
+        
+        
+        const gruposCuadro = new Set<number>(
+            preguntasMultiples
+                .map((p: any) => p.grupo_cuadro_id)
+                .filter((id: any): id is number => id !== null && id !== undefined)
+        );
+        
+        gruposCuadro.forEach((grupoCuadroId) => {
+            const preguntasDelGrupo = preguntasMultiples
+                .filter((p: any) => p.grupo_cuadro_id === grupoCuadroId)
+                .sort((a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0));
+            
+            grupos.push({
+                id: grupoCuadroId,
+                nombre: `Sección ${contadorGrupo} (Repetible)`,
+                preguntas: preguntasDelGrupo,
+                tipo: 'multiple'
+            });
+            contadorGrupo++;
+        });
+        
+        return grupos;
+    };
+
+    const gruposOrganizados = organizarPreguntasEnGrupos();
+    const totalPaginas = gruposOrganizados.length;
+
+    
+    const paginaActualCompleta = (): boolean => {
+        if (paginaActual >= gruposOrganizados.length) return false;
+
+        const grupoActual = gruposOrganizados[paginaActual];
+
+        if (grupoActual.tipo === 'simple') {
+            return grupoActual.preguntas.every((pregunta: any) => {
+                const respuesta = obtenerRespuesta(pregunta.id);
+                return respuesta?.texto?.trim() || respuesta?.opcion_id;
+            });
+        } else {
+            const instancias = respuestasMultiples[grupoActual.id] || [];
+            return instancias.length > 0 && instancias.every((instancia) => {
+                for (const key in instancia) {
+                    const r = instancia[key];
+                    if (!(r.texto?.trim() || r.opcion_id)) return false;
+                }
+                return true;
+            });
+        }
+    };
+
+
+    const calcularProgreso = (): number => {
+        let totalPreguntas = 0;
+        let preguntasRespondidas = 0;
+
+        
+        respuestas.forEach((r) => {
+            totalPreguntas++;
+            if (r.texto?.trim() || r.opcion_id) preguntasRespondidas++;
+        });
+
+        
+        for (const grupoId in respuestasMultiples) {
+            const instancias = respuestasMultiples[grupoId];
+
+            for (const instancia of instancias) {
+                for (const key in instancia) {
+                    const r = instancia[key];
+                    totalPreguntas++;
+                    if (r.texto?.trim() || r.opcion_id) {
+                        preguntasRespondidas++;
+                    }
+                }
+            }
+        }
+
+
+        return totalPreguntas > 0 ? (preguntasRespondidas / totalPreguntas) * 100 : 0;
+    };
+
+    const avanzarPagina = () => {
+        if (paginaActual < totalPaginas - 1) {
+            setPaginaActual(paginaActual + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            setMostrarResumen(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    const retrocederPagina = () => {
+        if (mostrarResumen) {
+            setMostrarResumen(false);
+        } else if (paginaActual > 0) {
+            setPaginaActual(paginaActual - 1);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const irAPagina = (index: number) => {
+        setMostrarResumen(false);
+        setPaginaActual(index);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     if (cargando)
@@ -301,27 +481,74 @@ export default function ResponderInstrumento() {
             </Container>
         );
 
-    const gruposCuadro = preguntasPorGrupoCuadro();
+    const grupoActual = !mostrarResumen && paginaActual < gruposOrganizados.length ? gruposOrganizados[paginaActual] : null;
 
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
             <Container style={{ maxWidth: '1200px' }}>
                 <Button variant="outline-secondary" className="mb-3" onClick={() => navigate(rutaVolver)}>
-                    ← Volver {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
+                    <i className="fa-solid fa-arrow-left"></i> Volver {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
                 </Button>
 
-                <Card className="border-0 shadow-sm w-100" style={{ borderRadius: '1rem' }}>
-                    <div className="text-center mb-3 mt-3">
-                        <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
-                            {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}
-                        </h1>
-                        <p className="text-muted mb-0">
-                            {esDocente ? 'Complete el informe de cátedra' : 'Complete la encuesta con sus respuestas'}
-                        </p>
-                    </div>
+                <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                    <Card.Body className="p-4">
+                        <div className="text-center mb-4">
+                            <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
+                                {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}
+                            </h1>
+                            <p className="text-muted mb-3">
+                                {esDocente ? 'Complete el informe de cátedra' : 'Complete la encuesta con sus respuestas'}
+                            </p>
+                        </div>
 
-                    <Card.Body className="p-3 p-md-4">
-                        {esDocente && (
+                        
+                        <div className="mb-4">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <small className="text-muted fw-semibold">Progreso general</small>
+                                <small className="text-muted fw-semibold">{Math.round(calcularProgreso())}%</small>
+                            </div>
+                            <ProgressBar 
+                                now={calcularProgreso()} 
+                                variant="success"
+                                style={{ height: '10px', borderRadius: '10px' }}
+                            />
+                        </div>
+
+                        
+                        {!mostrarResumen && (
+                            <div className="d-flex justify-content-center align-items-center gap-2 mb-4 flex-wrap">
+                                {gruposOrganizados.map((grupo, index) => {
+                                    const completada = index < paginaActual || (index === paginaActual && paginaActualCompleta());
+                                    const actual = index === paginaActual;
+                                    
+                                    return (
+                                        <div
+                                            key={grupo.id}
+                                            onClick={() => irAPagina(index)}
+                                            style={{
+                                                width: '40px',
+                                                height: '40px',
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: completada ? '#198754' : actual ? '#0d6efd' : '#e9ecef',
+                                                color: completada || actual ? 'white' : '#6c757d',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s',
+                                                border: actual ? '3px solid #0a58ca' : 'none',
+                                            }}
+                                            title={grupo.nombre}
+                                        >
+                                            {completada ? '✓' : index + 1}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {esDocente && paginaActual === 0 && !mostrarResumen && (
                             <Tabs defaultActiveKey="formulario" className="mb-4">
                                 <Tab eventKey="formulario" title="Completar Informe">
                                     <div className="mb-4">
@@ -330,101 +557,115 @@ export default function ResponderInstrumento() {
                                 </Tab>
                             </Tabs>
                         )}
+                    </Card.Body>
+                </Card>
 
-                        {plantillaFormulario?.preguntas
-                            ?.filter((p: any) => !p.multiple_respuestas)
-                            .map((pregunta: any, idx: number) => (
-                                <Card
-                                    key={pregunta.id}
-                                    className="border-0 shadow-sm w-100 mb-3"
-                                    style={{ borderRadius: '1rem' }}
-                                >
-                                    <Card.Body className="p-3">
-                                        <div className="mb-2 d-flex align-items-center gap-3">
-                                            <Badge
-                                                bg="secondary"
-                                                className="rounded-circle"
-                                                style={{
-                                                    width: '35px',
-                                                    height: '35px',
-                                                    fontSize: '1rem',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                {idx + 1}
-                                            </Badge>
-                                            <div>
-                                                <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
-                                                <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
-                                                    {pregunta.tipo}
+                
+                {!mostrarResumen && grupoActual && (
+                    <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                        <Card.Body className="p-4">
+                           
+                            <div 
+                                className="mb-4 p-3 rounded"
+                                style={{
+                                    backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
+                                    borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`
+                                }}
+                            >
+                                <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                    {grupoActual.nombre}
+                                </h4>
+                                <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                    {grupoActual.tipo === 'multiple' 
+                                        ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
+                                        : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`
+                                    }
+                                </p>
+                            </div>
+
+                            {grupoActual.tipo === 'simple' ? (
+                                
+                                grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                    <Card
+                                        key={pregunta.id}
+                                        className="border-0 shadow-sm w-100 mb-3"
+                                        style={{ borderRadius: '1rem' }}
+                                    >
+                                        <Card.Body className="p-3">
+                                            <div className="mb-2 d-flex align-items-center gap-3">
+                                                <Badge
+                                                    bg="secondary"
+                                                    className="rounded-circle"
+                                                    style={{
+                                                        width: '35px',
+                                                        height: '35px',
+                                                        fontSize: '1rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    {idx + 1}
                                                 </Badge>
+                                                <div>
+                                                    <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
+                                                    <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
+                                                        {pregunta.tipo}
+                                                    </Badge>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {pregunta.tipo === EnumTipoPregunta.abierta ? (
-                                            <Form.Control
-                                                as="textarea"
-                                                rows={4}
-                                                value={obtenerRespuesta(pregunta.id)?.texto || ''}
-                                                onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value)}
-                                                placeholder="Escriba su respuesta..."
-                                                className="input-pregunta"
-                                            />
-                                        ) : (
-                                            <Form.Group>
-                                                {pregunta.opciones?.map((opcion: any) => (
-                                                    <Form.Check
-                                                        key={opcion.id}
-                                                        type="radio"
-                                                        name={`pregunta-${pregunta.id}`}
-                                                        label={opcion.texto}
-                                                        checked={obtenerRespuesta(pregunta.id)?.opcion_id === opcion.id}
-                                                        onChange={() =>
-                                                            actualizarRespuesta(pregunta.id, undefined, opcion.id)
-                                                        }
-                                                        className="mb-2"
-                                                    />
-                                                ))}
-                                            </Form.Group>
-                                        )}
-                                    </Card.Body>
-                                </Card>
-                            ))}
-
-                        {Object.entries(gruposCuadro).map(([grupoCuadroId, preguntasGrupo]: [string, any]) => {
-                            const grupoId = parseInt(grupoCuadroId);
-                            const instancias = respuestasMultiples[grupoId] || [];
-                            const ultimaInstanciaCompleta = instancias.length === 0 || instanciaEstaCompleta(instancias[instancias.length - 1]);
-
-                            return (
-                                <div key={grupoId} className="mb-4">
-                                    <div className="mb-3">
-                                        <h5 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
-                                            Grupo de preguntas repetibles
-                                        </h5>
-                                        <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                                            Complete las siguientes preguntas. Puede agregar más según necesite.
-                                        </p>
-                                    </div>
-
-                                    {instancias.map((instancia, instanciaIdx) => (
-                                        <div key={instanciaIdx} className="mb-3">
-                                            {instancias.length > 1 && (
-                                                <div className="d-flex justify-content-end mb-2">
+                                            {pregunta.tipo === EnumTipoPregunta.abierta ? (
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={4}
+                                                    value={obtenerRespuesta(pregunta.id)?.texto || ''}
+                                                    onChange={(e) => actualizarRespuesta(pregunta.id, e.target.value)}
+                                                    placeholder="Escriba su respuesta..."
+                                                    className="input-pregunta"
+                                                />
+                                            ) : (
+                                                <Form.Group>
+                                                    {pregunta.opciones?.map((opcion: any) => (
+                                                        <Form.Check
+                                                            key={opcion.id}
+                                                            type="radio"
+                                                            name={`pregunta-${pregunta.id}`}
+                                                            label={opcion.texto}
+                                                            checked={obtenerRespuesta(pregunta.id)?.opcion_id === opcion.id}
+                                                            onChange={() =>
+                                                                actualizarRespuesta(pregunta.id, undefined, opcion.id)
+                                                            }
+                                                            className="mb-2"
+                                                        />
+                                                    ))}
+                                                </Form.Group>
+                                            )}
+                                        </Card.Body>
+                                    </Card>
+                                ))
+                            ) : (
+                                
+                                <div>
+                                    {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                        <div key={instanciaIdx} className="mb-4">
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                <Badge bg="primary" style={{ fontSize: '1rem' }}>
+                                                    Respuesta {instanciaIdx + 1}
+                                                </Badge>
+                                                {(respuestasMultiples[grupoActual.id] || []).length > 1 && (
                                                     <Button
                                                         variant="outline-danger"
                                                         size="sm"
-                                                        onClick={() => eliminarInstancia(grupoId, instanciaIdx)}
+                                                        onClick={() => eliminarInstancia(grupoActual.id, instanciaIdx)}
                                                     >
                                                         <i className="fas fa-trash me-1"></i>
                                                         Eliminar
                                                     </Button>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
 
-                                            {preguntasGrupo.map((pregunta: any, idx: number) => (
+                                            {grupoActual.preguntas.map((pregunta: any, idx: number) => (
                                                 <Card
                                                     key={pregunta.id}
                                                     className="border-0 shadow-sm w-100 mb-3"
@@ -467,7 +708,7 @@ export default function ResponderInstrumento() {
                                                                 value={instancia[pregunta.id]?.texto || ''}
                                                                 onChange={(e) =>
                                                                     actualizarRespuestaMultiple(
-                                                                        grupoId,
+                                                                        grupoActual.id,
                                                                         instanciaIdx,
                                                                         pregunta.id,
                                                                         e.target.value
@@ -490,7 +731,7 @@ export default function ResponderInstrumento() {
                                                                         }
                                                                         onChange={() =>
                                                                             actualizarRespuestaMultiple(
-                                                                                grupoId,
+                                                                                grupoActual.id,
                                                                                 instanciaIdx,
                                                                                 pregunta.id,
                                                                                 undefined,
@@ -509,70 +750,215 @@ export default function ResponderInstrumento() {
                                     ))}
 
                                     <div className="text-end">
-                                        {!ultimaInstanciaCompleta && (
-                                            <small className="text-muted d-block mt-2">
-                                                Complete todas las respuestas antes de agregar más
-                                            </small>
-                                        )}
                                         <Button
                                             variant="primary"
                                             size="sm"
-                                            onClick={() => agregarInstanciaRespuestas(grupoId, preguntasGrupo)}
-                                            disabled={!ultimaInstanciaCompleta}
+                                            onClick={() => agregarInstanciaRespuestas(grupoActual.id, grupoActual.preguntas)}
+                                            disabled={
+                                                respuestasMultiples[grupoActual.id]?.length === 0 ||
+                                                !instanciaEstaCompleta(
+                                                    respuestasMultiples[grupoActual.id][
+                                                        respuestasMultiples[grupoActual.id].length - 1
+                                                    ]
+                                                )
+                                            }
                                             className="d-flex align-items-center gap-2 ms-auto"
                                         >
                                             <i className="fas fa-plus"></i>
                                             Agregar más
                                         </Button>
-                                        
+
+                                        {respuestasMultiples[grupoActual.id]?.length > 0 &&
+                                            !instanciaEstaCompleta(
+                                                respuestasMultiples[grupoActual.id][
+                                                    respuestasMultiples[grupoActual.id].length - 1
+                                                ]
+                                            ) && (
+                                                <small className="text-muted d-block mt-2">
+                                                    Complete todas las respuestas antes de agregar más
+                                                </small>
+                                            )}
                                     </div>
                                 </div>
-                            );
-                        })}
+                            )}
 
-                        {todasRespondidas() ? (
-                            <Alert variant="success" className="text-center mt-3">
-                                {esDocente
-                                    ? "¡Listo para enviar el informe!"
-                                    : "¡Listo para enviar la encuesta!"}
-                            </Alert>
-                        ) : (
-                            <Alert
-                                variant="warning"
-                                className="text-center mt-3"
-                            >
-                                Por favor, complete todas las preguntas antes de enviar.
-                            </Alert>
-                        )}
+                            
+                            <div className="mt-4 pt-3 border-top">
+                                <Row className="align-items-center">
+                                    <Col xs={6}>
+                                        {paginaActual > 0 && (
+                                            <Button
+                                                variant="outline-secondary"
+                                                onClick={retrocederPagina}
+                                            >
+                                                <i className="fa-solid fa-arrow-left"></i> Anterior
+                                            </Button>
+                                        )}
+                                    </Col>
+                                    <Col xs={6} className="text-end">
+                                        <Button
+                                            variant="primary"
+                                            onClick={avanzarPagina}
+                                            disabled={!paginaActualCompleta()}
+                                        >
+                                            {paginaActual < totalPaginas - 1 ? 'Siguiente →' : 'Ver Resumen →'}
+                                        </Button>
+                                    </Col>
+                                </Row>
+                                
+                                {!paginaActualCompleta() && (
+                                    <Alert variant="warning" className="mt-3 mb-0">
+                                        <i className="fas fa-info-circle me-2"></i>
+                                        Complete todas las preguntas de esta sección para continuar
+                                    </Alert>
+                                )}
+                            </div>
+                        </Card.Body>
+                    </Card>
+                )}
 
-                        <Row className="mt-4">
-                            <Col md={6} className="mb-2">
-                                <Button
-                                    variant="outline-secondary"
-                                    className="w-100"
-                                    onClick={() => navigate(rutaVolver)}
+                
+                {mostrarResumen && (
+                    <Card className="border-0 shadow-sm w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                        <Card.Body className="p-4">
+                            <div className="text-center mb-4">
+                                <div 
+                                    style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '50%',
+                                        backgroundColor: todasRespondidas() ? '#d1e7dd' : '#fff3cd',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        margin: '0 auto 1rem',
+                                        fontSize: '2.5rem'
+                                    }}
                                 >
-                                    Volver {esDocente ? 'a Informes' : 'a Materias'}
-                                </Button>
-                            </Col>
-                            <Col md={6} className="mb-2">
-                                <ModalExito
-                                    onEnviar={enviarRespuestas}
-                                    onExito={() => navigate(rutaVolver)}
-                                    desactivado={!todasRespondidas() || enviando}
-                                    variante="success"
-                                    textoBoton={
-                                        esDocente
-                                            ? "Enviar Informe de Cátedra"
-                                            : "Enviar Encuesta"
-                                    }
-                                    className="w-100"
-                                />
-                            </Col>
-                        </Row>
+                                    {todasRespondidas() ? <i className="fa-solid fa-check"></i> : <i className="fa-solid fa-triangle-exclamation" style={{color: "#FFD43B"}}></i>}
+                                </div>
+                                <h2 className="fw-bold mb-2" style={{ color: '#1f2937' }}>
+                                    Resumen de respuestas
+                                </h2>
+                                <p className="text-muted mb-0">
+                                    Revise sus respuestas antes de enviar
+                                </p>
+                            </div>
 
-                    </Card.Body>
-                </Card>
+                            {todasRespondidas() ? (
+                                <Alert variant="success" className="text-center">
+                                    <i className="fas fa-check-circle me-2"></i>
+                                    ¡Excelente! Has completado todas las preguntas. Puedes revisar tus respuestas o enviar el formulario.
+                                </Alert>
+                            ) : (
+                                <Alert variant="warning" className="text-center">
+                                    <i className="fas fa-exclamation-triangle me-2"></i>
+                                    Algunas preguntas están incompletas. Puedes volver atrás para completarlas.
+                                </Alert>
+                            )}
+
+                            
+                            <div className="mt-4">
+                                <h5 className="fw-bold mb-3">Progreso por sección</h5>
+                                {gruposOrganizados.map((grupo, index) => {
+                                    let completadas = 0;
+                                    let total = 0;
+
+                                    if (grupo.tipo === 'simple') {
+                                        total = grupo.preguntas.length;
+                                        completadas = grupo.preguntas.filter((p: any) => {
+                                            const resp = obtenerRespuesta(p.id);
+                                            return resp?.texto?.trim() || resp?.opcion_id;
+                                        }).length;
+                                    } else {
+                                        const instancias = respuestasMultiples[grupo.id] || [];
+
+                                        for (const instancia of instancias) {
+                                            for (const key in instancia) {
+                                                const r = instancia[key];
+                                                total++;
+                                                if (r.texto?.trim() || r.opcion_id) {
+                                                    completadas++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+                                    const porcentaje = total > 0 ? (completadas / total) * 100 : 0;
+                                    const completo = completadas === total;
+
+                                    return (
+                                        <Card key={grupo.id} className="mb-3 border" style={{ cursor: 'pointer' }} onClick={() => irAPagina(index)}>
+                                            <Card.Body className="p-3">
+                                                <Row className="align-items-center">
+                                                    <Col xs={8}>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <Badge bg={completo ? 'success' : 'warning'}>
+                                                                {completo ? <i className="fa-solid fa-check"></i> : <i className="fa-solid fa-triangle-exclamation" style={{color: "#FFD43B"}}></i>}
+                                                            </Badge>
+                                                            <div>
+                                                                <h6 className="mb-0 fw-semibold">{grupo.nombre}</h6>
+                                                                <small className="text-muted">
+                                                                    {completadas} de {total} preguntas respondidas
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs={4} className="text-end">
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                irAPagina(index);
+                                                            }}
+                                                        >
+                                                            {completo ? 'Revisar' : 'Completar'}
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                                <ProgressBar 
+                                                    now={porcentaje} 
+                                                    variant={completo ? 'success' : 'warning'}
+                                                    className="mt-2"
+                                                    style={{ height: '6px' }}
+                                                />
+                                            </Card.Body>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+
+                            
+                            <Row className="mt-4">
+                                <Col md={6} className="mb-2">
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="w-100"
+                                        onClick={retrocederPagina}
+                                    >
+                                        <i className="fa-solid fa-arrow-left"></i> Volver a editar
+                                    </Button>
+                                </Col>
+                                <Col md={6} className="mb-2">
+                                    <ModalExito
+                                        onEnviar={enviarRespuestas}
+                                        onExito={() => navigate(rutaVolver)}
+                                        desactivado={!todasRespondidas() || enviando}
+                                        variante="success"
+                                        textoBoton={
+                                            esDocente
+                                                ? "Enviar Informe de Cátedra"
+                                                : "Enviar Encuesta"
+                                        }
+                                        className="w-100"
+                                    />
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
+                )}
             </Container>
         </div>
     );

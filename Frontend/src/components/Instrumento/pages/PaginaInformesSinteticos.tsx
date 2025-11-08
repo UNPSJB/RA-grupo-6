@@ -1,5 +1,3 @@
-// PaginaInformesSinteticos.tsx
-
 import { useState, useEffect } from "react";
 import InstrumentoList from "../components/InstrumentoList";
 import type { instrumentoList } from "../types";

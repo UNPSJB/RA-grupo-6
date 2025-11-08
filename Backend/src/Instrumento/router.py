@@ -29,11 +29,10 @@ def get_instrumentos_por_tipo(
         else:
             raise HTTPException(status_code=400, detail=f"Tipo de instrumento inválido: {tipo_instrumento}")
 
-    print(">>> tipo_instrumento recibido:", tipo_instrumento)
-    print(">>> tipo_enum.value:", tipo_enum.value)
+
 
     todos = db.query(InstrumentoModel).all()
-    print(">>> Todos los instrumentos en DB:", [(i.id, i.tipo) for i in todos])
+
     # FIX: comparar contra el .value, no contra el Enum
     query = db.query(InstrumentoModel).filter(
         InstrumentoModel.tipo == tipo_enum.value

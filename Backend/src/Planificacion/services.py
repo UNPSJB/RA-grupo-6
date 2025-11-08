@@ -11,9 +11,6 @@ from src.Planificacion import schemas
 def crearPlanificacion(db:Session, planificacion: schemas.Planificacion) -> schemas.Planificacion:
     _nueva_planificacion = Planificacion(**planificacion.model_dump())
 
-
-    
-
     db.add(_nueva_planificacion)
     db.commit()
     db.refresh(_nueva_planificacion)

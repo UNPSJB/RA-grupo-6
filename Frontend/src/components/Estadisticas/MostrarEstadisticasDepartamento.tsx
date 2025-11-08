@@ -1,4 +1,4 @@
-import { Card, Col, Container, Row, Form, Button, Alert, Badge, Spinner } from "react-bootstrap";
+import { Card, Col, Container, Row, Form, Button, Alert, Badge} from "react-bootstrap";
 import { GraficoRespondidos } from "../Graficos/GraficoRespondidos";
 import { useEffect, useState } from "react";
 

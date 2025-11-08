@@ -10,6 +10,7 @@ from src.Dictados import schemas,exceptions
 
 from collections import defaultdict
 
+from src.PeriodoVinculado.models import PeriodoVinculado
 from src.Instrumento.models import TipoInstrumento, Instrumento
 from src.Carrera.models import Carrera
 
@@ -387,32 +388,3 @@ def _obtener_estudiantes_asignados(db: Session, materia: Materia, instrumento: I
         print(f"Error calculando estudiantes asignados para materia {materia.id}: {e}")
         return 0
 
-# Funciones existentes para compatibilidad
-def getInstrumentosUltDictado(db: Session):
-    from .services import getUltimoDictado
-    ultimo_dictado = getUltimoDictado(db)
-    return ultimo_dictado.instrumentos
-
-def getCantRespInstUltDic(db: Session):
-    instrumentos = getInstrumentosUltDictado(db)
-    dictado = getUltimoDictado(db)
-
-    estadisticas = {}
-    estadisticas['Respondidas_Alumno'] = 0
-    estadisticas['Asignadas_Alumno'] = 0
-    estadisticas['Respondidas_Docente'] = 0
-    estadisticas['Asignadas_Docente'] = 0
-    estadisticas['Respondidas_Departamento'] = 0
-    estadisticas['Asignadas_Departamento'] = 0
-    
-    for instrumento in instrumentos:
-        rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
-
-        match(rol_usuario_encuestado):
-            case ("estudiante"):
-                estadisticas['Respondidas_Alumno'] = estadisticas['Respondidas_Alumno'] + len(instrumento.respuestas_formulario)
-                # ... resto de la lógica existente
-            case _:
-                continue
-                
-    return estadisticas

@@ -27,19 +27,15 @@ def get_cantidad_respondidos(db:Session = Depends(get_db)):
 @router.get("/PromediosDocentes", response_model=list[dict])
 def get_promedios_docentes(db:Session = Depends(get_db)):
     return services.getPromedioDocentes(db)
+
+
 # NUEVOS ENDPOINTS PARA ESTADÍSTICAS
 @router.get("/EstadisticasDetalladas", response_model=dict)
-def get_estadisticas_detalladas(
-    departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"),
-    db: Session = Depends(get_db)
-):
+def get_estadisticas_detalladas( departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"), db: Session = Depends(get_db)): 
     return services.getEstadisticasDetalladas(db, departamento_id)
 
 @router.get("/EstadisticasPorCarrera", response_model=dict)
-def get_estadisticas_por_carrera(
-    departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"), 
-    db: Session = Depends(get_db)
-):
+def get_estadisticas_por_carrera(departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"), db: Session = Depends(get_db)):
     return services.getEstadisticasPorCarrera(db, departamento_id)
 
 @router.get("/EstadisticasPorMateria/{carrera_id}", response_model=dict)
@@ -47,8 +43,5 @@ def get_estadisticas_por_materia(carrera_id: int, db: Session = Depends(get_db))
     return services.getEstadisticasPorMateria(db, carrera_id)
 
 @router.get("/EstadisticasPorAnio", response_model=dict)
-def get_estadisticas_por_anio(
-    departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"),
-    db: Session = Depends(get_db)
-):
+def get_estadisticas_por_anio(departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"), db: Session = Depends(get_db)):
     return services.getEstadisticasPorAnio(db, departamento_id)

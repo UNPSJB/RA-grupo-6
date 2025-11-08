@@ -4,11 +4,10 @@ from pydantic import BaseModel, field_validator, ConfigDict
 from src.Roles.schemas import Rol
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 
-if TYPE_CHECKING:
-    from src.RespuestasFormulario.schemas import RespuestasFormulario
 
 class UsuarioBase(BaseModel):
     id: int
+    username: str
     nombre: str
     apellido: str
     email: str
@@ -18,12 +17,28 @@ class UsuarioBase(BaseModel):
     model_config = ConfigDict(from_attributes =  True)
 
 
-class Usuario(UsuarioBase):
+class UsuarioSchema(UsuarioBase):
     respuestas_formulario: List['RespuestasFormulario'] = None
     model_config = ConfigDict(from_attributes =  True)
 
 from src.RespuestasFormulario.schemas import RespuestasFormulario
+UsuarioSchema.model_rebuild()
 
-Usuario.model_rebuild()
 
+class AuthUsuarioSchema(BaseModel):
+    username: str
+    hashed_password: str
+    disabled: Optional[bool] = None
+    is_active: bool
+    model_config = ConfigDict(from_attributes =  True)
+    
+
+class UserCreateSchema(BaseModel):
+    username: str
+    email: str
+    nombre: str
+    apellido: str
+    legajo: int
+    password: str
+    
 

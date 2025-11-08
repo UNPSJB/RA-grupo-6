@@ -28,7 +28,7 @@ export interface RespuestasFormularios{
 
 export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : number}) {
     
-    const url_base = `http://127.0.0.1:8000/usuarios/${usuario_id}`
+    const url_base = `http://127.0.0.1:8000/api/usuarios/${usuario_id}`
     const [respuestasFormularios, setRespuestasFormularios] = useState<RespuestasFormularios[]>([])
     const [respuestaFormularioFiltrado, setRespuestaFormularioFiltrado ] = useState<RespuestasFormularios[]>([])
 

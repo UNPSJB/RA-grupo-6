@@ -33,4 +33,14 @@ class Usuario(ModeloBase):
     
     periodo_vinculado: Mapped["PeriodoVinculado"] = relationship("PeriodoVinculado", back_populates="usuario")
 
-    departamento_info: Mapped[Optional["UsuarioDepartamento"]] = relationship("UsuarioDepartamento", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
+    departamento_info: Mapped[Optional["UsuarioDepartamento"]] = relationship(
+        "UsuarioDepartamento",
+        back_populates="usuario",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    username: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    disabled: Mapped[Optional[bool]] = mapped_column(Integer, nullable=True, default=None)
+    hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Integer, nullable=False, default=1)

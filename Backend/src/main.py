@@ -7,7 +7,6 @@ from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
-from src.Materias.router import router as materias_router
 # from src.GrupoCuadro.models import GrupoCuadro
 
 
@@ -37,21 +36,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Route de Usuarios
+from src.Usuarios.router import router as usuarios_router
+app.include_router(usuarios_router)
 
-# Asociamos los routers a nuestra app
+#Route de Materias
+from src.Materias.router import router as materias_router
 app.include_router(materias_router)
-
-# Example: app.include_router(personas_router)
 
 #Router de Preguntas
 from src.Pregunta.router import router as preguntas_router
 app.include_router(preguntas_router)
+
 #Route de Respuestas
 from src.Respuesta.router import router as respuestas_router
 app.include_router(respuestas_router)
+
 #Route de Opciones 
 from src.Opciones.router import router as opciones_router
 app.include_router(opciones_router)
+
 #Router de Formularios
 from src.PlantillaFormulario.router import router as formulario_router
 app.include_router(formulario_router)
@@ -59,10 +63,6 @@ app.include_router(formulario_router)
 #Route de Rol
 from src.Roles.router import router as roles_router
 app.include_router(roles_router)
-
-#Route de Usuario
-from src.Usuarios.router import router as usuarios_router
-app.include_router(usuarios_router)
 
 #Route de Grupo de pregunta
 from src.GrupoPregunta.router import router as grupo_pregunta_router

@@ -31,6 +31,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
   const [errores, setErrores] = useState<ErrorPreguntaCerrada>({});
   const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
   const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
+  const [obligatoria, setObligatoria] = useState<boolean>(false);
 
   const crearPregunta = () => {
     const nuevosErrores: ErrorPreguntaCerrada = {};
@@ -71,6 +72,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       multiple_respuestas: multiplesRespuestas,
       grupo_cuadro_id: grupoCuadroSeleccionado,
       orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null,
+      obligatoria: obligatoria,
     };
 
     fetch("http://127.0.0.1:8000/preguntas/cerrada", {
@@ -86,6 +88,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       setMultiplesRespuestas(false);
       setGrupoCuadroSeleccionado(null);
       setOrdenEnGrupo(1);
+      setObligatoria(false);
       setErrores({});
       refrescarPreguntas();
       manejarPestaña();

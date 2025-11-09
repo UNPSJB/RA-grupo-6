@@ -24,6 +24,7 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
 
     const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
     const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
+    const [obligatoria, setObligatoria] =useState<boolean>(false);
 
     const crearPregunta = (event: React.FormEvent) => {
         const nuevosErrores: ErrorPreguntaAbierta = {};
@@ -57,7 +58,8 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
             estadistica: estadisticaSeleccionada,
             multiple_respuestas: multiplesRespuestas,
             grupo_cuadro_id: grupoCuadroSeleccionado,
-            orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null
+            orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null,
+            obligatoria: obligatoria
         };
 
         console.log("Payload que se envía:", nuevaPregunta);
@@ -74,6 +76,7 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
             setMultiplesRespuestas(false);
             setGrupoCuadroSeleccionado(null);
             setOrdenEnGrupo(1);
+            setObligatoria(false);
             setErrores({});
             refrescarPreguntas();
             manejarPestania();

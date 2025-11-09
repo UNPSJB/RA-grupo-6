@@ -12,5 +12,13 @@ class Carrera(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, index=True)
 
     departamento_id: Mapped[int] = mapped_column(ForeignKey("departamento.id"))
-    materias: Mapped[List["Materia"]] = relationship("Materia", back_populates="carrera")
-    departamento: Mapped["Departamento"] = relationship("Departamento", back_populates="carreras")
+    materias: Mapped[List["Materia"]] = relationship(
+        "Materia", 
+        back_populates="carrera",
+        lazy="noload"  
+    )
+    departamento: Mapped["Departamento"] = relationship(
+        "Departamento", 
+        back_populates="carreras",
+        lazy="noload"  
+    )

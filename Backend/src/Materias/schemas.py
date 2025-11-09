@@ -15,5 +15,6 @@ class MateriaBase(BaseModel):
     departamento: Departamento
 
 class Materia(MateriaBase):
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True,
+                    "recursive_guard": True,}
     pass

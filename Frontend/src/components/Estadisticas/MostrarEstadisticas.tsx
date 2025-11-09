@@ -1,6 +1,6 @@
-import { Card, Col, Container, Row } from "react-bootstrap";
-import { GraficoRespondidos } from "../Graficos/GraficoRespondidos";
+import { Col, Container, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
+import { CardCantRespondidos } from "./CardCantRespondidos";
 
 export interface EstadisticasDictado {
     Respondidas_Alumno: number;
@@ -36,144 +36,26 @@ export function MostrarEstadisticas(){
             <Row className="d-flex justify-content-center m-4">
 
                 <Col xs={6} className="d-flex justify-content-center">
-                    
-                    <Card className="shadow-none" style={{width: '75%'}}>
-                        <div className="d-flex justify-content-center">
-                            <GraficoRespondidos titulo='Todos' respondidos={totalesRespondidos} noRespondidos={totalesAsignadas - totalesRespondidos}/>
-                        </div>
-                        <hr />
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-success" style={{fontSize: '24px'}}>{totalesRespondidos}</span> <br /> Respondidos
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-danger" style={{fontSize: '24px'}}>{totalesAsignadas - totalesRespondidos}</span> <br />Sin responder
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold" style={{fontSize: '24px'}}>{totalesAsignadas}</span> <br /> Total
-                                    </p>
-                                </Col>
-
-                                </Row>
-                        </Card.Body>
-
-                    </Card>
+                    <CardCantRespondidos titulo={"Todos"} totalesAsignadas={totalesAsignadas}  totalesRespondidos={totalesRespondidos}/>
                 </Col>
 
                 <Col xs={6} className="d-flex justify-content-center">
-                    
-                    <Card className="shadow-none" style={{width: '75%'}}>
-                        <div className="d-flex justify-content-center">
-                            <GraficoRespondidos titulo='Estudiantes' respondidos={estadisticas? estadisticas.Respondidas_Alumno : 0} noRespondidos={(estadisticas? (estadisticas.Asignadas_Alumno - estadisticas.Respondidas_Alumno) : 0) }/>
-                        </div>
-                        <hr />
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-success" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Respondidas_Alumno : 0} </span> <br /> Respondidos
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-danger" style={{fontSize: '24px'}}> {(estadisticas? (estadisticas.Asignadas_Alumno - estadisticas.Respondidas_Alumno) : 0) }</span> <br />Sin responder
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Asignadas_Alumno : 0} </span> <br /> Total
-                                    </p>
-                                </Col>
-
-                                </Row>
-                        </Card.Body>
-
-                    </Card>
+                    <CardCantRespondidos titulo={"Estudiantes"} totalesAsignadas={estadisticas? estadisticas.Asignadas_Alumno :0}  totalesRespondidos={estadisticas? estadisticas.Respondidas_Alumno :0}/>
                 </Col>
-
-                
-
             </Row>
+
             <Row className="d-flex justify-content-center m-4">
                 <Col xs={6} className="d-flex justify-content-center">
-                    
-                    <Card className="shadow-none" style={{width: '75%'}}>
-                        <div className="d-flex justify-content-center">
-                            <GraficoRespondidos titulo='Docentes' respondidos={estadisticas? estadisticas.Respondidas_Docente : 0} noRespondidos={(estadisticas? (estadisticas.Asignadas_Docente - estadisticas.Respondidas_Docente) : 0) }/>
-                        </div>
-                        <hr />
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-success" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Respondidas_Docente : 0} </span> <br /> Respondidos
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-danger" style={{fontSize: '24px'}}> {(estadisticas? (estadisticas.Asignadas_Docente - estadisticas.Respondidas_Docente) : 0) }</span> <br />Sin responder
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Asignadas_Docente : 0} </span> <br /> Total
-                                    </p>
-                                </Col>
-
-                                </Row>
-                        </Card.Body>
-
-                    </Card>
+                    <CardCantRespondidos titulo={"Docentes"} totalesAsignadas={estadisticas? estadisticas.Asignadas_Docente :0}  totalesRespondidos={estadisticas? estadisticas.Respondidas_Docente :0}/>
                 </Col>
                 <Col xs={6} className="d-flex justify-content-center">
                     
-                    <Card className="shadow-none" style={{width: '75%'}}>
-                        <div className="d-flex justify-content-center">
-                            <GraficoRespondidos titulo='Departamentos' respondidos={estadisticas? estadisticas.Respondidas_Departamento : 0} noRespondidos={(estadisticas? (estadisticas.Asignadas_Departamento - estadisticas.Respondidas_Departamento) : 0) }/>
-                        </div>
-                        <hr />
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-success" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Respondidas_Departamento : 0} </span> <br /> Respondidos
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold text-danger" style={{fontSize: '24px'}}> {(estadisticas? (estadisticas.Asignadas_Departamento - estadisticas.Respondidas_Departamento) : 0) }</span> <br />Sin responder
-                                    </p>
-                                </Col>
-
-                                <Col>
-                                    <p className="mb-0">
-                                        <span className="fw-bold" style={{fontSize: '24px'}}> {estadisticas? estadisticas.Asignadas_Departamento : 0} </span> <br /> Total
-                                    </p>
-                                </Col>
-
-                                </Row>
-                        </Card.Body>
-
-                    </Card>
+                    <CardCantRespondidos titulo={"Departamentos"} totalesAsignadas={estadisticas? estadisticas.Asignadas_Departamento :0}  totalesRespondidos={estadisticas? estadisticas.Respondidas_Departamento :0}/>
                 </Col>
             </Row>
-
-
-
+        
         </Container>
+
 
     )
 

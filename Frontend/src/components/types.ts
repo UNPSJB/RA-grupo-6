@@ -156,6 +156,7 @@ export type PreguntaCerrada = {
   multiple_respuestas: boolean;
   grupo_cuadro_id?: number | null; 
   orden_en_grupo?: number | null;
+  obligatoria: boolean;
 };
 
 export type Formulario = {

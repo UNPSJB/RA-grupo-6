@@ -1,14 +1,3 @@
-"""from pydantic import BaseModel
-
-class CarreraBase(BaseModel):
-    id: int
-    nombre: str
-
-class Carrera(CarreraBase):
-    model_config = {"from_attributes": True}
-    pass
-
-"""
 from typing import TYPE_CHECKING, Optional
 from pydantic import BaseModel
 
@@ -19,10 +8,14 @@ class CarreraBase(BaseModel):
     id: int
     nombre: str
 
+
 class Carrera(CarreraBase):
     departamento_id: int
     departamento: Optional["Departamento"] = None
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "json_schema_mode_override": "serialization"
+    }
 
 class CarreraSimple(BaseModel):
     id: int

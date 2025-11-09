@@ -13,6 +13,7 @@ class PreguntaBase(BaseModel):
     estadistica: bool
     rol_id: int     
     multiple_respuestas: bool
+    obligatoria: bool
     grupo_cuadro_id: Optional[int] = Field(default=None)
     orden_en_grupo: Optional[int] = Field(default=None)
     pregunta_fuente_id: Optional[int] = Field(default=None)
@@ -44,6 +45,7 @@ class Pregunta(PreguntaBase):
     puede_eliminarse: bool = True
     puede_modificarse: bool = True
     grupo_pregunta: GrupoPregunta
+    obligatoria: bool
     grupo_cuadro_id: Optional[int] = None
     orden_en_grupo: Optional[int] = None
     pregunta_fuente: Optional["Pregunta"] = None

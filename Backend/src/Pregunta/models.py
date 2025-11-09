@@ -67,6 +67,8 @@ class Pregunta(ModeloBase):
     )
 
     estadistica: Mapped[bool] = mapped_column(Boolean, nullable= False)
+    obligatoria: Mapped[bool] = mapped_column(Boolean, nullable= False)
+
 
     multiple_respuestas : Mapped[bool] = mapped_column(Boolean, nullable= False)
 

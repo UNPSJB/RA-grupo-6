@@ -130,23 +130,47 @@ def enviar_recordatorios_automaticos(db: Session, dias_antes: int = 7, departame
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
+        detalles_info = [] 
+        
         for item in instrumentos_proximos:
             instrumento = item["instrumento"]
             dias_para_vencer = item["dias_para_vencer"]
             for estudiante in item["estudiantes_pendientes"]:
                 resultados["total_estudiantes"] += 1
+                
+                detalles_info.append({
+                    "estudiante": estudiante,
+                    "instrumento": instrumento,
+                    "dias_para_vencer": dias_para_vencer
+                })
+                
                 futures.append(executor.submit(
                     email_service.enviar_email,
                     estudiante.email,
                     f"Recordatorio: Encuesta pendiente - Vence en {dias_para_vencer} día(s)",
-                    f"Hola {estudiante.nombre} {estudiante.apellido},\n\n..."
+                    f"Hola {estudiante.nombre} {estudiante.apellido},\n\n"
+                    f"Te recordamos que tienes pendiente completar la encuesta:\n"
+                    f"Materia: {instrumento.materia.nombre}\n"
+                    f"Fecha de cierre: {instrumento.fecha_cierre.strftime('%d/%m/%Y')}\n"
+                    f"Días restantes: {dias_para_vencer}\n\n"
+                    f"Por favor, ingresa al sistema para completarla.\n\n"
+                    f"Saludos,\nSistema de Encuestas"
                 ))
 
-        # Esperar y procesar resultados
         for i, future in enumerate(futures):
             exito = future.result()
-            detalle = { ... }  # mismo formato que antes
-            detalle["estado"] = "enviado" if exito else "fallido"
+            info = detalles_info[i]
+            
+      
+            detalle = {
+                "estudiante": f"{info['estudiante'].nombre} {info['estudiante'].apellido}",
+                "email": info['estudiante'].email,
+                "materia": info['instrumento'].materia.nombre, 
+                "fecha_cierre": info['instrumento'].fecha_cierre.strftime('%d/%m/%Y'), 
+                "dias_restantes": info['dias_para_vencer'], 
+                "estado": "enviado" if exito else "fallido"
+            }
+            
             resultados["detalles"].append(detalle)
             if exito:
                 resultados["enviados"] += 1

@@ -1,18 +1,3 @@
-"""
-from pydantic import BaseModel
-
-from src.UsuarioDepartamento.schemas import UsuarioDepartamentoRead
-
-class DepartamentoBase(BaseModel):
-    id: int
-    nombre: str
-    usuarios_info: UsuarioDepartamentoRead
-
-class Departamento(DepartamentoBase):
-    model_config = {"from_attributes": True}
-    pass
-
-"""
 from typing import List, Optional, TYPE_CHECKING
 from pydantic import BaseModel
 
@@ -26,9 +11,12 @@ class DepartamentoBase(BaseModel):
     nombre: str
 
 class Departamento(DepartamentoBase):
-    usuarios_info: Optional[UsuarioDepartamentoRead] = None
+    usuarios_info: Optional[List[UsuarioDepartamentoRead]] = []
     carreras: List["Carrera"] = []
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "json_schema_mode_override": "serialization"
+    }
 
 class DepartamentoSimple(BaseModel):
     id: int

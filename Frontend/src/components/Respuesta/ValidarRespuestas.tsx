@@ -1,0 +1,88 @@
+import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
+
+export function validarInstanciaCompleta(instancia: InstanciaRespuestas): boolean {
+    for (const key in instancia) {
+        const r = instancia[key];
+        if (!(r.texto?.trim() || r.opcion_id)) return false;
+    }
+    return true;
+}
+
+export function validarTodasRespuestasCompletas(
+    respuestas: RespuestaTemporal[],
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
+    plantillaFormulario: any
+): boolean {
+    const simplesCompletas = respuestas.every((r) => r.texto?.trim() || r.opcion_id);
+
+    const preguntasMultiples = plantillaFormulario?.preguntas.filter((p: any) => p.multiple_respuestas) || [];
+    const gruposCuadro = new Set<number>(
+        preguntasMultiples
+            .map((p: any) => p.grupo_cuadro_id)
+            .filter((id: any): id is number => id !== null && id !== undefined)
+    );
+
+    const multiplesCompletas = (() => {
+        for (const grupoCuadroId of gruposCuadro) {
+            const instancias = respuestasMultiples[grupoCuadroId] || [];
+            if (instancias.length === 0) return false;
+
+            for (const instancia of instancias) {
+                if (!validarInstanciaCompleta(instancia)) return false;
+            }
+        }
+        return true;
+    })();
+
+    return simplesCompletas && multiplesCompletas;
+}
+
+export function calcularProgresoTotal(
+    respuestas: RespuestaTemporal[],
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+): number {
+    let totalPreguntas = 0;
+    let preguntasRespondidas = 0;
+
+    respuestas.forEach((r) => {
+        totalPreguntas++;
+        if (r.texto?.trim() || r.opcion_id) preguntasRespondidas++;
+    });
+
+    for (const grupoId in respuestasMultiples) {
+        const instancias = respuestasMultiples[grupoId];
+
+        for (const instancia of instancias) {
+            for (const key in instancia) {
+                const r = instancia[key];
+                totalPreguntas++;
+                if (r.texto?.trim() || r.opcion_id) {
+                    preguntasRespondidas++;
+                }
+            }
+        }
+    }
+
+    return totalPreguntas > 0 ? (preguntasRespondidas / totalPreguntas) * 100 : 0;
+}
+
+export function validarPaginaCompleta(
+    paginaActual: number,
+    gruposOrganizados: any[],
+    respuestas: RespuestaTemporal[],
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+): boolean {
+    if (paginaActual >= gruposOrganizados.length) return false;
+
+    const grupoActual = gruposOrganizados[paginaActual];
+
+    if (grupoActual.tipo === 'simple') {
+        return grupoActual.preguntas.every((pregunta: any) => {
+            const respuesta = respuestas.find((r) => r.pregunta_id === pregunta.id);
+            return respuesta?.texto?.trim() || respuesta?.opcion_id;
+        });
+    } else {
+        const instancias = respuestasMultiples[grupoActual.id] || [];
+        return instancias.length > 0 && instancias.every((instancia) => validarInstanciaCompleta(instancia));
+    }
+}

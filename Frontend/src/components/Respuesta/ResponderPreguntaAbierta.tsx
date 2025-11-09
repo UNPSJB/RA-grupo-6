@@ -82,8 +82,7 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
   };
 
   return (
-    <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: '0.75rem' }}>
-      <Card.Body className="p-4">
+    < div className=" mb-4" style={{ borderRadius: '0.75rem' }}>
         <div className="d-flex justify-content-between align-items-start mb-3">
           <div className="d-flex align-items-center gap-2">
             <Badge 
@@ -199,8 +198,7 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
             </Button>
           </Alert>
         )}
-      </Card.Body>
-    </Card>
+    </div>
   );
 }
 

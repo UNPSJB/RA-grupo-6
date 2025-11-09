@@ -5,13 +5,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from src.Opciones.models import Opcion
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:  
     from src.PlantillaFormulario.models import PlantillaFormulario
     from src.Respuesta.models import Respuesta
     from src.GrupoPregunta.models import GrupoPregunta
     from src.Roles.models import Rol
+    from src.GrupoCuadro.models import GrupoCuadro 
 
 class EnumTipoPregunta(str, enum.Enum):
     abierta = "abierta"
@@ -42,6 +43,12 @@ class Pregunta(ModeloBase):
 
     rol: Mapped["Rol"] = relationship("Rol", back_populates="preguntas")
 
+    grupo_cuadro_id: Mapped[Optional[int]] = mapped_column(ForeignKey("grupos_cuadro.id"), nullable=True)
+
+    grupo_cuadro: Mapped[Optional["GrupoCuadro"]] = relationship(back_populates="preguntas")
+
+    orden_en_grupo: Mapped[int] = mapped_column(Integer, nullable=True)
+
     formularios: Mapped[list["PlantillaFormulario"]] = relationship(
     "PlantillaFormulario",
     secondary="formulario_pregunta",
@@ -66,3 +73,21 @@ class Pregunta(ModeloBase):
 
 
 
+
+    multiple_respuestas : Mapped[bool] = mapped_column(Boolean, nullable= False)
+
+    pregunta_fuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("preguntas.id"), nullable=True)
+
+    pregunta_fuente: Mapped[Optional["Pregunta"]] = relationship(
+        "Pregunta",
+        remote_side=[id],
+        foreign_keys=[pregunta_fuente_id],
+        back_populates="preguntas_que_la_usan",
+        uselist=False
+    )
+
+    preguntas_que_la_usan: Mapped[list["Pregunta"]] = relationship(
+        "Pregunta",
+        back_populates="pregunta_fuente",
+        foreign_keys=[pregunta_fuente_id]
+    )

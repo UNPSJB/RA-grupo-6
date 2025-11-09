@@ -1,8 +1,14 @@
 
 from datetime import date
+from typing import TYPE_CHECKING
 from sqlalchemy import Date, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
+
+
+if TYPE_CHECKING:  
+    from src.Materias.models import Materia
+    from src.Usuarios.models import Usuario
 
 class PeriodoVinculado(ModeloBase):
 
@@ -15,6 +21,6 @@ class PeriodoVinculado(ModeloBase):
     materia_id: Mapped[int] = mapped_column(ForeignKey("materia.id"))
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
 
-    materia: Mapped["src.Materias.models.Materia"] = relationship("src.Materias.models.Materia", back_populates="periodos_vinculados")
-    usuario: Mapped["src.Usuarios.models.Usuario"] = relationship("src.Usuarios.models.Usuario", back_populates="periodo_vinculado")
+    materia: Mapped["Materia"] = relationship("Materia", back_populates="periodos_vinculados")
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="periodo_vinculado")
 

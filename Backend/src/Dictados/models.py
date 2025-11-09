@@ -11,13 +11,6 @@ if TYPE_CHECKING:
     from src.Instrumento.models import Instrumento 
 
 
-# materia_dictado = Table(
-#     'materia_dictado',
-#     ModeloBase.metadata,
-#     Column("materia_id", String, ForeignKey("materia.id"), primary_key=True),
-#     Column("dictados_id", Integer, ForeignKey("dictados.id"), primary_key=True)
-# )
-
 class MateriaDictado(ModeloBase):
     __tablename__ = "materias_dictados"
 
@@ -39,11 +32,6 @@ class Dictado(ModeloBase):
     fecha_inicio: Mapped[date] = mapped_column(Date, nullable=False)
     fecha_cierre: Mapped[date] = mapped_column(Date, nullable=False)
 
-    # materias: Mapped[list["Materia"]] = relationship(
-    #     "Materia",
-    #     secondary=materia_dictado,
-    #     back_populates="dictados"
-    # )
     materias_dictados: Mapped[Optional[List["MateriaDictado"]]] = relationship("MateriaDictado", back_populates="dictado")
     
     instrumentos: Mapped[Optional[List["Instrumento"]]] = relationship("Instrumento", back_populates="dictado")

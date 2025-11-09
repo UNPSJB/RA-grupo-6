@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import null, select, update
-from src.Instrumento.schemas import TasaRespuesta
+from sqlalchemy import select
+from src.Roles.models import Rol
 from src.PlantillaFormulario import schemas, exceptions
 from src.PlantillaFormulario.models import PlantillaFormulario
 from src.Pregunta.models import Pregunta
@@ -41,7 +41,7 @@ def getComparacionPlantillas(db:Session, rol_id:int) -> list:
             "CantPreguntas": len(plantilla.preguntas),
             "CantObligatorias": len([pregunta for pregunta in plantilla.preguntas if pregunta.obligatoria]),
             "Grupos": len(set([pregunta.grupo_pregunta.id for pregunta in plantilla.preguntas])),
-            "TasaRespuestas": getTasaRespuestasInstrumentos(db, plantilla.instrumentos),
+            "TasaRespuestas": getTasaRespuestasInstrumentos(db, plantilla.instrumentos, plantilla.rol_id),
             "Completitud": getCompletitud(db, plantilla.instrumentos),
         })
         
@@ -54,17 +54,17 @@ def getMejorPlantilla(db:Session, rol_id:int) -> schemas.PlantillaFormulario:
         return None
 
     mejorPlantilla = db_plantilla_formulario[0]
-    mejorScore = (0.55 * getTasaRespuestasInstrumentos(db, db_plantilla_formulario[0].instrumentos)) + (0.45 * getCompletitud(db, db_plantilla_formulario[0].instrumentos))
+    mejorScore = (0.55 * getTasaRespuestasInstrumentos(db, mejorPlantilla.instrumentos, rol_id)) + (0.45 * getCompletitud(db, mejorPlantilla.instrumentos))
     
     for plantilla in db_plantilla_formulario:
         
-        scorePlantilla = (0.55 * getTasaRespuestasInstrumentos(db, plantilla.instrumentos)) + (0.45 * getCompletitud(db, plantilla.instrumentos))
+        scorePlantilla = (0.55 * getTasaRespuestasInstrumentos(db, plantilla.instrumentos, rol_id)) + (0.45 * getCompletitud(db, plantilla.instrumentos))
         
         if (scorePlantilla > mejorScore):
             mejorScore = scorePlantilla
             mejorPlantilla = plantilla
             
-
+    print(mejorPlantilla)
     return mejorPlantilla
 
 
@@ -77,7 +77,7 @@ def getTasaRespuestasPlantillas(db:Session, rol_id:int) -> float:
         
         instrumentos = instrumentos + (plantilla.instrumentos)
 
-    return getTasaRespuestasInstrumentos(db, instrumentos)
+    return getTasaRespuestasInstrumentos(db, instrumentos, rol_id)
 
 
 

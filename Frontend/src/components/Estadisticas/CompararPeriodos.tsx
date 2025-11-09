@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Row, Stack, Table } from "react-bootstrap"
+import { Button, Col, Container, Row, Table } from "react-bootstrap"
 import type { PlantillaFormulario } from "../types";
 
 type EstadisticasPlantilla = {
@@ -82,13 +82,13 @@ export function CompararPlantillas(){
                         <i className="fa-solid fa-chart-simple" style={{color: "#3f9c56ff", fontSize: "2rem", marginBottom: "10px"}}></i>
                         {/* <i className="fa-solid fa-file-circle-check" ></i> */}
                         <p className="mb-0 text-muted fw-bold">Tasa promedio de respuestas</p>
-                        <p className="mb-0"> {tasaRespuestas? tasaRespuestas * 100 : 0} %</p>
+                        <p className="mb-0"> {(tasaRespuestas? tasaRespuestas * 100 : 0)? (tasaRespuestas? tasaRespuestas * 100 : 0).toFixed(2) : "-"} %</p>
                     </Col>
                 </Row>
             </div>
 
             <div className="p-3 border rounded shadow rounded-4">
-                <h3 className="m-3 pb-4 border-bottom">Metricas por plantilla</h3>
+                <h4 className="m-3 pb-4 border-bottom">Metricas por plantilla</h4>
                 <Table>
                     <thead>
                         <tr className="text-center">
@@ -96,27 +96,35 @@ export function CompararPlantillas(){
                         <th > <i className="fa-regular fa-circle-question text-muted"></i> <br /> Preguntas</th>
                         <th> <i className="fa-solid fa-circle-exclamation text-muted"></i> <br />Obligatorias</th>
                         <th> <i className="fa-solid fa-layer-group text-muted"></i> <br /> Secciones</th>
-                        {/* <th> <i className="fa-solid fa-users text-muted"></i> <br /> Tasa respuestas</th> */}
                         <th> <i className="fa-light fa-percent text-muted"> </i> <br />  Tasa respuestas</th>
                         <th> <i className="fa-regular fa-circle-check text-muted"></i> <br /> Completitud</th>
-
-                        {/* <th>Tiempo</th> */}
                         </tr>
                     </thead>
                     <tbody>
-                        {estadisticas &&  estadisticas.map((plantilla, indice) => (
+                        {estadisticas.length > 0? estadisticas.map((plantilla, indice) => (
                             <tr key={indice}>
                             <td className="text-center"> {plantilla.Titulo}</td>
                             <td className="text-center"> {plantilla.CantPreguntas}</td>
                             <td className="text-center"> {plantilla.CantObligatorias}</td>
                             <td className="text-center"> {plantilla.Grupos}</td>
-                            <td className="text-center"> {plantilla.TasaRespuestas}</td>
-                            <td className="text-center"> {plantilla.Completitud}</td>
+                            <td className="text-center"> {(plantilla.TasaRespuestas * 100)?  (plantilla.TasaRespuestas * 100).toFixed(2) : "-"}  % </td>
+                            <td className="text-center"> {(plantilla.Completitud * 100)? (plantilla.Completitud * 100).toFixed(2) : "-"} %</td>
                             </tr>
-                        ))}
+                        ))
+                        :
+                            <>
+                                <tr key={0}>
+                                <td className="text-center"> - </td>
+                                    <td className="text-center"> - </td>
+                                    <td className="text-center"> - </td>
+                                    <td className="text-center"> - </td>
+                                    <td className="text-center"> - % </td>
+                                    <td className="text-center"> - %</td>
+                                </tr>
+                            </>
+                        }
                     </tbody>
                 </Table>
-
             </div>
 
         </Container>

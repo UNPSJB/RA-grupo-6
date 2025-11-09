@@ -36,7 +36,7 @@ export function MostrarEstadisticas(){
             <Row className="d-flex justify-content-center m-4">
 
                 <Col xs={6} className="d-flex justify-content-center">
-                    <CardCantRespondidos titulo={"Todos"} totalesAsignadas={totalesRespondidos}  totalesRespondidos={totalesAsignadas}/>
+                    <CardCantRespondidos titulo={"Todos"} totalesAsignadas={totalesAsignadas}  totalesRespondidos={totalesRespondidos}/>
                 </Col>
 
                 <Col xs={6} className="d-flex justify-content-center">

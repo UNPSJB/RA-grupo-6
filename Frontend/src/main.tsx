@@ -15,18 +15,13 @@ import ResponderInstrumento from './components/Instrumento/ResponderInstrumento'
 import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
-import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
-import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
-// createRoot(document.getElementById('root')!).render(
-
-
 import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
 import {EstadisticasCatedras} from './components/Estadisticas/MostrarEstadisticasCatedras.tsx'
-import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 import { MonitoreoRecordatorios } from './components/MonitoreoRecordatorios'
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
 import Login from './context/Login.tsx';
+import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -37,8 +32,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ProtectedRoute>
               <Menu />
               <Routes>
+                <Route path='/' element={<CompararPlantillas/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
-                <Route path='/' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>

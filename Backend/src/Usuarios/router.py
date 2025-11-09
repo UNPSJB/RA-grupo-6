@@ -1,5 +1,6 @@
 # src/Usuarios/router.py
 
+from src.Usuarios.models import Usuario
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -69,7 +70,9 @@ async def register_user(user: schemas.UserCreateSchema, db: Session = Depends(ge
     """
     Registra un nuevo usuario.
     """
+    print(db.query(Usuario).all())
     db_user = services.get_user_by_username(db, username=user.username)
+    
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
 

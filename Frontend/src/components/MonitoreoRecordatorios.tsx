@@ -98,7 +98,7 @@ export function MonitoreoRecordatorios() {
                                             Ejecutando...
                                         </>
                                     ) : (
-                                        "Ejecutar Recordatorios Ahora"
+                                        "Ejecutar recordatorios ahora"
                                     )}
                                 </Button>
                             </div>

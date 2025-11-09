@@ -1,5 +1,4 @@
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, plugins, Title } from 'chart.js';
-import { Display } from 'react-bootstrap-icons';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -32,13 +31,12 @@ const data = {
                 legend: {
                     position: 'bottom' as const,
                     onClick: () => {},
-                    align: 'center' as const,
+                    align: 'start' as const,
                     labels: {
-                        padding: 20,
+                        padding: 15,
                         boxWidth: 15,
-                        boxHeight: 15
-                        // usePointStyle: true, 
-                        // pointStyle: 'circle'
+                        boxHeight: 15,
+                        textAlign: 'left' as const
                     }
                 }
             }

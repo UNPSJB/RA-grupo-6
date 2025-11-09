@@ -12,7 +12,6 @@ import { RespuestasFormulario } from './components/RespuestasFormulario/Respuest
 import Menu from './components/Menu.tsx';
 import SeleccionarMateria from './components/materias/SeleccionarMateria';
 import ResponderInstrumento from './components/Instrumento/ResponderInstrumento';
-import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
@@ -22,6 +21,7 @@ import { MonitoreoRecordatorios } from './components/MonitoreoRecordatorios'
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
 import Login from './context/Login.tsx';
+import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -32,10 +32,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ProtectedRoute>
               <Menu />
               <Routes>
+                <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
-                <Route path='/' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
-                <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
+                <Route path="/" element={<MostrarEstadisticas/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>
                 <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>
                 <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>

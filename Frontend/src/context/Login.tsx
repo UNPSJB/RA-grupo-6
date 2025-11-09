@@ -30,119 +30,153 @@ const LoginFormContent: React.FC<LoginFormContentProps> = ({
   error
 }) => {
   return (
-    <Card
-      className="shadow-lg border-0 rounded-4"
-      style={{
-        background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-        width: "520px",
-        minHeight: "320px",
-        margin: "0 auto",
-      }}
-    >
-      <Card.Body className="px-4 py-4 d-flex align-items-center justify-content-center">
-        <Row className="w-100 justify-content-center">
-          <Col xs={12} lg={10}>
-            <div className="text-center mb-4 mt-1">
-              <h2
-                className="fw-bold text-primary mb-1"
-                style={{ fontSize: "1.9rem" }}
-              >
-                Bienvenido
-              </h2>
-              <p className="text-muted mb-2" style={{ fontSize: "0.95rem" }}>
-                Inicie sesión para continuar
-              </p>
-            </div>
-
-            <Form onSubmit={handleSubmit}>
-              <Form.Floating className="mb-3">
-                <Form.Control
-                  type="text"
-                  id="floatingUsername"
-                  placeholder="Ingrese su usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="rounded-3"
-                  style={{
-                    borderColor: "#dee2e6",
-                    fontSize: "1rem",
-                    padding: "0.5rem 1rem",
-                    height: "40px",
-                    width: "100%",
-                  }}
-                />
-                <label
-                  htmlFor="floatingUsername"
-                  style={{ marginLeft: "2.5%", fontSize: "0.95rem" }}
+    <>
+      <style>{`
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+          opacity: 0.65;
+          transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+        
+        .form-floating > label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          padding: 0.65rem 0.875rem;
+          pointer-events: none;
+          border: 1px solid transparent;
+          transform-origin: 0 0;
+          transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+        }
+        
+        .form-floating > .form-control {
+          padding: 0.65rem 0.875rem;
+        }
+      `}</style>
+      
+      <Card
+        className="shadow-lg border-0 rounded-4"
+        style={{
+          background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+          width: "520px",
+          minHeight: "340px",
+          margin: "0 auto",
+        }}
+      >
+        <Card.Body className="px-5 py-4 d-flex align-items-center justify-content-center">
+          <Row className="w-100 justify-content-center">
+            <Col xs={12} lg={10}>
+              <div className="text-center mb-3">
+                <h2
+                  className="fw-bold text-primary mb-2"
+                  style={{ fontSize: "1.85rem", letterSpacing: "-0.5px" }}
                 >
-                  Usuario
-                </label>
-              </Form.Floating>
-
-              <Form.Floating className="mb-3">
-                <Form.Control
-                  type="password"
-                  id="floatingPassword"
-                  placeholder="Ingrese su contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="rounded-3"
-                  style={{
-                    borderColor: "#dee2e6",
-                    fontSize: "1rem",
-                    padding: "0.5rem 1rem",
-                    height: "40px",
-                    width: "100%",
-                  }}
-                />
-                <label
-                  htmlFor="floatingPassword"
-                  style={{ marginLeft: "2.5%", fontSize: "0.95rem" }}
-                >
-                  Contraseña
-                </label>
-              </Form.Floating>
-
-              {error && (
-                <Alert
-                  variant="danger"
-                  className="py-2 text-center rounded-3 mb-3"
-                >
-                  <small>{error}</small>
-                </Alert>
-              )}
-
-              <div className="text-end mb-3" style={{ marginRight: "4%" }}>
-                <a
-                  href="/recuperar-password"
-                  className="text-decoration-none small text-primary"
-                >
-                  ¿Olvidó su contraseña?
-                </a>
+                  Bienvenido
+                </h2>
+                <p className="text-muted mb-0" style={{ fontSize: "0.93rem" }}>
+                  Inicie sesión para continuar
+                </p>
               </div>
 
-              <div className="d-flex justify-content-center">
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="rounded-3 fw-semibold"
-                  style={{
-                    fontSize: "1.05rem",
-                    height: "40px",
-                    width: "100%",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  Ingresar
-                </Button>
+              <Form onSubmit={handleSubmit}>
+                <div style={{ marginTop: "1.75rem" }}>
+                  <Form.Floating className="mb-3">
+                  <Form.Control
+                    type="text"
+                    id="floatingUsername"
+                    placeholder="Usuario"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="rounded-3"
+                    style={{
+                      borderColor: "#dee2e6",
+                      fontSize: "0.95rem",
+                      height: "44px",
+                      transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+                    }}
+                  />
+                  <label
+                    htmlFor="floatingUsername"
+                    style={{ 
+                      fontSize: "0.95rem",
+                      color: "#6c757d",
+                    }}
+                  >
+                    Usuario
+                  </label>
+                </Form.Floating>
+
+                <Form.Floating className="mb-3">
+                  <Form.Control
+                    type="password"
+                    id="floatingPassword"
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="rounded-3"
+                    style={{
+                      borderColor: "#dee2e6",
+                      fontSize: "0.95rem",
+                      height: "44px",
+                      transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+                    }}
+                  />
+                  <label
+                    htmlFor="floatingPassword"
+                    style={{ 
+                      fontSize: "0.95rem",
+                      color: "#6c757d",
+                    }}
+                  >
+                    Contraseña
+                  </label>
+                </Form.Floating>
+
+                {error && (
+                  <Alert
+                    variant="danger"
+                    className="py-2 text-center rounded-3 mb-3"
+                  >
+                    <small>{error}</small>
+                  </Alert>
+                )}
+
+                <div className="text-end mb-3">
+                  <a
+                    href="/recuperar-password"
+                    className="text-decoration-none text-primary"
+                    style={{ fontSize: "0.88rem", fontWeight: "500" }}
+                  >
+                    ¿Olvidó su contraseña?
+                  </a>
+                </div>
+
+                <div className="d-flex justify-content-center">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="rounded-3 fw-semibold shadow-sm"
+                    style={{
+                      fontSize: "1.05rem",
+                      height: "46px",
+                      width: "100%",
+                      transition: "all 0.2s ease",
+                      letterSpacing: "0.3px",
+                    }}
+                  >
+                    Ingresar
+                  </Button>
+                </div>
               </div>
             </Form>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 
@@ -167,7 +201,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
   }
 
   if (!showModal && user) {
-    return <Navigate to="/seleccionar-rol" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -176,7 +210,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
     try {
       await login(username, password);
       if (showModal) onClose?.();
-      else navigate("/seleccionar-rol");
+      else navigate("/");
     } catch {
       setError("Usuario o contraseña incorrectos");
     }

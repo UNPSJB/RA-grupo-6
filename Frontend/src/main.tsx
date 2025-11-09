@@ -33,7 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ProtectedRoute>
               <Menu />
               <Routes>
-                <Route path='/' element={<MostrarEstadisticasDepartamento/>} ></Route>
+                <Route path='/' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>

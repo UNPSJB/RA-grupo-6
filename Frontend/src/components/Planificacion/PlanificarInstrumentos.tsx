@@ -100,9 +100,51 @@ export function PlanificarPeriodos(){
                         <Button onClick={() => setMostrar(false)} variant="link"><i className="fa-solid fa-xmark" style={{color:"grey", fontSize:"24px"}}></i></Button>
                     </Col>
                 </Row>
+                
+                <Row className="pt-3 ps-3 pe-3">
 
+                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
+                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                            <option value="0" disabled>Seleccione un rol... </option>
+                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                        </Form.Select>
+                </Row>
 
-                <Row className="d-flex gap-3">
+                <Row className="pt-3 ps-3 pe-3">
+
+                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
+                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                            <option value="0" disabled>Seleccione un rol... </option>
+                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                        </Form.Select>
+                </Row>
+
+                <Row className="pt-3 ps-3 pe-3">
+
+                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
+                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                            <option value="0" disabled>Seleccione un rol... </option>
+                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                        </Form.Select>
+                </Row>
+
+                <Row className="p-2">
+
+                    <Col>
+                        <div className="d-flex flex-column">
+                            <Form.Label className="text-muted">Fecha de inicio: </Form.Label>
+                            <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} className="border p-2 rounded-3" min={fechaHoy}/>
+                        </div>
+                    </Col>
+                    <Col>
+                        <div className="d-flex flex-column">
+                            <Form.Label className="text-muted">Fecha de cierre: </Form.Label>
+                            <input disabled={fechaInicio == ""} type="date" value={fechaCierre} onChange={(e) => setFechaCierre(e.target.value)} className="border p-2 rounded-3" min={fechaInicio}/>
+                        </div>
+                    </Col>
+                </Row>
+
+                {/* <Row className="d-flex gap-3">
                     <Col className="d-flex flex-column gap-3">
                         <div>
                             <Form.Label className="text-muted">Dirigido a</Form.Label>
@@ -134,7 +176,7 @@ export function PlanificarPeriodos(){
 
                     </Col>
 
-                </Row>
+                </Row> */}
 
 
                 <Row className="d-flex justify-content-end">
@@ -154,7 +196,11 @@ export function PlanificarPeriodos(){
 
             }
 
-            <div className="border rounded-4 p-3 ">
+            <div className="border rounded-4 p-3">
+                <h4><i className="fa-regular fa-calendar"></i> Periodos planificados</h4>
+            </div>
+
+            {/* <div className="border rounded-4 p-3 ">
 
                 <Tab.Container >
 
@@ -211,7 +257,7 @@ export function PlanificarPeriodos(){
 
                     </Tab.Content>
                 </Tab.Container>
-            </div>
+            </div> */}
                 
         </Container>
 

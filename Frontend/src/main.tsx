@@ -22,6 +22,7 @@ import { MonitoreoRecordatorios } from './components/MonitoreoRecordatorios'
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
 import Login from './context/Login.tsx';
+import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -33,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Menu />
               <Routes>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
-                <Route path='/' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
+                <Route path='/' element={<PlanificarPeriodos/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>

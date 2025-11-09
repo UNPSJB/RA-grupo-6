@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from src.Instrumento import schemas
 from src.PeriodoVinculado.models import PeriodoVinculado
 from src.Instrumento.schemas import TasaRespuesta
 from src.Instrumento.models import Instrumento
@@ -29,5 +30,4 @@ def obtenerTasaRespuestas(db: Session, instrumento_id: int) -> TasaRespuesta:
     tasa_respuestas = TasaRespuesta(no_respondieron= cant_respuestas - respondidos, respondidos= respondidos)
     
     return tasa_respuestas
-
 

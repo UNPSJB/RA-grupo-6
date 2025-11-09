@@ -16,13 +16,12 @@ import SeleccionarRol from './components/SeleccionarRol';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
 import SeleccionarInformeSintetico from './components/Instrumento/components/SeleccionarInformeSintetico.tsx';
-import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 import {EstadisticasCatedras} from './components/Estadisticas/MostrarEstadisticasCatedras.tsx'
-// createRoot(document.getElementById('root')!).render(
+import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
+import { MonitoreoRecordatorios } from './components/MonitoreoRecordatorios'
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx';
 import Login from './context/Login.tsx';
-import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -33,6 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ProtectedRoute>
               <Menu />
               <Routes>
+                <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
                 <Route path='/' element={<MostrarEstadisticasDepartamento/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/seleccionar-rol' element={<SeleccionarRol/>}></Route>

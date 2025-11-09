@@ -7,8 +7,7 @@ from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
-# from src.GrupoCuadro.models import GrupoCuadro
-
+from src.Email.tasks import iniciar_programador
 
 load_dotenv()
 
@@ -19,6 +18,7 @@ ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
 @asynccontextmanager
 async def db_creation_lifespan(app: FastAPI):
     ModeloBase.metadata.create_all(bind=engine)
+    iniciar_programador() # Iniciar el programador de recordatorios de encuestas
     yield
 
 
@@ -27,6 +27,7 @@ app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 origins = [
     "http://localhost:5173", # para recibir requests desde app React (puerto: 5173)
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,6 +44,8 @@ app.include_router(usuarios_router)
 #Route de Materias
 from src.Materias.router import router as materias_router
 app.include_router(materias_router)
+
+# Example: app.include_router(personas_router)
 
 #Router de Preguntas
 from src.Pregunta.router import router as preguntas_router
@@ -100,3 +103,5 @@ app.include_router(dictados_router)
 from src.GrupoCuadro.router import router as grupo_cuadro_router
 app.include_router(grupo_cuadro_router)
 
+from src.Email.router import router as email_router
+app.include_router(email_router)

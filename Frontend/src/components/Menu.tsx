@@ -33,6 +33,7 @@ function Menu(){
                         <Nav.Link href="/seleccionar-informe-sintetico">Responder Informe Sintetico</Nav.Link>
                         <Nav.Link href="/instrumentos-docente">Responder Informe Catedra</Nav.Link>
                         <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
+                        <Nav.Link href="/monitoreo-recordatorios">Testing de emails</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

@@ -5,7 +5,6 @@ import EliminarPregunta from "./EliminarPregunta";
 import { EnumTipoPregunta } from "../types";
 import ModificarPregunta from "./ModificarPregunta";
 
-
 const url_base = 'http://127.0.0.1:8000/preguntas/';
 
 import type { Pregunta } from "../types";
@@ -19,7 +18,6 @@ function VerPregunta() {
             .then((data) => setPreguntas(data))
             .catch(error => console.log(error));
     }, []);
-
 
     const handleDeleted = (id: string) => {
         setPreguntas(prev => prev.filter(p => p.id !== id));
@@ -41,10 +39,9 @@ function VerPregunta() {
                     <p className="text-muted">Gestiona todas las preguntas del sistema</p>
                 </div>
                 <Container className="pb-5">
-
-                    <div className="container mt-4 p-0 d-flex flex-wrap justify-content-center">
+                    <div className="container mt-4 p-0 d-flex flex-wrap justify-content-center gap-3">
                         {preguntas.map((pregunta) => (
-                            <Card style={{ width: '20rem' }} key={pregunta.id}>
+                            <Card style={{ width: '30rem' }} key={pregunta.id}>
                                 <Card.Body className="d-flex flex-column gap-3">
                                     <Card.Title className="d-flex justify-content-between align-items-center">
                                         <div className="d-flex gap-3">
@@ -52,7 +49,7 @@ function VerPregunta() {
                                                 bg="primary"
                                                 className="rounded-circle p-2 d-inline-flex justify-content-center align-items-center"
                                                 style={{ minWidth: '30px', minHeight: '30px' }}
-                                                >
+                                            >
                                                 {pregunta.id}
                                             </Badge>
 
@@ -60,12 +57,12 @@ function VerPregunta() {
                                                 bg="success"
                                                 className="rounded-5 p-2.5 d-inline-flex justify-content-center align-items-center"
                                                 style={{ minWidth: '30px', minHeight: '25px' }}
-                                                >
+                                            >
                                                 {pregunta.tipo}
                                             </Badge>
                                         </div>
 
-                                        <div className='d-flex gap-2 '>
+                                        <div className='d-flex gap-2'>
                                             {pregunta.puede_modificarse && (
                                                 <ModificarPregunta pregunta={pregunta} onEditar={handleEdited}/>
                                             )}
@@ -73,18 +70,19 @@ function VerPregunta() {
                                                 <EliminarPregunta preguntaId={pregunta.id} onDeleted={handleDeleted} />
                                             )}
                                         </div>
-
                                     </Card.Title>
 
                                     <Card.Subtitle className="d-flex">{pregunta.texto}</Card.Subtitle>
 
                                     {pregunta.tipo === EnumTipoPregunta.cerrada &&
-                                        <Card.Text className="d-flex gap-2 flex-wrap">
-                                            {pregunta.opciones.map((op) => (
-                                                <span className="border rounded-3 p-2 d-inline-flex justify-content-center align-items-center" key={op.id}>
-                                                    {op.texto}
-                                                </span>
-                                            ))}
+                                        <Card.Text>
+                                            <div className="d-flex flex-column gap-2">
+                                                {pregunta.opciones.map((op) => (
+                                                    <div className="border rounded-3 p-2" key={op.id}>
+                                                        {op.texto}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </Card.Text>
                                     }
                                 </Card.Body>
@@ -95,6 +93,6 @@ function VerPregunta() {
             </div>
         </>
     );
-};
+}
 
 export default VerPregunta;

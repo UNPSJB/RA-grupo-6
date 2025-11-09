@@ -28,5 +28,4 @@ def estado_programador():
 @router.post("/recordatorios/ejecutar-ahora")
 def ejecutar_recordatorios_manual(db: Session = Depends(get_db)):
     resultado = enviar_recordatorios_automaticos(db, dias_antes=7)
-    logger.info(f"✅ Resultado: {resultado['enviados']} enviados, {resultado['fallidos']} fallidos")
     return resultado

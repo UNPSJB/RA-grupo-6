@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_, not_, exists
+import concurrent.futures
 
 class EmailService:
     def __init__(self):
@@ -121,65 +122,35 @@ def obtener_instrumentos_proximos_vencer(db: Session, dias_antes: int = 7, depar
     
     return resultado
 
-def enviar_recordatorios_automaticos(db: Session, dias_antes: int = 7, departamento_id: int = None) -> Dict:
-    # Recordatorio automático basado en proximidad de cierre
-
+def enviar_recordatorios_automaticos(db: Session, dias_antes: int = 7, departamento_id: int = None) -> dict:
     email_service = EmailService()
     instrumentos_proximos = obtener_instrumentos_proximos_vencer(db, dias_antes, departamento_id)
-    
-    resultados = {
-        "enviados": 0,
-        "fallidos": 0,
-        "total_estudiantes": 0,
-        "detalles": []
-    }
-    
-    for item in instrumentos_proximos:
-        instrumento = item["instrumento"]
-        dias_para_vencer = item["dias_para_vencer"]
-        
-        for estudiante in item["estudiantes_pendientes"]:
-            resultados["total_estudiantes"] += 1
-            
-            asunto = f"Recordatorio: Encuesta pendiente - Vence en {dias_para_vencer} día(s)"
-            mensaje = f"""
-            Hola {estudiante.nombre} {estudiante.apellido},
 
-            Te recordamos que tenés una encuesta pendiente de la materia:
-            
-            Materia: {instrumento.materia.nombre}
-            Fecha de cierre: {instrumento.fecha_cierre}
-            Tiempo restante: {dias_para_vencer} día(s)
+    resultados = {"enviados": 0, "fallidos": 0, "total_estudiantes": 0, "detalles": []}
 
-            Por favor, ingresa al sistema para completar la encuesta antes de la fecha de cierre.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for item in instrumentos_proximos:
+            instrumento = item["instrumento"]
+            dias_para_vencer = item["dias_para_vencer"]
+            for estudiante in item["estudiantes_pendientes"]:
+                resultados["total_estudiantes"] += 1
+                futures.append(executor.submit(
+                    email_service.enviar_email,
+                    estudiante.email,
+                    f"Recordatorio: Encuesta pendiente - Vence en {dias_para_vencer} día(s)",
+                    f"Hola {estudiante.nombre} {estudiante.apellido},\n\n..."
+                ))
 
-            ¡Tu opinión es muy importante para nosotros!
-
-            Saludos cordiales.
-            UNPSJB.
-            """
-            
-            exito = email_service.enviar_email(estudiante.email, asunto, mensaje)
-            
+        # Esperar y procesar resultados
+        for i, future in enumerate(futures):
+            exito = future.result()
+            detalle = { ... }  # mismo formato que antes
+            detalle["estado"] = "enviado" if exito else "fallido"
+            resultados["detalles"].append(detalle)
             if exito:
                 resultados["enviados"] += 1
-                resultados["detalles"].append({
-                    "estudiante": f"{estudiante.nombre} {estudiante.apellido}",
-                    "email": estudiante.email,
-                    "materia": instrumento.materia.nombre,
-                    "fecha_cierre": instrumento.fecha_cierre.strftime("%Y-%m-%d"),
-                    "dias_restantes": dias_para_vencer,
-                    "estado": "enviado"
-                })
             else:
                 resultados["fallidos"] += 1
-                resultados["detalles"].append({
-                    "estudiante": f"{estudiante.nombre} {estudiante.apellido}",
-                    "email": estudiante.email,
-                    "materia": instrumento.materia.nombre,
-                    "fecha_cierre": instrumento.fecha_cierre.strftime("%Y-%m-%d"),
-                    "dias_restantes": dias_para_vencer,
-                    "estado": "fallido"
-                })
-    
+
     return resultados

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button, ListGroup, Badge, Spinner, Alert, Container } from 'react-bootstrap';
+import {capitalizarCadena} from "../Funciones";
 
 interface Materia {
     id: string;
@@ -107,14 +108,6 @@ function SeleccionarMateria() {
                                             Selecciona una materia para responder la encuesta correspondiente
                                         </p>
                                     </div>
-                                    <Button 
-                                        variant="outline-secondary" 
-                                        size="sm"
-                                        onClick={() => navigate('/seleccionar-rol')}
-                                    >
-                                        <i className="fas fa-arrow-left me-2"></i>
-                                        Cambiar Rol
-                                    </Button>
                                 </div>
                             </div>
                             
@@ -138,7 +131,7 @@ function SeleccionarMateria() {
                                             }}
                                         >
                                             <div className="flex-grow-1">
-                                                <div className="fw-bold fs-5 mb-1">{materia.nombre}</div>
+                                                <div className="fw-bold fs-5 mb-1">{capitalizarCadena(materia.nombre)}</div>
                                                 <div className="d-flex align-items-center gap-3">
                                                     <small className="text-muted">
                                                         Código: {materia.id} 
@@ -188,12 +181,6 @@ function SeleccionarMateria() {
                                     <p className="text-muted">
                                         No se encontraron encuestas pendientes para tus materias cursadas.
                                     </p>
-                                    <Button 
-                                        variant="outline-primary"
-                                        onClick={() => navigate('/seleccionar-rol')}
-                                    >
-                                        Volver a Selección de Rol
-                                    </Button>
                                 </div>
                             )}
                         </Card.Body>

@@ -1,12 +1,17 @@
+from __future__ import annotations
 from pydantic import BaseModel
 from datetime import date
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from src.RespuestasFormulario.schemas import RespuestasFormulario
 from src.PlantillaFormulario.schemas import PlantillaFormulario
 from src.Materias.schemas import Materia
 
 from .models import TipoInstrumento 
+
+if TYPE_CHECKING:
+    from src.RespuestasFormulario.schemas import RespuestasFormulario
+
 
 class InstrumentoBase(BaseModel):
     fecha_inicio: date
@@ -16,7 +21,7 @@ class InstrumentoBase(BaseModel):
     materia_id: str
     materia: Materia
     plantilla_formulario: PlantillaFormulario
-    respuestas_formulario: RespuestasFormulario
+    respuestas_formulario: List[RespuestasFormulario]
 
 class InstrumentoCreate(InstrumentoBase):
     pass 
@@ -78,4 +83,9 @@ class EstadisticaPregunta(BaseModel):
     opciones: List[EstadisticaOpcion]
 
 
- 
+class TasaRespuesta(BaseModel):
+    no_respondieron: int
+    respondidos: int
+
+InstrumentoBase.model_rebuild()
+InstrumentoDetalle.model_rebuild()

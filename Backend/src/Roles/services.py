@@ -16,3 +16,11 @@ def leer_rol(db: Session, rol_id: int) -> schemas.Rol:
         raise exceptions.RolNoEncontrado()
 
     return db_rol
+
+def create_role(db: Session, name: str, description: str = "") -> Rol:
+    """Crea un nuevo rol."""
+    db_role = Rol(name=name, description=description)
+    db.add(db_role)
+    db.commit()
+    db.refresh(db_role)
+    return db_role

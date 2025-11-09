@@ -100,8 +100,6 @@ export type DetalleEncuestaCompleto = {
   respuestas_abiertas_agrupadas: GrupoPreguntasAbiertas[];
 };
 
-
-
 // Las respuestas del administrativo
 export type RespuestaSintesis = {
   pregunta_texto: string| null;

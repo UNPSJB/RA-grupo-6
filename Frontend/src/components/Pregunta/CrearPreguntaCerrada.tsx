@@ -9,6 +9,7 @@ import ElegirGrupoPregunta from "../GrupoPregunta/GrupoPregunta";
 import type { PreguntaCerrada } from "../types";
 import ELegirRol from "../Rol/ElegirRol";
 import type { ErrorPreguntaCerrada } from "../types";
+import ElegirGrupoCuadro from "../GrupoCuadro/ElegirGrupoCuadro";
 
 type Props = {
   manejarPestaña: () => void;
@@ -22,12 +23,14 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
   const [texto, setTexto] = useState("")
   const [mostrar, setMostrar] = useState(false);
   const [TextoMostrar, setTextoMostrar] = useState("Mostrar");
-  const[opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>([])
+  const [opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<Opcion[]>([])
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(0)
   const [rolSeleccionado, setRolSeleccionado] = useState<string>("")
   const [estadisticaSeleccionada, setEstadisticaSeleccionada] = useState<boolean>(true)
-
+  const [multiplesRespuestas, setMultiplesRespuestas] = useState<boolean>(false);
   const [errores, setErrores] = useState<ErrorPreguntaCerrada>({});
+  const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
+  const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
 
   const crearPregunta = () => {
     const nuevosErrores: ErrorPreguntaCerrada = {};
@@ -65,6 +68,9 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       grupo_pregunta_id: grupoSeleccionado,
       estadistica: estadisticaSeleccionada,
       rol_id: rolSeleccionado,
+      multiple_respuestas: multiplesRespuestas,
+      grupo_cuadro_id: grupoCuadroSeleccionado,
+      orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null,
     };
 
     fetch("http://127.0.0.1:8000/preguntas/cerrada", {
@@ -77,6 +83,9 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
       setGrupoSeleccionado(0);
       setRolSeleccionado("");
       setEstadisticaSeleccionada(true);
+      setMultiplesRespuestas(false);
+      setGrupoCuadroSeleccionado(null);
+      setOrdenEnGrupo(1);
       setErrores({});
       refrescarPreguntas();
       manejarPestaña();
@@ -134,18 +143,64 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
 
       <ELegirRol selectedRol={rolSeleccionado} onChangeRol={setRolSeleccionado} error={errores.rol}></ELegirRol>
 
+
+
       <Form.Group className="mb-3 text-start mt-3" >
         <Form.Label className="fw-semibold mb-3">Estadisticas</Form.Label>
         <div className="d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm">
-          <span className="fw-semibold">Incluir en estadísticas</span>
+          <div className="d-flex flex-column" style={{fontSize:"0.9rem"}}>
+              <span className="fw-semibold">Incluir en estadísticas</span>
+              <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                Para preguntas de las que se quiera sacar estadísticas
+              </small>
+          </div>
           <Form.Check
             type="switch"
-            id="pregunta-cerrada"
+            id="switch-multiples-respuestas"
             checked={estadisticaSeleccionada}
             onChange={(e) => setEstadisticaSeleccionada(e.target.checked)}
           />
         </div>
       </Form.Group>
+
+
+
+      <Form.Group className='mb-3 text-start mt-3'>
+          <Form.Label className='fw-semibold mb-2'>Configuración</Form.Label>
+          <div className='d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm'>
+              <div className='d-flex flex-column'>
+                  <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                      Permite múltiples respuestas
+                  </span>
+                  <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                      Para cuadros con varias filas (ej: un docente por fila)
+                  </small>
+              </div>
+              <Form.Check
+                  type='switch'
+                  id='switch-multiples-respuestas'
+                  checked={multiplesRespuestas}
+                  onChange={(e) => setMultiplesRespuestas(e.target.checked)}
+              />
+          </div>
+      </Form.Group>
+
+      <ElegirGrupoCuadro seleccionarGrupo={grupoCuadroSeleccionado} cambiarGrupo={setGrupoCuadroSeleccionado}/>
+
+      {grupoCuadroSeleccionado && (
+          <Form.Group className='mb-3 text-start'>
+              <Form.Label className='fw-semibold'>Orden en el grupo</Form.Label>
+              <Form.Control
+                  type='number'
+                  min={0}
+                  value={ordenEnGrupo}
+                  onChange={(e) => setOrdenEnGrupo(parseInt(e.target.value) || 0)}
+              />
+              <Form.Text className='text-muted'>
+                  Define el orden de esta pregunta dentro del cuadro (0,1,2..)
+              </Form.Text>
+          </Form.Group>
+      )}
 
       <Form.Group className="mb-4 mt-3 text-start">
         <div className="d-flex justify-content-between align-items-center">

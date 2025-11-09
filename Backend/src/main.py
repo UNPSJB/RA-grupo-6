@@ -7,9 +7,7 @@ from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
 from fastapi.middleware.cors import CORSMiddleware
-from src.Materias.router import router as materias_router
-
-
+from src.Email.tasks import iniciar_programador
 
 load_dotenv()
 
@@ -20,6 +18,7 @@ ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
 @asynccontextmanager
 async def db_creation_lifespan(app: FastAPI):
     ModeloBase.metadata.create_all(bind=engine)
+    iniciar_programador() # Iniciar el programador de recordatorios de encuestas
     yield
 
 
@@ -29,6 +28,7 @@ origins = [
     "http://localhost:5173", # para recibir requests desde app React (puerto: 5173)
 ]
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -37,8 +37,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Route de Usuarios
+from src.Usuarios.router import router as usuarios_router
+app.include_router(usuarios_router)
 
-# Asociamos los routers a nuestra app
+#Route de Materias
+from src.Materias.router import router as materias_router
 app.include_router(materias_router)
 
 # Example: app.include_router(personas_router)
@@ -46,12 +50,15 @@ app.include_router(materias_router)
 #Router de Preguntas
 from src.Pregunta.router import router as preguntas_router
 app.include_router(preguntas_router)
+
 #Route de Respuestas
 from src.Respuesta.router import router as respuestas_router
 app.include_router(respuestas_router)
+
 #Route de Opciones 
 from src.Opciones.router import router as opciones_router
 app.include_router(opciones_router)
+
 #Router de Formularios
 from src.PlantillaFormulario.router import router as formulario_router
 app.include_router(formulario_router)
@@ -59,10 +66,6 @@ app.include_router(formulario_router)
 #Route de Rol
 from src.Roles.router import router as roles_router
 app.include_router(roles_router)
-
-#Route de Usuario
-from src.Usuarios.router import router as usuarios_router
-app.include_router(usuarios_router)
 
 #Route de Grupo de pregunta
 from src.GrupoPregunta.router import router as grupo_pregunta_router
@@ -95,3 +98,13 @@ app.include_router(usuariodepartamento_router)
 #Route de planificacion
 from src.Planificacion.router import router as planificacion_router
 app.include_router(planificacion_router)
+#Route de Dictados
+from src.Dictados.router import router as dictados_router
+app.include_router(dictados_router)
+
+#Route de GrupoCuadro
+from src.GrupoCuadro.router import router as grupo_cuadro_router
+app.include_router(grupo_cuadro_router)
+
+from src.Email.router import router as email_router
+app.include_router(email_router)

@@ -9,3 +9,5 @@ from src.Departamento.schemas import Departamento
 from src.Carrera.schemas import Carrera
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Planificacion.schemas import Planificacion
+from src.Dictados.schemas import Dictado
+from src.GrupoCuadro.schemas import GrupoCuadro

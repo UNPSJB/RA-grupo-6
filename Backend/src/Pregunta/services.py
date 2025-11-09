@@ -6,7 +6,7 @@ from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
+    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id, multiple_respuestas = pregunta.multiple_respuestas, grupo_cuadro_id = pregunta.grupo_cuadro_id, orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None)
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -25,7 +25,7 @@ def crear_pregunta_cerrada(db: Session, pregunta: schemas.PreguntaCerradaCreate)
 
 
 
-    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id)
+    _nueva = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.cerrada, grupo_pregunta_id=pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id, multiple_respuestas = pregunta.multiple_respuestas, grupo_cuadro_id = pregunta.grupo_cuadro_id,  orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None)
     _nueva.opciones = opciones_validas
     
     db.add(_nueva)
@@ -49,7 +49,10 @@ def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
                 rol_id = preg.rol_id,
                 estadistica = preg.estadistica,
                 puede_eliminarse= not en_formulario,
-                puede_modificarse= not en_formulario
+                puede_modificarse= not en_formulario,
+                multiple_respuestas= preg.multiple_respuestas,
+                grupo_cuadro_id = preg.grupo_cuadro_id,
+                orden_en_grupo= preg.orden_en_grupo
             )
         )
     return resultado

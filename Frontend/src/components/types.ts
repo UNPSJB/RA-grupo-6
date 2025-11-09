@@ -71,7 +71,7 @@ export type Usuario = {
 
 export type TypeRespuestasFormulario = {
     id: number
-    materia: Materia
+    instrumento: instrumentoList
     usuario: Usuario 
     fecha_envio: Date
     respuestas: Respuesta[]
@@ -153,6 +153,9 @@ export type PreguntaCerrada = {
   grupo_pregunta_id: number;
   rol_id: string;
   estadistica: boolean;
+  multiple_respuestas: boolean;
+  grupo_cuadro_id?: number | null; 
+  orden_en_grupo?: number | null;
 };
 
 export type Formulario = {
@@ -207,4 +210,28 @@ export type Planificacion = {
     fecha_cierre: Date
     plantilla_formulario_id: number
     plantilla_formulario: PlantillaFormulario
+}
+export type GrupoCuadro = {
+    id: number;
+    nombre: string;
+    descripcion?: string;
+    orden: number;
+};
+
+export interface InstanciaRespuestas {
+    [preguntaId: number]: RespuestaTemporal;
+}
+
+export interface RespuestaTemporal {
+    pregunta_id: number;
+    texto?: string;
+    opcion_id?: number;
+    instancia_respuesta?: number;
+}
+
+export interface GrupoPreguntas {
+    id: number;
+    nombre: string;
+    preguntas: any[];
+    tipo: 'simple' | 'multiple';
 }

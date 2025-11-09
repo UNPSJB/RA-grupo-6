@@ -39,6 +39,7 @@ type ListaInstrumentosProps = {
   onSeleccionar: (instrumento: instrumentoList) => void; 
 };
 
+
 export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: ListaInstrumentosProps) {
   const config = INSTRUMENTO_CONFIG[tipo];
 

@@ -1,3 +1,4 @@
+import type { Materia } from "../types";
 
 export type TipoInstrumento = 
   | 'ENCUESTA_ESTUDIANTE' 
@@ -80,6 +81,7 @@ export type GrupoRespuestasAbiertas = {
 
 export type DetalleInformeCatedraCompleto = {
   id: number;
+  materia: string;
   titulo_formulario: string;
   fecha_completado: string;
   estadisticas: EstadisticaPregunta[];
@@ -124,9 +126,11 @@ export type ResumenInformeAcademico = {
 export type DetalleInformeSinteticoCompleto = {
   id: number;
   titulo_formulario: string;
+  departamento: string;
   fecha_completado: string;
   autor_administrativo: string; 
   respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
+  estadisticas: EstadisticaPregunta[];
   informes_academicos_base: ResumenInformeAcademico[];
 };
 
@@ -144,5 +148,16 @@ export type GrupoRespuestasSintesis = {
     pregunta_texto: string;
     respuesta_texto: string | null;
   }[];
+};
+
+export type DetalleInformeProps = {
+  informe: instrumentoList; 
+  onVolver: () => void;
+};
+
+export type ListaInstrumentosProps = {
+  instrumentos: instrumentoList[]; 
+  tipo: TipoInstrumento;
+  onSeleccionar: (instrumento: instrumentoList) => void; 
 };
 

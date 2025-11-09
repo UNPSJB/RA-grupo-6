@@ -1,6 +1,7 @@
 from typing import List
 from pydantic import BaseModel, field_validator
 from src.PeriodoVinculado.schemas import PeriodoVinculado
+from src.Departamento.schemas import Departamento
 from src.Materias import exceptions
 
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
@@ -11,6 +12,7 @@ class MateriaBase(BaseModel):
     id: str
     nombre: str
     periodos_vinculados: List[PeriodoVinculado]
+    departamento: Departamento
 
 class Materia(MateriaBase):
     model_config = {"from_attributes": True}

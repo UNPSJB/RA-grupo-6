@@ -1,7 +1,7 @@
 from datetime import date
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
-from typing import Dict, Any 
+from typing import TYPE_CHECKING, Dict, Any 
 
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Materias.models import Materia, EnumTipoDictado
@@ -14,6 +14,14 @@ from src.PeriodoVinculado.models import PeriodoVinculado
 from src.Instrumento.models import TipoInstrumento, Instrumento
 from src.Carrera.models import Carrera
 from src.Parametros import services
+
+from src.Instrumento.services import crearInstrumentos
+
+if TYPE_CHECKING:
+    from src.Email.tasks import scheduler
+
+
+
 
 
 def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dictado:
@@ -421,7 +429,17 @@ def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
 
             db.add(materiaDictado)
             db.commit()
-
+    
+    scheduler.add_job(
+        crearInstrumentos,
+        trigger='cron',
+        month=nuevoDictado.fecha_cierre.month, 
+        day=nuevoDictado.fecha_cierre.day,   
+        hour=0,  
+        minute=0,
+        id="creacion_instr_1C",
+        args=[db, nuevoDictado]
+    )
 
     #SEGUNDO DICTADO
     dictado_seg_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (Dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE))).first() 
@@ -443,5 +461,17 @@ def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
 
             db.add(materiaDictado)
             db.commit()
-            
+
+
+    scheduler.add_job(
+        crearInstrumentos,
+        trigger='cron',
+        month=nuevoDictado.fecha_cierre.month, 
+        day=nuevoDictado.fecha_cierre.day,   
+        hour=0,  
+        minute=0,
+        id="creacion_instr_2C",
+        args=[db, nuevoDictado]
+    )
+
     return nuevoDictado

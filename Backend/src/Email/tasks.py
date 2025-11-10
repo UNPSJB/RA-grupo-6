@@ -12,6 +12,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+#Inicia el programador de tareas automáticas
+scheduler = BackgroundScheduler()
+
 def enviar_recordatorios_diarios():
     #Tarea programada que se ejecuta automáticamente cada día
     db: Session = SessionLocal()
@@ -44,24 +47,18 @@ def ActualizarFechas(db: Session):
     
     db.commit()
 
-# def PlanificarCrearInstrumento():
-#     if ():
-
-
-#     return
-
-
 def tareasAnuales():
     db: Session = SessionLocal()
     ActualizarFechas(db)
     CrearDictadosAnuales(db)
-    PlanificarCrearInstrumento(db)
 
 
 def iniciar_programador():
-    #Inicia el programador de tareas automáticas
-    scheduler = BackgroundScheduler()
-    
+
+    if scheduler.running:
+        logger.info("El scheduler esta corriendo")
+        return
+
     # add_job para que se ejecute todos los días a las 08:00
     scheduler.add_job(
         enviar_recordatorios_diarios,
@@ -78,6 +75,7 @@ def iniciar_programador():
         hour=0,  
         minute=0,
         id="tareas_anuales",
+        replace_existing=True   
     )
 
     scheduler.start()

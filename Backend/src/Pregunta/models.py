@@ -34,7 +34,8 @@ class Pregunta(ModeloBase):
         nullable=False,
         default=EnumTipoPregunta.abierta
     )
-
+    obligatoria: Mapped[bool] = mapped_column(Boolean, nullable=True)
+    
     grupo_pregunta_id: Mapped[int] = mapped_column(ForeignKey("grupos_pregunta.id"), nullable=False)
 
     grupo_pregunta: Mapped["GrupoPregunta"] = relationship(back_populates="preguntas")

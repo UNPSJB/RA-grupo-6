@@ -2,14 +2,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 from sqlalchemy import Integer, String, Date, ForeignKey, Column, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from src.models import ModeloBase
 from datetime import date
+
+
 
 if TYPE_CHECKING:
     from src.Instrumento.exceptions import Instrumento
     from src.Pregunta.models import Pregunta
     from src.Roles.models import Rol
+    from src.Parametros.models import Parametros
 
 formulario_pregunta = Table(
     "formulario_pregunta",
@@ -31,3 +33,8 @@ class PlantillaFormulario(ModeloBase):
     instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="plantilla_formulario")
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False) 
     rol: Mapped["Rol"] =relationship("Rol", back_populates="Plantillaformularios")
+
+    parametro_plantilla_est : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante", foreign_keys="Parametros.plantilla_estudiante")
+    parametro_plantilla_doc : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_docente", foreign_keys="Parametros.plantilla_docente")
+    parametro_plantilla_dep : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_departamento", foreign_keys="Parametros.plantilla_departamento")
+    

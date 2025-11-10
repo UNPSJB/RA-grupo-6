@@ -23,6 +23,7 @@ import Login from './context/Login.tsx';
 import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadisticas.tsx';
 import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
 import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
+import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Routes>
                 <Route path='/' element={<CompararPlantillas/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
+                <Route path='/' element={<PlanificarPeriodos/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas/>}></Route>

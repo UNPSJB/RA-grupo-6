@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 interface ModalExitoProps {
-  onEnviar: () => boolean | Promise<boolean>; 
-  onExito?: () => void;
-  desactivado: boolean;
-  textoBoton?: string;
-  variante?: string;
-  className?: string;
+    onEnviar: () => boolean | Promise<boolean>; 
+    onExito?: () => void;
+    desactivado: boolean;
+    textoBoton?: string;
+    variante?: string;
+    className?: string;
 }
 
 function ModalExito({ onEnviar, onExito, desactivado, textoBoton, variante, className }: ModalExitoProps) {
@@ -26,7 +26,8 @@ function ModalExito({ onEnviar, onExito, desactivado, textoBoton, variante, clas
                     if (onExito) onExito();
                 }, 1500);
             }
-        } catch {
+        
+            } catch {
             alert("Ocurrió un error al ejecutar la acción");
         } finally {
             setEnviando(false);

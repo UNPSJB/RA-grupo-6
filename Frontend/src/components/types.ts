@@ -185,6 +185,7 @@ export type ErrorPreguntaAbierta = {
 };
 
 export type PlantillaFormulario = {
+  id: number
   titulo: string;
   fecha_creacion: Date;
   preguntas: Pregunta[];
@@ -227,4 +228,39 @@ export interface GrupoPreguntas {
     nombre: string;
     preguntas: any[];
     tipo: 'simple' | 'multiple';
+}
+
+export type Parametros={
+    inicio_primer_dictado: Date
+    cierre_primer_dictado: Date
+    inicio_segundo_dictado: Date
+    cierre_segundo_dictado: Date
+
+    plantilla_estudiante: number
+    plantilla_docente: number
+    plantilla_departamento: number
+
+    disponibilidad_estudiante: number
+    disponibilidad_docente: number
+    disponibilidad_departamento: number
+  
+    obj_plantilla_estudiante: PlantillaFormulario
+    obj_plantilla_docente: PlantillaFormulario
+    obj_plantilla_departamento: PlantillaFormulario
+
+}
+
+export type ParametrosUpdate = {
+    inicio_primer_dictado: Date
+    cierre_primer_dictado: Date
+    inicio_segundo_dictado: Date
+    cierre_segundo_dictado: Date
+
+    plantilla_estudiante: number
+    plantilla_docente: number
+    plantilla_departamento: number
+
+    disponibilidad_estudiante: number
+    disponibilidad_docente: number
+    disponibilidad_departamento: number
 }

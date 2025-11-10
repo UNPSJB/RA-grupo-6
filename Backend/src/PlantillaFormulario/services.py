@@ -78,6 +78,8 @@ def getTasaRespuestasPlantillas(db:Session, rol_id:int) -> float:
         instrumentos = instrumentos + (plantilla.instrumentos)
 
     return getTasaRespuestasInstrumentos(db, instrumentos, rol_id)
+def get_plantillas_rol(db:Session, rol_id:int) -> List[schemas.PlantillaFormulario]:
+    return db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
 
 
 

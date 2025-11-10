@@ -178,8 +178,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("inicio_primer_dictado", "mes", e.target.value)}
                         >
-                            <option value="">Mes</option>
-                            {meses.map(m => (
+                            {meses.slice(0,6).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>
@@ -198,8 +197,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
                         >
-                            <option value="">Mes</option>
-                            {meses.map(m => (
+                            {meses.slice(0,6).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>
@@ -223,8 +221,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("inicio_segundo_dictado", "mes", e.target.value)}
                         >
-                            <option value="">Mes</option>
-                            {meses.map(m => (
+                            {meses.slice(6,12).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>
@@ -243,8 +240,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "mes", e.target.value)}
                         >
-                            <option value="">Mes</option>
-                            {meses.map(m => (
+                            {meses.slice(6,12).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>

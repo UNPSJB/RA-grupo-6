@@ -8,9 +8,9 @@ class ParametrosBase(BaseModel):
     inicio_segundo_dictado: date
     cierre_segundo_dictado: date
 
-    plantilla_estudiante: int
-    plantilla_docente: int
-    plantilla_departamento: int
+    plantilla_estudiante_id: int
+    plantilla_docente_id: int
+    plantilla_departamento_id: int
 
     #Dias que estara disponible el formulario
     disponibilidad_estudiante: int

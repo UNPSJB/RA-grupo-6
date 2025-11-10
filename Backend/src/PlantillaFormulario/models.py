@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from src.Instrumento.exceptions import Instrumento
     from src.Pregunta.models import Pregunta
     from src.Roles.models import Rol
+    from src.Parametros.models import Parametros
 
 formulario_pregunta = Table(
     "formulario_pregunta",
@@ -32,3 +33,8 @@ class PlantillaFormulario(ModeloBase):
     instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="plantilla_formulario")
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False) 
     rol: Mapped["Rol"] =relationship("Rol", back_populates="Plantillaformularios")
+
+    parametro_plantilla_est : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante")
+    parametro_plantilla_doc : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_docente")
+    parametro_plantilla_dep : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_departamento")
+    

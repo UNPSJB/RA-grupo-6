@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react"
-import {Button, Card, Col, Container, Form, Nav, Row, Tab} from "react-bootstrap"
-import type { Planificacion, PlantillaFormulario, Rol} from "../types"
+import {Button, Col, Container, Form, Row} from "react-bootstrap"
+import type { Parametros, PlantillaFormulario, Rol} from "../types"
 
 export function PlanificarPeriodos(){
 
-    const [mostrar, setMostrar] = useState(false)
     const [roles, setRoles] = useState<Rol[]>()
     const [fechaInicio, setFechaInicio] = useState<string>("");
     const [fechaCierre, setFechaCierre] = useState<string>("");
     const fechaHoy = new Date().toISOString().split("T")[0];
     const [plantillas, setPlantillas] = useState<PlantillaFormulario[]>()
-    const [plantillaSeleccionada, setPlantillaSeleccionada] = useState("")
+
     const [rolSeleccionado, setRolSeleccionado] = useState<string>("0")
 
     const url_roles = "http://127.0.0.1:8000/roles/"
@@ -32,233 +31,146 @@ export function PlanificarPeriodos(){
         }
 
     }, [rolSeleccionado]);
-    
-    const urlPlanificaciones = (`http://127.0.0.1:8000/Planificaciones/get_proximos_periodos`)
-    const [proximosPeriodos, setProximosPeriodos] = useState<Planificacion[]>([])
-    
+
+
+    const urlParametros = (`http://127.0.0.1:8000/Parametros/`)
+    const [parametros, setParametros] = useState<Parametros>()
+    const [modificacionesParametros, setModificacionesParametros] = useState<Parametros>()
     useEffect(() => {
 
-        fetch(urlPlanificaciones)
+        fetch(urlParametros)
         .then(response => response.json())
-        .then((data) => setProximosPeriodos(data))
+        .then((data) => {setParametros(data); setModificacionesParametros(data)})
         .catch(error => console.log(error));
 
-    }, [urlPlanificaciones]);
-
-
-    function crearPlanificacion(){
-
-        const nuevaPlanificacion = {
-            fecha_inicio: fechaInicio,
-            fecha_cierre: fechaCierre,
-            plantilla_formulario_id: Number(plantillaSeleccionada)
-        }
-
-        fetch("http://127.0.0.1:8000/Planificaciones/",{
-            method: "POST",
-            headers:{ "Content-Type": "application/json" },
-            body: JSON.stringify(nuevaPlanificacion),
-        }).then(() =>{
-            setFechaInicio("");
-            setFechaCierre("");
-            setRolSeleccionado("0");
-            setPlantillaSeleccionada("");
-        });
-    }
-
-    function diasEntreFechas(fecha1: Date, fecha2:Date){
-        
-        var msFecha1 = fecha1.getTime()
-        var msFecha2 = fecha2.getTime()
-
-        return Math.round(((msFecha2 - msFecha1) / (1000 * 60 * 60 * 24)))
-    }
-
+    }, []);
 
     return(
-        <Container className="d-flex flex-column gap-4"> 
-            <Row className="border rounded-4 p-3 shadow mt-3">
-                <Col xs={10}>
-                    <h3>Planificación de periodos</h3>
-                </Col>
-                {!mostrar &&
-                <Col className="d-flex justify-content-end" xs={2} >
-                    <Button onClick={() => setMostrar(true)} > <i className="fa-solid fa-plus"></i> {mostrar?  " Cancelar": " Nuevo periodo" }  </Button>
-                </Col>
-                }
+        <Container className="d-flex flex-column gap-5 pb-5"> 
+            <Row>
+                <h2>Parametrización de los dictados</h2>
+                <p>Configure los dictados para su asignación automatica</p>
             </Row>
-            
-            {mostrar &&
-
-            <div className="d-flex flex-column gap-3 border rounded-4 p-4 ">
-
-                <Row >
-                    <Col xs={11}>
-                        <h4>Crear un nuevo periodo</h4>
-                    </Col>
-                    <Col xs={1} className="d-flex justify-content-end ">
-                        <Button onClick={() => setMostrar(false)} variant="link"><i className="fa-solid fa-xmark" style={{color:"grey", fontSize:"24px"}}></i></Button>
-                    </Col>
-                </Row>
                 
-                <Row className="pt-3 ps-3 pe-3">
-
-                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
-                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
-                            <option value="0" disabled>Seleccione un rol... </option>
-                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
-                        </Form.Select>
-                </Row>
-
-                <Row className="pt-3 ps-3 pe-3">
-
-                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
-                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
-                            <option value="0" disabled>Seleccione un rol... </option>
-                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
-                        </Form.Select>
-                </Row>
-
-                <Row className="pt-3 ps-3 pe-3">
-
-                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
-                        <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
-                            <option value="0" disabled>Seleccione un rol... </option>
-                            {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
-                        </Form.Select>
-                </Row>
-
-                <Row className="p-2">
-
+            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+                    <h4 className="mb-4">Primer Dictado</h4>
                     <Col>
                         <div className="d-flex flex-column">
                             <Form.Label className="text-muted">Fecha de inicio: </Form.Label>
-                            <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} className="border p-2 rounded-3" min={fechaHoy}/>
+                            <input type="date" value={String(modificacionesParametros?.inicio_primer_dictado)} onChange={(e) => setFechaInicio(e.target.value)} className="border p-2 rounded-3" min={fechaHoy}/>
                         </div>
                     </Col>
                     <Col>
                         <div className="d-flex flex-column">
                             <Form.Label className="text-muted">Fecha de cierre: </Form.Label>
-                            <input disabled={fechaInicio == ""} type="date" value={fechaCierre} onChange={(e) => setFechaCierre(e.target.value)} className="border p-2 rounded-3" min={fechaInicio}/>
+                            <input type="date" value={String(modificacionesParametros?.cierre_primer_dictado)} onChange={(e) => setFechaCierre(e.target.value)} className="border p-2 rounded-3" min={fechaInicio}/>
                         </div>
                     </Col>
-                </Row>
+            </Row>
 
-                {/* <Row className="d-flex gap-3">
-                    <Col className="d-flex flex-column gap-3">
-                        <div>
-                            <Form.Label className="text-muted">Dirigido a</Form.Label>
-                            <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
-                                <option value="0" disabled>Seleccione un rol... </option>
-                                {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
-                            </Form.Select>
-                        </div>
-
+            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+                    <h4 className="mb-4">Segundo Dictado</h4>
+                    <Col>
                         <div className="d-flex flex-column">
                             <Form.Label className="text-muted">Fecha de inicio: </Form.Label>
-                            <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} className="border p-2 rounded-3" min={fechaHoy}/>
-                        </div>
-                    </Col>
+                            <input type="date" value={String(modificacionesParametros?.inicio_segundo_dictado)} onChange={(e) => setFechaInicio(e.target.value)} className="border p-2 rounded-3" min={fechaHoy}/>
 
-                    <Col className="d-flex flex-column gap-3">
-                        <div>
-                            <Form.Label className="text-muted">Plantilla: </Form.Label>
-                            <Form.Select disabled={rolSeleccionado== "0"} value={plantillaSeleccionada} onChange={(e) => setPlantillaSeleccionada(e.target.value)}>
-                                <option disabled value={""}>Seleccione una plantilla... </option>
-                                {plantillas?.map(plantilla =>  <option value={plantilla.id}>{plantilla.titulo} </option>)}
-                            </Form.Select>
-                        </div>
-                        
-                        <div className="d-flex flex-column">
-                            <Form.Label className="text-muted">Fecha de cierre: </Form.Label>
-                            <input disabled={fechaInicio == ""} type="date" value={fechaCierre} onChange={(e) => setFechaCierre(e.target.value)} className="border p-2 rounded-3" min={fechaInicio}/>
-                        </div>
-
-                    </Col>
-
-                </Row> */}
-
-
-                <Row className="d-flex justify-content-end">
-                    <Col className="d-flex justify-content-end gap-4" >
-                        <Button variant="outline-secondary" onClick={() => setMostrar(false)}>
-                            Cancelar
-                        </Button>
-
-                        <Button variant="success">
-                            <i className="fa-regular fa-floppy-disk"></i> <span style={{fontWeight:600}} onClick={() => crearPlanificacion()}> Guardar </span>
-                        </Button>
-                    </Col>
-
-                </Row>
-
-            </div>
-
-            }
-
-            <div className="border rounded-4 p-3">
-                <h4><i className="fa-regular fa-calendar"></i> Periodos planificados</h4>
-            </div>
-
-            {/* <div className="border rounded-4 p-3 ">
-
-                <Tab.Container >
-
-                    <Row className="d-flex justify-content-between border-bottom align-items-center ">
-                        <Col xs="auto">
-                            <h4><i className="fa-regular fa-calendar"></i> Periodos planificados</h4>
-                        </Col>
-                        <Col xs="auto">
-                            <Nav variant="tabs" >
-                                <Nav.Item>
-                                    <Nav.Link> Todos </Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link> Estudiante </Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link> Docente </Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link> Departamento </Nav.Link>
-                                </Nav.Item>
-                            </Nav>
-                        </Col>
-                    </Row>
-
-                    <Tab.Content className="p-3" >
-                        <Tab.Pane eventKey={0} >  </Tab.Pane>
-                        <Tab.Pane eventKey={1} > Estudiante </Tab.Pane>
-                        <Tab.Pane eventKey={2} > Docente </Tab.Pane>
-                        <Tab.Pane eventKey={3} > Departamento </Tab.Pane>
-
-                        <div className="d-flex">
-
-                        {proximosPeriodos? proximosPeriodos.map((proximoPeriodo) => 
                             
-                            <Card className="shadow-sm ">
-
-                                <p>{proximoPeriodo.plantilla_formulario.titulo}</p>
-                                <p><span className="fw-bold" style={{color:"#141212ff"}}>Inicio:</span> {String(proximoPeriodo.fecha_inicio)}</p>
-                                <p><span className="fw-bold" style={{color:"#141212ff"}}>Cierre:</span> {String(proximoPeriodo.fecha_cierre)}</p>
-                                <p className="fw-bold mb-0" style={{color:"#1969ffff"}}> Comienza en {diasEntreFechas(new Date(proximoPeriodo.fecha_inicio), new Date())} dias</p>
-                            </Card>
-                                
-                        )
-                        :
-                            <div className="text-center">    
-                                <i style={{opacity: 0.5 }} className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p className="text-muted">No hay periodos planificados</p>
-                                <p className="text-muted">Los periodos planificados aparecerán acá</p>
-                            </div>
-
-                        }
                         </div>
+                    </Col>
+                    <Col>
+                        <div className="d-flex flex-column">
+                            <Form.Label className="text-muted">Fecha de cierre: </Form.Label>
+                            <input disabled={fechaInicio == ""} type="date" value={String(modificacionesParametros?.cierre_segundo_dictado)} onChange={(e) => setFechaCierre(e.target.value)} className="border p-2 rounded-3" min={fechaInicio}/>
+                        </div>
+                    </Col>
+            </Row>
 
-                    </Tab.Content>
-                </Tab.Container>
-            </div> */}
-                
+            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+                <h4 className="mb-4">Plantillas</h4>
+                <Col>
+                    <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
+                    <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                        <option value="0" disabled>Seleccione una plantilla.. </option>
+                        {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                    </Form.Select>
+                    
+                </Col>
+                <Col>
+                    <Form.Label className="text-muted"> Plantilla del docente</Form.Label>
+                    <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                        <option value="0" disabled>Seleccione una plantilla.. </option>
+                        {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                    </Form.Select>
+                </Col>
+                <Col>
+                    <Form.Label className="text-muted"> Plantilla del departamento</Form.Label>
+                    <Form.Select onChange={(e) => setRolSeleccionado(e.target.value)} value={rolSeleccionado}>
+                        <option value="0" disabled>Seleccione una plantilla... </option>
+                        {roles?.map(rol =>  <option value={String(rol.id)} >{rol.nombre} </option>)}
+                    </Form.Select>
+                </Col>
+            </Row>
+
+            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+                <h4 className="mb-4"> Disponibilidad de Formularios</h4>
+                <Col className="d-flex justify-content-center flex-column">
+                        <Form.Label>Estudiante</Form.Label>
+                        <Form.Control type="number" name="estudiante" value={modificacionesParametros?.disponibilidad_estudiante} min={0} placeholder="Cantidad de dias"
+                            onChange={(e) => {
+                                const value = Number(e.target.value);
+                                if (value <= 30) {
+                                    setModificacionesParametros({
+                                        ...modificacionesParametros!,
+                                        disponibilidad_estudiante: value,
+                                    });
+                                }
+                            }}
+                        />
+                </Col>
+
+                    <Col className="d-flex justify-content-center flex-column">
+                        <Form.Label>Docente</Form.Label>
+                        <Form.Control type="number" name="docente" value={modificacionesParametros?.disponibilidad_docente ?? ""} min={0} max={30} placeholder="Cantidad de dias"
+                        
+                            onChange={(e) => {
+                                const value = Number(e.target.value);
+                                if (value <= 30) {
+                                    setModificacionesParametros({
+                                        ...modificacionesParametros!,
+                                        disponibilidad_docente: value,
+                                    });
+                                }
+                            }}
+                        />
+                    </Col>
+
+                    <Col className="d-flex justify-content-center flex-column">
+                        <Form.Label>Departamento</Form.Label>
+                        <Form.Control type="number" name="departamento" value={modificacionesParametros?.disponibilidad_departamento ?? ""} min={0} max={30} placeholder="Cantidad de dias"
+                            onChange={(e) => {
+                                const value = Number(e.target.value);
+                                if (value <= 30) {
+                                    setModificacionesParametros({
+                                        ...modificacionesParametros!,
+                                        disponibilidad_departamento: value,
+                                    });
+                                }
+                            }}
+                        />
+
+                    </Col>
+            </Row>
+
+            <Row className="d-flex align-items-center justify-content-center">
+                <Col xs={3}>
+                    <Button  variant="success"><i className="fa-solid fa-floppy-disk"></i> Guardar configuración </Button>
+                </Col>
+                <Col xs={1}>
+                    <Button  variant="outline-secondary" onClick={() => setModificacionesParametros(parametros)}> Limpiar</Button>
+                </Col>
+            </Row>
+
         </Container>
 
     )

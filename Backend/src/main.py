@@ -19,6 +19,7 @@ ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
 async def db_creation_lifespan(app: FastAPI):
     ModeloBase.metadata.create_all(bind=engine)
     iniciar_programador() # Iniciar el programador de recordatorios de encuestas
+    
     yield
 
 

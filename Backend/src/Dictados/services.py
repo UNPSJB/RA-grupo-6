@@ -13,6 +13,7 @@ from collections import defaultdict
 from src.PeriodoVinculado.models import PeriodoVinculado
 from src.Instrumento.models import TipoInstrumento, Instrumento
 from src.Carrera.models import Carrera
+from src.Parametros import services
 
 
 def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dictado:
@@ -391,6 +392,8 @@ def _obtener_estudiantes_asignados(db: Session, materia: Materia, instrumento: I
 
 
 def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
+    parametros = services.getParametros(db)
+
     #Definicion de fechas de referencia
     ANIO_DICTADO_NUEVO = date.today().year
     INICIO_PRIMER_CUATRIMESTRE = date(ANIO_DICTADO_NUEVO, 3, 1)
@@ -403,16 +406,8 @@ def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
     dictado_prim_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_PRIMER_CUATRIMESTRE) & (Dictado.fecha_cierre <= INICIO_SEGUNDO_CUATRIMESTRE))).first() 
 
     if (dictado_prim_cuatri is None):
-        dictado_ant_prim_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= date(ANIO_DICTADO_NUEVO - 1, 3, 1)) & (Dictado.fecha_cierre <= date(ANIO_DICTADO_NUEVO - 1, 7, 1)))).first() 
-
         materias = db.scalars(select(Materia).where(Materia.dictado == EnumTipoDictado.PRIMER_CUATRIMESTRE)).all()  
-
-        if(dictado_ant_prim_cuatri is None):
-            nuevoDictado = Dictado(fecha_inicio=INICIO_PRIMER_CUATRIMESTRE, fecha_cierre=INICIO_SEGUNDO_CUATRIMESTRE)
-        else:
-            fecha_inicio = date(ANIO_DICTADO_NUEVO,dictado_ant_prim_cuatri.fecha_inicio.month, dictado_ant_prim_cuatri.fecha_inicio.day)
-            fecha_cierre = date(ANIO_DICTADO_NUEVO,dictado_ant_prim_cuatri.fecha_cierre.month, dictado_ant_prim_cuatri.fecha_cierre.day)
-            nuevoDictado = Dictado(fecha_inicio=fecha_inicio, fecha_cierre=fecha_cierre)
+        nuevoDictado = Dictado(fecha_inicio=parametros.inicio_primer_dictado, fecha_cierre=parametros.cierre_primer_dictado)
         
         db.add(nuevoDictado)
         db.commit()
@@ -432,17 +427,10 @@ def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
     dictado_seg_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (Dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE))).first() 
 
     if (dictado_seg_cuatri is None):
-        dictado_ant_seg_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= date(ANIO_DICTADO_NUEVO - 1, 7, 1)) & (Dictado.fecha_cierre <= date(ANIO_DICTADO_NUEVO - 1, 12, 31)))).first() 
-
         materias = db.scalars(select(Materia).where(Materia.dictado == EnumTipoDictado.SEGUNDO_CUATRIMESTRE)).all()  
 
-        if(dictado_ant_seg_cuatri is None):
-            nuevoDictado = Dictado(fecha_inicio=INICIO_SEGUNDO_CUATRIMESTRE, fecha_cierre=FIN_SEGUNDO_CUATRIMESTRE)
-        else:
-            fecha_inicio = date(ANIO_DICTADO_NUEVO,dictado_seg_cuatri.fecha_inicio.month, dictado_seg_cuatri.fecha_inicio.day)
-            fecha_cierre = date(ANIO_DICTADO_NUEVO,dictado_seg_cuatri.fecha_cierre.month, dictado_seg_cuatri.fecha_cierre.day)
-            nuevoDictado = Dictado(fecha_inicio=fecha_inicio, fecha_cierre=fecha_cierre)
-        
+        nuevoDictado = Dictado(fecha_inicio=parametros.inicio_segundo_dictado, fecha_cierre=parametros.cierre_segundo_dictado)
+    
         db.add(nuevoDictado)
         db.commit()
         db.refresh(nuevoDictado)

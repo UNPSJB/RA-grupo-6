@@ -204,13 +204,6 @@ export type Instrumento = {
 
 }
 
-
-export type Planificacion = {
-    fecha_inicio: Date
-    fecha_cierre: Date
-    plantilla_formulario_id: number
-    plantilla_formulario: PlantillaFormulario
-}
 export type GrupoCuadro = {
     id: number;
     nombre: string;
@@ -234,4 +227,20 @@ export interface GrupoPreguntas {
     nombre: string;
     preguntas: any[];
     tipo: 'simple' | 'multiple';
+}
+
+export type Parametros={
+    inicio_primer_dictado: Date
+    cierre_primer_dictado: Date
+    inicio_segundo_dictado: Date
+    cierre_segundo_dictado: Date
+
+    plantilla_estudiante: number
+    plantilla_docente: number
+    plantilla_departamento: number
+
+    disponibilidad_estudiante: number
+    disponibilidad_docente: number
+    disponibilidad_departamento: number
+  
 }

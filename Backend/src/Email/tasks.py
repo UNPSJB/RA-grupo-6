@@ -1,8 +1,12 @@
+from datetime import date, datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
+from src.Parametros.router import getParametros
+from src.Dictados.services import CrearDictadosAnuales
 from src.database import SessionLocal
 from .services import enviar_recordatorios_automaticos
+from apscheduler.triggers.date import DateTrigger
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +26,38 @@ def enviar_recordatorios_diarios():
     finally:
         db.close()
 
+
+def ActualizarFechas(db: Session):
+    parametros = getParametros(db)
+
+    inicio = parametros.inicio_primer_dictado 
+    parametros.inicio_primer_dictado = date(date.today().year, inicio.month, inicio.day)
+
+    inicio = parametros.inicio_segundo_dictado 
+    parametros.inicio_segundo_dictado = date(date.today().year, inicio.month, inicio.day)
+
+    cierre = parametros.cierre_primer_dictado 
+    parametros.cierre_primer_dictado = date(date.today().year, cierre.month, cierre.day)
+    
+    cierre = parametros.cierre_segundo_dictado 
+    parametros.cierre_segundo_dictado = date(date.today().year, cierre.month, cierre.day)
+    
+    db.commit()
+
+# def PlanificarCrearInstrumento():
+#     if ():
+
+
+#     return
+
+
+def tareasAnuales():
+    db: Session = SessionLocal()
+    ActualizarFechas(db)
+    CrearDictadosAnuales(db)
+    PlanificarCrearInstrumento(db)
+
+
 def iniciar_programador():
     #Inicia el programador de tareas automáticas
     scheduler = BackgroundScheduler()
@@ -32,6 +68,16 @@ def iniciar_programador():
         trigger=CronTrigger(hour=8, minute=0),
         id='recordatorios_diarios',
         replace_existing=True
+    )
+
+    scheduler.add_job(
+        tareasAnuales,
+        trigger='cron',
+        month=1, 
+        day=1,   
+        hour=0,  
+        minute=0,
+        id="tareas_anuales",
     )
 
     scheduler.start()

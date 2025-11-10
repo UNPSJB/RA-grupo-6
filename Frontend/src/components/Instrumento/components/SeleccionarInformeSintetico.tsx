@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Container, ListGroup, Button, Spinner, Alert, Badge, Card } from "react-bootstrap";
 import { capitalizarCadena } from "../../Funciones";
 
-
 interface InstrumentoDepartamento {
     id: number;
     tipo: 'INFORME_SINTETICO';
@@ -21,38 +20,6 @@ interface InstrumentoDepartamento {
     materia_id: string;
 }
 
-// Usuario para DepartamentoAlumnos (Lucy)
-const USUARIO_DEPARTAMENTO_ALUMNOS = {
-    id: 3,
-    nombre: "Lucy",
-    apellido: "Marticoneta", 
-    rol: 'departamento_alumnos'
-};
-
-// Mock data temporal
-const mockInformesSinteticosPendientes: InstrumentoDepartamento[] = [ // Revisar InformeSinteticoList
-    {
-        id: 201,
-        tipo: 'INFORME_SINTETICO',
-        fecha_inicio: '2024-01-01',
-        fecha_cierre: '2025-10-20',
-        materia: { id: 'FIS1', nombre: 'Física I' },
-        plantilla_formulario: { id: 3, titulo: 'Informe de Sintetico - Física I - 2024' },
-        plantilla_formulario_id: 3,
-        materia_id: 'FIS1'
-    },
-    {
-        id: 202,
-        tipo: 'INFORME_SINTETICO',
-        fecha_inicio: '2024-01-01', 
-        fecha_cierre: '2025-10-20',
-        materia: { id: 'MAT1', nombre: 'Matemática I' },
-        plantilla_formulario: { id: 4, titulo: 'Informe de Sintetico - Matemática I - 2024' },
-        plantilla_formulario_id: 4,
-        materia_id: 'MAT1'
-    }
-];
-
 export default function SeleccionarInformeSintetico() {
     const [informes, setInformes] = useState<InstrumentoDepartamento[]>([]);
     const [loading, setLoading] = useState(true);
@@ -69,10 +36,14 @@ export default function SeleccionarInformeSintetico() {
             setLoading(true);
             setError(null);
 
-            // TODO: Borrar el mock y descomentar el fetch
-            /*
+           
+            const usuarioActual = JSON.parse(localStorage.getItem('usuario_actual') || '{}');
+            const usuarioId = usuarioActual.id || 3; 
+
+            console.log('Cargando informes sintéticos para usuario:', usuarioId);
+           
             const response = await fetch(
-                `http://127.0.0.1:8000/instrumentos/INFORME_SINTETICO?usuario_id=${USUARIO_DEPARTAMENTO_ALUMNOS.id}&mostrar_respondidos=false`
+                `http://127.0.0.1:8000/instrumentos/INFORME_SINTETICO?usuario_id=${usuarioId}&mostrar_respondidos=false`
             );
             
             if (!response.ok) {
@@ -82,16 +53,18 @@ export default function SeleccionarInformeSintetico() {
             
             const data = await response.json();
             
-            setInformes(data);
-            */
-
-            await new Promise(resolve => setTimeout(resolve, 800));
-            setInformes(mockInformesSinteticosPendientes);
+            console.log('Informes sintéticos recibidos:', data);
+            
+            setInformes(Array.isArray(data) ? data : []);
+            
+            if (!Array.isArray(data) || data.length === 0) {
+                setMensaje('No se encontraron informes sintéticos pendientes.');
+            }
             
         } catch (err: any) {
             setError(err.message);
             console.error("Error cargando informes sintéticos:", err);
-            setMensaje("Error al cargar los informes sinteticos");
+            setMensaje("Error al cargar los informes sintéticos");
         } finally {
             setLoading(false);
         }
@@ -100,7 +73,7 @@ export default function SeleccionarInformeSintetico() {
     const handleSeleccionarInforme = (informe: InstrumentoDepartamento) => {
         console.log('Informe sintético seleccionado:', informe);
         
-        // Navegar a responder-instrumento
+        
         navigate(`/responder-instrumento/${informe.id}`, {
             state: {
                 materiaNombre: informe.materia.nombre,
@@ -111,9 +84,9 @@ export default function SeleccionarInformeSintetico() {
     };
 
     const estaActivo = (instrumento: InstrumentoDepartamento) => {
-        const hoy = new Date('2025-10-20')
-        return new Date(instrumento.fecha_inicio) <= new Date(hoy) && 
-               new Date(instrumento.fecha_cierre) >= new Date(hoy);
+        const hoy = new Date();
+        return new Date(instrumento.fecha_inicio) <= hoy && 
+               new Date(instrumento.fecha_cierre) >= hoy;
     };
 
     if (loading) {
@@ -233,9 +206,9 @@ export default function SeleccionarInformeSintetico() {
                             ) : (
                                 <div className="text-center py-5">
                                     <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay informes sinteticos pendientes</h5>
+                                    <h5 className="text-muted mb-3">No hay informes sintéticos pendientes</h5>
                                     <p className="text-muted">
-                                        No se encontraron informes sinteticos pendientes para completar.
+                                        No se encontraron informes sintéticos pendientes para completar.
                                     </p>
                                 </div>
                             )}

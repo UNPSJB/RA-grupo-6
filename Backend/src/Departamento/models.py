@@ -26,6 +26,5 @@ class Departamento(ModeloBase):
     )
     usuarios_info: Mapped[List["UsuarioDepartamento"]] = relationship(
         "UsuarioDepartamento",
-        back_populates="departamento",
-        lazy="noload"  
+        back_populates="departamento"
     )

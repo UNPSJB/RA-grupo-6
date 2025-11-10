@@ -36,7 +36,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Routes>
                 <Route path='/' element={<CompararPlantillas/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
-                <Route path='/' element={<PlanificarPeriodos/>} ></Route>
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas/>}></Route>
@@ -53,6 +52,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos/>}></Route>
                 <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>
                 <Route path='/VerInformeActividadCurricular' element={<PaginaInformesCatedra/>}></Route>
+                <Route path='/PlanificarPeriodos' element={<PlanificarPeriodos/>}></Route>
               </Routes>
             </ProtectedRoute>
           }

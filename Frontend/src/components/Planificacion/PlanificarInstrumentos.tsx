@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import type { Parametros, PlantillaFormulario} from "../types";
+import ModalExito from "../ModalEnvio";
 
 export function PlanificarPeriodos() {
 
@@ -118,20 +119,31 @@ export function PlanificarPeriodos() {
 
 
 
-    function actualizarParametros(parametros : Parametros){
-
-        if(parametros.inicio_primer_dictado && parametros.cierre_primer_dictado && parametros.inicio_segundo_dictado &&
-        parametros.cierre_segundo_dictado && parametros.plantilla_estudiante && parametros.plantilla_docente &&
-        parametros.plantilla_departamento && parametros.disponibilidad_estudiante && parametros.disponibilidad_docente && parametros.disponibilidad_departamento
-        ){
-            fetch("http://localhost:8000/Parametros/actualizar/", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(parametros),
-            })
-        }
+    function actualizarParametros(parametros : Parametros): Promise<boolean>{
+        return new Promise((resolve) => {
+            if(parametros.inicio_primer_dictado && parametros.cierre_primer_dictado && parametros.inicio_segundo_dictado &&
+            parametros.cierre_segundo_dictado && parametros.plantilla_estudiante && parametros.plantilla_docente &&
+            parametros.plantilla_departamento && parametros.disponibilidad_estudiante && parametros.disponibilidad_docente && parametros.disponibilidad_departamento
+            ){
+                fetch("http://localhost:8000/Parametros/actualizar/", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(parametros),
+                })
+                .then(res => {
+                    if(res.ok) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                })
+                .catch(() => resolve(false));
+            } else {
+                resolve(false);
+            }
+        });
     }
 
     const meses = [
@@ -157,7 +169,7 @@ export function PlanificarPeriodos() {
             </Row>
 
 
-            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+            <Row className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
                 <h4 className="mb-4">Primer Dictado</h4>
                 <Col>
                     <Form.Label className="text-muted">Fecha de inicio:</Form.Label>
@@ -202,7 +214,7 @@ export function PlanificarPeriodos() {
             </Row>
 
             {/* Segundo dictado */}
-            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+            <Row className="p-2" style={{ borderLeft: "3px solid #198754" }}>
                 <h4 className="mb-4">Segundo Dictado</h4>
                 <Col>
                     <Form.Label className="text-muted">Fecha de inicio:</Form.Label>
@@ -246,7 +258,7 @@ export function PlanificarPeriodos() {
                 </Col>
             </Row>
 
-            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+            <Row className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
                 <h4 className="mb-4">Plantillas</h4>
                     <Col >
                         <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
@@ -318,7 +330,7 @@ export function PlanificarPeriodos() {
                     </Col>
             </Row>
 
-            <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
+            <Row className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
                 <h4 className="mb-4">Disponibilidad de Formularios</h4>
                 {["estudiante", "docente", "departamento"].map((tipo) => {
                     const key = `disponibilidad_${tipo}` as keyof Parametros;
@@ -348,9 +360,14 @@ export function PlanificarPeriodos() {
 
             <Row className="d-flex align-items-center justify-content-center">
                 <Col xs={3}>
-                    <Button variant="success" onClick={() => modificacionesParametros? actualizarParametros(modificacionesParametros) : null}>
-                        <i className="fa-solid fa-floppy-disk"></i> Guardar configuración
-                    </Button>
+                    <ModalExito 
+                        onEnviar={() => modificacionesParametros ? actualizarParametros(modificacionesParametros) : Promise.resolve(false)}
+                        onExito={() => setParametros(modificacionesParametros)}
+                        desactivado={!modificacionesParametros}
+                        textoBoton="Guardar configuración"
+                        variante="success"
+                        className=""
+                    />
                 </Col>
                 <Col xs={1}>
                     <Button variant="outline-secondary" onClick={() => setModificacionesParametros(parametros)}>

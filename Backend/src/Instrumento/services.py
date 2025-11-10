@@ -48,7 +48,7 @@ def crearInstrumentos(db:Session, dictado: Dictado) -> bool:
     for materia in dictado.materias_dictados:
 
         nuevoInstrumentoAlumno = Instrumento( 
-            plantilla_formulario_id= parametros.plantilla_estudiante, 
+            plantilla_formulario= parametros.plantilla_estudiante, 
             fecha_inicio= dictado.fecha_cierre, 
             fecha_cierre= dictado.fecha_cierre + timedelta(parametros.disponibilidad_estudiante),
             tipo = TipoInstrumento.ENCUESTA_ESTUDIANTE,

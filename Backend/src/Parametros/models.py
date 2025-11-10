@@ -26,6 +26,6 @@ class Parametros(ModeloBase):
     disponibilidad_departamento: Mapped[int] = mapped_column(Integer, nullable=False)
 
     #Relaciones
-    obj_plantilla_estudiante: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_est")
-    obj_plantilla_docente: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_doc")
-    obj_plantilla_departamento: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_dep")
+    obj_plantilla_estudiante: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_est", foreign_keys=[plantilla_estudiante])
+    obj_plantilla_docente: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_doc", foreign_keys=[plantilla_docente])
+    obj_plantilla_departamento: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_dep", foreign_keys=[plantilla_departamento])

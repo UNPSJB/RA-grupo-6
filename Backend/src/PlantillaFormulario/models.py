@@ -34,7 +34,7 @@ class PlantillaFormulario(ModeloBase):
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False) 
     rol: Mapped["Rol"] =relationship("Rol", back_populates="Plantillaformularios")
 
-    parametro_plantilla_est : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante")
-    parametro_plantilla_doc : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_docente")
-    parametro_plantilla_dep : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_departamento")
+    parametro_plantilla_est : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante", foreign_keys="Parametros.plantilla_estudiante")
+    parametro_plantilla_doc : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_docente", foreign_keys="Parametros.plantilla_docente")
+    parametro_plantilla_dep : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_departamento", foreign_keys="Parametros.plantilla_departamento")
     

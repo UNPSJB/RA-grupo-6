@@ -1,38 +1,41 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import type { Parametros, PlantillaFormulario, Rol } from "../types";
+import type { Parametros, PlantillaFormulario} from "../types";
 
 export function PlanificarPeriodos() {
-    const [roles, setRoles] = useState<Rol[]>();
-    const [plantillas, setPlantillas] = useState<PlantillaFormulario[]>();
-    const [rolSeleccionado, setRolSeleccionado] = useState<string>("0");
 
     const [parametros, setParametros] = useState<Parametros>();
     const [modificacionesParametros, setModificacionesParametros] = useState<Parametros>();
 
-    const url_roles = "http://127.0.0.1:8000/roles/";
-    const urlParametros = "http://127.0.0.1:8000/Parametros/";
-
-
+    const [plantillasEstudiante, setPlantillasEstudiante] = useState<PlantillaFormulario[]>([])
     useEffect(() => {
-        fetch(url_roles)
+        fetch(`http://127.0.0.1:8000/formularios/rol/${1}`)
             .then(res => res.json())
-            .then(setRoles)
+            .then((data) =>  setPlantillasEstudiante(data))
+            .catch(console.log);
+    }, []);
+
+    
+    const [plantillasDocente, setPlantillasDocente] = useState<PlantillaFormulario[]>([])
+    useEffect(() => {
+        fetch(`http://127.0.0.1:8000/formularios/rol/${2}`)
+            .then(res => res.json())
+            .then((data) =>  setPlantillasDocente(data))
+            .catch(console.log);
+    }, []);
+
+    
+    const [plantillasDepartamento, setPlantillasDepartamento] = useState<PlantillaFormulario[]>([])
+    useEffect(() => {
+        fetch(`http://127.0.0.1:8000/formularios/rol/${3}`)
+            .then(res => res.json())
+            .then((data) =>  setPlantillasDepartamento(data))
             .catch(console.log);
     }, []);
 
 
     useEffect(() => {
-        if (rolSeleccionado !== "0") {
-            fetch(`http://127.0.0.1:8000/formularios/rol/${rolSeleccionado}`)
-                .then(res => res.json())
-                .then(setPlantillas)
-                .catch(console.log);
-        }
-    }, [rolSeleccionado]);
-
-    useEffect(() => {
-        fetch(urlParametros)
+        fetch("http://127.0.0.1:8000/Parametros/")
             .then(res => res.json())
             .then((data) => {
                 setParametros(data);
@@ -52,7 +55,6 @@ export function PlanificarPeriodos() {
         if ([4, 6, 9, 11].includes(mesNum)) return 30;
         return 31;
     };
-
 
     const formatearFecha = (fecha: any): string => {
         if (!fecha) return "";
@@ -113,6 +115,24 @@ export function PlanificarPeriodos() {
         }
         return opciones;
     };
+
+
+
+    function actualizarParametros(parametros : Parametros){
+
+        if(parametros.inicio_primer_dictado && parametros.cierre_primer_dictado && parametros.inicio_segundo_dictado &&
+        parametros.cierre_segundo_dictado && parametros.plantilla_estudiante && parametros.plantilla_docente &&
+        parametros.plantilla_departamento && parametros.disponibilidad_estudiante && parametros.disponibilidad_docente && parametros.disponibilidad_departamento
+        ){
+            fetch("http://localhost:8000/Parametros/actualizar/", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(parametros),
+            })
+        }
+    }
 
     const meses = [
         { valor: "01", nombre: "Enero" },
@@ -228,20 +248,75 @@ export function PlanificarPeriodos() {
 
             <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
                 <h4 className="mb-4">Plantillas</h4>
-                {["Estudiante", "Docente", "Departamento"].map((tipo) => (
-                    <Col key={tipo}>
-                        <Form.Label className="text-muted"> Plantilla del {tipo}</Form.Label>
+                    <Col >
+                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
                         <Form.Select
-                            onChange={(e) => setRolSeleccionado(e.target.value)}
-                            value={rolSeleccionado}
+                            value={modificacionesParametros?.obj_plantilla_estudiante.titulo}
+                                onChange={(e) => {
+                                    const selectedId = Number(e.target.value);
+                                    const selectedPlantilla = plantillasEstudiante?.find(p => p.id === selectedId);
+
+                                    if (!selectedPlantilla) return;
+
+                                    setModificacionesParametros(prev => ({
+                                    ...prev!,
+                                    plantilla_estudiante: selectedPlantilla.id,
+                                    obj_plantilla_estudiante: selectedPlantilla
+                                    }));
+                                }}
                         >
                             <option value="0" disabled>Seleccione una plantilla.. </option>
-                            {roles?.map((rol) => (
-                                <option key={rol.id} value={String(rol.id)}>{rol.nombre}</option>
+                            {plantillasEstudiante?.map((plantilla) => (
+                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
                             ))}
                         </Form.Select>
                     </Col>
-                ))}
+
+                    <Col >
+                        <Form.Label className="text-muted"> Plantilla del docente</Form.Label>
+                        <Form.Select
+                            value={modificacionesParametros?.obj_plantilla_docente.titulo}
+
+                            onChange={(e) => {
+                                const selectedId = Number(e.target.value);
+                                const selectedPlantilla = plantillasDocente?.find(p => p.id === selectedId);
+
+                                if (!selectedPlantilla) return;
+
+                                setModificacionesParametros(prev => ({
+                                ...prev!,
+                                plantilla_docente: selectedPlantilla.id,
+                                obj_plantilla_docente: selectedPlantilla
+                                }));
+                            }}>
+                            <option value="0" disabled>Seleccione una plantilla.. </option>
+                            {plantillasDocente?.map((plantilla) => (
+                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
+                            ))}
+                        </Form.Select>
+                    </Col>
+
+                    <Col >
+                        <Form.Label className="text-muted"> Plantilla del departamento</Form.Label>
+                        <Form.Select value={modificacionesParametros?.obj_plantilla_departamento.titulo}   
+                        onChange={(e) => {
+                            const selectedId = Number(e.target.value);
+                            const selectedPlantilla = plantillasDepartamento?.find(p => p.id === selectedId);
+
+                            if (!selectedPlantilla) return;
+
+                            setModificacionesParametros(prev => ({
+                            ...prev!,
+                            plantilla_departamento: selectedPlantilla.id,
+                            obj_plantilla_departamento: selectedPlantilla
+                            }));
+                        }}>
+                            <option value="0" disabled>Seleccione una plantilla.. </option>
+                            {plantillasDepartamento?.map((plantilla) => (
+                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
+                            ))}
+                        </Form.Select>
+                    </Col>
             </Row>
 
             <Row className="p-2" style={{ borderLeft: "3px solid blue" }}>
@@ -256,7 +331,7 @@ export function PlanificarPeriodos() {
                                 min={0}
                                 max={30}
                                 placeholder="Cantidad de dias"
-                                value={modificacionesParametros?.[key] ?? ""}
+                                value={String(modificacionesParametros?.[key] ?? "")}
                                 onChange={(e) => {
                                     const value = Number(e.target.value);
                                     if (value <= 30) {
@@ -274,7 +349,7 @@ export function PlanificarPeriodos() {
 
             <Row className="d-flex align-items-center justify-content-center">
                 <Col xs={3}>
-                    <Button variant="success">
+                    <Button variant="success" onClick={() => modificacionesParametros? actualizarParametros(modificacionesParametros) : null}>
                         <i className="fa-solid fa-floppy-disk"></i> Guardar configuración
                     </Button>
                 </Col>

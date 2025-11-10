@@ -251,19 +251,19 @@ export function PlanificarPeriodos() {
                     <Col >
                         <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
                         <Form.Select
-                            value={modificacionesParametros?.obj_plantilla_estudiante.titulo}
-                                onChange={(e) => {
-                                    const selectedId = Number(e.target.value);
-                                    const selectedPlantilla = plantillasEstudiante?.find(p => p.id === selectedId);
+                            value={modificacionesParametros?.plantilla_estudiante}
+                            onChange={(e) => {
+                                const selectedId = Number(e.target.value);
+                                const plantillaSeleccionada = plantillasEstudiante?.find(p => p.id === selectedId);
 
-                                    if (!selectedPlantilla) return;
-
-                                    setModificacionesParametros(prev => ({
-                                    ...prev!,
-                                    plantilla_estudiante: selectedPlantilla.id,
-                                    obj_plantilla_estudiante: selectedPlantilla
-                                    }));
-                                }}
+                                if (plantillaSeleccionada) {
+                                setModificacionesParametros({
+                                    ...modificacionesParametros!,
+                                    plantilla_estudiante: plantillaSeleccionada.id,
+                                    obj_plantilla_estudiante: plantillaSeleccionada
+                                });
+                                }
+                            }}
                         >
                             <option value="0" disabled>Seleccione una plantilla.. </option>
                             {plantillasEstudiante?.map((plantilla) => (
@@ -275,19 +275,18 @@ export function PlanificarPeriodos() {
                     <Col >
                         <Form.Label className="text-muted"> Plantilla del docente</Form.Label>
                         <Form.Select
-                            value={modificacionesParametros?.obj_plantilla_docente.titulo}
-
+                            value={modificacionesParametros?.plantilla_docente}
                             onChange={(e) => {
                                 const selectedId = Number(e.target.value);
-                                const selectedPlantilla = plantillasDocente?.find(p => p.id === selectedId);
+                                const plantillaSeleccionada = plantillasDocente?.find(p => p.id === selectedId);
 
-                                if (!selectedPlantilla) return;
-
-                                setModificacionesParametros(prev => ({
-                                ...prev!,
-                                plantilla_docente: selectedPlantilla.id,
-                                obj_plantilla_docente: selectedPlantilla
-                                }));
+                                if (plantillaSeleccionada) {
+                                setModificacionesParametros({
+                                    ...modificacionesParametros!,
+                                    plantilla_docente: plantillaSeleccionada.id,
+                                    obj_plantilla_docente: plantillaSeleccionada
+                                });
+                                }
                             }}>
                             <option value="0" disabled>Seleccione una plantilla.. </option>
                             {plantillasDocente?.map((plantilla) => (
@@ -298,18 +297,18 @@ export function PlanificarPeriodos() {
 
                     <Col >
                         <Form.Label className="text-muted"> Plantilla del departamento</Form.Label>
-                        <Form.Select value={modificacionesParametros?.obj_plantilla_departamento.titulo}   
+                        <Form.Select value={modificacionesParametros?.plantilla_departamento}   
                         onChange={(e) => {
                             const selectedId = Number(e.target.value);
-                            const selectedPlantilla = plantillasDepartamento?.find(p => p.id === selectedId);
+                            const plantillaSeleccionada = plantillasDepartamento?.find(p => p.id === selectedId);
 
-                            if (!selectedPlantilla) return;
-
-                            setModificacionesParametros(prev => ({
-                            ...prev!,
-                            plantilla_departamento: selectedPlantilla.id,
-                            obj_plantilla_departamento: selectedPlantilla
-                            }));
+                            if (plantillaSeleccionada) {
+                            setModificacionesParametros({
+                                ...modificacionesParametros!,
+                                plantilla_departamento: plantillaSeleccionada.id,
+                                obj_plantilla_departamento: plantillaSeleccionada
+                            });
+                            }
                         }}>
                             <option value="0" disabled>Seleccione una plantilla.. </option>
                             {plantillasDepartamento?.map((plantilla) => (

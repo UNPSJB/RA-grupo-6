@@ -20,7 +20,16 @@ type Props = {
     onEliminar: (grupoCuadroId: number, instanciaIndex: number) => void;
 };
 
-function PreguntaMultiple({pregunta,index,instancia,instanciaIndex,grupoCuadroId,totalInstancias,onActualizar,onEliminar,}: Props) {
+function PreguntaMultiple({
+    pregunta,
+    index,
+    instancia,
+    instanciaIndex,
+    grupoCuadroId,
+    totalInstancias,
+    onActualizar,
+    onEliminar,
+}: Props) {
     
     const respuesta = instancia[pregunta.id];
     
@@ -56,11 +65,19 @@ function PreguntaMultiple({pregunta,index,instancia,instanciaIndex,grupoCuadroId
                     >
                         {index + 1}
                     </Badge>
-                    <div>
+                    <div className="flex-grow-1">
                         <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
-                        <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
-                            {pregunta.tipo}
-                        </Badge>
+                        <div className="d-flex gap-2 align-items-center">
+                            <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
+                                {pregunta.tipo}
+                            </Badge>
+                            {pregunta.pregunta_fuente_id && (
+                                <Badge bg="warning" text="dark">
+                                    <i className="fas fa-link me-1"></i>
+                                    Autocompletada
+                                </Badge>
+                            )}
+                        </div>
                     </div>
                 </div>
 

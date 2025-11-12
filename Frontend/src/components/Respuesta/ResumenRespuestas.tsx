@@ -179,18 +179,12 @@ function ResumenRespuestas({
                     );
                 })}
             </div>
-
-            {/* Botones de acción */}
             <Row className="mt-4 pt-3 border-top">
                 <Col md={6} className="mb-2">
                     <Button
                         variant="outline-secondary"
                         className="w-100"
                         onClick={onRetroceder}
-                        style={{
-                            padding: '0.75rem',
-                            fontWeight: '500',
-                        }}
                     >
                         <i className="fa-solid fa-arrow-left me-2"></i>
                         Volver a editar

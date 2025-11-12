@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from src.RespuestasFormulario.models import RespuestasFormulario 
     from src.Materias.models import Materia
     from src.Dictados.models import Dictado
-
+    from src.Departamento.models import Departamento
 
 class TipoInstrumento(str, enum.Enum):
     def __new__(cls, value, display_name):
@@ -37,6 +37,8 @@ class Instrumento(ModeloBase):
     plantilla_formulario_id: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
     dictado_id: Mapped[int] = mapped_column(ForeignKey("dictados.id"))
+    departamento_id: Mapped[Optional[int]] = mapped_column(ForeignKey("departamento.id"), nullable=True)
+    
 
     instrumento_fuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("instrumento.id"), nullable=True)
 
@@ -45,6 +47,7 @@ class Instrumento(ModeloBase):
     materia: Mapped["Materia"] = relationship(back_populates="instrumentos")
     respuestas_formulario: Mapped[List["RespuestasFormulario"]] = relationship(back_populates="instrumento")
     dictado: Mapped["Dictado"] = relationship("Dictado", back_populates="instrumentos")
+    departamento: Mapped[Optional["Departamento"]] = relationship("Departamento", back_populates="instrumentos")
 
 
     instrumento_fuente: Mapped[Optional["Instrumento"]] = relationship(

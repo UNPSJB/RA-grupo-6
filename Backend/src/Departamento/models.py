@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from src.Materias.models import Materia
     from src.Carrera.models import Carrera
     from src.UsuarioDepartamento.models import UsuarioDepartamento
+    from src.Instrumento.models import Instrumento
     
 class Departamento(ModeloBase):
     __tablename__ = "departamento"
@@ -27,4 +28,10 @@ class Departamento(ModeloBase):
     usuarios_info: Mapped[List["UsuarioDepartamento"]] = relationship(
         "UsuarioDepartamento",
         back_populates="departamento"
+    )
+
+    instrumentos: Mapped[List["Instrumento"]] = relationship(
+        "Instrumento",
+        back_populates="departamento",
+        lazy="noload"
     )

@@ -31,7 +31,7 @@ function InstrumentosDocente() {
             try {
                 console.log('Cargando informes de cátedra...');
                 
-                const url = `http://127.0.0.1:8000/instrumentos/INFORME_CATEDRA?usuario_id=${2}&mostrar_respondidos=false`;
+                const url = `http://127.0.0.1:8000/instrumentos/INFORME_CATEDRA?usuario_id=${5}&mostrar_respondidos=false`;
                 console.log('URL:', url);
                 
                 const response = await fetch(url);

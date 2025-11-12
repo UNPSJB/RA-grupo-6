@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Spinner, Tabs, Tab } from 'react-bootstrap';
 import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas } from '../types';
+import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
@@ -17,6 +18,7 @@ export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth(); 
 
     const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<any>(null);
     const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
@@ -29,22 +31,24 @@ export default function ResponderInstrumento() {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);
-    const [usuarioActual, setUsuarioActual] = useState<any>(null);
 
     const [paginaActual, setPaginaActual] = useState(0);
     const [mostrarResumen, setMostrarResumen] = useState(false);
 
-    useEffect(() => {
-        const usuario = localStorage.getItem('usuario_actual');
-        if (usuario) setUsuarioActual(JSON.parse(usuario));
-    }, []);
-
     const locationState = location.state || {};
-    const rolActual = locationState.rol || localStorage.getItem('rol_actual');
-    const esDocente = rolActual === 'docente';
-    const esAlumno = rolActual === 'alumno';
+    const rolActual = locationState.rol || user?.rol?.nombre || localStorage.getItem('rol_actual');
+    const esDocente = rolActual === 'docente' || user?.rol?.nombre === 'docente';
+    const esAlumno = rolActual === 'alumno' || user?.rol?.nombre === 'alumno';
     const materiaNombre = locationState.materiaNombre || '';
     const rutaVolver = esDocente ? '/instrumentos-docente' : esAlumno ? '/materias' : '/';
+
+
+    useEffect(() => {
+        
+        if (!user) {
+            console.warn('⚠️ No hay usuario autenticado');
+        }
+    }, [user, navigate]);
 
     useEffect(() => {
         if (instrumentoIdParam) cargarInstrumento(parseInt(instrumentoIdParam));
@@ -129,16 +133,33 @@ export default function ResponderInstrumento() {
     };
 
     const enviarRespuestas = async (): Promise<boolean> => {
-        if (!instrumentoSeleccionado || !usuarioActual) return false;
+        
+        if (!instrumentoSeleccionado) {
+            alert('Error: No hay instrumento seleccionado');
+            return false;
+        }
+        
+        if (!user) {
+            alert('Error: Debe iniciar sesión para enviar el formulario');
+            navigate('/login');
+            return false;
+        }
+        
         setEnviando(true);
+        
         try {
             const exito = await enviarFormularioCompleto(
                 instrumentoSeleccionado,
-                usuarioActual,
+                user,
                 respuestas,
                 respuestasMultiples
             );
+            console.log('Resultado del envío:', exito);
             return exito;
+        } catch (error) {
+            console.error('❌ Error en enviarRespuestas:', error);
+            alert('Error al enviar: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+            return false;
         } finally {
             setEnviando(false);
         }

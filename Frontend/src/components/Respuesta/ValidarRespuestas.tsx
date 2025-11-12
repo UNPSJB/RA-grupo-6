@@ -77,7 +77,7 @@ export function validarPaginaCompleta(
     const grupoActual = gruposOrganizados[paginaActual];
 
     if (grupoActual.tipo === 'simple') {
-        return grupoActual.preguntas.every((pregunta: any) => {
+        return grupoActual.preguntas.filter((pregunta : any) => pregunta.obligatoria).every((pregunta: any) => {
             const respuesta = respuestas.find((r) => r.pregunta_id === pregunta.id);
             return respuesta?.texto?.trim() || respuesta?.opcion_id;
         });

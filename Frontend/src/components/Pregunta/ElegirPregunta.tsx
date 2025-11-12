@@ -43,7 +43,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
   };
   
   const eliminarPregunta = (id: string) => {
-    setPreguntasSeleccionadas(preguntasSeleccionadas.filter(p => p.id !== id));
+    setPreguntasSeleccionadas(preguntasSeleccionadas.filter(p => String(p.id) !== id));
   };
 
 
@@ -107,7 +107,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
                     </div>
 
                     <Button
-                      onClick={() => eliminarPregunta(pregunta.id)}
+                      onClick={() => eliminarPregunta(String(pregunta.id))}
                       className="bg-transparent border-0 p-0"
                     >
                       <i

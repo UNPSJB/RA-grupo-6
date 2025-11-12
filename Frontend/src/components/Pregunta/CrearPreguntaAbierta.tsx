@@ -22,6 +22,8 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
     const [errores, setErrores] = useState<ErrorPreguntaAbierta>({});
     const [multiplesRespuestas, setMultiplesRespuestas] = useState<boolean>(false);
 
+
+
     const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
     const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
     const [obligatoria, setObligatoria] =useState<boolean>(false);
@@ -48,7 +50,7 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         setErrores(nuevosErrores);
 
         if (erroresTotales > 0) return;
-         
+
         
         const nuevaPregunta = {
             texto: texto,
@@ -123,6 +125,8 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
 
                 <Form.Group className='mb-3 text-start mt-3'>
                     <Form.Label className='fw-semibold mb-2'>Configuración</Form.Label>
+                    <div className='d-flex flex-column gap-2'>
+
                     <div className='d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm'>
                         <div className='d-flex flex-column'>
                             <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
@@ -138,7 +142,29 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
                             checked={multiplesRespuestas}
                             onChange={(e) => setMultiplesRespuestas(e.target.checked)}
                         />
+
+
                     </div>
+
+                    <div className='d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm'>
+                        <div className='d-flex flex-column'>
+                            <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                                Respuesta obligatoria
+                            </span>
+                            <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                                La respuesta será requerida antes de continuar
+                            </small>
+                        </div>
+                                            
+                        <Form.Check
+                            type='switch'
+                            id='switch-pregunta-obligatoria'
+                            checked={obligatoria}
+                            onChange={(e) => setObligatoria(e.target.checked)}
+                        />
+                    </div>
+                    </div>
+
                 </Form.Group>
 
                 <ElegirGrupoCuadro seleccionarGrupo={grupoCuadroSeleccionado} cambiarGrupo={setGrupoCuadroSeleccionado}/>

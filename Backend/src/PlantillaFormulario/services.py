@@ -64,7 +64,6 @@ def getMejorPlantilla(db:Session, rol_id:int) -> schemas.PlantillaFormulario:
             mejorScore = scorePlantilla
             mejorPlantilla = plantilla
             
-    print(mejorPlantilla)
     return mejorPlantilla
 
 

@@ -28,7 +28,7 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
                     {index + 1}
                 </Badge>
                 <div className="flex-grow-1">
-                    <h5 className="fw-semibold mb-1">{pregunta.texto}</h5>
+                    <h5 className="fw-semibold mb-1">{pregunta.texto} {pregunta.obligatoria && (<span style={{ color: "red" }}>*</span>)} </h5>
                     <div className="d-flex gap-2 align-items-center">
                         <Badge bg={pregunta.tipo === EnumTipoPregunta.abierta ? 'success' : 'info'}>
                             {pregunta.tipo}

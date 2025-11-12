@@ -20,6 +20,9 @@ class EnumTipoDictado(str, enum.Enum):
     SEGUNDO_CUATRIMESTRE = "segundo_cuatrimestre"
     ANUAL = "anual"
 
+class EnumTipoCiclo(str, enum.Enum):
+    CICLO_BASICO = "Ciclo_Basico"
+    CICLO_SUPERIOR = "Ciclo_Superior"
 
 class Materia(ModeloBase):
     __tablename__ = "materia"
@@ -28,7 +31,8 @@ class Materia(ModeloBase):
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, index=True)
     dictado: Mapped[EnumTipoDictado] = mapped_column(Enum(EnumTipoDictado, native_enum=False), nullable=False)
-    
+    ciclo: Mapped[EnumTipoCiclo] = mapped_column(Enum(EnumTipoCiclo, native_enum= False), nullable=False)
+
     #Foraneas
     departamento_id: Mapped[int] = mapped_column(ForeignKey("departamento.id"))
     carrera_id: Mapped[int] = mapped_column(ForeignKey("carrera.id"))
@@ -40,11 +44,5 @@ class Materia(ModeloBase):
     periodos_vinculados: Mapped[Optional[List["PeriodoVinculado"]]] = relationship("PeriodoVinculado", back_populates="materia")
     materias_dictados: Mapped[Optional[List["MateriaDictado"]]] = relationship("MateriaDictado", back_populates="materia")
 
-    # respuestas_formulario: Mapped[Optional[List["RespuestasFormulario"]]] = relationship(back_populates='materia')
-    # dictados: Mapped[list["Dictado"]] = relationship(
-    #      "Dictado",
-    #      secondary="materias_dictado",
-    #      back_populates="materias"
-    #  )
 
 

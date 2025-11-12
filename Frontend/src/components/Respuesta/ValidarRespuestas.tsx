@@ -13,9 +13,14 @@ export function validarTodasRespuestasCompletas(
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
     plantillaFormulario: any
 ): boolean {
-    const simplesCompletas = respuestas.every((r) => r.texto?.trim() || r.opcion_id);
 
-    const preguntasMultiples = plantillaFormulario?.preguntas.filter((p: any) => p.multiple_respuestas) || [];
+    const preguntasObligatorias = plantillaFormulario.preguntas.filter((pregunta: any) => pregunta.obligatoria && !pregunta.multiple_respuestas)
+
+    const simplesCompletas = preguntasObligatorias.every((pregunta: any) => {
+    return respuestas.some((respuesta) => respuesta.pregunta_id === pregunta.id && (respuesta.texto?.trim() || respuesta.opcion_id) );
+    });
+
+    const preguntasMultiples = plantillaFormulario?.preguntas.filter((p: any) => p.multiple_respuestas && p.obligatoria) || [];
     const gruposCuadro = new Set<number>(
         preguntasMultiples
             .map((p: any) => p.grupo_cuadro_id)

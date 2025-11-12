@@ -57,7 +57,7 @@ async function enviarRespuestasSimples(respuestas: RespuestaTemporal[], formular
     const respuestasFiltradas = respuestas.filter((r) => r.texto?.trim() || r.opcion_id);
 
 
-    const promesas = respuestasFiltradas.map(async (r, index) => {
+    const promesas = respuestasFiltradas.map(async (r) => {
         const cuerpoRespuesta = {
             pregunta_id: r.pregunta_id,
             texto: r.texto?.trim() || null,

@@ -10,7 +10,6 @@ import PaginaEncuestasEstudiantes from './components/Instrumento/pages/PaginaEnc
 import PaginaInformesCatedra from './components/Instrumento/pages/PaginaInformesCatedra.tsx';
 import { RespuestasFormulario } from './components/RespuestasFormulario/RespuestasFormulario.tsx';
 import Menu from './components/Menu.tsx';
-import SeleccionarMateria from './components/materias/SeleccionarMateria';
 import ResponderInstrumento from './components/Instrumento/ResponderInstrumento';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';
@@ -24,6 +23,7 @@ import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadistic
 import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
 import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
+import SeleccionarMateria from './components/Materias/SeleccionarMateria.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>

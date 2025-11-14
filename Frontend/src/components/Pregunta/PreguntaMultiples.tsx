@@ -1,4 +1,4 @@
-import { Badge, Form } from 'react-bootstrap';
+import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
@@ -109,6 +109,13 @@ function PreguntaMultiple({
                         ))}
                     </Form.Group>
                 )}
+
+                {pregunta.pregunta_fuente_id &&
+                <div className='text-end mb-1 mt-1'>
+
+                    <Button  style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas</Button>
+                </div>
+                }
             </div>
         </>
     );

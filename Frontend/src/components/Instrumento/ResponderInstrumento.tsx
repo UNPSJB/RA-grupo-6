@@ -157,7 +157,7 @@ export default function ResponderInstrumento() {
             console.log('Resultado del envío:', exito);
             return exito;
         } catch (error) {
-            console.error('❌ Error en enviarRespuestas:', error);
+            console.error(' Error en enviarRespuestas:', error);
             alert('Error al enviar: ' + (error instanceof Error ? error.message : 'Error desconocido'));
             return false;
         } finally {
@@ -293,6 +293,7 @@ export default function ResponderInstrumento() {
                                             index={idx}
                                             respuesta={obtenerRespuesta(pregunta.id)}
                                             onActualizar={actualizarRespuesta}
+                                            instrumento_id={Number(instrumentoIdParam)}
                                         />
                                     ))
                                 ) : (

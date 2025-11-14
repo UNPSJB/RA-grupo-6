@@ -1,5 +1,46 @@
 import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
 
+
+export function cargarRespuesta(pregunta : any, instrumentoId: number){
+
+    let textoPrefill = '';
+    let opcionPrefill = undefined;
+
+    if (pregunta.pregunta_fuente_id) {
+        console.log(pregunta.pregunta_fuente_id)
+        return fetch(`http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`)
+            .then((res) => res.ok ? res.json() : null)
+            .then((prefillData) => {
+                if (prefillData?.respuestas?.length > 0) {
+                    const primeraRespuesta = prefillData.respuestas[0];
+                    textoPrefill = primeraRespuesta.texto || '';
+                    opcionPrefill = primeraRespuesta.opcion_id;
+                }
+                return {
+                    pregunta_id: pregunta.id,
+                    texto: textoPrefill,
+                    opcion_id: opcionPrefill,
+                };
+            })
+            .catch((error) => {
+                console.error(`Error cargando prefill pregunta ${pregunta.id}:`, error);
+                return { pregunta_id: pregunta.id, texto: '', opcion_id: undefined };
+            });
+    } else {
+        
+        return Promise.resolve({
+            pregunta_id: pregunta.id,
+            texto: '',
+            opcion_id: undefined,
+        });
+    }
+
+
+}
+
+
+
+
 export function cargarRespuestasIniciales(
     plantillaFormulario: any,
     instrumentoId: number
@@ -11,35 +52,9 @@ export function cargarRespuestasIniciales(
     const preguntasSimples = plantillaFormulario.preguntas.filter((p: any) => !p.multiple_respuestas);
 
     const respuestasSimplesPromises = preguntasSimples.map((pregunta: any) => {
-        let textoPrefill = '';
-        let opcionPrefill = undefined;
 
-        if (pregunta.pregunta_fuente_id) {
-            return fetch(`http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`)
-                .then((res) => res.ok ? res.json() : null)
-                .then((prefillData) => {
-                    if (prefillData?.respuestas?.length > 0) {
-                        const primeraRespuesta = prefillData.respuestas[0];
-                        textoPrefill = primeraRespuesta.texto || '';
-                        opcionPrefill = primeraRespuesta.opcion_id;
-                    }
-                    return {
-                        pregunta_id: pregunta.id,
-                        texto: textoPrefill,
-                        opcion_id: opcionPrefill,
-                    };
-                })
-                .catch((error) => {
-                    console.error(`Error cargando prefill pregunta ${pregunta.id}:`, error);
-                    return { pregunta_id: pregunta.id, texto: '', opcion_id: undefined };
-                });
-        } else {
-            return Promise.resolve({
-                pregunta_id: pregunta.id,
-                texto: '',
-                opcion_id: undefined,
-            });
-        }
+        return cargarRespuesta(pregunta=pregunta, instrumentoId=instrumentoId);
+
     });
 
     const preguntasMultiples = plantillaFormulario.preguntas.filter((p: any) => p.multiple_respuestas);

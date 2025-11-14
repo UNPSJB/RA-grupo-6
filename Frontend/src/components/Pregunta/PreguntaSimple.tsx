@@ -1,15 +1,24 @@
-import { Badge, Form } from 'react-bootstrap';
+import { Badge, Button, Form} from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { RespuestaTemporal } from '../types';
+import { useState } from 'react';
+import { cargarRespuesta } from '../Respuesta/CargarRespuestasIniciales';
 
 type Props = {
     pregunta: any;
     index: number;
     respuesta?: RespuestaTemporal;
     onActualizar: (preguntaId: number, texto?: string, opcionId?: number) => void;
+    instrumento_id: number;
 };
 
-function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
+
+
+function PreguntaSimple({ pregunta, index, respuesta, onActualizar, instrumento_id }: Props) {
+
+
+    const [valor, setValor] = useState(respuesta?.texto? respuesta.texto : "")
+
     return (
         <div className="mb-4 pb-3">
             <div className="mb-3 d-flex align-items-center gap-3">
@@ -47,8 +56,8 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
                 <Form.Control
                     as="textarea"
                     rows={4}
-                    value={respuesta?.texto || ''}
-                    onChange={(e) => onActualizar(pregunta.id, e.target.value)}
+                    value={valor}
+                    onChange={(e) => setValor(e.target.value)}
                     placeholder="Escriba su respuesta..."
                     className="input-pregunta"
                 />
@@ -67,6 +76,13 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
                     ))}
                 </Form.Group>
             )}
+
+            {pregunta.pregunta_fuente_id &&
+            <div className='text-end mb-1 mt-1'>
+
+                <Button  onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
+            </div>
+            }
         </div>
     );
 }

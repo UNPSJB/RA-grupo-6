@@ -197,7 +197,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
                         >
-                            {meses.slice(0,6).map(m => (
+                            {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1]) - 1, 6).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>
@@ -210,6 +210,10 @@ export function PlanificarPeriodos() {
                     </div>
                 </Col>
             </Row>
+
+
+
+
 
             {/* Segundo dictado */}
             <Row className="p-2" style={{ borderLeft: "3px solid #198754" }}>
@@ -240,7 +244,7 @@ export function PlanificarPeriodos() {
                             value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "mes", e.target.value)}
                         >
-                            {meses.slice(6,12).map(m => (
+                            {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1]) - 1,12).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
                         </Form.Select>

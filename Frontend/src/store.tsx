@@ -1,6 +1,12 @@
 import { legacy_createStore as createStore } from 'redux'
 
-const initialState = {
+export interface RootState {
+  sidebarShow: boolean
+  theme: 'light' | 'dark'
+  sidebarUnfoldable?: boolean
+}
+
+const initialState: RootState = {
   sidebarShow: true,
   theme: 'light',
 }

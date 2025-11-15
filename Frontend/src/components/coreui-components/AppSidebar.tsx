@@ -19,13 +19,14 @@ import logo from '../../assets/Unipat.png'
 
 // sidebar nav config
 import navigation from '../../_nav'
+import type { RootState } from '../../store'
 
 
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
-  const unfoldable = useSelector((state: any) => state.sidebarUnfoldable)
-  const sidebarShow = useSelector((state: any) => state.sidebarShow)
+  const unfoldable = useSelector((state: RootState) => state.sidebarUnfoldable)
+  const sidebarShow = useSelector((state: RootState) => state.sidebarShow)
 
   return (
     <CSidebar

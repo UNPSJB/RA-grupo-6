@@ -10,7 +10,7 @@ const DefaultLayout = () => {
     <div>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader onToggleSidebar={() => { /* TODO: implement sidebar toggle */ }} />
+        <AppHeader/>
         <div className="body flex-grow-1">
           <AppContent />
         </div>

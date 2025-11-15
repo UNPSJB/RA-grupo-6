@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 // componente simple de "Cargando..."
-import { Spinner } from 'react-bootstrap'; 
+import { CSpinner } from '@coreui/react'; 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   if (loading) {
     return (
       <div className="vh-100 d-flex justify-content-center align-items-center">
-        <Spinner animation="border" />
+        <CSpinner />
         <p>Validando sesión...</p>
       </div>
     );

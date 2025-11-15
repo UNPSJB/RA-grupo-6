@@ -1,0 +1,15 @@
+import ReactDOM from 'react-dom/client';
+import { AuthProvider } from './context/AuthContext.tsx';
+import App from './App.tsx';
+// Importamos nuestro CSS personalizado después para poder sobreescribir si es necesario
+import './index.css';
+import { Provider } from 'react-redux';
+import store from './store.tsx';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <Provider store={store}>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </Provider>,
+);

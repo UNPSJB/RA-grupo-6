@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Row, Table } from "react-bootstrap"
+import { CButton, CCol, CContainer, CRow, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CCard, CCardHeader, CCardBody } from "@coreui/react";
 import type { PlantillaFormulario } from "../types";
 
 type EstadisticasPlantilla = {
@@ -46,61 +46,73 @@ export function CompararPlantillas(){
     }, [rol]);
 
     return(
-        <>
-            <Row className="d-flex align-items-center pb-3 border-bottom mb-5 mt-3">
-                <Col className="d-flex justify-content-start">
-                    <h2>Comparación de estadisticas</h2>
-                </Col>
-                <Col className="d-flex justify-content-end gap-4">
-                    <Button style={activo === "1"? estiloBotonActivo : estiloBotonInactivo } onClick={() => {setRol(1); setActivo("1")}}> Estudiantes </Button>
+            <CCard>
+                <CCardHeader>
+                        <div className='m-2'>
+                            <h4>Comparación de Estadísticas</h4>
+                        </div>
+                            
+                        
+                </CCardHeader>
+                <CCardHeader >
+                    <CButton className='m-1' color={activo === "1" ? "primary" : "outline-primary" } onClick={() => {setRol(1); setActivo("1")}}>Estudiantes</CButton>
+                    <CButton className='m-1' color={activo === "2" ? "primary" : "outline-primary"} onClick={() => {setRol(2); setActivo("2")}}>Docentes</CButton>
+                    <CButton className='m-1' color={activo === "3" ? "primary" :  "outline-primary"} onClick={() => {setRol(3); setActivo("3")}}>Departamento</CButton>
+                </CCardHeader>
+                <CCardBody>
 
-                    <Button style={activo === "2"? estiloBotonActivo : estiloBotonInactivo } onClick={() => {setRol(2); setActivo("2")}}> Docentes </Button>
-                    
-                    <Button style={activo === "3"? estiloBotonActivo : estiloBotonInactivo } onClick={() => {setRol(3); setActivo("3")}}> Departamento </Button>
-                </Col>
-            </Row>
+                    <CCard className="mb-4">
+                        
+                        
+                        <CCardHeader>
+                            <h5 className="mb-0">Resumen General</h5>
+                        </CCardHeader>
+                        <CCardBody>
+                            
+                            <CRow className="g-3 text-center">
+                                
+                                <CCol md={4}>
+                                    <div className="p-3 border rounded h-100">
+                                        <i className="fa-regular fa-file-lines text-primary" style={{fontSize: "2rem", marginBottom: "10px"}}></i>
+                                        <p className="mb-0 text-medium-emphasis fw-bold">Total de plantillas</p>
+                                        <p className="mb-0 fs-4 fw-semibold">{estadisticas.length}</p>
+                                    </div>
+                                </CCol>
+                                <CCol md={4}>
+                                    <div className="p-3 border rounded h-100">
+                                        <i className="fa-solid fa-star text-warning" style={{fontSize: "2rem", marginBottom: "10px"}}></i>
+                                        <p className="mb-0 text-medium-emphasis fw-bold">Mejor plantilla</p>
+                                        <p className="mb-0 fs-5 fw-semibold">{mejorPlantilla? mejorPlantilla.titulo : "-"}</p>
+                                    </div>
+                                </CCol>
+                                <CCol md={4}>
+                                    <div className="p-3 border rounded h-100">
+                                        <i className="fa-solid fa-chart-simple text-success" style={{fontSize: "2rem", marginBottom: "10px"}}></i>
+                                        <p className="mb-0 text-medium-emphasis fw-bold">Tasa promedio de respuestas</p>
+                                        <p className="mb-0 fs-4 fw-semibold"> {(tasaRespuestas? tasaRespuestas * 100 : 0)? (tasaRespuestas? tasaRespuestas * 100 : 0).toFixed(2) : "-"} %</p>
+                                    </div>
+                                </CCol>
+                            </CRow>
+                        </CCardBody>
+                    </CCard>
 
-            <div className="p-4 mb-4 shadow rounded-4">
-
-                <h4 className="border-bottom ps-3 pb-3">Resumen General</h4>
-
-                <Row className="gap-4 p-3">
-                    <Col className="p-4 text-center border rounded" style={{borderTopColor : "", }}>
-                        {/* <i className="fa-solid fa-file-lines" style={{color: "grey", fontSize: "2rem", marginBottom: "10px"}}> </i> */}
-                        <i className="fa-regular fa-file-lines" style={{color: "#339CFF", fontSize: "2rem", marginBottom: "10px"}}></i>
-                        <p className="mb-0 text-muted fw-bold">Total de plantillas</p>
-                        <p className="mb-0">{estadisticas.length}</p>
-                    </Col>
-
-                    <Col className="p-4 text-center border rounded">
-                        <i className="fa-solid fa-star" style={{color: "#FECF2F", fontSize: "2rem", marginBottom: "10px"}}></i>
-                        <p className="mb-0 text-muted fw-bold">Mejor plantilla</p>
-                        <p className="mb-0">{mejorPlantilla? mejorPlantilla.titulo : "-"}</p>
-                    </Col>
-
-                    <Col className="p-4 text-center border rounded">
-                        <i className="fa-solid fa-chart-simple" style={{color: "#3f9c56ff", fontSize: "2rem", marginBottom: "10px"}}></i>
-                        {/* <i className="fa-solid fa-file-circle-check" ></i> */}
-                        <p className="mb-0 text-muted fw-bold">Tasa promedio de respuestas</p>
-                        <p className="mb-0"> {(tasaRespuestas? tasaRespuestas * 100 : 0)? (tasaRespuestas? tasaRespuestas * 100 : 0).toFixed(2) : "-"} %</p>
-                    </Col>
-                </Row>
-            </div>
-
-            <div className="p-3 border rounded shadow rounded-4">
-                <h4 className="m-3 pb-4 border-bottom">Metricas por plantilla</h4>
-                <Table>
-                    <thead>
-                        <tr className="text-center">
-                        <th> <i className="fa-solid fa-clipboard-list text-muted"></i> Plantilla</th>
-                        <th > <i className="fa-regular fa-circle-question text-muted"></i> <br /> Preguntas</th>
-                        <th> <i className="fa-solid fa-circle-exclamation text-muted"></i> <br />Obligatorias</th>
-                        <th> <i className="fa-solid fa-layer-group text-muted"></i> <br /> Secciones</th>
-                        <th> <i className="fa-light fa-percent text-muted"> </i> <br />  Tasa respuestas</th>
-                        <th> <i className="fa-regular fa-circle-check text-muted"></i> <br /> Completitud</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <CCard>
+                        <CCardHeader>
+                            <h5 className="mb-0">Métricas por Plantilla</h5>
+                        </CCardHeader>
+                        <CCardBody>
+                            <CTable responsive="sm" hover>
+                                <CTableHead>
+                                    <CTableRow className="text-center">
+                                        <CTableHeaderCell> <i className="fa-solid fa-clipboard-list text-medium-emphasis"></i> Plantilla</CTableHeaderCell>
+                                        <CTableHeaderCell> <i className="fa-regular fa-circle-question text-medium-emphasis"></i> <br /> Preguntas</CTableHeaderCell>
+                                        <CTableHeaderCell> <i className="fa-solid fa-circle-exclamation text-medium-emphasis"></i> <br />Obligatorias</CTableHeaderCell>
+                                        <CTableHeaderCell> <i className="fa-solid fa-layer-group text-medium-emphasis"></i> <br /> Secciones</CTableHeaderCell>
+                                        <CTableHeaderCell> <i className="fa-light fa-percent text-medium-emphasis"> </i> <br />  Tasa respuestas</CTableHeaderCell>
+                                        <CTableHeaderCell> <i className="fa-regular fa-circle-check text-medium-emphasis"></i> <br /> Completitud</CTableHeaderCell>
+                                    </CTableRow>
+                                </CTableHead>
+                                <CTableBody>
                         {estadisticas.length > 0? estadisticas.map((plantilla, indice) => (
                             <tr key={indice}>
                             <td className="text-center"> {plantilla.Titulo}</td>
@@ -122,12 +134,13 @@ export function CompararPlantillas(){
                                     <td className="text-center"> - %</td>
                                 </tr>
                             </>
-                        }
-                    </tbody>
-                </Table>
-            </div>
-
-        </>
+                                }
+                                </CTableBody>
+                            </CTable>
+                        </CCardBody>
+                    </CCard>
+                </CCardBody>
+            </CCard>
     )
 
 }

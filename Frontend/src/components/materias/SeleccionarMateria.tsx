@@ -8,7 +8,8 @@ import {
     CBadge,
     CSpinner,
     CAlert,
-    CCardBody
+    CCardBody,
+    CCardHeader
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
 
@@ -96,14 +97,17 @@ function SeleccionarMateria() {
     }
 
     return (
-        <CCard className="mb-4">
-            <CCardBody className="p-4 p-md-5">
-                <div className="mb-4">
-                    <h1 className="fw-bold mb-2">Encuestas para Alumnos</h1>
+        <CCard >
+            <CCardHeader>
+                <div className="m-2">
+                    <h4 >Encuestas para Alumnos</h4>
                     <p className="text-medium-emphasis mb-0">
                         Selecciona una materia para responder la encuesta correspondiente
                     </p>
                 </div>
+            </CCardHeader>
+            <CCardBody className="p-4 p-md-5">
+                
 
                 {mensaje && (
                     <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">

@@ -8,7 +8,8 @@ import {
   CModal,
   CModalHeader,
   CModalTitle,
-  CModalBody, CFormLabel, CFormInput
+  CModalBody, CFormLabel, CFormInput,
+  CCardHeader
 } from "@coreui/react";
 import ElegirRol from "../Rol/ElegirRol";
 import ElegirPregunta from "../Pregunta/ElegirPregunta";
@@ -143,15 +144,18 @@ function CrearPlantillaFormulario() {
       </CModal>
 
       <CCard className="mb-4">
-        <CCardBody className="p-4 p-md-5">
-          <div className="mb-5">
-            <h1 className="fw-bold mb-2">
+        <CCardHeader>
+          <div className="m-2">
+            <h4 >
               Crear Nuevo Formulario
-            </h1>
+            </h4>
             <p className="text-medium-emphasis mb-0">
               Completa los campos para crear el Formulario
             </p>
           </div>
+        </CCardHeader>
+        <CCardBody className="p-4 p-md-5">
+          
 
           {intentoEnvio && cantidadErrores > 0 && (
             <CAlert color="warning" className="mb-4 d-flex align-items-start gap-2">

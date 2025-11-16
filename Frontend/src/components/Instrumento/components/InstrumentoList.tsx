@@ -1,6 +1,7 @@
 import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
+import { CBadge, CButton, CCard, CCardBody, CCardHeader, CListGroup, CListGroupItem } from "@coreui/react";
 
 
 const INSTRUMENTO_CONFIG = {
@@ -44,29 +45,24 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
   const config = INSTRUMENTO_CONFIG[tipo];
 
   return (
-    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-      <Card.Body className="p-4 p-md-5">
-        <div className="mb-4">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h1 className="fw-bold mb-2">{config.titulo}</h1>
-              <p className="text-muted mb-0">{config.subtitulo}</p>
-            </div>
-          </div>
+    <CCard >
+      <CCardHeader>
+        <div className="m-2">
+              <h4 >{config.titulo}</h4>
+              <p className="text-medium-emphasis">{config.subtitulo}</p>
         </div>
+      </CCardHeader>
+      <CCardBody>
+        
         
         {instrumentos.length > 0 ? (
-          <ListGroup variant="flush">
+          <CListGroup>
             {instrumentos.map((instrumento) => (
-              <ListGroup.Item 
+              <CListGroupItem 
                 key={instrumento.id} 
-                action 
                 onClick={() => onSeleccionar(instrumento)}
                 className="d-flex justify-content-between align-items-center p-4"
-                style={{ 
-                  cursor: 'pointer',
-                  borderBottom: '1px solid #e9ecef'
-                }}
+                
               >
                 <div className="flex-grow-1">
                   <div className="fw-bold fs-5 mb-1">
@@ -76,9 +72,9 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                     <small className="text-muted">
                       Código: {instrumento.materia.id}
                     </small>
-                    <Badge bg={config.badgeColor}>
+                    <CBadge color={config.badgeColor} >
                       {config.badgeText}
-                    </Badge>
+                    </CBadge>
                     {instrumento.docente && (
                       <small className="text-muted">
                         Docente: {instrumento.docente.nombre} {instrumento.docente.apellido}
@@ -90,8 +86,8 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                   </div>
                 </div>
                 
-                <Button 
-                  variant="primary"
+                <CButton 
+                  color="primary" 
                   size="sm" 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -101,10 +97,10 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                 >
                   <i className={`fas ${config.buttonIcon} me-2`}></i>
                   {config.buttonText}
-                </Button>
-              </ListGroup.Item>
+                </CButton>
+              </CListGroupItem>
             ))}
-          </ListGroup>
+          </CListGroup>
         ) : (
           <div className="text-center py-5">
             <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
@@ -112,7 +108,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
             <p className="text-muted">{config.emptyState}</p>
           </div>
         )}
-      </Card.Body>
-    </Card>
+      </CCardBody>
+    </CCard>
   );
 }

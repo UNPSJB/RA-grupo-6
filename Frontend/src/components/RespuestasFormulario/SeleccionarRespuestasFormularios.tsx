@@ -2,6 +2,7 @@ import { useState, useEffect, type ChangeEvent } from 'react';
 import { Card, ListGroup, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { capitalizarCadena } from "../Funciones";
+import { CCard, CCardBody, CCardHeader, CContainer, CFormInput, CFormLabel, CListGroup, CListGroupItem } from '@coreui/react';
 
 export interface Respuestas {
     id: number;
@@ -64,23 +65,28 @@ export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : 
         
     return (
         <>
-            <Container className="mt-4">
-                <div className="row justify-content-center ">
-                    <div className="col-md-10">
-                        <Card className=" w-100 " style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5">
-                                <div className="mb-5 text-center">
-                                    <h1 className="fw-bold mb-2"> Formularios completados </h1>
-                                    <p className="text-muted mb-0">
+                        <CCard >
+                            <CCardHeader>
+                                <div className="m-2">
+                                    <h4> Formularios completados </h4>
+                                    <p className="text-medium-emphasis mb-0">
                                         Seleccione un formulario para visualizar sus respuestas
                                     </p>
-                                    <input type="search"  placeholder="Buscar formulario..." onChange={buscar} className='w-100 bg-transparent rounded border p-2 mt-3' style={{color: "black"}} />
+                                    
                                 </div>
+                            </CCardHeader>
+                            <CCardBody >
+                            <CFormLabel className="fw-semibold">
+                                Buscar formulario
+                            </CFormLabel>
+                            {/* VER SI ESTA BIEN EL CRITERIO DE BUSQUEDA DEL PLACEHOLDER */}
+                            <CFormInput type="search"  placeholder="Ingrese el nombre de la materia o el código..." onChange={buscar}  />
+                                
 
                             {respuestasFormularios.length > 0 ? (
-                                    <ListGroup variant="flush">
+                                    <CListGroup variant="flush">
                                         {respuestaFormularioFiltrado.map((respuestaFormulario) => (
-                                            <ListGroup.Item key={respuestaFormulario.respuesta_formulario.id} className="d-flex justify-content-between align-items-center p-4 border rounded mb-3">
+                                            <CListGroupItem key={respuestaFormulario.respuesta_formulario.id} className="d-flex justify-content-between align-items-center p-4 border rounded mb-3">
                                                 <div className="flex-grow-1">
                                                     <div className="fw-bold fs-5 mb-1">{capitalizarCadena(respuestaFormulario.materia.nombre)}</div>
                                                     <div className="d-flex align-items-center gap-3">
@@ -97,9 +103,9 @@ export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : 
                                                     Ver respuestas
                                                 </Link>
 
-                                            </ListGroup.Item>
+                                            </CListGroupItem>
                                         ))}
-                                    </ListGroup>
+                                    </CListGroup>
                                 ) : (
                                     <div className="text-center py-5">
                                         <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
@@ -109,11 +115,8 @@ export function SeleccionarRespuestasFormularios( {usuario_id} : { usuario_id : 
                                         </p>
                                     </div>
                                 )}
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
+                            </CCardBody>
+                        </CCard>
         </>
     );
 }

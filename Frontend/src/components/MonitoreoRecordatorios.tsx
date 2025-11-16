@@ -8,7 +8,8 @@ import {
     CCardBody,
     CTableHead,
     CTableRow,
-    CTableHeaderCell, CTableBody, CTableDataCell
+    CTableHeaderCell, CTableBody, CTableDataCell,
+    CCardHeader
 } from "@coreui/react";
 import { useState, useEffect } from "react";
 import { capitalizarCadena } from "./Funciones";
@@ -71,17 +72,18 @@ export function MonitoreoRecordatorios() {
     };
 
     return (
-        <CCard className="mb-4">
-            <CCardBody className="p-4 p-md-5">
-                <div className="mb-4 text-center">
-                    <h1 className="fw-bold mb-2">
+        <CCard >
+            <CCardHeader>
+                <div className="m-2">
+                    <h4 >
                         Recordatorios Automáticos
-                    </h1>
-                    <p className="text-medium-emphasis mb-0">
+                    </h4>
+                    <p className="text-medium-emphasis">
                         Configuración y ejecución del sistema de recordatorios
                     </p>
                 </div>
-
+            </CCardHeader>
+            <CCardBody className="p-4 p-md-5">
                 {estado ? (
                     <div>
                         <div className="row g-3 mb-4">
@@ -115,7 +117,6 @@ export function MonitoreoRecordatorios() {
                         <div className="d-grid mt-4">
                             <CButton
                                 color="primary"
-                                size="lg"
                                 onClick={ejecutarAhora}
                                 disabled={ejecutando}
                             >

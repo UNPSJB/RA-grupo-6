@@ -6,6 +6,7 @@ import {
     CCard,
     CCardBody,
     CSpinner,
+    CCardHeader,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { cilCheckCircle, cilWarning, cilXCircle, cilChevronRight } from "@coreui/icons";
@@ -142,54 +143,60 @@ export function EstadisticasCatedras() {
     const materiasOrdenadas = [...materias].sort((a, b) => a.promedio_general - b.promedio_general);
 
     return (
-        <CContainer fluid className="py-4">
-            <div className="mb-4">
-                <h2 className="fw-bold">Evaluación de Cátedras</h2>
-                <p className="text-medium-emphasis">
-                    Cuatrimestre {cuatrimestre}
-                </p>
-            </div>
-
+            <>
             <CCard className="mb-4">
+            <CCardHeader>
+                <div className="m-2">
+                    <h4>Evaluación de Cátedras</h4>
+                    <p className="text-medium-emphasis">
+                        Cuatrimestre {cuatrimestre}
+                    </p>
+                </div>
+            </CCardHeader>
+            <CCardBody>
+                <CRow className="text-center">
+                    <CCol md={4}>
+                        <div className="text-medium-emphasis small text-uppercase">Total Cátedras</div>
+                        <div className="fs-4 fw-semibold">{totalCatedras}</div>
+                    </CCol>
+                    <CCol md={4}>
+                        <div className="text-medium-emphasis small text-uppercase">Promedio General</div>
+                        <div className="fs-4 fw-semibold text-primary">{promedioGeneral}</div>
+                    </CCol>
+                    <CCol md={4}>
+                        <div className="text-medium-emphasis small text-uppercase">Requieren Atención</div>
+                        <div className="fs-4 fw-semibold text-danger">{requierenAtencion}</div>
+                    </CCol>
+                </CRow>
+            </CCardBody>
+        </CCard>
+        <CCard >
+                <CCardHeader>
+                    <div className="m-2">
+                        <h4 className="fw-semibold ">
+                            Cátedras (ordenadas por prioridad de atención)
+                        </h4>
+                    </div>
+                </CCardHeader>
                 <CCardBody>
-                    <CRow className="text-center">
-                        <CCol md={4}>
-                            <div className="text-medium-emphasis small text-uppercase">Total Cátedras</div>
-                            <div className="fs-4 fw-semibold">{totalCatedras}</div>
-                        </CCol>
-                        <CCol md={4}>
-                            <div className="text-medium-emphasis small text-uppercase">Promedio General</div>
-                            <div className="fs-4 fw-semibold text-primary">{promedioGeneral}</div>
-                        </CCol>
-                        <CCol md={4}>
-                            <div className="text-medium-emphasis small text-uppercase">Requieren Atención</div>
-                            <div className="fs-4 fw-semibold text-danger">{requierenAtencion}</div>
-                        </CCol>
-                    </CRow>
+                    {loading ? (
+                        <div className="text-center py-5">
+                            <CSpinner />
+                            <p className="mt-2">Cargando estadísticas de cátedras...</p>
+                        </div>
+                    ) : (
+                        <CRow className="g-4">
+                            {materiasOrdenadas.map(materia => (
+                                <CardMateria
+                                    key={materia.id}
+                                    materia={materia}
+                                    onClick={() => setMateriaSeleccionada(materia)} />
+                            ))}
+                        </CRow>
+                    )}
+
                 </CCardBody>
             </CCard>
-
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="fw-semibold mb-0">
-                    Cátedras (ordenadas por prioridad de atención)
-                </h4>
-            </div>
-
-            {loading ? (
-                <div className="text-center py-5">
-                    <CSpinner />
-                    <p className="mt-2">Cargando estadísticas de cátedras...</p>
-                </div>
-            ) : (
-                <CRow className="g-4">
-                    {materiasOrdenadas.map(materia => (
-                        <CardMateria
-                            key={materia.id}
-                            materia={materia}
-                            onClick={() => setMateriaSeleccionada(materia)} />
-                    ))}
-                </CRow>
-            )}
-        </CContainer>
+        </>
     );
 }

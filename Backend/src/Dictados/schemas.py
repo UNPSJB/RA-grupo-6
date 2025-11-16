@@ -1,8 +1,9 @@
 
 from datetime import date
-from typing import List
+from typing import TYPE_CHECKING, List
 from pydantic import BaseModel
 from src.Materias.schemas import Materia
+
 
 class DictadoBase(BaseModel):
     fecha_inicio: date
@@ -12,8 +13,16 @@ class DictadoBase(BaseModel):
 class DictadoCreate(DictadoBase):
     pass
 
+
 class Dictado(DictadoBase):
     id: int
     
     model_config = {"from_attributes": True}
     pass
+
+class MateriaDictado(BaseModel):
+    materia: Materia
+    dictado: Dictado
+
+
+

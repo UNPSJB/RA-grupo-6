@@ -51,6 +51,7 @@ export type Materia = {
     id: string
     nombre: string
     carrera: Carrera
+    dictado: Dictado
 }
 
 export type Rol = {
@@ -291,3 +292,8 @@ export type UsuarioDepartamento = {
 }
 
 
+export type Dictado = {
+    fecha_inicio: Date
+    fecha_cierre: Date
+    materias: Materia[] 
+}

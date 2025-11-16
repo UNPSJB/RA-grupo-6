@@ -46,7 +46,7 @@ export function DatosInstrumento({instrumento} : {instrumento : InstrumentoDetai
                             
                             <td>
                                 <p className="mb-0 text-center">
-                                    <span className="fw-bold"> Ciclo Lectivo: </span> {capitalizarCadena(instrumento.materia.nombre)}
+                                    <span className="fw-bold"> Ciclo Lectivo: </span> {instrumento.materia.dictado.fecha_inicio.getFullYear()}
                                 </p>
                             </td>
                             <td>
@@ -60,7 +60,7 @@ export function DatosInstrumento({instrumento} : {instrumento : InstrumentoDetai
                                 </p>
                             </td> */}
 
-                            
+
 
                         </>
                         // :

@@ -1,8 +1,7 @@
-import enum
 from typing import TYPE_CHECKING, List, Optional
 
 from src.models import ModeloBase
-from sqlalchemy import Column, Date, ForeignKey, Integer, Table, String
+from sqlalchemy import Date, ForeignKey, Integer
 from datetime import date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -16,7 +15,6 @@ class MateriaDictado(ModeloBase):
 
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), primary_key= True)
     dictado_id: Mapped[int] = mapped_column(ForeignKey("dictados.id"), primary_key = True)
-
 
     materia: Mapped["Materia"] = relationship("Materia", back_populates="materias_dictados")
     dictado: Mapped["Dictado"] = relationship("Dictado", back_populates="materias_dictados")

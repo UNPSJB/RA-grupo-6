@@ -3,7 +3,7 @@ import { Form, Button, ListGroup } from "react-bootstrap";
 import CrearGrupoCuadro from "./GrupoCuadroCreate";
 import type { GrupoCuadro } from "../types";
 
-const url_base = 'http://127.0.0.1:8000/grupos_cuadro/';
+const url_base = '/grupos_cuadro/';
 
 type Props = {
     seleccionarGrupo: number | null;

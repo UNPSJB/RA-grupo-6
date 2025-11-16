@@ -14,9 +14,9 @@ type EstadisticasPlantilla = {
 export function CompararPlantillas(){
 
     const [rol, setRol] = useState(1)
-    const url_base = `http://127.0.0.1:8000/formularios/EstadisticasFormularios/rol_${rol}` 
-    const url_base_mejor_plantilla= `http://127.0.0.1:8000/formularios/MejorPlantilla/rol_${rol}`
-    const url_tasa_respuesta= `http://127.0.0.1:8000/formularios/TasaRespuestasPlantillas/rol_${rol}`
+    const url_base = `/formularios/EstadisticasFormularios/rol_${rol}` 
+    const url_base_mejor_plantilla= `/formularios/MejorPlantilla/rol_${rol}`
+    const url_tasa_respuesta= `/formularios/TasaRespuestasPlantillas/rol_${rol}`
 
     const [estadisticas, setEstadisticas] = useState<EstadisticasPlantilla[]>([]);
     const [mejorPlantilla, setMejorPlantilla] = useState<PlantillaFormulario>()

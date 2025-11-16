@@ -18,6 +18,7 @@
     "@react-pdf/renderer": "^4.3.1",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
     "pako": "^2.1.0",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",

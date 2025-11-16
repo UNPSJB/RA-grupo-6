@@ -30,7 +30,7 @@ class Materia(ModeloBase):
     #Atributos
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, index=True)
-    dictado: Mapped[EnumTipoDictado] = mapped_column(Enum(EnumTipoDictado, native_enum=False), nullable=False)
+    dictado: Mapped[EnumTipoDictado] = mapped_column(Enum(EnumTipoDictado, native_enum=False), nullable=False )
     ciclo: Mapped[EnumTipoCiclo] = mapped_column(Enum(EnumTipoCiclo, native_enum= False), nullable=False)
 
     #Foraneas
@@ -42,7 +42,7 @@ class Materia(ModeloBase):
     departamento: Mapped["Departamento"] = relationship("Departamento", back_populates="materias")
     carrera: Mapped["Carrera"] = relationship("Carrera", back_populates="materias")
     periodos_vinculados: Mapped[Optional[List["PeriodoVinculado"]]] = relationship("PeriodoVinculado", back_populates="materia")
-    materias_dictados: Mapped[Optional[List["MateriaDictado"]]] = relationship("MateriaDictado", back_populates="materia")
+    materias_dictados: Mapped[Optional[List["MateriaDictado"]]] = relationship("MateriaDictado", back_populates="materia" )
 
 
 

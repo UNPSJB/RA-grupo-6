@@ -15,6 +15,8 @@ import { RespuestasFormulario } from '../RespuestasFormulario/RespuestasFormular
 import { EstadisticasCatedras } from '../Estadisticas/MostrarEstadisticasCatedras'
 import { PlanificarPeriodos } from '../Planificacion/PlanificarInstrumentos'
 import SeleccionarRespuestasFormularios from '../RespuestasFormulario/SeleccionarRespuestasFormularios'
+import { MostrarEstadisticasDepartamento } from '../Estadisticas/MostrarEstadisticasDepartamento'
+import ResponderInstrumento from '../Instrumento/ResponderInstrumento'
 
 
 const PlaceholderComponent = ({ path }: { path: string }) => (
@@ -36,7 +38,7 @@ const AppContent = () => {
         <Route path='/VerPregunta' element={<VerPregunta />} />
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario />} />
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos />} />
-
+        <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
         {/* Rutas Departamento */}
         <Route path="/seleccionar-informe-sintetico" element={<SeleccionarInformeSintetico/>} />
         <Route path="/VerInformeActividadCurricular" element={<PaginaInformesCatedra/>} />
@@ -48,6 +50,7 @@ const AppContent = () => {
         <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>
         <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
         {/* Rutas Secretaria Académica */}
+        <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
         <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas />} />
         <Route path="/EstadisticasDeDocente" element={<EstadisticasCatedras/>} />
         <Route path="/PlanificarPeriodos" element={<PlanificarPeriodos/>} />

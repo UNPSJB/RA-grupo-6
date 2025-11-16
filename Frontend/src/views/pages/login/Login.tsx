@@ -34,7 +34,6 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Manejo de carga inicial de autenticación
   if (loading) {
     return (
       <div className="vh-100 d-flex justify-content-center align-items-center">
@@ -157,9 +156,14 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
     );
   }
 
+  const background = {
+    backgroundImage: 'linear-gradient(180deg, #cfd8e3 0%, #4f6b88 100%)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
 
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
+    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center" style={background}>
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={8}>
@@ -170,7 +174,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
                 </CCardBody>
               </CCard>
 
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+              <CCard className="text-white bg-dark py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center d-flex flex-column justify-content-center">
                   <div>
                     <img

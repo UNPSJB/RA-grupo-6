@@ -14,26 +14,15 @@ export interface EstadisticasDictado {
 
 export function MostrarEstadisticas(){
 
-    const url_base = "/api/Dictados/CantidadRespuestas" 
+    const url_base = "http://127.0.0.1:8000/Dictados/CantidadRespuestas" 
 
     const [estadisticas, setEstadisticas] = useState<EstadisticasDictado>()
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(url_base);
-
-                if (!response.ok) {
-                    throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                setEstadisticas(data);
-            } catch (error) {
-                console.error("Error al obtener las estadísticas:", error);
-            }
-        };
-        fetchData();
+        fetch(url_base)
+            .then(response => response.json())
+            .then((data) => setEstadisticas(data))
+            .catch(error => console.log(error));
     }, []);
 
     const totalesRespondidos = estadisticas? (estadisticas.Respondidas_Alumno + estadisticas.Respondidas_Docente + estadisticas.Respondidas_Departamento) : 0

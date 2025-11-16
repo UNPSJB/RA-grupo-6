@@ -35,3 +35,5 @@ class Departamento(ModeloBase):
         back_populates="departamento",
         lazy="noload"
     )
+
+    sede: Mapped[str] = mapped_column(String, index=False)

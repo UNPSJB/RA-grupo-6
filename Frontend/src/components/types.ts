@@ -50,6 +50,7 @@ export type Respuesta = {
 export type Materia = {
     id: string
     nombre: string
+    carrera: Carrera
 }
 
 export type Rol = {
@@ -113,6 +114,9 @@ export type InstrumentoDetail = InstrumentoBase & {
   fecha_completado: string;
   respuestas: RespuestaDetalle[];
   docente?: Docente;
+  departamento: Departamento
+  materia: Materia
+  plantilla_formulario: PlantillaFormulario
 };
 
 export type RespuestaDetalle = {
@@ -264,3 +268,26 @@ export type ParametrosUpdate = {
     disponibilidad_docente: number
     disponibilidad_departamento: number
 }
+
+export type Departamento = {
+    usuarios_info: UsuarioDepartamento[]
+    carreras: Carrera 
+    nombre: string
+    sede: string
+}
+
+export type Carrera = {
+    departamento_id: number
+    departamento: Departamento[]
+    nombre: string
+}
+
+export type UsuarioDepartamento = {
+    id: number
+    nombre: string
+    apellido: string
+    legajo: number
+
+}
+
+

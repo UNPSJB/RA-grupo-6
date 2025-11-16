@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Spinner, Tabs, Tab } from 'react-bootstrap';
-import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas } from '../types';
+import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
+import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail } from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
@@ -13,6 +13,7 @@ import PreguntaSimple from '../Pregunta/PreguntaSimple';
 import PreguntaMultiple from '../Pregunta/PreguntaMultiples';
 import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
+import { DatosInstrumento } from './DatosInstrumento';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -20,7 +21,7 @@ export default function ResponderInstrumento() {
     const location = useLocation();
     const { user } = useAuth(); 
 
-    const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<any>(null);
+    const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<InstrumentoDetail>();
     const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
 
     const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
@@ -228,6 +229,12 @@ export default function ResponderInstrumento() {
 
                 <Card className=" w-100 mb-4" style={{ borderRadius: '1rem' }}>
                     <Card.Body className="p-4">
+
+                        {
+                            instrumentoSeleccionado &&
+                            <DatosInstrumento instrumento={instrumentoSeleccionado} ></DatosInstrumento>
+                        }
+
                         <div className="text-center mb-4">
                             <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
                                 {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}

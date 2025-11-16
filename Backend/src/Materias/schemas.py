@@ -1,5 +1,6 @@
 from typing import List
 from pydantic import BaseModel, field_validator
+from src.Carrera.schemas import Carrera
 from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Departamento.schemas import Departamento
 from src.Materias import exceptions
@@ -13,6 +14,7 @@ class MateriaBase(BaseModel):
     nombre: str
     periodos_vinculados: List[PeriodoVinculado]
     departamento: Departamento
+    carrera: Carrera
     ciclo: EnumTipoCiclo
 
 class Materia(MateriaBase):

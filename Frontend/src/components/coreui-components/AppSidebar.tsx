@@ -9,14 +9,12 @@ import {
   CSidebarHeader,
   CSidebarToggler,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
 import { AppSidebarNav } from './AppSidebarNav'
 
 
 import logo from '../../assets/Unipat.png'
 //import { sygnet } from 'src/assets/brand/sygnet'
 
-// sidebar nav config
 import navigation from '../../_nav'
 import type { RootState } from '../../store'
 

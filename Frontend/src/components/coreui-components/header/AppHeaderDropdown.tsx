@@ -32,8 +32,8 @@ const AppHeaderDropdown = () => {
 
   const handleLogout = () => {
     console.log('Cerrando sesión...')
-    logout() // Limpia el estado de autenticación en el contexto
-    navigate('/login') // Redirige al usuario a la página de login
+    logout() 
+    navigate('/login')
   }
 
   return (

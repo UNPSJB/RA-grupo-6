@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "@coreui/coreui": "^5.1.0",
-    "@coreui/react": "^5.2.0",
-    "chart.js": "^4.5.1",
-    "react-chartjs-2": "^5.3.1"
-  }
-}

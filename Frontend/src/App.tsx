@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, type FC } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
 import { useSelector, type TypedUseSelectorHook } from 'react-redux'
 
 import { CSpinner, useColorModes } from '@coreui/react'
@@ -8,7 +8,6 @@ import './scss/style.scss'
 import PrivateRoute from './PrivateRoute.tsx' 
 import './scss/examples.scss'
 
-// --- 1. Lazy Loading Components ---
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
@@ -29,7 +28,6 @@ interface RootState {
 
 const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
-// --- 3. Componente Principal ---
 
 const App: FC = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -47,7 +45,7 @@ const App: FC = () => {
     setColorMode(storedTheme)
   }, [isColorModeSet, setColorMode, storedTheme])
   return (
-    <HashRouter>
+    <BrowserRouter >
       <Suspense
         fallback={
           <div className="pt-3 text-center">
@@ -70,7 +68,7 @@ const App: FC = () => {
           />
         </Routes>
       </Suspense>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 

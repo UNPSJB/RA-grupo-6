@@ -1,7 +1,6 @@
-import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
-import { CBadge, CButton, CCardBody, CCardHeader, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react";
+import { CButton, CCardBody, CCardHeader, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react";
 import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 
@@ -68,7 +67,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
             </CTableHead>
             <CTableBody>
               {instrumentos.map((instrumento) => (
-                <CTableRow key={instrumento.id} onClick={() => onSeleccionar(instrumento)} style={{ cursor: 'pointer' }} verticalAlign="middle">
+                <CTableRow key={instrumento.id} onClick={() => onSeleccionar(instrumento)} style={{ cursor: 'pointer' }} >
                   <CTableDataCell>
                     <div className="fw-normal">{capitalizarCadena(instrumento.materia.nombre)}</div>
                     <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>

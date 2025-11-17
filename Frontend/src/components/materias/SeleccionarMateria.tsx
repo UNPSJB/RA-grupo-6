@@ -121,8 +121,6 @@ function SeleccionarMateria() {
                         {materias.map((materia) => (
                             <CListGroupItem
                                 key={materia.id}
-                                as="button"
-                                action
                                 onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(materia)}
                                 className="d-flex justify-content-between align-items-center p-4"
                                 disabled={!materia.tieneEncuestaActiva}

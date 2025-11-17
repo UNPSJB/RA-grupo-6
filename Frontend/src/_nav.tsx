@@ -11,8 +11,10 @@ import {
   cilStar,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import RequireAuthNavItem from './components/Auth/RequireAuthNavItem'
 
 const _nav = [
+  
   {
     component: CNavItem,
     name: 'Comparar Plantillas',
@@ -20,8 +22,12 @@ const _nav = [
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
   {
-    component: CNavTitle,
-    name: 'Secretaría Académica',
+    component: RequireAuthNavItem,
+    roles: ['Docente'], 
+    item: {
+      component: CNavTitle,
+      name: 'Secretaría Académica',
+    },
   },
   {
     component: CNavItem,

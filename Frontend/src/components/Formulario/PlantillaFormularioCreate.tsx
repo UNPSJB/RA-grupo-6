@@ -16,6 +16,7 @@ import ElegirPregunta from "../Pregunta/ElegirPregunta";
 import type { Pregunta } from "../types";
 import type { Formulario } from "../types";
 import type { ErrorValidacion } from "../types";
+import ShadowedCard from "../Estadisticas/ShadowedCard";
 
 
 function CrearPlantillaFormulario() {
@@ -143,7 +144,7 @@ function CrearPlantillaFormulario() {
         </CModalBody>
       </CModal>
 
-      <CCard className="mb-4">
+      <ShadowedCard className="mb-4">
         <CCardHeader>
           <div className="m-2">
             <h4 >
@@ -206,7 +207,7 @@ function CrearPlantillaFormulario() {
                   />
           </CForm>
         </CCardBody>
-      </CCard>
+      </ShadowedCard>
     </>
   );
 }

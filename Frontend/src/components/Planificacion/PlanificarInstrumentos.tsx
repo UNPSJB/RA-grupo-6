@@ -3,6 +3,7 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import type { Parametros, PlantillaFormulario} from "../types";
 import ModalExito from "../ModalEnvio";
 import { CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CForm, CFormLabel, CFormSelect, CRow } from "@coreui/react";
+import ShadowedCard from "../Estadisticas/ShadowedCard";
 
 export function PlanificarPeriodos() {
 
@@ -163,7 +164,7 @@ export function PlanificarPeriodos() {
     ];
 
     return (
-            <CCard >
+            <ShadowedCard >
                 <CCardHeader>
                     <div className="m-2">
                        <h4>Parametrización de los dictados</h4>
@@ -365,7 +366,7 @@ export function PlanificarPeriodos() {
                                 desactivado={!modificacionesParametros}
                                 textoBoton="Guardar configuración"
                                 variante="success"
-                                className=""
+                                className="text-white"
                             />
                         </CCol>
                         <CCol xs="auto">
@@ -377,6 +378,6 @@ export function PlanificarPeriodos() {
                 </CCardBody>
 
             
-            </CCard>
+            </ShadowedCard>
     );
 }

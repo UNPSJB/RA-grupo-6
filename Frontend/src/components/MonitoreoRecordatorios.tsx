@@ -13,6 +13,7 @@ import {
 } from "@coreui/react";
 import { useState, useEffect } from "react";
 import { capitalizarCadena } from "./Funciones";
+import ShadowedCard from "./Estadisticas/ShadowedCard";
 
 interface EstadoProgramador {
     automatico: boolean;
@@ -72,7 +73,7 @@ export function MonitoreoRecordatorios() {
     };
 
     return (
-        <CCard >
+        <ShadowedCard >
             <CCardHeader>
                 <div className="m-2">
                     <h4 >
@@ -226,6 +227,6 @@ export function MonitoreoRecordatorios() {
                     </div>
                 )}
             </CCardBody>
-        </CCard>
+        </ShadowedCard>
     );
 }

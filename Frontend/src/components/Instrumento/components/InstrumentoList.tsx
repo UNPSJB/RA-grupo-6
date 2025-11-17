@@ -2,6 +2,7 @@ import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
 import { CBadge, CButton, CCard, CCardBody, CCardHeader, CListGroup, CListGroupItem } from "@coreui/react";
+import ShadowedCard from "../../Estadisticas/ShadowedCard";
 
 
 const INSTRUMENTO_CONFIG = {
@@ -45,7 +46,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
   const config = INSTRUMENTO_CONFIG[tipo];
 
   return (
-    <CCard >
+    <ShadowedCard >
       <CCardHeader>
         <div className="m-2">
               <h4 >{config.titulo}</h4>
@@ -109,6 +110,6 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
           </div>
         )}
       </CCardBody>
-    </CCard>
+    </ShadowedCard>
   );
 }

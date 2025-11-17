@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import {
   CButton,
@@ -16,7 +16,6 @@ import {
   CAlert,
   CModal, 
   CModalBody,
-  CImage,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilLockLocked, cilUser } from '@coreui/icons';
@@ -34,19 +33,6 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const originalTheme = document.documentElement.dataset.coreuiTheme;
-    // Forzar tema claro en la página de login
-    document.documentElement.dataset.coreuiTheme = 'light';
-
-    // Restaurar el tema original al desmontar el componente
-    return () => {
-      if (originalTheme) {
-        document.documentElement.dataset.coreuiTheme = originalTheme;
-      }
-    };
-  }, []);
 
   if (loading) {
     return (
@@ -73,7 +59,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
       
     } catch (err: any) {
       console.error("Error en el login:", err);
-      setError('Usuario o contraseña incorrectos. ');
+      setError('Usuario o contraseña incorrectos. Por favor, intente nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -81,7 +67,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
 
   const FormContent = (
     <CForm onSubmit={handleSubmit}>
-      <h3 className='text-dark'>Bienvenido</h3>
+      <h2>Bienvenido</h2>
       <p className="text-body-secondary">Inicie sesión para continuar</p>
 
       {/* Campo de Usuario */}
@@ -171,17 +157,12 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
   }
 
   const background = {
-    // Un fondo más moderno con un degradado sutil y un patrón SVG
-    backgroundImage: `
-      radial-gradient(circle at 1% 1%, rgba(220, 230, 255, 1), rgba(150, 169, 244, 0.05) 25%),
-      radial-gradient(circle at 99% 50%, rgba(144, 167, 202, 0.94), rgba(255, 255, 255, 0) 35%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='80' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23a1c4fd' fill-opacity='0.1'%3E%3Cpath opacity='.4' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v--9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v--9h-9v9h9zm-9-10h9v-9h-9v9sm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
-    `,
+    backgroundImage: 'linear-gradient(180deg, #ffffffaa 0%, rgba(130, 182, 255, 0.46)100%)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   };
   const background_card = {
-    backgroundImage: 'linear-gradient(130deg, #2c7aae99 5%, #5e84b0c1 40%, #023151be 95%)',
+    backgroundImage: 'linear-gradient(130deg, #60b3ea9f 4%, #80b3edbd 20%, #1a5a84f0 80%)',
     
   };
 
@@ -189,41 +170,42 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center" style={background}>
       <CContainer>
         <CRow className="justify-content-center mt-4">
-          <CCol lg={8}>
-            <CCard className="mb-0 shadow">
-              <CRow className="g-0">
-                <CCol md={6}>
-                  <CCardBody className="p-4 p-md-5">
-                    {FormContent}
-                  </CCardBody>
-                </CCol>
-                <CCol md={6} style={{ ...background_card, borderTopRightRadius: '0.375rem', borderBottomRightRadius: '0.375rem' }}>
-                  <CCardBody className="text-center d-flex flex-column justify-content-center h-100 p-4">
-                    <div className='mt-2 text-light'>
-                      <CImage
-                        src="/Unipat.png"
-                        alt="Logo UNPSJB"
-                        style={{
-                          maxWidth: 80,
-                          height: "auto",
-                          marginBottom: '1rem'
-                        }}
-                      />
-                      <h5 className="fw-light">Sistema de Reportes Académicos</h5>
-                      <p className='mb-0'>
-                        Universidad Nacional de la Patagonia San Juan Bosco
-                      </p>
-                      
-                      <Link to="/register">
-                        <CButton className="mt-4 mb-4 outline-light text-white" active tabIndex={-1}>
-                          Registrarse 
-                        </CButton>
-                      </Link>
-                    </div>
-                  </CCardBody>
-                </CCol>
-              </CRow>
-            </CCard>
+          <CCol md={8}>
+            <CCardGroup>
+              <CCard className="p-4 mb-0 ">
+                <CCardBody  className="border-0 py-5">
+                  {FormContent}
+                </CCardBody>
+              </CCard>
+
+              <CCard className="border-0 text-white py-5" style={{...background_card}}>
+                <CCardBody className="text-center d-flex flex-column justify-content-center">
+                  <div>
+                    <img
+                      src="/Unipat.png" 
+                      alt="Logo UNPSJB"
+                      style={{
+                        maxWidth: 100,
+                        height: "auto",
+                        marginBottom: '1rem'
+                      }}
+                    />
+                    <h2 className="fw-light">Sistema de Reportes Académicos</h2>
+                    <p className='mb-0'>
+                      Universidad Nacional de la Patagonia
+                    </p>
+                    <p >
+                     San Juan Bosco
+                    </p>
+                    <Link to="/register">
+                      <CButton className="mt-3 outline-light text-white" active tabIndex={-1}>
+                        Registrarse Ahora
+                      </CButton>
+                    </Link>
+                  </div>
+                </CCardBody>
+              </CCard>
+            </CCardGroup>
           </CCol>
         </CRow>
       </CContainer>

@@ -4,6 +4,8 @@ import type {DetalleInformeSinteticoCompleto, DetalleInformeProps } from "../typ
 import { mockInformeSinteticoCompleto } from "../MockInformes";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InformePDFDocument from "./InformePDFDocument";
+import { CAccordion, CAccordionBody, CAccordionHeader, CAccordionItem, CButton, CCard, CCardBody } from "@coreui/react";
+import ShadowedCard from "../../Estadisticas/ShadowedCard";
 
 export default function DetalleInformeSintetico({ informe, onVolver }: DetalleInformeProps) {
   
@@ -20,18 +22,18 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
 
   if (loading || !detalleCompleto) {
     return (
-      <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+      <ShadowedCard className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
         <Card.Body className="p-4 p-md-5 text-center">
           <Spinner animation="border" />
           <p className="mt-2">Cargando detalle del informe sintético...</p>
         </Card.Body>
-      </Card>
+      </ShadowedCard>
     );
   }
 
   return (
-    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-      <Card.Body className="p-4 p-md-5">
+    <ShadowedCard className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+      <CCardBody className="p-4 p-md-5">
         
         <div className="mb-4">
           <h1 className="fw-bold mb-2">{detalleCompleto.titulo_formulario}</h1>
@@ -45,14 +47,14 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
         
         <hr className="my-4" />
         <h3 className="fw-semibold fs-5 mb-3">Informes Académicos Analizados</h3>
-        <Accordion>
+        <CAccordion>
           {detalleCompleto.informes_academicos_base.map((informeBase, index) => (
-            <Accordion.Item eventKey={String(index)} key={informeBase.id}>
-              <Accordion.Header>
+            <CAccordionItem eventKey={String(index)} key={informeBase.id}>
+              <CAccordionHeader>
                 <span className="fw-bold me-2">{informeBase.titulo_formulario}</span>
                 <Badge bg="info" pill>Docente: {informeBase.docente_nombre}</Badge>
-              </Accordion.Header>
-              <Accordion.Body>
+              </CAccordionHeader>
+              <CAccordionBody>
                 {informeBase.respuestas_abiertas_agrupadas.map(grupoDocente => (
                   <div key={grupoDocente.grupo} className="mb-3">
                     <h4 className="fw-bold fs-6 mb-3 p-2 bg-light rounded">
@@ -71,10 +73,10 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
                     </ListGroup>
                   </div>
                 ))}
-              </Accordion.Body>
-            </Accordion.Item>
+              </CAccordionBody>
+            </CAccordionItem>
           ))}
-        </Accordion>
+        </CAccordion>
 
         <hr className="my-4" />
         <h3 className="fw-semibold fs-5 mb-3">Conclusiones del Informe Sintético</h3>
@@ -121,12 +123,12 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
             </PDFDownloadLink>
           )}
                   
-          <Button variant="secondary" onClick={onVolver}>
+          <CButton color="secondary" onClick={onVolver}>
             Volver al Listado
-          </Button>
+          </CButton>
         </div>
         
-      </Card.Body>
-    </Card>
+      </CCardBody>
+    </ShadowedCard>
   );
 }

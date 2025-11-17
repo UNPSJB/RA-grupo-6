@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CButton, CCol, CContainer, CRow, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CCard, CCardHeader, CCardBody } from "@coreui/react";
 import type { PlantillaFormulario } from "../types";
+import ShadowedCard from "./ShadowedCard";
 
 type EstadisticasPlantilla = {
     Titulo: string;
@@ -46,7 +47,7 @@ export function CompararPlantillas(){
     }, [rol]);
 
     return(
-            <CCard>
+            <ShadowedCard>
                 <CCardHeader>
                         <div className='m-2'>
                             <h4>Comparación de Estadísticas</h4>
@@ -140,7 +141,7 @@ export function CompararPlantillas(){
                         </CCardBody>
                     </CCard>
                 </CCardBody>
-            </CCard>
+            </ShadowedCard>
     )
 
 }

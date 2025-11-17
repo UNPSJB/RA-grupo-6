@@ -13,6 +13,7 @@ import {
     CCardHeader
 } from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
+import ShadowedCard from '../Estadisticas/ShadowedCard';
 
 interface InstrumentoDocente {
     id: number;
@@ -122,19 +123,17 @@ function InstrumentosDocente() {
 
     if (cargando) {
         return (
-            <CContainer className="mt-4">
-                <CCard className="text-center">
+                <ShadowedCard className="text-center">
                     <CCardBody className="p-5">
                         <CSpinner color="primary" className="mb-3" />
                         <p className="text-medium-emphasis">Cargando informes de cátedra disponibles...</p>
                     </CCardBody>
-                </CCard>
-            </CContainer>
+                </ShadowedCard>
         );
     }
 
     return (
-            <CCard>
+            <ShadowedCard>
                 <CCardHeader>
                     <div className="m-2">
                         <h4 >Informes de Cátedra Pendientes</h4>
@@ -222,7 +221,7 @@ function InstrumentosDocente() {
                         </div>
                     )}
                 </CCardBody>
-            </CCard>
+            </ShadowedCard>
     );
 }
 

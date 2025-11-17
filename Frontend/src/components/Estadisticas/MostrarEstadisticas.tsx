@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { CCol, CContainer, CRow, CCard, CCardBody, CCardHeader } from "@coreui/react";
+import { CCol, CRow, CCardBody, CCardHeader } from "@coreui/react";
 import { CardCantRespondidos } from "./CardCantRespondidos";
+import ShadowedCard from "./ShadowedCard";
+
 
 export interface EstadisticasDictado {
     Respondidas_Alumno: number;
@@ -29,7 +31,7 @@ export function MostrarEstadisticas(){
     const totalesAsignadas = estadisticas? (estadisticas.Asignadas_Alumno + estadisticas.Asignadas_Docente + estadisticas.Asignadas_Departamento) : 0
 
     return(
-            <CCard>
+            <ShadowedCard>
                 <CCardHeader>
                     <div className="m-2">
                         <h4>Tasa de Respuestas Totales</h4>
@@ -54,7 +56,7 @@ export function MostrarEstadisticas(){
                         </CCol>
                     </CRow>
                 </CCardBody>
-            </CCard>
+            </ShadowedCard>
     )
 
 

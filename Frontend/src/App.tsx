@@ -33,28 +33,19 @@ const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 const App: FC = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-  
   const storedTheme = useAppSelector((state) => state.theme)
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
-    
     const themeMatch = urlParams.get('theme') && urlParams.get('theme')?.match(/^[A-Za-z0-9\s]+/)
-    
     const theme = themeMatch ? themeMatch[0] : null
-    
     if (theme) {
       setColorMode(theme)
     }
-
     if (isColorModeSet()) {
       return
     }
-
     setColorMode(storedTheme)
-    
   }, [isColorModeSet, setColorMode, storedTheme])
-
   return (
     <HashRouter>
       <Suspense

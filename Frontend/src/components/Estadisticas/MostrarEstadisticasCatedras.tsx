@@ -13,6 +13,7 @@ import { cilCheckCircle, cilWarning, cilXCircle, cilChevronRight } from "@coreui
 //import { DetalleMateria } from "../materias/DetalleMateria";
 import { capitalizarCadena } from "../Funciones";
 import { DetalleMateria } from "../Materias/DetalleMateria";
+import ShadowedCard from "./ShadowedCard";
 
 
 export interface GrupoEstadistica {
@@ -144,7 +145,7 @@ export function EstadisticasCatedras() {
 
     return (
             <>
-            <CCard className="mb-4">
+            <ShadowedCard className="mb-4">
             <CCardHeader>
                 <div className="m-2">
                     <h4>Evaluación de Cátedras</h4>
@@ -169,8 +170,8 @@ export function EstadisticasCatedras() {
                     </CCol>
                 </CRow>
             </CCardBody>
-        </CCard>
-        <CCard >
+        </ShadowedCard>
+        <ShadowedCard >
                 <CCardHeader>
                     <div className="m-2">
                         <h4 className="fw-semibold ">
@@ -196,7 +197,7 @@ export function EstadisticasCatedras() {
                     )}
 
                 </CCardBody>
-            </CCard>
+            </ShadowedCard>
         </>
     );
 }

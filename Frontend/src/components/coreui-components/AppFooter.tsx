@@ -2,7 +2,7 @@ import { CFooter } from '@coreui/react'
 
 const AppFooter = () => {
   return (
-    <CFooter>
+    <CFooter className='mt-4'>
       <div>
         <span>&copy; 2025.</span>
       </div>

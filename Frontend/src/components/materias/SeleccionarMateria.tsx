@@ -12,6 +12,7 @@ import {
     CCardHeader
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
+import ShadowedCard from '../Estadisticas/ShadowedCard';
 
 interface Materia {
     id: string;
@@ -97,7 +98,7 @@ function SeleccionarMateria() {
     }
 
     return (
-        <CCard >
+        <ShadowedCard >
             <CCardHeader>
                 <div className="m-2">
                     <h4 >Encuestas para Alumnos</h4>
@@ -181,7 +182,7 @@ function SeleccionarMateria() {
                     </div>
                 )}
             </CCardBody>
-        </CCard>
+        </ShadowedCard>
     );
 }
 

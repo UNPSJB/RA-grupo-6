@@ -1,7 +1,7 @@
 import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
-import { CBadge, CButton, CCard, CCardBody, CCardHeader, CListGroup, CListGroupItem } from "@coreui/react";
+import { CBadge, CButton, CCardBody, CCardHeader, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react";
 import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 
@@ -57,51 +57,47 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
         
         
         {instrumentos.length > 0 ? (
-          <CListGroup>
-            {instrumentos.map((instrumento) => (
-              <CListGroupItem 
-                key={instrumento.id} 
-                onClick={() => onSeleccionar(instrumento)}
-                className="d-flex justify-content-between align-items-center p-4"
-                
-              >
-                <div className="flex-grow-1">
-                  <div className="fw-bold fs-5 mb-1">
-                    {capitalizarCadena(instrumento.materia.nombre)}
-                  </div>
-                  <div className="d-flex align-items-center gap-3 flex-wrap">
-                    <small className="text-muted">
-                      Código: {instrumento.materia.id}
-                    </small>
-                    <CBadge color={config.badgeColor} >
-                      {config.badgeText}
-                    </CBadge>
-                    {instrumento.docente && (
-                      <small className="text-muted">
-                        Docente: {instrumento.docente.nombre} {instrumento.docente.apellido}
-                      </small>
-                    )}
-                    <small className="text-muted">
-                      Período {new Date(instrumento.fecha_inicio).toLocaleDateString()} al {new Date(instrumento.fecha_cierre).toLocaleDateString()}
-                    </small>
-                  </div>
-                </div>
-                
-                <CButton 
-                  color="primary" 
-                  size="sm" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSeleccionar(instrumento);
-                  }}
-                  className="px-4 py-2"
-                >
-                  <i className={`fas ${config.buttonIcon} me-2`}></i>
-                  {config.buttonText}
-                </CButton>
-              </CListGroupItem>
-            ))}
-          </CListGroup>
+          <CTable className='border mb-1'  hover responsive>
+            <CTableHead color="light" >
+              <CTableRow>
+                <CTableHeaderCell>Materia</CTableHeaderCell>
+                <CTableHeaderCell>Período</CTableHeaderCell>
+                {tipo === 'INFORME_CATEDRA' && <CTableHeaderCell>Docente</CTableHeaderCell>}
+                <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {instrumentos.map((instrumento) => (
+                <CTableRow key={instrumento.id} onClick={() => onSeleccionar(instrumento)} style={{ cursor: 'pointer' }} verticalAlign="middle">
+                  <CTableDataCell>
+                    <div className="fw-normal">{capitalizarCadena(instrumento.materia.nombre)}</div>
+                    <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    {new Date(instrumento.fecha_inicio).toLocaleDateString()} - {new Date(instrumento.fecha_cierre).toLocaleDateString()}
+                  </CTableDataCell>
+                  {tipo === 'INFORME_CATEDRA' && instrumento.docente && (
+                    <CTableDataCell>
+                      {instrumento.docente.nombre} {instrumento.docente.apellido}
+                    </CTableDataCell>
+                  )}
+                  <CTableDataCell className="text-center">
+                    <CButton
+                      color="primary"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSeleccionar(instrumento);
+                      }}
+                    >
+                      <i className={`fas ${config.buttonIcon}`}></i>
+                      {config.buttonText}
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
         ) : (
           <div className="text-center py-5">
             <i className="fas fa-inbox fa-3x text-muted mb-3"></i>

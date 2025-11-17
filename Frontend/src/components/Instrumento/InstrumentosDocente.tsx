@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-    CContainer, 
-    CCard, 
     CButton, 
-    CListGroup, 
-    CListGroupItem, 
     CBadge, 
     CSpinner, 
     CAlert,
     CCardBody,
-    CCardHeader
+    CCardHeader,
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell, CTableBody, CTableDataCell
 } from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
@@ -142,7 +142,7 @@ function InstrumentosDocente() {
                         </p>
                     </div>
                 </CCardHeader>
-                <CCardBody>
+                <CCardBody >
                     {mensaje && (
                         <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
                             {mensaje}
@@ -150,67 +150,51 @@ function InstrumentosDocente() {
                     )}
                     
                     {instrumentos.length > 0 ? (
-                        <CListGroup flush>
+                        <CTable className='border mb-1'  hover responsive>
+                            <CTableHead color="light">
+                                <CTableRow>
+                                    <CTableHeaderCell>Materia</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+                                    <CTableHeaderCell>Vencimiento</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
                             {instrumentos.map((instrumento) => {
                                 const activo = estaActivo(instrumento);
                                 return (
-                                    <CListGroupItem 
-                                        key={instrumento.id} 
-                                        as="button"
-                                        action 
-                                        onClick={() => activo && handleSeleccionarInstrumento(instrumento)}
-                                        className="d-flex justify-content-between align-items-center p-3"
-                                        disabled={!activo}
-                                    >
-                                        <div className="flex-grow-1 text-start">
-                                            <div className="fw-bold fs-5 mb-1">
-                                                {capitalizarCadena(instrumento.materia.nombre)}
-                                            </div>
-                                            <div className="d-flex align-items-center gap-3">
-                                                <small className="text-medium-emphasis">
-                                                    Código: {instrumento.materia.id}
-                                                </small>
-                                                {activo ? (
-                                                    <>
-                                                        <CBadge color="success" className="ms-2">
-                                                           Informe Activo
-                                                        </CBadge>
-                                                        <small className="text-medium-emphasis">
-                                                            Vence: {new Date(instrumento.fecha_cierre).toLocaleDateString()}
-                                                        </small>
-                                                    </>
-                                                ) : (
-                                                    <CBadge color="secondary" className="ms-2">
-                                                        Inactivo
-                                                    </CBadge>
-                                                )}
-                                            </div>
-                                        </div>
-                                        
-                                        {activo ? (
-                                            <CButton 
+                                    <CTableRow key={instrumento.id} onClick={() => activo && handleSeleccionarInstrumento(instrumento)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }} verticalAlign="middle">
+                                        <CTableDataCell>
+                                            <div className="fw-bold">{capitalizarCadena(instrumento.materia.nombre)}</div>
+                                            <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CBadge color={activo ? "success" : "secondary"}>
+                                                {activo ? "Activo" : "Inactivo"}
+                                            </CBadge>
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {activo ? new Date(instrumento.fecha_cierre).toLocaleDateString() : '-'}
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CButton
                                                 color="primary"
+                                                size="sm"
+                                                disabled={!activo}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleSeleccionarInstrumento(instrumento);
                                                 }}
                                             >
                                                 <i className="fas fa-edit me-2"></i>
-                                                Completar
+                                                Completar Informe
                                             </CButton>
-                                        ) : (
-                                            <CButton 
-                                                color="secondary"
-                                                variant="outline"
-                                                disabled
-                                            >
-                                                No Disponible
-                                            </CButton>
-                                        )}
-                                    </CListGroupItem>
+                                        </CTableDataCell>
+                                    </CTableRow>
                                 );
                             })}
-                        </CListGroup>
+                            </CTableBody>
+                        </CTable>
                     ) : (
                         <div className="text-center py-5">
                             <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>

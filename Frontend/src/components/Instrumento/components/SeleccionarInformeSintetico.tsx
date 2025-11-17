@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, ListGroup, Button, Spinner, Alert, Badge, Card } from "react-bootstrap";
+import { Container, Spinner, Alert } from "react-bootstrap";
+import { CCard, CCardBody, CBadge, CButton, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell } from "@coreui/react";
 import { capitalizarCadena } from "../../Funciones";
 
 interface InstrumentoDepartamento {
@@ -105,9 +106,9 @@ export default function SeleccionarInformeSintetico() {
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     {error}
                     <div className="mt-3">
-                        <Button variant="outline-danger" onClick={cargarInformesSinteticos}>
+                        <CButton variant="outline-danger" onClick={cargarInformesSinteticos}>
                             Reintentar
-                        </Button>
+                        </CButton>
                     </div>
                 </Alert>
             </Container>
@@ -116,106 +117,80 @@ export default function SeleccionarInformeSintetico() {
 
     return (
         <Container className="mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <Card className="border-0 shadow-sm w-100" style={{borderRadius: "1rem"}}>
-                        <Card.Body className="p-4 p-md-5">
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <h1 className="fw-bold mb-2">Informes Sintéticos Pendientes</h1>
-                                        <p className="text-muted mb-0">
-                                            Selecciona un informe sintético para completar.
-                                        </p>
-                                    </div>
-                                </div>
+            <CCard className="border-0 shadow-sm">
+                <CCardBody className="p-4 p-md-5">
+                    <div className="mb-4">
+                        <h1 className="fw-bold mb-2">Informes Sintéticos Pendientes</h1>
+                        <p className="text-medium-emphasis mb-0">
+                            Selecciona un informe sintético para completar.
+                        </p>
+                    </div>
+
+                    {mensaje && !informes.length && (
+                        <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                            {mensaje}
+                        </Alert>
+                    )}
+
+                    {informes.length > 0 ? (
+                        <CTable striped hover responsive>
+                            <CTableHead color="light">
+                                <CTableRow>
+                                    <CTableHeaderCell>Materia</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+                                    <CTableHeaderCell>Vencimiento</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
+                                {informes.map((informe) => {
+                                    const activo = estaActivo(informe);
+                                    return (
+                                        <CTableRow key={informe.id} onClick={() => activo && handleSeleccionarInforme(informe)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }} verticalAlign="middle">
+                                            <CTableDataCell>
+                                                <div className="fw-bold">{capitalizarCadena(informe.materia.nombre)}</div>
+                                                <div className="small text-medium-emphasis">Código: {informe.materia.id}</div>
+                                            </CTableDataCell>
+                                            <CTableDataCell className="text-center">
+                                                <CBadge color={activo ? "success" : "secondary"}>
+                                                    {activo ? "Activo" : "Inactivo"}
+                                                </CBadge>
+                                            </CTableDataCell>
+                                            <CTableDataCell>
+                                                {activo ? new Date(informe.fecha_cierre).toLocaleDateString() : '-'}
+                                            </CTableDataCell>
+                                            <CTableDataCell className="text-center">
+                                                <CButton
+                                                    color="primary"
+                                                    size="sm"
+                                                    disabled={!activo}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSeleccionarInforme(informe);
+                                                    }}
+                                                >
+                                                    <i className="fas fa-edit me-2"></i>
+                                                    Completar
+                                                </CButton>
+                                            </CTableDataCell>
+                                        </CTableRow>
+                                    );
+                                })}
+                            </CTableBody>
+                        </CTable>
+                    ) : (
+                        !mensaje.includes('Error') && (
+                            <div className="text-center py-5">
+                                <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 className="text-muted mb-3">No hay informes sintéticos pendientes</h5>
+                                <p className="text-muted">
+                                    No se encontraron informes para completar en este momento.
+                                </p>
                             </div>
-
-                            {mensaje && (
-                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
-                                    {mensaje}
-                                </Alert>
-                            )}
-
-                           {informes.length > 0 ? (
-                                <ListGroup variant="flush">
-                                    {informes.map((informe) => {
-                                        const activo = estaActivo(informe);
-                                        return (
-                                            <ListGroup.Item 
-                                                key={informe.id} 
-                                                action 
-                                                onClick={() => activo && handleSeleccionarInforme(informe)}
-                                                className="d-flex justify-content-between align-items-center p-4"
-                                                style={{ 
-                                                    cursor: activo ? 'pointer' : 'not-allowed',
-                                                    borderBottom: '1px solid #e9ecef',
-                                                }}
-                                            >
-                                                <div className="flex-grow-1">
-                                                    <div className="fw-bold fs-5 mb-1">
-                                                        {capitalizarCadena(informe.materia.nombre)}
-                                                    </div>
-                                                    <div className="d-flex align-items-center gap-3">
-                                                        <small className="text-muted">
-                                                            Código: {informe.materia.id}
-                                                        </small>
-                                                        {activo ? (
-                                                            <>
-                                                                <Badge bg="success" className="ms-2">
-                                                                   Informe Activo
-                                                                </Badge>
-                                                                <small className="text-muted">
-                                                                    Vence: {new Date(informe.fecha_cierre).toLocaleDateString()}
-                                                                </small>
-                                                            </>
-                                                        ) : (
-                                                            <Badge bg="secondary" className="ms-2">
-                                                                Inactivo
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                
-                                                {activo ? (
-                                                    <Button 
-                                                        variant="primary"
-                                                        size="sm" 
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleSeleccionarInforme(informe);
-                                                        }}
-                                                        className="px-4 py-2"
-                                                    >
-                                                        <i className="fas fa-edit me-2"></i>
-                                                        Completar Informe
-                                                    </Button>
-                                                ) : (
-                                                    <Button 
-                                                        variant="outline-secondary" 
-                                                        size="sm"
-                                                        disabled
-                                                    >
-                                                        No Disponible
-                                                    </Button>
-                                                )}
-                                            </ListGroup.Item>
-                                        );
-                                    })}
-                                </ListGroup>
-                            ) : (
-                                <div className="text-center py-5">
-                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay informes sintéticos pendientes</h5>
-                                    <p className="text-muted">
-                                        No se encontraron informes sintéticos pendientes para completar.
-                                    </p>
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
+                        )
+                    )}
+                </CCardBody>
+            </CCard>
         </Container>
     );
 }

@@ -57,7 +57,7 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar, instrumento_
                     as="textarea"
                     rows={4}
                     value={valor}
-                    onChange={(e) => setValor(e.target.value)}
+                    onChange={(e) => {setValor(e.target.value);  onActualizar(pregunta.id, valor, undefined)}}
                     placeholder="Escriba su respuesta..."
                     className="input-pregunta"
                 />

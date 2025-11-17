@@ -3,7 +3,7 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import type { Parametros, PlantillaFormulario} from "../types";
 import ModalExito from "../ModalEnvio";
 import { CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CForm, CFormLabel, CFormSelect, CRow } from "@coreui/react";
-import ShadowedCard from "../Estadisticas/ShadowedCard";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 export function PlanificarPeriodos() {
 

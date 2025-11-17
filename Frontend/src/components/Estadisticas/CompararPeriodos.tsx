@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CButton, CCol, CContainer, CRow, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CCard, CCardHeader, CCardBody } from "@coreui/react";
 import type { PlantillaFormulario } from "../types";
-import ShadowedCard from "./ShadowedCard";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 type EstadisticasPlantilla = {
     Titulo: string;

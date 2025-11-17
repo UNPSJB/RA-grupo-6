@@ -2,7 +2,7 @@ import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
 import { CBadge, CButton, CCard, CCardBody, CCardHeader, CListGroup, CListGroupItem } from "@coreui/react";
-import ShadowedCard from "../../Estadisticas/ShadowedCard";
+import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 
 const INSTRUMENTO_CONFIG = {

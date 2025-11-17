@@ -3,7 +3,7 @@ import { Card, Button, ListGroup, Badge, Spinner, Alert } from "react-bootstrap"
 import type { instrumentoList, EstadisticaPregunta, GrupoPreguntasAbiertas } from "../types";
 import Estadisticas from "./Estadisticas";
 import { mockDetalleCompleto } from "../MockInformes";
-import ShadowedCard from "../../Estadisticas/ShadowedCard";
+import ShadowedCard from "../../coreui-components/ShadowedCard";
 import { CCardBody, CCardHeader } from "@coreui/react";
 
 // --------------------------------------------------------------------------------

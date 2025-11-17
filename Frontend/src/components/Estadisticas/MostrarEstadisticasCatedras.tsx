@@ -13,7 +13,7 @@ import { cilCheckCircle, cilWarning, cilXCircle, cilChevronRight } from "@coreui
 //import { DetalleMateria } from "../materias/DetalleMateria";
 import { capitalizarCadena } from "../Funciones";
 import { DetalleMateria } from "../Materias/DetalleMateria";
-import ShadowedCard from "./ShadowedCard";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 
 export interface GrupoEstadistica {

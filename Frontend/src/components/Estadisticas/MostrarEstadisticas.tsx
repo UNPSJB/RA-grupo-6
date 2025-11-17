@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CCol, CRow, CCardBody, CCardHeader } from "@coreui/react";
 import { CardCantRespondidos } from "./CardCantRespondidos";
-import ShadowedCard from "./ShadowedCard";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 
 export interface EstadisticasDictado {

@@ -5,7 +5,7 @@ import { mockInformeSinteticoCompleto } from "../MockInformes";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InformePDFDocument from "./InformePDFDocument";
 import { CAccordion, CAccordionBody, CAccordionHeader, CAccordionItem, CButton, CCard, CCardBody } from "@coreui/react";
-import ShadowedCard from "../../Estadisticas/ShadowedCard";
+import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 export default function DetalleInformeSintetico({ informe, onVolver }: DetalleInformeProps) {
   

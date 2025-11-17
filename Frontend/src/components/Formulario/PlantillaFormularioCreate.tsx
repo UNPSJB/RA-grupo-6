@@ -16,7 +16,7 @@ import ElegirPregunta from "../Pregunta/ElegirPregunta";
 import type { Pregunta } from "../types";
 import type { Formulario } from "../types";
 import type { ErrorValidacion } from "../types";
-import ShadowedCard from "../Estadisticas/ShadowedCard";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 
 function CrearPlantillaFormulario() {

@@ -13,7 +13,7 @@ import {
     CCardHeader
 } from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
-import ShadowedCard from '../Estadisticas/ShadowedCard';
+import ShadowedCard from '../coreui-components/ShadowedCard';
 
 interface InstrumentoDocente {
     id: number;

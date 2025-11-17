@@ -3,7 +3,7 @@ import { Card, ListGroup, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { capitalizarCadena } from "../Funciones";
 import { CCard, CCardBody, CCardHeader, CContainer, CFormInput, CFormLabel, CListGroup, CListGroupItem } from '@coreui/react';
-import ShadowedCard from '../Estadisticas/ShadowedCard';
+import ShadowedCard from '../coreui-components/ShadowedCard';
 
 export interface Respuestas {
     id: number;

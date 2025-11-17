@@ -35,7 +35,8 @@ function Menu(){
                         <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
                         <Nav.Link href="/MostrarEstadisticas">Ver Estadisticas Encuestados</Nav.Link>
                         <Nav.Link href="/monitoreo-recordatorios">Testing de emails</Nav.Link>
-                         <Nav.Link href="/PlanificarPeriodos">Planificacion de Formularios</Nav.Link>
+                        <Nav.Link href="/PlanificarPeriodos">Planificacion de Formularios</Nav.Link>
+                        <Nav.Link href="/mis-respuestas">Ver Mis Respuestas</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

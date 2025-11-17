@@ -5,6 +5,7 @@ import array
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Dictados.models import Dictado
 from src.Departamento.models import Departamento
 from src.Materias.models import Materia
@@ -209,3 +210,55 @@ def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrument
 
     return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
 
+###
+def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import joinedload
+    
+    # Obtener instrumentos de tipo X
+    instrumentos = db.scalars(
+        select(Instrumento)
+        .where(Instrumento.tipo == tipo)
+        .options(
+            joinedload(Instrumento.materia),
+            joinedload(Instrumento.plantilla_formulario)
+        )
+    ).all()
+    
+    instrumentos_con_info = []
+    
+    for instrumento in instrumentos:
+        # Verificar si el user tiene RespuestasFormulario para el instrumento
+        respuestas_form = db.scalar(
+            select(RespuestasFormulario)
+            .where(
+                and_(
+                    RespuestasFormulario.instrumento_id == instrumento.id,
+                    RespuestasFormulario.usuario_id == usuario_id
+                )
+            )
+        )
+        
+        respondido = respuestas_form is not None
+        
+        # Filtrar mostrar_respondidos
+        if (mostrar_respondidos and respondido) or (not mostrar_respondidos and not respondido):
+            instrumentos_con_info.append({
+                "id": instrumento.id,
+                "tipo": instrumento.tipo,
+                "fecha_inicio": instrumento.fecha_inicio,
+                "fecha_cierre": instrumento.fecha_cierre,
+                "materia": {
+                    "id": instrumento.materia.id,
+                    "nombre": instrumento.materia.nombre
+                },
+                "plantilla_formulario": {
+                    "id": instrumento.plantilla_formulario.id,
+                    "titulo": instrumento.plantilla_formulario.titulo
+                } if instrumento.plantilla_formulario else None,
+                "respondido": respondido,
+                "respuestas_formulario_id": respuestas_form.id if respuestas_form else None,
+                "fecha_envio": respuestas_form.fecha_envio if respuestas_form else None
+            })
+    
+    return instrumentos_con_info

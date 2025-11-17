@@ -57,3 +57,40 @@ def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int):
     }
 
     return {"respuestas_formulario": respuestas_formulario}
+
+##
+def buscar_respuestas_formulario(db: Session, instrumento_id: int = None, usuario_id: int = None):
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import joinedload
+    
+    query = select(RespuestasFormulario)
+    
+    conditions = []
+    if instrumento_id:
+        conditions.append(RespuestasFormulario.instrumento_id == instrumento_id)
+    if usuario_id:
+        conditions.append(RespuestasFormulario.usuario_id == usuario_id)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+    
+    formularios = db.scalars(
+        query.options(
+            joinedload(RespuestasFormulario.instrumento).joinedload(Instrumento.materia),
+            joinedload(RespuestasFormulario.usuario)
+        )
+    ).all()
+    
+    return [
+        {
+            "id": form.id,
+            "fecha_envio": form.fecha_envio,
+            "instrumento_id": form.instrumento_id,
+            "usuario_id": form.usuario_id,
+            "materia": {
+                "id": form.instrumento.materia.id,
+                "nombre": form.instrumento.materia.nombre
+            } if form.instrumento and form.instrumento.materia else None
+        }
+        for form in formularios
+    ]

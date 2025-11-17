@@ -111,3 +111,14 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         respuestas_formulario=instrumento.respuestas_formulario or [], 
         materia=instrumento.materia
     )
+
+###
+##Obtener instrumentos por tipo y usuario, opcinal: filtrar por respondidos
+@router.get("/tipo/{tipo}")
+def obtener_instrumentos_por_tipo_y_usuario(
+    tipo: str,
+    usuario_id: int = Query(...),
+    mostrar_respondidos: bool = Query(False),
+    db: Session = Depends(get_db)
+):
+    return services.obtener_instrumentos_por_tipo_usuario(db, tipo, usuario_id, mostrar_respondidos)

@@ -24,6 +24,8 @@ import { MostrarEstadisticas } from './components/Estadisticas/MostrarEstadistic
 import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.tsx';
 import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
+import VerRespuestasEstudiante from './components/RespuestasFormulario/VerRespuestasEstudiante.tsx';
+import VerRespuestas from './components/RespuestasFormulario/VerRespuestas.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -37,7 +39,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route path='/' element={<CompararPlantillas/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
-                <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
+                <Route path='/mostrar-estadisticas-departamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
                 <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas/>}></Route>
                 <Route path='/Materias' element={<SeleccionarMateria/>}></Route>
                 <Route path='/instrumentos-docente' element={<InstrumentosDocente/>}></Route>
@@ -53,6 +55,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>
                 <Route path='/VerInformeActividadCurricular' element={<PaginaInformesCatedra/>}></Route>
                 <Route path='/PlanificarPeriodos' element={<PlanificarPeriodos/>}></Route>
+                <Route path="/mis-respuestas" element={<VerRespuestasEstudiante />} />
+                <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas />} />
               </Routes>
             </ProtectedRoute>
           }

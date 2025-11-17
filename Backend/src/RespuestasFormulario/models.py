@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING, List
-from sqlalchemy import Date, Integer, ForeignKey
+from sqlalchemy import Date, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import date
 from src.models import ModeloBase
@@ -15,6 +15,7 @@ class RespuestasFormulario(ModeloBase):
     #Atributos
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     fecha_envio: Mapped[date] = mapped_column(Date, nullable=True)
+    datos: Mapped[str] = mapped_column(String)
 
     #Foraneas
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)

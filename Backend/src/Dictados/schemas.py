@@ -22,11 +22,7 @@ class Dictado(DictadoBase):
     model_config = {"from_attributes": True}
     pass
 
-class MateriaDictado(BaseModel):
-    materia: "Materia"
-    dictado: "Dictado"
 
 from src.Materias.schemas import Materia
 Dictado.model_rebuild()
-MateriaDictado.model_rebuild()
 

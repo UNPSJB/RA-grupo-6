@@ -45,3 +45,8 @@ def get_estadisticas_por_materia(carrera_id: int, db: Session = Depends(get_db))
 @router.get("/EstadisticasPorAnio", response_model=dict)
 def get_estadisticas_por_anio(departamento_id: Optional[int] = Query(None, description="Filtrar por departamento"), db: Session = Depends(get_db)):
     return services.getEstadisticasPorAnio(db, departamento_id)
+
+
+@router.get("/Inscriptos/{materia_id}/{instrumento_id}", response_model=int)
+def get_inscriptos(materia_id:str, instrumento_id:int, db: Session = Depends(get_db)):
+    return services.get_inscriptos(db, materia_id, instrumento_id)

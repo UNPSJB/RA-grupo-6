@@ -140,7 +140,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
 
       <div className="contenedor-scroll"style={{maxHeight: '400px', 
           overflowY: 'auto',  padding: '1.25rem'}}>
-      <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto}/>
+      <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto} label="Contenido de la pregunta"/>
 
       <ElegirGrupoPregunta selectedGrupo={grupoSeleccionado} onChangeGrupo={setGrupoSeleccionado} error={errores.grupo}></ElegirGrupoPregunta>
 

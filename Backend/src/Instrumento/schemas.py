@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from datetime import date
 from typing import TYPE_CHECKING, List, Optional
 
+from src.Dictados.schemas import Dictado
 from src.Departamento.schemas import Departamento
 from src.RespuestasFormulario.schemas import RespuestasFormulario
 from src.PlantillaFormulario.schemas import PlantillaFormulario
@@ -73,6 +74,7 @@ class InstrumentoDetalle(BaseModel):
     materia: Materia 
     departamento: Departamento
     tipo: TipoInstrumento
+    dictado: Dictado
 
 # cómo se ve cada opción con su conteo?
 class EstadisticaOpcion(BaseModel):

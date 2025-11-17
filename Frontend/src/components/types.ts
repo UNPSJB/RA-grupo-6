@@ -118,6 +118,7 @@ export type InstrumentoDetail = InstrumentoBase & {
   departamento: Departamento
   materia: Materia
   plantilla_formulario: PlantillaFormulario
+  dictado: Dictado
 };
 
 export type RespuestaDetalle = {
@@ -296,4 +297,16 @@ export type Dictado = {
     fecha_inicio: Date
     fecha_cierre: Date
     materias: Materia[] 
+}
+
+
+export interface DatosInstrumentoDocenteProps {
+    sede: string;
+    cicloLectivo: number;
+    asignatura: string;
+    codAsignatura: string;
+    docente: string;
+    inscriptos: number;
+    comisionesTeoricas: number;
+    comisionesPracticas: number;
 }

@@ -70,6 +70,7 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
             .joinedload(RespuestasFormularioModel.respuestas)
             .joinedload(RespuestaModel.opcion),
         joinedload(InstrumentoModel.departamento),
+        joinedload(InstrumentoModel.dictado),
     ).filter(InstrumentoModel.id == instrumento_id).first()
 
     if not instrumento:
@@ -87,7 +88,8 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
             respuestas_formulario=instrumento.respuestas_formulario,
             materia=instrumento.materia,
             departamento=instrumento.departamento,
-            tipo = instrumento.tipo
+            tipo = instrumento.tipo, 
+            dictado= instrumento.dictado
         )
     
     respuestas_form = instrumento.respuestas_formulario[0] 
@@ -114,5 +116,6 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         respuestas_formulario=instrumento.respuestas_formulario or [], 
         materia=instrumento.materia,
         departamento=instrumento.departamento,
-        tipo=instrumento.tipo
+        tipo=instrumento.tipo,
+        dictado=instrumento.dictado
     )

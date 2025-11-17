@@ -9,8 +9,7 @@ from .models import EnumTipoCiclo
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
 # https://docs.pydantic.dev/latest/concepts/fields/
 
-if TYPE_CHECKING: 
-    from src.Dictados.schemas import MateriaDictado 
+
 
 class MateriaBase(BaseModel):
     id: str
@@ -19,13 +18,11 @@ class MateriaBase(BaseModel):
     departamento: Departamento
     carrera: Carrera
     ciclo: EnumTipoCiclo
-    materias_dictados: List["MateriaDictado"]
 
 class Materia(MateriaBase):
     model_config = {"from_attributes": True,
                     "recursive_guard": True,}
     pass
 
-from src.Dictados.schemas import MateriaDictado 
 Materia.model_rebuild()
 

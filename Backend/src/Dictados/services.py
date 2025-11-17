@@ -3,7 +3,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 from typing import TYPE_CHECKING, Dict, Any 
 
-from src.PeriodoVinculado.schemas import PeriodoVinculado
 from src.Materias.models import Materia, EnumTipoDictado
 from src.Dictados.models import Dictado, MateriaDictado
 from src.Dictados import schemas,exceptions
@@ -19,10 +18,6 @@ from src.Instrumento.services import crearInstrumentos
 
 if TYPE_CHECKING:
     from src.Email.tasks import scheduler
-
-
-
-
 
 def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dictado:
 
@@ -396,6 +391,25 @@ def _obtener_estudiantes_asignados(db: Session, materia: Materia, instrumento: I
     except Exception as e:
         print(f"Error calculando estudiantes asignados para materia {materia.id}: {e}")
         return 0
+
+
+def get_inscriptos(db:Session, materia_id:str, instrumento_id:int) -> int:
+
+    instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+
+    try:
+        count = db.query(PeriodoVinculado).filter(
+            PeriodoVinculado.materia_id == materia_id,
+            PeriodoVinculado.fecha_desde <= instrumento.dictado.fecha_cierre,
+            (PeriodoVinculado.fecha_hasta >= instrumento.dictado.fecha_inicio) & (PeriodoVinculado.fecha_hasta.is_not(None))
+        ).count()
+        return count
+    except Exception as e:
+        print(f"Error calculando estudiantes asignados para materia {materia_id}: {e}")
+        return 0
+
+
+
 
 
 

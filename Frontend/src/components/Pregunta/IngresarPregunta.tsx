@@ -6,14 +6,14 @@ type Props = {
     texto: string;
     setTexto: (v: string) => void;
     error?: string;
+    label: string
 };
 
-function IngresarPregunta({texto, setTexto, error} : Props){
+function IngresarPregunta({texto, setTexto, error, label} : Props){
 
     return (
-
         <Form.Group className="mb-3 text-start">
-            <Form.Label htmlFor="pregunta-cerrada" className="labelStyle fw-semibold"> Contenido de la pregunta </Form.Label>
+            <Form.Label htmlFor="pregunta-cerrada" className="labelStyle fw-semibold"> {label} </Form.Label>
             <Form.Control
                 as="textarea"
                 id="pregunta-cerrada"

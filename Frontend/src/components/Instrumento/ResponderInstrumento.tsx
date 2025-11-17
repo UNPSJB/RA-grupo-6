@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
-import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail } from '../types';
+import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail} from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
@@ -13,7 +13,7 @@ import PreguntaSimple from '../Pregunta/PreguntaSimple';
 import PreguntaMultiple from '../Pregunta/PreguntaMultiples';
 import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
-import { DatosInstrumento } from './DatosInstrumento';
+import { DatosInstrumentoDocente } from './DatosInstrumento';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -219,6 +219,19 @@ export default function ResponderInstrumento() {
     const grupoActual =
         !mostrarResumen && paginaActual < gruposOrganizados.length ? gruposOrganizados[paginaActual] : null;
 
+    // const props: DatosInstrumentoDocenteProps = {
+    //     sede: "",
+    //     cicloLectivo: 0,
+    //     asignatura: "",
+    //     codAsignatura: "",
+    //     docente: "",
+    //     inscriptos: 0,
+    //     comisionesTeoricas: 0,
+    //     comisionesPracticas: 0
+    // };
+    
+
+
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
             <Container style={{ maxWidth: '1200px' }}>
@@ -232,7 +245,7 @@ export default function ResponderInstrumento() {
 
                         {
                             instrumentoSeleccionado &&
-                            <DatosInstrumento instrumento={instrumentoSeleccionado} ></DatosInstrumento>
+                            <DatosInstrumentoDocente instrumento={instrumentoSeleccionado} ></DatosInstrumentoDocente>
                         }
 
                         <div className="text-center mb-4">

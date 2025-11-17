@@ -21,4 +21,3 @@ def get_Docente(materia_id:str, db:Session) -> UsuarioSchema:
     
     return docente.usuario
 
-

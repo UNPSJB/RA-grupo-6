@@ -32,7 +32,7 @@ def actualizar_respuesta(respuesta_id: int, respuesta: schemas.RespuestaUpdate, 
 def borrar_respuesta(respuesta_id: int, db: Session = Depends(get_db)) -> schemas.RespuestaDelete:
     return services.eliminar_respuesta(db, respuesta_id)  
 
-### version unificada del GET
+### version ampliada del GET "/"
 @router.get("/", response_model=list[schemas.Respuesta])
 def leer_respuestas(
     formulario_id: int = Query(None),

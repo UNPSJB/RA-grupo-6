@@ -1,4 +1,3 @@
-// VerRespuestasEstudiante.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Spinner, Alert, Badge, ListGroup } from 'react-bootstrap';
@@ -24,7 +23,8 @@ export default function VerRespuestasEstudiante() {
                 setMensaje('');
 
                 const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
-                //userid=5 ; username: lucas
+                //userid=5 ; username: lucas ; para mostrar datos
+                
                 const res = await fetch(`http://127.0.0.1:8000/RespuestasFormulario/buscar/?usuario_id=${userId}`);
                 if (!res.ok) throw new Error('No se pudieron cargar las encuestas');
 
@@ -99,7 +99,7 @@ export default function VerRespuestasEstudiante() {
                                                     </small>
                                                     {encuesta.plantilla_formulario_id && (
                                                         <Badge bg="success" className="ms-2">
-                                                            Formulario listo
+                                                            Formulario respondido
                                                         </Badge>
                                                     )}
                                                 </div>

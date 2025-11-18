@@ -58,7 +58,6 @@ def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int):
 
     return {"respuestas_formulario": respuestas_formulario}
 
-##
 def buscar_respuestas_formulario(db: Session, instrumento_id: int = None, usuario_id: int = None):
     from sqlalchemy import select, and_
     from sqlalchemy.orm import joinedload
@@ -82,15 +81,17 @@ def buscar_respuestas_formulario(db: Session, instrumento_id: int = None, usuari
     ).all()
     
     return [
-        {
-            "id": form.id,
-            "fecha_envio": form.fecha_envio,
-            "instrumento_id": form.instrumento_id,
-            "usuario_id": form.usuario_id,
-            "materia": {
-                "id": form.instrumento.materia.id,
-                "nombre": form.instrumento.materia.nombre
-            } if form.instrumento and form.instrumento.materia else None
-        }
-        for form in formularios
-    ]
+    {
+        "id": form.id,
+        "fecha_envio": form.fecha_envio,
+        "instrumento_id": form.instrumento_id,
+        "usuario_id": form.usuario_id,
+        "materia": {
+            "id": form.instrumento.materia.id,
+            "nombre": form.instrumento.materia.nombre
+        } if form.instrumento and form.instrumento.materia else None,
+        "plantilla_formulario_id": form.instrumento.plantilla_formulario_id
+        if form.instrumento else None
+    }
+    for form in formularios
+]

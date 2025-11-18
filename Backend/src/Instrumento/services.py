@@ -210,12 +210,10 @@ def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrument
 
     return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
 
-###
 def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
     from sqlalchemy import select, and_
     from sqlalchemy.orm import joinedload
     
-    # Obtener instrumentos de tipo X
     instrumentos = db.scalars(
         select(Instrumento)
         .where(Instrumento.tipo == tipo)
@@ -227,8 +225,7 @@ def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: in
     
     instrumentos_con_info = []
     
-    for instrumento in instrumentos:
-        # Verificar si el user tiene RespuestasFormulario para el instrumento
+    for instrumento in instrumentos: # Verificar si el user tiene RespuestasFormulario para el instrumento
         respuestas_form = db.scalar(
             select(RespuestasFormulario)
             .where(

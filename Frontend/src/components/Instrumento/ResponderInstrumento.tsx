@@ -219,18 +219,6 @@ export default function ResponderInstrumento() {
     const grupoActual =
         !mostrarResumen && paginaActual < gruposOrganizados.length ? gruposOrganizados[paginaActual] : null;
 
-    // const props: DatosInstrumentoDocenteProps = {
-    //     sede: "",
-    //     cicloLectivo: 0,
-    //     asignatura: "",
-    //     codAsignatura: "",
-    //     docente: "",
-    //     inscriptos: 0,
-    //     comisionesTeoricas: 0,
-    //     comisionesPracticas: 0
-    // };
-    
-
 
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>

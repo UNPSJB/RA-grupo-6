@@ -15,7 +15,7 @@ class RespuestasFormularioBase(BaseModel):
 
 
 class RespuestasFormularioCreate(RespuestasFormularioBase):
-    # datos: str
+    datos: str
     pass
 
 

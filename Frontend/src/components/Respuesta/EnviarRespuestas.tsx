@@ -1,3 +1,4 @@
+import { getDatosInstrumento } from "../Funciones";
 import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
 
 export async function enviarFormularioCompleto(
@@ -32,11 +33,20 @@ async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any)
         throw new Error('No hay usuario autenticado para crear el formulario');
     }
 
+    let datos 
+    if (instrumentoSeleccionado){
+        datos = " "
+    }
+    else{
+        datos =JSON.stringify(getDatosInstrumento(instrumentoSeleccionado)) 
+    }
+
     const cuerpoFormulario = {
         materia_id: instrumentoSeleccionado.materia?.id,
         usuario_id: usuarioActual.id,
         instrumento_id: instrumentoSeleccionado.id,
         fecha_envio: new Date().toISOString().split('T')[0],
+        datos: datos
     };
     const formularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
         method: 'POST',

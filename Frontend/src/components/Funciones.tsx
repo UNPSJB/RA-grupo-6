@@ -64,3 +64,4 @@ export function getDatosInstrumento(instrumento : InstrumentoDetail){
     
     return datosInstrumento
 }
+

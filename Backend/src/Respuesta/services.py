@@ -167,6 +167,7 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         )
     ).all()
     
+    
     if not instrumentos_catedra:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     

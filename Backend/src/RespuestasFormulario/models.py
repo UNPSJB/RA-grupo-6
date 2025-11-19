@@ -15,7 +15,7 @@ class RespuestasFormulario(ModeloBase):
     #Atributos
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     fecha_envio: Mapped[date] = mapped_column(Date, nullable=True)
-    # datos: Mapped[str] = mapped_column(String)
+    datos: Mapped[str] = mapped_column(String, nullable=True)
 
     #Foraneas
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)

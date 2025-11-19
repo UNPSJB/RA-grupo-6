@@ -25,7 +25,10 @@ import { CompararPlantillas } from './components/Estadisticas/CompararPeriodos.t
 import { MostrarEstadisticasDepartamento } from './components/Estadisticas/MostrarEstadisticasDepartamento.tsx';
 import { PlanificarPeriodos } from './components/Planificacion/PlanificarInstrumentos.tsx';
 import VerRespuestasEstudiante from './components/RespuestasFormulario/VerRespuestasEstudiante.tsx';
+import VerRespuestasDocente from './components/RespuestasFormulario/VerRespuestasDocente.tsx';
+import VerRespuestasDepartamento from './components/RespuestasFormulario/VerRespuestasDepartamento.tsx';
 import VerRespuestas from './components/RespuestasFormulario/VerRespuestas.tsx';
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -55,8 +58,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route path='/VerEncuestasEstudiante' element={<PaginaEncuestasEstudiantes/>}></Route>
                 <Route path='/VerInformeActividadCurricular' element={<PaginaInformesCatedra/>}></Route>
                 <Route path='/PlanificarPeriodos' element={<PlanificarPeriodos/>}></Route>
-                <Route path="/mis-respuestas" element={<VerRespuestasEstudiante />} />
-                <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas />} />
+                <Route path="/respuestas-encuesta-estudiante" element={<VerRespuestasEstudiante/>}></Route>
+                <Route path="/respuestas-informe-catedra" element={<VerRespuestasDocente/>}></Route>
+                <Route path="/respuestas-informe-sintetico" element={<VerRespuestasDepartamento/>}></Route>
+                <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas/>}></Route>
               </Routes>
             </ProtectedRoute>
           }

@@ -259,3 +259,47 @@ def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: in
             })
     
     return instrumentos_con_info
+
+##
+#Obtiene informes de cátedra respondidos por un usuario 
+def obtener_informes_catedra_por_usuario(db: Session, usuario_id: int):
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import joinedload
+    
+    # Buscar respuestas formulario para instrumentos INFORME_CATEDRA
+    respuestas_form = db.scalars(
+        select(RespuestasFormulario)
+        .join(Instrumento)
+        .options(
+            joinedload(RespuestasFormulario.instrumento)
+            .joinedload(Instrumento.materia),
+            joinedload(RespuestasFormulario.instrumento)
+            .joinedload(Instrumento.plantilla_formulario)
+        )
+        .where(and_(
+            RespuestasFormulario.usuario_id == usuario_id,
+            Instrumento.tipo == TipoInstrumento.INFORME_CATEDRA
+        ))
+    ).all()
+    
+    return [
+        {
+            "id": rf.id,
+            "fecha_envio": rf.fecha_envio,
+            "instrumento_id": rf.instrumento_id,
+            "instrumento": {
+                "id": rf.instrumento.id,
+                "nombre": rf.instrumento.plantilla_formulario.titulo,
+                "tipo": rf.instrumento.tipo,
+                "fecha_inicio": rf.instrumento.fecha_inicio,
+                "fecha_cierre": rf.instrumento.fecha_cierre
+            },
+            "materia": {
+                "id": rf.instrumento.materia.id,
+                "nombre": rf.instrumento.materia.nombre
+            },
+            "plantilla_formulario_id": rf.instrumento.plantilla_formulario_id,
+            "respondido": True
+        }
+        for rf in respuestas_form
+    ]

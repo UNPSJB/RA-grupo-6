@@ -29,18 +29,31 @@ export default function VerRespuestas() {
     const materiaNombre = locationState.materiaNombre || '';
     const fechaEnvio = locationState.fechaEnvio || '';
     const plantillaFormularioId = locationState.plantillaFormularioId;
+    const tipoInstrumento = locationState.tipoInstrumento || 'ENCUESTA_ESTUDIANTE';
 
     useEffect(() => {
         if (respuestasFormularioId) {
-            cargarDatos(parseInt(respuestasFormularioId));
+            cargarTodosLosDatos(parseInt(respuestasFormularioId));
         }
     }, [respuestasFormularioId]);
 
-    const cargarDatos = async (formId: number): Promise<void> => {
+    const cargarTodosLosDatos = async (formId: number): Promise<void> => {
         setCargando(true);
         setError('');
 
         try {
+            await cargarDatosEncuesta(formId);
+        } catch (e: unknown) {
+            const mensaje = e instanceof Error ? e.message : 'Error al cargar los datos';
+            setError(mensaje);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    const cargarDatosEncuesta = async (formId: number): Promise<void> => {
+        try {
+            // Cargar respuestas
             const resp = await fetch(
                 `http://127.0.0.1:8000/respuestas/?formulario_id=${formId}`
             );
@@ -50,6 +63,7 @@ export default function VerRespuestas() {
             const respuestasData: RespuestaGuardada[] = await resp.json();
             setRespuestas(respuestasData);
 
+            // Cargar plantilla del formulario
             if (plantillaFormularioId) {
                 const plantillaResponse = await fetch(
                     `http://127.0.0.1:8000/formularios/${plantillaFormularioId}`
@@ -63,10 +77,20 @@ export default function VerRespuestas() {
                 }
             }
         } catch (e: unknown) {
-            const mensaje = e instanceof Error ? e.message : 'Error';
-            setError(mensaje);
-        } finally {
-            setCargando(false);
+            throw e;
+        }
+    };
+
+    // Función para obtener badge según el tipo
+    const getBadgeConfig = () => {
+        switch (tipoInstrumento) {
+            case 'INFORME_CATEDRA':
+                return { bg: "primary", text: "Informe de Cátedra"};
+            case 'INFORME_SINTETICO':
+                return { bg: "info", text: "Informe Sintético"};
+            case 'ENCUESTA_ESTUDIANTE':
+            default:
+                return { bg: "success", text: "Encuesta Estudiante"};
         }
     };
 
@@ -92,6 +116,311 @@ export default function VerRespuestas() {
         );
     };
 
+    // Render preguntas de grupo
+    const renderPreguntasDelGrupo = (grupo: GrupoPreguntas) => {
+        return grupo.preguntas.map((pregunta) => {
+            const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
+
+            return (
+                <Card 
+                    key={pregunta.id} 
+                    className="mb-4 border-0 shadow-sm"
+                    style={{
+                        width: '100%',
+                        minWidth: '100%',
+                        maxWidth: '100%'
+                    }}
+                >
+                    <Card.Body 
+                        className="p-4"
+                        style={{
+                            width: '100%',
+                            minWidth: '100%'
+                        }}
+                    >
+                        {/* Encabezado de pregunta*/}
+                        <div 
+                            className="mb-3"
+                            style={{
+                                width: '100%',
+                                minWidth: '100%',
+                                maxWidth: '100%'
+                            }}
+                        >
+                            <div 
+                                className="fw-bold mb-2"
+                                style={{ 
+                                    color: "#1f2937", 
+                                    fontSize: "1.2rem",
+                                    lineHeight: '1.4',
+                                    width: '100%',
+                                    minWidth: '100%',
+                                    maxWidth: '100%',
+                                    display: 'block',
+                                    whiteSpace: 'normal',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    wordBreak: 'normal',
+                                    textAlign: 'left'
+                                }}
+                            >
+                                {pregunta.orden}. {pregunta.texto}
+                            </div>
+                            
+                            {/* Badges debajo del texto de la pregunta */}
+                            <div className="d-flex gap-2 flex-wrap mt-2">
+                                {pregunta.obligatoria && (
+                                    <Badge bg="danger" className="fs-7">Obligatoria</Badge>
+                                )}
+                                {pregunta.tipo === "abierta" && (
+                                    <Badge bg="secondary" className="fs-7">Abierta</Badge>
+                                )}
+                                {pregunta.tipo === "cerrada" && (
+                                    <Badge bg="primary" className="fs-7">Cerrada</Badge>
+                                )}
+                                {pregunta.multiple_respuestas && (
+                                    <Badge bg="warning" text="dark" className="fs-7">
+                                        Repetible
+                                    </Badge>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Respuestas */}
+                        <div 
+                            className="mt-3"
+                            style={{
+                                width: '100%',
+                                minWidth: '100%'
+                            }}
+                        >
+                            {respuestasPregunta.length > 0 ? (
+                                respuestasPregunta.map((r, i) =>
+                                    renderRespuesta(r, pregunta, i)
+                                )
+                            ) : (
+                                <div className="p-3 rounded bg-warning bg-opacity-10 w-100">
+                                    <i className="fas fa-exclamation-circle me-2 text-warning"></i>
+                                    <span className="text-muted">No respondida</span>
+                                </div>
+                            )}
+                        </div>
+                    </Card.Body>
+                </Card>
+            );
+        });
+    };
+
+    // Informe Sintético
+    const renderInformeSintetico = () => {
+        return (
+            <Container fluid className="mt-4 px-4">
+                <div className="row justify-content-center">
+                    <div className="col-12">
+                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                            <Card.Body className="p-4 p-md-5">
+                                
+                                {/* Encabezado Informe Sintético */}
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h1 className="fw-bold mb-2">Informe Sintético</h1>
+                                            <p className="text-muted mb-0">
+                                                Materia: {materiaNombre}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div className="d-flex gap-3">
+                                            <Badge bg="secondary" className="fs-6">
+                                                <i className="fas fa-calendar me-1" />
+                                                {new Date(fechaEnvio).toLocaleDateString()}
+                                            </Badge>
+                                            <Badge bg="info" className="fs-6">
+                                                <i className="fas fa-chart-pie me-1" />
+                                                Informe Sintético
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Alert variant="info" className="mb-4">
+                                    <i className="fas fa-info-circle me-2"></i>
+                                    Vista de informe sintético - Esta vista mostrará análisis consolidados cuando esté disponible.
+                                </Alert>
+
+                                {/* Mostrar respuestas fallback */}
+                                {renderVistaEncuesta()}
+                            </Card.Body>
+                        </Card>
+                    </div>
+                </div>
+            </Container>
+        );
+    };
+
+    // Renderp ara encuestas e informes de çatedra
+    const renderVistaEncuesta = () => {
+        const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
+            ? organizarPreguntasEnGrupos(plantillaFormulario)
+            : [];
+
+        if (!plantillaFormulario && respuestas.length > 0) {
+            return (
+                <div className="text-center py-5">
+                    <i className="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h5 className="text-warning mb-3">Plantilla no disponible</h5>
+                    <p className="text-muted">
+                        Las respuestas se cargaron correctamente pero no se pudo obtener la plantilla.
+                    </p>
+                    <Button variant="primary" onClick={() => navigate(-1)}>
+                        Volver
+                    </Button>
+                </div>
+            );
+        }
+
+        const estiloBotonActivo = { backgroundColor: "#0d6efd", border: "none", color: "#fff" };
+        const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
+
+        const badgeConfig = getBadgeConfig();
+
+        return (
+            <Container fluid className="mt-4 px-4">
+                <div className="row justify-content-center">
+                    <div className="col-12">
+                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                            <Card.Body className="p-4 p-md-5">
+
+                                {/* Encabezado */}
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h1 className="fw-bold mb-2">Respuestas enviadas</h1>
+                                            <p className="text-muted mb-0">
+                                                Materia: {materiaNombre}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div className="d-flex gap-3">
+                                            <Badge bg="secondary" className="fs-6">
+                                                <i className="fas fa-calendar me-1" />
+                                                {new Date(fechaEnvio).toLocaleDateString()}
+                                            </Badge>
+                                            <Badge bg={badgeConfig.bg} className="fs-6">
+                                                {badgeConfig.text}
+                                            </Badge>
+                                        </div>
+
+                                        {gruposOrganizados.length > 0 && (
+                                            <div className="text-end">
+                                                <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
+                                                    <span style={{ color: "grey", fontSize: "13px" }}>TOTAL PREGUNTAS</span>
+                                                    <br />
+                                                    {gruposOrganizados.reduce((total, grupo) => total + grupo.preguntas.length, 0)} preguntas
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Botón volver */}
+                                <div className="mb-4">
+                                    <Button
+                                        variant="outline-secondary"
+                                        onClick={() => navigate(-1)}
+                                        className="mb-3"
+                                    >
+                                        <i className="fa-solid fa-arrow-left me-2"></i>
+                                        Volver
+                                    </Button>
+                                </div>
+
+                                {/* Contenido de respuestas */}
+                                {!gruposOrganizados.length ? (
+                                    <div className="text-center py-5">
+                                        <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <h5 className="text-muted mb-3">No se encontraron preguntas para mostrar</h5>
+                                        <p className="text-muted">
+                                            No hay preguntas disponibles en esta encuesta.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="respuestas-content">
+                                        {/* Mostrar solo el grupo activo si hay múltiples grupos */}
+                                        {gruposOrganizados.length > 1 ? (
+                                            <>
+                                                {/* Botones de navegación entre grupos */}
+                                                <Stack className="pt-3 pb-3 mb-4" direction="horizontal" gap={3}>
+                                                    {gruposOrganizados.map((grupo, index) => (
+                                                        <Button
+                                                            key={grupo.id}
+                                                            style={grupoActivo === index ? estiloBotonActivo : estiloBotonInactivo}
+                                                            onClick={() => setGrupoActivo(index)}
+                                                            className="flex-grow-1"
+                                                        >
+                                                            {grupo.nombre} ({grupo.preguntas.length})
+                                                        </Button>
+                                                    ))}
+                                                </Stack>
+
+                                                {gruposOrganizados.map((grupo, grupoIdx) => (
+                                                    grupoIdx === grupoActivo && (
+                                                        <div key={grupo.id}>
+                                                            {/* Encabezado del grupo */}
+                                                            <div
+                                                                className="mb-4 p-3 rounded"
+                                                                style={{
+                                                                    backgroundColor: "#e7f3ff",
+                                                                    borderLeft: "5px solid #0d6efd",
+                                                                }}
+                                                            >
+                                                                <h4 className="fw-bold mb-1 fs-5">{grupo.nombre}</h4>
+                                                                <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
+                                                                    {grupo.preguntas.length} preguntas
+                                                                </p>
+                                                            </div>
+
+                                                            {/* Preguntas del grupo activo*/}
+                                                            {renderPreguntasDelGrupo(grupo)}
+                                                        </div>
+                                                    )
+                                                ))}
+                                            </>
+                                        ) : (
+                                            // Mostrar 1 solo grupo
+                                            gruposOrganizados.map((grupo) => (
+                                                <div key={grupo.id}>
+                                                    {renderPreguntasDelGrupo(grupo)}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Botón al pie */}
+                                <div className="text-center mt-4 pt-3 border-top">
+                                    <Button
+                                        variant="outline-primary"
+                                        onClick={() => navigate(-1)}
+                                        className="me-3"
+                                    >
+                                        <i className="fas fa-arrow-left me-2"></i>
+                                        Volver
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </div>
+                </div>
+            </Container>
+        );
+    };
+
+    // carga y error
     if (cargando) {
         return (
             <Container className="mt-4">
@@ -123,8 +452,8 @@ export default function VerRespuestas() {
                                     {error}
                                 </Alert>
                                 <div className="text-center mt-4">
-                                    <Button variant="secondary" onClick={() => navigate('/mis-respuestas')}>
-                                        Volver a mis encuestas respondidas
+                                    <Button variant="secondary" onClick={() => navigate(-1)}>
+                                        Volver
                                     </Button>
                                 </div>
                             </Card.Body>
@@ -135,234 +464,6 @@ export default function VerRespuestas() {
         );
     }
 
-    const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
-        ? organizarPreguntasEnGrupos(plantillaFormulario)
-        : [];
-
-
-    const estiloBotonActivo = { backgroundColor: "#0d6efd", border: "none", color: "#fff" };
-    const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
-
-    return (
-        <Container fluid className="mt-4 px-4">
-            <div className="row justify-content-center">
-                <div className="col-12">
-                    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                        <Card.Body className="p-4 p-md-5">
-
-                            {/* Encabezado */}
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <h1 className="fw-bold mb-2">Respuestas enviadas</h1>
-                                        <p className="text-muted mb-0">
-                                            Materia: {materiaNombre}
-                                        </p>
-                                    </div>
-                                </div>
-                                
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="d-flex gap-3">
-                                        <Badge bg="secondary" className="fs-6">
-                                            <i className="fas fa-calendar me-1" />
-                                            {new Date(fechaEnvio).toLocaleDateString()}
-                                        </Badge>
-                                        <Badge bg="info" className="fs-6">
-                                            <i className="fas fa-eye me-1" />
-                                            Modo lectura
-                                        </Badge>
-                                    </div>
-
-                                    <div className="text-end">
-                                        <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
-                                            <span style={{ color: "grey", fontSize: "13px" }}>TOTAL PREGUNTAS</span>
-                                            <br />
-                                            {gruposOrganizados.reduce((total, grupo) => total + grupo.preguntas.length, 0)} preguntas
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Botón volver */}
-                            <div className="mb-4">
-                                <Button
-                                    variant="outline-secondary"
-                                    onClick={() => navigate('/mis-respuestas')}
-                                    className="mb-3"
-                                >
-                                    <i className="fa-solid fa-arrow-left me-2"></i>
-                                    Volver a mis encuestas respondidas
-                                </Button>
-                            </div>
-
-                            {/* Botones de navegación entre grupos */}
-                            {gruposOrganizados.length > 1 && (
-                                <Stack className="pt-3 pb-3 mb-4" direction="horizontal" gap={3}>
-                                    {gruposOrganizados.map((grupo, index) => (
-                                        <Button
-                                            key={grupo.id}
-                                            style={grupoActivo === index ? estiloBotonActivo : estiloBotonInactivo}
-                                            onClick={() => setGrupoActivo(index)}
-                                            className="flex-grow-1"
-                                        >
-                                            {grupo.nombre} ({grupo.preguntas.length})
-                                        </Button>
-                                    ))}
-                                </Stack>
-                            )}
-
-                            {/* Contenido de resputas */}
-                            {!gruposOrganizados.length ? (
-                                <div className="text-center py-5">
-                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No se encontraron preguntas para mostrar</h5>
-                                    <p className="text-muted">
-                                        No hay preguntas disponibles en esta encuesta.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="respuestas-content">
-                                    {/* Mostrar solo el grupo activo */}
-                                    {gruposOrganizados.map((grupo, grupoIdx) => (
-                                        grupoIdx === grupoActivo && (
-                                            <div key={grupo.id}>
-                                                {/* Encabezado del grupo */}
-                                                {gruposOrganizados.length > 1 && (
-                                                    <div
-                                                        className="mb-4 p-3 rounded"
-                                                        style={{
-                                                            backgroundColor: "#e7f3ff",
-                                                            borderLeft: "5px solid #0d6efd",
-                                                        }}
-                                                    >
-                                                        <h4 className="fw-bold mb-1 fs-5">{grupo.nombre}</h4>
-                                                        <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
-                                                            {grupo.preguntas.length} preguntas
-                                                        </p>
-                                                    </div>
-                                                )}
-
-                                                {/* Preguntas del grupo activo*/}
-                                                {grupo.preguntas.map((pregunta) => {
-                                                    const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
-
-                                                    return (
-                                                        <Card 
-                                                            key={pregunta.id} 
-                                                            className="mb-4 border-0 shadow-sm"
-                                                            style={{
-                                                                width: '100%',
-                                                                minWidth: '100%',
-                                                                maxWidth: '100%'
-                                                            }}
-                                                        >
-                                                            <Card.Body 
-                                                                className="p-4"
-                                                                style={{
-                                                                    width: '100%',
-                                                                    minWidth: '100%'
-                                                                }}
-                                                            >
-                                                                {/* Encabezado de pregunta*/}
-                                                                <div 
-                                                                    className="mb-3"
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        minWidth: '100%',
-                                                                        maxWidth: '100%'
-                                                                    }}
-                                                                >
-                                                                    <div 
-                                                                        className="fw-bold mb-2"
-                                                                        style={{ 
-                                                                            color: "#1f2937", 
-                                                                            fontSize: "1.2rem",
-                                                                            lineHeight: '1.4',
-                                                                            width: '100%',
-                                                                            minWidth: '100%',
-                                                                            maxWidth: '100%',
-                                                                            display: 'block',
-                                                                            whiteSpace: 'normal',
-                                                                            wordWrap: 'break-word',
-                                                                            overflowWrap: 'break-word',
-                                                                            wordBreak: 'normal',
-                                                                            textAlign: 'left'
-                                                                        }}
-                                                                    >
-                                                                        {pregunta.orden}. {pregunta.texto}
-                                                                    </div>
-                                                                    
-                                                                    {/* Badges debajo del texto de la pregunta */}
-                                                                    <div className="d-flex gap-2 flex-wrap mt-2">
-                                                                        {pregunta.obligatoria && (
-                                                                            <Badge bg="danger" className="fs-7">Obligatoria</Badge>
-                                                                        )}
-                                                                        {pregunta.tipo === "abierta" && (
-                                                                            <Badge bg="secondary" className="fs-7">Abierta</Badge>
-                                                                        )}
-                                                                        {pregunta.tipo === "cerrada" && (
-                                                                            <Badge bg="primary" className="fs-7">Cerrada</Badge>
-                                                                        )}
-                                                                        {pregunta.multiple_respuestas && (
-                                                                            <Badge bg="warning" text="dark" className="fs-7">
-                                                                                Varias respuestas
-                                                                            </Badge>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Respuestas */}
-                                                                <div 
-                                                                    className="mt-3"
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        minWidth: '100%'
-                                                                    }}
-                                                                >
-                                                                    {respuestasPregunta.length > 0 ? (
-                                                                        respuestasPregunta.map((r, i) =>
-                                                                            renderRespuesta(r, pregunta, i)
-                                                                        )
-                                                                    ) : (
-                                                                        <div className="p-3 rounded bg-warning bg-opacity-10 w-100">
-                                                                            <i className="fas fa-exclamation-circle me-2 text-warning"></i>
-                                                                            <span className="text-muted">No respondida</span>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </Card.Body>
-                                                        </Card>
-                                                    );
-                                                })}
-                                            </div>
-                                        )
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Botones al pie */}
-                            <div className="text-center mt-4 pt-3 border-top">
-                                <Button
-                                    variant="outline-primary"
-                                    onClick={() => navigate('/mis-respuestas')}
-                                    className="me-3"
-                                >
-                                    <i className="fas fa-list me-2"></i>
-                                    Volver a mis encuestas respondidas
-                                </Button>
-
-                                <Button
-                                    variant="primary"
-                                    onClick={() => navigate('/materias')}
-                                >
-                                    <i className="fas fa-edit me-2"></i>
-                                    Responder otra encuesta
-                                </Button>
-                            </div>
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
-        </Container>
-    );
+    // Render según tipo de instrumento - renderVistaEncuesta vale para informes de cátedra
+    return tipoInstrumento === 'INFORME_SINTETICO' ? renderInformeSintetico() : renderVistaEncuesta();
 }

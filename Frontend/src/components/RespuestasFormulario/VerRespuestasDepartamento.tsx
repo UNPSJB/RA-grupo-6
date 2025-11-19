@@ -12,7 +12,7 @@ interface InstrumentoRespondido {
     respuestas_formulario_id?: number;
 }
 
-export default function VerRespuestasEstudiante() {
+export default function VerRespuestasDepartamento() {
     const navigate = useNavigate();
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
@@ -27,9 +27,9 @@ export default function VerRespuestasEstudiante() {
                 const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
                 
                 const res = await fetch(
-                    `http://127.0.0.1:8000/instrumentos/tipo/ENCUESTA_ESTUDIANTE?usuario_id=${userId}&mostrar_respondidos=true`
+                    `http://127.0.0.1:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${userId}&mostrar_respondidos=true`
                 );
-                if (!res.ok) throw new Error('No se pudieron cargar las encuestas respondidas');
+                if (!res.ok) throw new Error('No se pudieron cargar los informes sintéticos');
 
                 const data = await res.json();
                 setInstrumentos(data);
@@ -52,9 +52,9 @@ export default function VerRespuestasEstudiante() {
                         <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5 text-center">
                                 <Spinner animation="border" role="status" className="mb-3">
-                                    <span className="visually-hidden">Cargando encuestas...</span>
+                                    <span className="visually-hidden">Cargando informes...</span>
                                 </Spinner>
-                                <p className="text-muted">Cargando encuestas respondidas...</p>
+                                <p className="text-muted">Cargando informes sintéticos respondidos...</p>
                             </Card.Body>
                         </Card>
                     </div>
@@ -72,9 +72,9 @@ export default function VerRespuestasEstudiante() {
                             <div className="mb-4">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h1 className="fw-bold mb-2">Encuestas Respondidas</h1>
+                                        <h1 className="fw-bold mb-2">Informes Sintéticos Respondidos</h1>
                                         <p className="text-muted mb-0">
-                                            Selecciona una encuesta para ver tus respuestas
+                                            Selecciona un informe para ver las respuestas del departamento
                                         </p>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@ export default function VerRespuestasEstudiante() {
                                                         Fecha de envío: {new Date(instrumento.fecha_envio).toLocaleDateString()}
                                                     </small>
                                                     <Badge bg="primary" className="ms-2">
-                                                        Encuesta de Estudiante
+                                                        Informe Sintético
                                                     </Badge>
                                                     {instrumento.plantilla_formulario && (
                                                         <Badge bg="success" className="ms-2">
@@ -121,7 +121,7 @@ export default function VerRespuestasEstudiante() {
                                                             fechaEnvio: instrumento.fecha_envio,
                                                             instrumentoId: instrumento.instrumento_id || instrumento.id,
                                                             plantillaFormularioId: instrumento.plantilla_formulario?.id,
-                                                            tipoInstrumento: 'ENCUESTA_ESTUDIANTE'
+                                                            tipoInstrumento: 'INFORME_SINTETICO'
                                                         }
                                                     })
                                                 }
@@ -136,9 +136,9 @@ export default function VerRespuestasEstudiante() {
                             ) : (
                                 <div className="text-center py-5">
                                     <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay encuestas respondidas</h5>
+                                    <h5 className="text-muted mb-3">No hay informes sintéticos respondidos</h5>
                                     <p className="text-muted">
-                                        Aún no has respondido ninguna encuesta.
+                                        Aún no se han respondido informes sintéticos en el departamento.
                                     </p>
                                 </div>
                             )}

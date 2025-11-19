@@ -13,7 +13,7 @@ export function capitalizarCadena(cadena: string): string {
     return cadenaCapitalizada
 }
 
-export function getDatosInstrumento({instrumento} : {instrumento : InstrumentoDetail}){
+export function getDatosInstrumento(instrumento : InstrumentoDetail){
 
     const [docente, setDocente] = useState<Usuario>()
     const [cantInscriptos, setCantInscriptos] = useState(0)
@@ -62,5 +62,5 @@ export function getDatosInstrumento({instrumento} : {instrumento : InstrumentoDe
         }
     }, [instrumento, docente, cantInscriptos])
     
-    return JSON.stringify(datosInstrumento)
+    return datosInstrumento
 }

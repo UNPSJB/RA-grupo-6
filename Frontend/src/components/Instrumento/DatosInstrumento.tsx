@@ -1,27 +1,15 @@
-import {Col, Form, Row, Table,  } from "react-bootstrap";
+import {Table,  } from "react-bootstrap";
 import type { InstrumentoDetail, Usuario} from "../types";
 import { capitalizarCadena } from "../Funciones";
 import { useEffect, useState } from "react";
-
-
-
 
 
 export function DatosInstrumentoDocente({instrumento} : {instrumento : InstrumentoDetail}){
 
     const [docente, setDocente] = useState<Usuario>()
     const [inscriptos, setInscriptos] = useState(0)
-    const [comisionesTeoricas, setComisionesTeoricas] = useState("")
-    const [comisionesPracticas, setComisionesPracticas] = useState("")
 
-    // function inicializarProps(props : DatosInstrumentoDocenteProps,  instrumento: InstrumentoDetail){
-    //     props.asignatura = capitalizarCadena(instrumento.materia.nombre)
-    //     props.codAsignatura = instrumento.materia.id
-    //     props.docente = capitalizarCadena(docente? (docente?.nombre + docente?.apellido) : "-")
-    //     props.inscriptos = inscriptos
-    //     props.cicloLectivo = (new Date(instrumento.dictado.fecha_inicio).getFullYear())
-    //     props.sede = instrumento.departamento.sede
-    // }
+    const [cantidadColumnas, setCantidadColumnas] = useState(0)
 
     useEffect(() => {
         fetch(`http://127.0.0.1:8000/materias/get_docente/${instrumento.materia.id}`)
@@ -34,9 +22,24 @@ export function DatosInstrumentoDocente({instrumento} : {instrumento : Instrumen
         .then((data) => setInscriptos(data))
         .catch(error => console.log(error));
 
-        // inicializarProps(props, instrumento)
+        if(instrumento.tipo == 'ENCUESTA_ESTUDIANTE'){
+            setCantidadColumnas(3)
+
+        }
+        else{
+
+            if (instrumento.tipo == 'INFORME_CATEDRA'){
+                setCantidadColumnas(4)       
+            }
+            else{
+                setCantidadColumnas(8)
+            }
+        }
+
+
 
     }, []);
+
 
     return( 
         <div className="mb-3">
@@ -44,7 +47,7 @@ export function DatosInstrumentoDocente({instrumento} : {instrumento : Instrumen
             <Table striped bordered className="rounded-3 overflow-hidden mb-4" style={{tableLayout: "fixed"}}>
                 <thead>
                     <tr className="text-center">
-                        <th colSpan={5} style={{fontSize:"18px", backgroundColor:"#816767ff", color:"white"}}> DATOS </th>
+                        <th colSpan={cantidadColumnas} style={{fontSize:"18px", backgroundColor:"#816767ff", color:"white"}}> Información general </th>
                     </tr>
                 </thead>
 
@@ -70,8 +73,30 @@ export function DatosInstrumentoDocente({instrumento} : {instrumento : Instrumen
                                     </p>
                                 </td>
                             </>
-                        : 
+                        :  instrumento.tipo === 'INFORME_CATEDRA'?
+                        
+                        <>
+                            <td>
+                                <p className="mb-0 text-center">
+                                    <span className="fw-bold"> Ciclo Lectivo: </span> {(new Date(instrumento.dictado.fecha_inicio).getFullYear())}
+                                </p>
+                            </td>
+                            
+                            <td>
+                                <p className="mb-0 text-center">
+                                    <span className="fw-bold"> Departamento: </span> {instrumento.departamento.nombre}
+                                </p>
+                            </td>
 
+                            <td>
+                                <p className="mb-0 text-center">
+                                    <span className="fw-bold"> Integrantes: </span> -
+                                </p>
+                            </td>
+
+                        </>
+
+                        :
                         <>
                             <td>
                                 <p className="mb-0 text-center">
@@ -94,47 +119,26 @@ export function DatosInstrumentoDocente({instrumento} : {instrumento : Instrumen
                                     <span className="fw-bold"> Inscriptos: </span> {inscriptos} 
                                 </p>
                             </td>
+                        
+                                                    
+                            <td>
+                                <p className="mb-0 text-center">
+                                    <span className="fw-bold"> Comisiones teoricas: </span> - 
+                                </p>
+                            </td>
+
+                            <td>
+                                <p className="mb-0 text-center">
+                                    <span className="fw-bold"> Comisiones prácticas: </span> - 
+                                </p>
+                            </td>
+                        
                         </>
                         
                     }
                     </tr>
                 </tbody>
             </Table>
-
-            <Row>
-                <Col>
-                    <Form.Group className="mb-3 text-center">
-                        <Form.Label htmlFor="comisiones-teoricas" className="labelStyle fw-semibold"> Comisiones teoricas </Form.Label>
-                        <Form.Control
-                            as="input"
-                            type="number"
-                            min={1}
-                            id="comisiones-teoricas"
-                            placeholder="Número de comisiones teóricas..."
-                            required
-                            value={comisionesTeoricas}
-                            onChange={(e) => Number(e.target.value) > 0? setComisionesTeoricas(e.target.value) : setComisionesTeoricas("")}
-                            style={{borderRadius:"10px", marginTop:"8px",}}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col>
-                    <Form.Group className="mb-3 text-center">
-                        <Form.Label htmlFor="comisiones-practicas" className="labelStyle fw-semibold"> Comisiones prácticas </Form.Label>
-                        <Form.Control
-                            as="input"
-                            type="number"
-                            min={1}
-                            id="comisiones-practicas"
-                            placeholder="Número de comisiones prácticas..."
-                            required
-                            value={comisionesPracticas}
-                            onChange={(e) => Number(e.target.value) > 0? setComisionesPracticas(e.target.value) : setComisionesPracticas("")}
-                            style={{borderRadius:"10px", marginTop:"8px",}}
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
 
 
         </div>

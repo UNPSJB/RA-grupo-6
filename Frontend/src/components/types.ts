@@ -300,13 +300,26 @@ export type Dictado = {
 }
 
 
-export interface DatosInstrumentoDocenteProps {
+export interface DatosInstrumentoDocente {
     sede: string;
     cicloLectivo: number;
     asignatura: string;
     codAsignatura: string;
     docente: string;
     inscriptos: number;
-    comisionesTeoricas: number;
-    comisionesPracticas: number;
+    comisionesTeoricas: string;
+    comisionesPracticas: string;
+}
+
+export interface DatosInstrumentoEstudiante{
+  sede: string,
+  carrera: string,
+  asignatura: string
+}
+
+export interface DatosInstrumentoDepartamento{
+  sede: string,
+  cicloLectivo: number,
+  departamento: string,
+  integrantes: string
 }

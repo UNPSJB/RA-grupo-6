@@ -5,6 +5,7 @@ import array
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from src.Materias.services import get_Docente
 from src.Dictados.models import Dictado
 from src.Departamento.models import Departamento
 from src.Materias.models import Materia
@@ -209,3 +210,35 @@ def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrument
 
     return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
 
+
+def getDatosInstrumento(db:Session, instrumento_id: int) -> str :
+
+    db_instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+
+    docente = get_Docente(db_instrumento.materia_id, db)
+    # inscriptos = get_inscriptos(db, db_instrumento.materia_id, db_instrumento.id)
+    inscriptos = 0
+    datos = {}
+
+    if (db_instrumento.plantilla_formulario.rol.nombre.lower() == "estudiante"):
+        
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['carrera'] = db_instrumento.materia.carrera.nombre
+        datos['asignatura'] = db_instrumento.materia.nombre
+
+    elif (db_instrumento.plantilla_formulario.rol.nombre.lower() == "docente"):   
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['cicloLectivo'] = db_instrumento.dictado.fecha_inicio.year
+        datos['asignatura'] = db_instrumento.materia.nombre
+        datos['codAsignatura'] = db_instrumento.materia.id
+        datos['docente'] = (docente.nombre + " " + docente.apellido).capitalize()
+        datos['inscriptos'] = inscriptos
+        datos['comisionesTeoricas'] = "-",
+        datos['comisionesPracticas'] = "-"
+    else:  
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['cicloLectivo'] = db_instrumento.dictado.fecha_inicio.year
+        datos['departamento'] = db_instrumento.departamento.nombre
+        datos['integrantes'] = "-"
+    
+    return str(datos)

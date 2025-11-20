@@ -1,6 +1,7 @@
 import {Table,  } from "react-bootstrap";
 import type { InstrumentoDetail} from "../types";
-import { capitalizarCadena, getDatosInstrumento } from "../Funciones";
+import { capitalizarCadena} from "../Funciones";
+import { useEffect, useState } from "react";
 
 
 function obtenerFilas(datosInstrumento: any){
@@ -28,8 +29,16 @@ function obtenerFilas(datosInstrumento: any){
 
 export function DatosInstrumentoDocente({instrumento} : {instrumento : InstrumentoDetail}){
 
-    const datosInstrumento = getDatosInstrumento(instrumento)
-    const filas = obtenerFilas(datosInstrumento)
+    const [datos, setDatos] = useState<string>("")
+
+    useEffect(() => {
+        fetch(`http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumento/${instrumento.id}`)
+            .then(r => r.json())
+            .then(data => setDatos(data));
+
+    }, []);
+
+    const filas = obtenerFilas(JSON.parse(datos))
 
 
     return( 

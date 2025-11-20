@@ -1,4 +1,4 @@
-import { getDatosInstrumento } from "../Funciones";
+import { useEffect, useState } from "react";
 import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
 
 export async function enviarFormularioCompleto(
@@ -32,15 +32,16 @@ async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any)
     if (!usuarioActual || !usuarioActual.id) {
         throw new Error('No hay usuario autenticado para crear el formulario');
     }
+    
+    const [datos, setDatos] = useState<string>("")
 
-    let datos 
-    if (instrumentoSeleccionado){
-        datos = " "
-    }
-    else{
-        datos =JSON.stringify(getDatosInstrumento(instrumentoSeleccionado)) 
-    }
+    useEffect(() => {
+        fetch(`http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumento/${instrumentoSeleccionado.id}`)
+            .then(r => r.json())
+            .then(data => setDatos(data));
 
+    }, []);
+    
     const cuerpoFormulario = {
         materia_id: instrumentoSeleccionado.materia?.id,
         usuario_id: usuarioActual.id,

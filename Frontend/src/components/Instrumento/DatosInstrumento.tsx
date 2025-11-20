@@ -1,4 +1,4 @@
-import {Table,  } from "react-bootstrap";
+import {Table} from "react-bootstrap";
 import type { InstrumentoDetail} from "../types";
 import { capitalizarCadena} from "../Funciones";
 import { useEffect, useState } from "react";
@@ -27,23 +27,23 @@ function obtenerFilas(datosInstrumento: any){
 }
 
 
-export function DatosInstrumentoDocente({instrumento} : {instrumento : InstrumentoDetail}){
+export function DatosInstrumento({instrumento} : {instrumento : InstrumentoDetail}){
 
-    const [datos, setDatos] = useState<any>(null) // o el tipo específico que esperas
 
-    const [filas, setFilas] = useState<any>()
+    const [filas, setFilas] = useState<any[]>([])
 
     useEffect(() => {
         fetch(`http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumento/${instrumento.id}`)
             .then(r => r.json())
-            .then(data => {setDatos(data); setFilas(obtenerFilas)}) // data ya está parseado por .json()
-    }, []);
+            .then(data => {setFilas(obtenerFilas(data))}) 
 
+    }, []);
 
     return( 
         <div className="mb-3">
 
-            {/* <Table striped bordered className="rounded-3 overflow-hidden mb-4" style={{tableLayout: "fixed"}}>
+
+            <Table striped bordered className="rounded-3 overflow-hidden mb-4" style={{tableLayout: "fixed"}}>
                 <thead>
                     <tr className="text-center">
                         <th colSpan={filas.length} style={{fontSize:"18px", backgroundColor:"#816767ff", color:"white"}}> Información general </th>
@@ -52,11 +52,10 @@ export function DatosInstrumentoDocente({instrumento} : {instrumento : Instrumen
 
                 <tbody>
                     <tr>
-                        {filas.map((fila) =>  fila )}
+                        {filas.map((fila : any) =>  fila )}
                     </tr>
                 </tbody>
-            </Table> */}
-
+            </Table>
 
         </div>
         

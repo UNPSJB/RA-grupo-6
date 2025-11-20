@@ -211,7 +211,7 @@ def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrument
     return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
 
 
-def getDatosInstrumento(db:Session, instrumento_id: int) -> str :
+def getDatosInstrumento(db:Session, instrumento_id: int) -> dict :
 
     db_instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
 
@@ -241,4 +241,4 @@ def getDatosInstrumento(db:Session, instrumento_id: int) -> str :
         datos['departamento'] = db_instrumento.departamento.nombre
         datos['integrantes'] = "-"
     
-    return str(datos)
+    return datos

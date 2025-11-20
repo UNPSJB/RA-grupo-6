@@ -42,7 +42,7 @@ async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any)
         usuario_id: usuarioActual.id,
         instrumento_id: instrumentoSeleccionado.id,
         fecha_envio: new Date().toISOString().split('T')[0],
-        datos: datos
+        datos: JSON.stringify(datos)
     };
     const formularioResponse = await fetch('http://127.0.0.1:8000/RespuestasFormulario/', {
         method: 'POST',

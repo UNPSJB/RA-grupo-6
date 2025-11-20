@@ -121,6 +121,6 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/ObtenerDatosInstrumento/{instrumento_id}", response_model=str)
+@router.get("/ObtenerDatosInstrumento/{instrumento_id}", response_model=dict)
 def get_datos_instrumento(instrumento_id: int, db:Session = Depends(get_db)):
     return services.getDatosInstrumento(db,instrumento_id)

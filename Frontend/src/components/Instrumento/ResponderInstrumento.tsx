@@ -13,7 +13,7 @@ import PreguntaSimple from '../Pregunta/PreguntaSimple';
 import PreguntaMultiple from '../Pregunta/PreguntaMultiples';
 import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
-import { DatosInstrumentoDocente } from './DatosInstrumento';
+import { DatosInstrumento } from './DatosInstrumento';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -233,7 +233,7 @@ export default function ResponderInstrumento() {
 
                         {
                             instrumentoSeleccionado &&
-                            <DatosInstrumentoDocente instrumento={instrumentoSeleccionado} ></DatosInstrumentoDocente>
+                            <DatosInstrumento instrumento={instrumentoSeleccionado} ></DatosInstrumento>
                         }
 
                         <div className="text-center mb-4">

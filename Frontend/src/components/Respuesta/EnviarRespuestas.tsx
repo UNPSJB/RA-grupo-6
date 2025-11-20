@@ -33,14 +33,9 @@ async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any)
         throw new Error('No hay usuario autenticado para crear el formulario');
     }
     
-    const [datos, setDatos] = useState<string>("")
-
-    useEffect(() => {
-        fetch(`http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumento/${instrumentoSeleccionado.id}`)
-            .then(r => r.json())
-            .then(data => setDatos(data));
-
-    }, []);
+    const datos = await fetch(
+            `http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumento/${instrumentoSeleccionado.id}`
+    ).then(r => r.json());
     
     const cuerpoFormulario = {
         materia_id: instrumentoSeleccionado.materia?.id,

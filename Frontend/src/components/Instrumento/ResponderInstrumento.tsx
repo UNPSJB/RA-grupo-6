@@ -47,7 +47,7 @@ export default function ResponderInstrumento() {
     useEffect(() => {
         
         if (!user) {
-            console.warn('⚠️ No hay usuario autenticado');
+            console.warn(' No hay usuario autenticado');
         }
     }, [user, navigate]);
 
@@ -319,6 +319,7 @@ export default function ResponderInstrumento() {
                                                         totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
                                                         onActualizar={actualizarRespuestaMultiple}
                                                         onEliminar={eliminarInstancia}
+                                                        instrumento={instrumentoSeleccionado}
                                                     />
                                                 ))}
                                             </div>

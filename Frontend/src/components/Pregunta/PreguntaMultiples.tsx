@@ -2,6 +2,7 @@ import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
+import { RespuestasFormulario } from '../RespuestasFormulario/RespuestasFormulario';
 
 type Props = {
     pregunta: any;
@@ -30,6 +31,7 @@ function PreguntaMultiple({
     totalInstancias,
     onActualizar,
     onEliminar,
+    instrumento,
 }: Props) {
     
     const respuesta = instancia[pregunta.id];
@@ -49,6 +51,10 @@ function PreguntaMultiple({
                     />
                 </div>
             )}
+
+            {index===0 && instrumento?.tipo === "INFORME_SINTETICO" &&
+                <h5 className="fw-semibold mb-1"> materiaNombre</h5>
+            }
 
             <div className="mb-4 pb-3">
                 <div className="mb-3 d-flex align-items-center gap-3">

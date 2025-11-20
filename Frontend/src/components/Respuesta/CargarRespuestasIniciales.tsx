@@ -18,13 +18,13 @@ export function cargarRespuesta(pregunta: any, instrumentoId: number): Promise<R
                 opcion_id: undefined
             }));
     }
-        
-        return Promise.resolve({
-            pregunta_id: pregunta.id,
-            texto: '',
-            opcion_id: undefined,
-        });
-    }
+
+    return Promise.resolve({
+        pregunta_id: pregunta.id,
+        texto: '',
+        opcion_id: undefined,
+    });
+}
 
 export async function cargarRespuestasIniciales(
     plantillaFormulario: any,
@@ -68,7 +68,7 @@ export async function cargarRespuestasIniciales(
             preguntasPorGrupo[p.grupo_cuadro_id] = [];
         }
         preguntasPorGrupo[p.grupo_cuadro_id].push(p);
-            }
+    }
 
     for (const resultado of resultadosFuente) {
         if (!resultado) continue;
@@ -86,27 +86,27 @@ export async function cargarRespuestasIniciales(
 
             prefillData.respuestas.forEach((resp: any, index: number) => {
                 if (!instancias[index]) {
-                                const instancia: InstanciaRespuestas = {};
+                    const instancia: InstanciaRespuestas = {};
                     pregGrupo.forEach((p: any) => {
                         instancia[p.id] = {
                             pregunta_id: p.id,
-                                            texto: '',
-                                            opcion_id: undefined,
-                                            instancia_respuesta: index + 1,
-                                        };
-                                });
+                            texto: '',
+                            opcion_id: undefined,
+                            instancia_respuesta: index + 1,
+                        };
+                    });
                     instancias.push(instancia);
                 }
 
                 instancias[index][pregunta.id] = {
-                                        pregunta_id: pregunta.id,
+                    pregunta_id: pregunta.id,
                     texto: resp.texto || '',
                     opcion_id: resp.opcion_id,
                     instancia_respuesta: index + 1,
                     materia_nombre: resp.materia_nombre,
                     materia_id: resp.materia_id
-                                    };
-                                });
+                };
+            });
         }
     }
 
@@ -117,17 +117,17 @@ export async function cargarRespuestasIniciales(
             preguntasPorGrupo[num].forEach((p: any) => {
                 instancia[p.id] = {
                     pregunta_id: p.id,
-                                texto: '',
-                                opcion_id: undefined,
+                    texto: '',
+                    opcion_id: undefined,
                     instancia_respuesta: 1
-                            };
-                        });
+                };
+            });
             respuestasMultiples[num] = [instancia];
         }
     }
 
     return {
-            respuestasSimples,
+        respuestasSimples,
         respuestasMultiples
     };
 }

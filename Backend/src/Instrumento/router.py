@@ -122,29 +122,3 @@ def obtener_instrumentos_por_tipo_y_usuario(
     db: Session = Depends(get_db)
 ):
     return services.obtener_instrumentos_por_tipo_usuario(db, tipo, usuario_id, mostrar_respondidos)
-
-
-###############
-@router.get("/usuario/{usuario_id}/informes-catedra")
-def get_informes_catedra_por_usuario(
-    usuario_id: int,
-    db: Session = Depends(get_db)
-):
-    return services.obtener_informes_catedra_por_usuario(db, usuario_id)
-
-@router.get("/departamento/{departamento_id}/informes-sinteticos")
-def get_informes_sinteticos_por_departamento(
-    departamento_id: int,
-    mostrar_respondidos: bool = Query(True),
-    db: Session = Depends(get_db)
-):
-    return services.obtener_informes_sinteticos_por_departamento(db, departamento_id, mostrar_respondidos)
-
-@router.get("/tipo/{tipo}")
-def obtener_instrumentos_por_tipo_y_departamento(
-    tipo: str,
-    departamento_id: int = Query(None),
-    mostrar_respondidos: bool = Query(False),
-    db: Session = Depends(get_db)
-):
-    return services.obtener_instrumentos_por_tipo_y_departamento(db, tipo, departamento_id, mostrar_respondidos)

@@ -37,8 +37,7 @@ def borrar_respuesta(respuesta_id: int, db: Session = Depends(get_db)) -> schema
 def leer_respuestas(
     formulario_id: int = Query(None),
     db: Session = Depends(get_db)
-) -> list[schemas.Respuesta]:
-    ##Devuelve todas las respuestas o las filtradas por formulario_id si se proporciona.
+) -> list[schemas.Respuesta]: ##Devuelve todas las respuestas o las filtradas por formulario_id si se proporciona.
     if formulario_id is not None:
         return services.obtener_respuestas_por_formulario(db, formulario_id)
     return services.listar_respuestas(db)

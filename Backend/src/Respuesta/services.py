@@ -272,7 +272,5 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         }
     return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
 
-#####
-
 def obtener_respuestas_por_formulario(db, formulario_id: int):
     return db.query(Respuesta).filter(Respuesta.formulario_id == formulario_id).all()

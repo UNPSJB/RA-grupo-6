@@ -20,7 +20,7 @@ class PreguntaBase(BaseModel):
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo :EnumTipoPregunta = EnumTipoPregunta.abierta
-
+    tipo_respuesta: str
 
 class PreguntaCerradaCreate(PreguntaBase):
     opciones: list[int]  

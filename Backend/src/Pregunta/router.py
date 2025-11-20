@@ -16,7 +16,7 @@ def crear_pregunta_abierta(pregunta: schemas.PreguntaAbiertaCreate, db: Session 
     return services.crear_pregunta_abierta(db, pregunta)
 
 
-@router.get("/", response_model=list[schemas.Pregunta])
+@router.get("/todos", response_model=list[schemas.Pregunta])
 def leer_pregunta(db: Session = Depends(get_db)) -> list[schemas.Pregunta]:
     return services.listar_preguntas(db)
 
@@ -31,4 +31,3 @@ def actualizar_pregunta(pregunta_id: int, pregunta: schemas.PreguntaUpdate, db: 
 @router.delete("/{pregunta_id}", response_model=schemas.PreguntaDelete)
 def borrar_pregunta(pregunta_id: int, db: Session = Depends(get_db)) -> schemas.PreguntaDelete:
     return services.eliminar_pregunta(db, pregunta_id)  
-

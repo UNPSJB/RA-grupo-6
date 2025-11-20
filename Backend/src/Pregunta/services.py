@@ -103,3 +103,4 @@ def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
 
     return db_pregunta 
 
+

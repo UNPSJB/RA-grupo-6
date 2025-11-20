@@ -106,7 +106,7 @@ export default function SeleccionarInformeSintetico() {
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     {error}
                     <div className="mt-3">
-                        <CButton variant="outline-danger" onClick={cargarInformesSinteticos}>
+                        <CButton color="outline-danger" onClick={cargarInformesSinteticos}>
                             Reintentar
                         </CButton>
                     </div>
@@ -146,7 +146,7 @@ export default function SeleccionarInformeSintetico() {
                                 {informes.map((informe) => {
                                     const activo = estaActivo(informe);
                                     return (
-                                        <CTableRow key={informe.id} onClick={() => activo && handleSeleccionarInforme(informe)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }} verticalAlign="middle">
+                                        <CTableRow key={informe.id} onClick={() => activo && handleSeleccionarInforme(informe)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }}>
                                             <CTableDataCell>
                                                 <div className="fw-bold">{capitalizarCadena(informe.materia.nombre)}</div>
                                                 <div className="small text-medium-emphasis">Código: {informe.materia.id}</div>

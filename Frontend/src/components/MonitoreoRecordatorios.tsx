@@ -194,7 +194,7 @@ export function MonitoreoRecordatorios() {
                                     </CTableHead>
                                     <CTableBody>
                                         {resultado.detalles.map((detalle, index) => (
-                                            <CTableRow key={index} verticalAlign="middle">
+                                            <CTableRow key={index} >
                                                 <CTableDataCell><strong>{capitalizarCadena(detalle.estudiante)}</strong></CTableDataCell>
                                                 <CTableDataCell><small>{detalle.email}</small></CTableDataCell>
                                                 <CTableDataCell>{capitalizarCadena(detalle.materia)}</CTableDataCell>

@@ -1,129 +1,124 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilDescription,
-  cilNotes,
-  cilPencil,
-  cilSpeedometer,
-  cilStar,
+    cilBell,
+    cilCalculator,
+    cilChartPie,
+    cilDescription,
+    cilNotes,
+    cilPencil,
+    cilSpeedometer,
+    cilStar,
+    cilBuilding,
+    cilEducation,
+    cilUser,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
-import RequireAuthNavItem from './components/Auth/RequireAuthNavItem'
 
-const _nav = [
-  
-  {
-    component: CNavItem,
-    name: 'Comparar Plantillas',
-    to: '/',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-  },
-  {
-    component: RequireAuthNavItem,
-    roles: ['Docente'], 
-    item: {
-      component: CNavTitle,
-      name: 'Secretaría Académica',
+const navSecretaria = [
+    { component: CNavTitle, name: 'Secretaría Académica' },
+    {
+        component: CNavItem,
+        name: 'Estadísticas Generales',
+        to: '/MostrarEstadisticas',
+        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     },
-  },
-  {
-    component: CNavItem,
-    name: 'Estadísticas Generales',
-    to: '/MostrarEstadisticas',
-    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Estadísticas por Docente',
-    to: '/EstadisticasDeDocente',
-    icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Planificar Períodos',
-    to: '/PlanificarPeriodos',
-    icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'Formularios y Reportes',
-  },
-  {
-    component: CNavItem,
-    name: 'Crear Formulario',
-    to: '/CrearFormulario',
-    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Ver Informes Sintéticos',
-    to: '/VerInformesSinteticos',
-    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Monitoreo de Recordatorios',
-    to: '/monitoreo-recordatorios',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'Roles',
-  },
-  {
-    component: CNavGroup,
-    name: 'Departamento',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
+    {
         component: CNavItem,
-        name: 'Informe Sintético',
+        name: 'Estadísticas por Docente',
+        to: '/EstadisticasDeDocente',
+        icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
+        name: 'Planificar Períodos',
+        to: '/PlanificarPeriodos',
+        icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
+    },
+    { component: CNavTitle, name: 'Formularios y Reportes' },
+    {
+        component: CNavItem,
+        name: 'Crear Formulario',
+        to: '/CrearFormulario',
+        icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
+        name: 'Ver Informes Sintéticos',
+        to: '/VerInformesSinteticos',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
+        name: 'Monitoreo de Recordatorios',
+        to: '/monitoreo-recordatorios',
+        icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    },
+];
+
+const navDepartamento = [
+    { component: CNavTitle, name: 'Departamento' },
+    {
+        component: CNavItem,
+        name: 'Completar Informe Sintético',
         to: '/seleccionar-informe-sintetico',
-      },
-      {
+        icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    },
+    {
         component: CNavItem,
-        name: 'Informe Act. Curricular',
+        name: 'Ver Informes de Cátedra',
         to: '/VerInformeActividadCurricular',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Docente',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    },
+    {
         component: CNavItem,
-        name: 'Instrumentos',
+        name: 'Ver Encuestas de Estudiantes',
+        to: '/VerEncuestasEstudiante',
+        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    },
+];
+
+const navDocente = [
+    { component: CNavTitle, name: 'Acciones' },
+    {
+        component: CNavItem,
+        name: 'Completar Informe',
         to: '/instrumentos-docente',
-      },
-      {
+        icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    },
+    {
         component: CNavItem,
         name: 'Ver Encuestas',
         to: '/VerEncuestasEstudiante',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Estudiante',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Materias',
-        to: '/materias',
-      },
-      {
-        component: CNavItem,
-        name: 'Responder Formularios',
-        to: '/RespuestasFormularios',
-      },
-    ],
-  },
-]
+        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    },
+];
 
-export default _nav
+const navEstudiante = [
+    { component: CNavTitle, name: 'Estudiante' },
+    {
+        component: CNavItem,
+        name: 'Responder Encuestas',
+        to: '/materias',
+        icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    },
+];
+
+const navDefault = [
+    {
+        component: CNavItem,
+        name: 'Inicio',
+        to: '/',
+        icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    },
+];
+
+const navigation = {
+    'secretaria': navSecretaria,
+    'departamento': navDepartamento,
+    'docente': navDocente,
+    'alumno': navEstudiante,
+    'default': navDefault
+};
+
+export default navigation;

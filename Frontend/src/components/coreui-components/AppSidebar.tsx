@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch,  } from 'react-redux'
 
 import {
   CCloseButton,
@@ -10,20 +10,27 @@ import {
   CSidebarToggler,
 } from '@coreui/react'
 import { AppSidebarNav } from './AppSidebarNav'
-
+import { useAuth } from '../../context/AuthContext'
 
 import logo from '../../assets/Unipat.png'
 //import { sygnet } from 'src/assets/brand/sygnet'
 
 import navigation from '../../_nav'
-import type { RootState } from '../../store'
 
-
+interface RootState {
+  sidebarUnfoldable: boolean
+  sidebarShow: boolean
+}
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state: RootState) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state: RootState) => state.sidebarShow)
+  const { user } = useAuth();
+
+  const userRole = user?.rol?.nombre.toLowerCase() || 'default';
+  const navItems = navigation[userRole as keyof typeof navigation] || navigation['default'];
+
 
   return (
     <CSidebar
@@ -50,7 +57,7 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
-      <AppSidebarNav items={navigation} />
+      <AppSidebarNav items={navItems} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}

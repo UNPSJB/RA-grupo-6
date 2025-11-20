@@ -71,7 +71,7 @@ function InstrumentosDocente() {
                 
             } catch (error) {
                 console.error('Error completo:', error);
-                setMensaje(`Error al cargar los informes de cátedra: ${error.message}`);
+                setMensaje(`Error al cargar los informes de cátedra: ${error}`);
                 setCargando(false);
                 
                 const datosEjemplo: InstrumentoDocente[] = [
@@ -163,7 +163,7 @@ function InstrumentosDocente() {
                             {instrumentos.map((instrumento) => {
                                 const activo = estaActivo(instrumento);
                                 return (
-                                    <CTableRow key={instrumento.id} onClick={() => activo && handleSeleccionarInstrumento(instrumento)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }} verticalAlign="middle">
+                                    <CTableRow key={instrumento.id} onClick={() => activo && handleSeleccionarInstrumento(instrumento)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }}>
                                         <CTableDataCell>
                                             <div className="fw-bold">{capitalizarCadena(instrumento.materia.nombre)}</div>
                                             <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>

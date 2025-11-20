@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
 
 export async function enviarFormularioCompleto(

@@ -227,6 +227,9 @@ export interface RespuestaTemporal {
     texto?: string;
     opcion_id?: number;
     instancia_respuesta?: number;
+    materia_nombre?:string;
+    materia_id?:string;
+  
 }
 
 export interface GrupoPreguntas {

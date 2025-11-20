@@ -2,7 +2,6 @@ import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
-import { RespuestasFormulario } from '../RespuestasFormulario/RespuestasFormulario';
 
 type Props = {
     pregunta: any;
@@ -35,26 +34,48 @@ function PreguntaMultiple({
 }: Props) {
     
     const respuesta = instancia[pregunta.id];
+    let materiaNombre: string | undefined = undefined;
+    let materiaId: string | undefined = undefined;
+
+    for (const key in instancia) {
+        const r = instancia[key];
+        if (r && r.materia_nombre) {
+            materiaNombre = r.materia_nombre;
+            materiaId = r.materia_id;
+            break;
+        }
+    }
     
     return (
         <>
             {index === 0 && (
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <Badge bg="primary" style={{ fontSize: '1rem' }}>
-                        Respuesta {instanciaIndex + 1}
-                    </Badge>
-                    <EliminarInstancia
-                        grupoCuadroId={grupoCuadroId}
-                        instanciaIndex={instanciaIndex}
-                        totalInstancias={totalInstancias}
-                        onEliminar={onEliminar}
-                    />
-                </div>
-            )}
+                <>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <Badge bg="primary" style={{ fontSize: '1rem' }}>
+                            Respuesta {instanciaIndex + 1}
+                        </Badge>
+                        <EliminarInstancia
+                            grupoCuadroId={grupoCuadroId}
+                            instanciaIndex={instanciaIndex}
+                            totalInstancias={totalInstancias}
+                            onEliminar={onEliminar}
+                        />
+                    </div>
 
-            {index===0 && instrumento?.tipo === "INFORME_SINTETICO" &&
-                <h5 className="fw-semibold mb-1"> materiaNombre</h5>
-            }
+                    {instrumento?.tipo === "INFORME_SINTETICO" && materiaNombre && (
+                        <div className="mb-3 p-3 rounded" style={{ 
+                            backgroundColor: '#f0f6ff', 
+                            borderLeft: '4px solid #0d6efd' 
+                        }}>
+                            <p className="mb-0 fw-semibold text-primary">
+                                <i className="fas fa-book me-2"></i>
+                                {materiaNombre}
+                                {materiaId && <span className="ms-2 text-muted">(Código: {materiaId})</span>}
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
 
             <div className="mb-4 pb-3">
                 <div className="mb-3 d-flex align-items-center gap-3">

@@ -167,28 +167,34 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         )
     ).all()
     
-    
     if not instrumentos_catedra:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     
-    respuestas_sintetizadas = []
     pregunta_id_a_buscar = pregunta_fuente.id 
     
-    if pregunta_fuente.tipo == "abierta":
+    if pregunta_fuente.tipo == "abierta" or (pregunta.tipo == "abierta" and pregunta_fuente.tipo == "cerrada"):
         
+        respuestas_sintetizadas = []
         for instrumento_catedra in instrumentos_catedra:
-            
             materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
             materia_nombre = materia.nombre if materia else None
             materia_id = materia.id if materia else None
+            
+            if pregunta_fuente.tipo == "abierta":
+                q = select(Respuesta.texto)
+                q = q.where(Respuesta.texto.isnot(None)) 
+                
+            else:
+                q = select(Opcion.texto).join(Respuesta, Respuesta.opcion_id == Opcion.id)
+                q = q.where(Respuesta.opcion_id.isnot(None))
+
 
             respuestas_de_texto = db.scalars(
-                select(Respuesta.texto)
+                q
                 .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
                 .where(
-                    Respuesta.pregunta_id == pregunta_id_a_buscar, 
-                    RespuestasFormulario.instrumento_id == instrumento_catedra.id,
-                    Respuesta.texto.isnot(None) 
+                    Respuesta.pregunta_id == pregunta_fuente.id,
+                    RespuestasFormulario.instrumento_id == instrumento_catedra.id
                 )
             ).all()
 
@@ -214,7 +220,7 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         preguntas_del_grupo = db.scalars(
             select(Pregunta)
             .where(
-                (Pregunta.grupo_pregunta_id == target_group_id) | (Pregunta.id == target_group_id),
+                or_(Pregunta.grupo_pregunta_id == target_group_id, Pregunta.id == target_group_id),
                 Pregunta.tipo == "cerrada",
                 Pregunta.estadistica == True
             )
@@ -223,51 +229,53 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         
         if not preguntas_del_grupo:
             return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+        
+        respuestas_sintetizadas = []
+        for instrumento_catedra in instrumentos_catedra: 
+             conteo_total_por_opcion_local = {}
+             total_respuestas_general_local = 0
+             
+             materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
+             materia_nombre = materia.nombre if materia else None
+             materia_id = materia.id if materia else None
 
-        for instrumento_catedra in instrumentos_catedra:
-            conteo_total_por_opcion_local = {}
-            total_respuestas_general_local = 0
+             for pregunta_grupo in preguntas_del_grupo:
+                 conteo_opciones = db.execute(
+                     select(Opcion.texto, func.count(Respuesta.id))
+                     .join(Respuesta, Respuesta.opcion_id == Opcion.id)
+                     .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
+                     .where(
+                         Respuesta.pregunta_id == pregunta_grupo.id, 
+                         RespuestasFormulario.instrumento_id == instrumento_catedra.id
+                     )
+                     .group_by(Opcion.id, Opcion.texto)
+                 ).all()
+
+                 for opcion_texto, count in conteo_opciones:
+                     if opcion_texto not in conteo_total_por_opcion_local:
+                         conteo_total_por_opcion_local[opcion_texto] = 0
+                     conteo_total_por_opcion_local[opcion_texto] += count
+                     total_respuestas_general_local += count
             
-            materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
-            materia_nombre = materia.nombre if materia else None
-            materia_id = materia.id if materia else None
-
-            for pregunta_grupo in preguntas_del_grupo:
-                conteo_opciones = db.execute(
-                    select(Opcion.texto, func.count(Respuesta.id))
-                    .join(Respuesta, Respuesta.opcion_id == Opcion.id)
-                    .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
-                    .where(
-                        Respuesta.pregunta_id == pregunta_grupo.id, 
-                        RespuestasFormulario.instrumento_id == instrumento_catedra.id
-                    )
-                    .group_by(Opcion.id, Opcion.texto)
-                ).all()
-
-                for opcion_texto, count in conteo_opciones:
-                    if opcion_texto not in conteo_total_por_opcion_local:
-                        conteo_total_por_opcion_local[opcion_texto] = 0
-                    conteo_total_por_opcion_local[opcion_texto] += count
-                    total_respuestas_general_local += count
-            
-            if total_respuestas_general_local > 0:
-                estadisticas_generales = []
-                for opcion_texto, count in sorted(conteo_total_por_opcion_local.items()):
-                    porcentaje = round((count / total_respuestas_general_local) * 100, 1)
-                    estadisticas_generales.append(f"{opcion_texto}: {porcentaje}%")
+             if total_respuestas_general_local > 0:
+                 estadisticas_generales = []
+                 for opcion_texto, count in sorted(conteo_total_por_opcion_local.items()):
+                     porcentaje = round((count / total_respuestas_general_local) * 100, 1)
+                     estadisticas_generales.append(f"{opcion_texto}: {porcentaje}%")
                 
-                texto_final = ", ".join(estadisticas_generales)
+                 texto_final = ", ".join(estadisticas_generales)
                 
-                respuestas_sintetizadas.append({
-                    "texto": texto_final,
-                    "instancia": None,
-                    "opcion_id": None,
-                    "materia_nombre": materia_nombre,
-                    "materia_id": materia_id
-                })
+                 respuestas_sintetizadas.append({
+                     "texto": texto_final,
+                     "instancia": None,
+                     "opcion_id": None,
+                     "materia_nombre": materia_nombre,
+                     "materia_id": materia_id
+                 })
 
         return {
             "respuestas": respuestas_sintetizadas,
             "multiple": pregunta.multiple_respuestas
         }
+    
     return {"respuestas": [], "multiple": pregunta.multiple_respuestas}

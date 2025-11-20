@@ -1,6 +1,6 @@
 import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
-import type { InstanciaRespuestas } from '../types';
+import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
     instanciaIndex: number;
     grupoCuadroId: number;
     totalInstancias: number;
+    instrumento?: InstrumentoDetail
     onActualizar: (
         grupoCuadroId: number,
         instanciaIndex: number,

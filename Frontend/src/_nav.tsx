@@ -79,10 +79,10 @@ const navDepartamento = [
 ];
 
 const navDocente = [
-    { component: CNavTitle, name: 'Acciones' },
+    { component: CNavTitle, name: 'Docente' },
     {
         component: CNavItem,
-        name: 'Completar Informe',
+        name: 'Completar Informe de Cátedra',
         to: '/instrumentos-docente',
         icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
     },
@@ -105,12 +105,7 @@ const navEstudiante = [
 ];
 
 const navDefault = [
-    {
-        component: CNavItem,
-        name: 'Inicio',
-        to: '/',
-        icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    },
+    // El componente Home se encarga de la redirección inicial.
 ];
 
 const navigation = {

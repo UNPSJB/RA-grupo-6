@@ -1,6 +1,5 @@
 import { CContainer } from '@coreui/react'
 import { Routes, Route } from 'react-router-dom'
-import { CompararPlantillas } from '../Estadisticas/CompararPeriodos'
 import { MonitoreoRecordatorios } from '../MonitoreoRecordatorios'
 import VerPregunta from '../Pregunta/VerPregunta'
 import CrearPlantillaFormulario from '../Formulario/PlantillaFormularioCreate'
@@ -17,6 +16,7 @@ import { PlanificarPeriodos } from '../Planificacion/PlanificarInstrumentos'
 import SeleccionarRespuestasFormularios from '../RespuestasFormulario/SeleccionarRespuestasFormularios'
 import { MostrarEstadisticasDepartamento } from '../Estadisticas/MostrarEstadisticasDepartamento'
 import ResponderInstrumento from '../Instrumento/ResponderInstrumento'
+import Home from '../../Home'
 
 
 const PlaceholderComponent = ({ path }: { path: string }) => (
@@ -33,7 +33,7 @@ const AppContent = () => {
   return (
     <CContainer lg>
       <Routes>
-        <Route path='/' element={<CompararPlantillas />} />
+        <Route path='/' element={<Home />} />
         <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
         <Route path='/VerPregunta' element={<VerPregunta />} />
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario />} />

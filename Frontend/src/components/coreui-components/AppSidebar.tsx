@@ -30,6 +30,14 @@ const AppSidebar = () => {
 
   const userRole = user?.rol?.nombre.toLowerCase() || 'default';
   const navItems = navigation[userRole as keyof typeof navigation] || navigation['default'];
+  const homePath = {
+    'secretaria': '/MostrarEstadisticas',
+    'departamento': '/seleccionar-informe-sintetico',
+    'docente': '/instrumentos-docente',
+    'alumno': '/materias',
+    'default': '/'
+  }[userRole] || '/';
+
 
 
   return (
@@ -44,7 +52,7 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom pb-0 pt-0">
-        <CSidebarBrand href="/" className="text-decoration-none ">
+        <CSidebarBrand href={homePath} className="text-decoration-none ">
           <div className="sidebar-brand-full ">
             
             <img src={logo} height={32} alt="Logo" className=' mb-2'/><span className="sidebar-brand-text fs-3 fw-semibold "> UNPSJB</span>

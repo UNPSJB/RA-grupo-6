@@ -2,6 +2,8 @@ import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
+import { cargarRespuesta } from '../Respuesta/CargarRespuestasIniciales';
+import { useState } from 'react';
 
 type Props = {
     pregunta: any;
@@ -10,7 +12,8 @@ type Props = {
     instanciaIndex: number;
     grupoCuadroId: number;
     totalInstancias: number;
-    instrumento?: InstrumentoDetail
+    instrumento?: InstrumentoDetail;
+    instrumento_id: number;
     onActualizar: (
         grupoCuadroId: number,
         instanciaIndex: number,
@@ -31,11 +34,14 @@ function PreguntaMultiple({
     onActualizar,
     onEliminar,
     instrumento,
+    instrumento_id,
 }: Props) {
     
     const respuesta = instancia[pregunta.id];
     let materiaNombre: string | undefined = undefined;
     let materiaId: string | undefined = undefined;
+    const [valor, setValor] = useState(respuesta?.texto? respuesta.texto : "")
+    
 
     for (const key in instancia) {
         const r = instancia[key];
@@ -113,10 +119,10 @@ function PreguntaMultiple({
                     <Form.Control
                         as="textarea"
                         rows={4}
-                        value={respuesta?.texto || ''}
-                        onChange={(e) =>
-                            onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
-                        }
+                        value={valor}
+                        onChange={(e) =>{ setValor(e.target.value)
+                            ;onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
+                        }}
                         placeholder="Escriba su respuesta..."
                         className="input-pregunta"
                     />
@@ -141,7 +147,7 @@ function PreguntaMultiple({
                 {pregunta.pregunta_fuente_id &&
                 <div className='text-end mb-1 mt-1'>
 
-                    <Button  style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas</Button>
+                    <Button  onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
                 </div>
                 }
             </div>

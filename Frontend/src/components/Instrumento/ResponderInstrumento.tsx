@@ -320,6 +320,7 @@ export default function ResponderInstrumento() {
                                                         onActualizar={actualizarRespuestaMultiple}
                                                         onEliminar={eliminarInstancia}
                                                         instrumento={instrumentoSeleccionado}
+                                                        instrumento_id={Number(instrumentoIdParam)}
                                                     />
                                                 ))}
                                             </div>

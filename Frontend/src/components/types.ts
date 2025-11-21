@@ -224,9 +224,12 @@ export interface InstanciaRespuestas {
 
 export interface RespuestaTemporal {
     pregunta_id: number;
-    texto?: string;
-    opcion_id?: number;
+    texto?: string | null;
+    opcion_id?: number |null;
     instancia_respuesta?: number;
+    materia_nombre?:string;
+    materia_id?:string;
+  
 }
 
 export interface GrupoPreguntas {

@@ -1,11 +1,12 @@
 from click import Option
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 from src.Opciones.schemas import Opcion
 from src.GrupoPregunta.schemas import GrupoPregunta
 from .models import EnumTipoPregunta 
 
 class PreguntaBase(BaseModel):
+    id: Optional[int]
     texto: str
     tipo: Optional[str] = None 
     opciones: Optional[List[int]] = None
@@ -17,6 +18,7 @@ class PreguntaBase(BaseModel):
     grupo_cuadro_id: Optional[int] = Field(default=None)
     orden_en_grupo: Optional[int] = Field(default=None)
     pregunta_fuente_id: Optional[int] = Field(default=None)
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 class PreguntaAbiertaCreate(PreguntaBase):
     tipo :EnumTipoPregunta = EnumTipoPregunta.abierta

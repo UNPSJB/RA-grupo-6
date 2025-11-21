@@ -2,7 +2,8 @@ import { Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
-import { RespuestasFormulario } from '../RespuestasFormulario/RespuestasFormulario';
+import { cargarRespuesta } from '../Respuesta/CargarRespuestasIniciales';
+import { useState } from 'react';
 
 type Props = {
     pregunta: any;
@@ -11,7 +12,8 @@ type Props = {
     instanciaIndex: number;
     grupoCuadroId: number;
     totalInstancias: number;
-    instrumento?: InstrumentoDetail
+    instrumento?: InstrumentoDetail;
+    instrumento_id: number;
     onActualizar: (
         grupoCuadroId: number,
         instanciaIndex: number,
@@ -32,29 +34,54 @@ function PreguntaMultiple({
     onActualizar,
     onEliminar,
     instrumento,
+    instrumento_id,
 }: Props) {
     
     const respuesta = instancia[pregunta.id];
+    let materiaNombre: string | undefined = undefined;
+    let materiaId: string | undefined = undefined;
+    const [valor, setValor] = useState(respuesta?.texto? respuesta.texto : "")
+    
+
+    for (const key in instancia) {
+        const r = instancia[key];
+        if (r && r.materia_nombre) {
+            materiaNombre = r.materia_nombre;
+            materiaId = r.materia_id;
+            break;
+        }
+    }
     
     return (
         <>
             {index === 0 && (
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <Badge bg="primary" style={{ fontSize: '1rem' }}>
-                        Respuesta {instanciaIndex + 1}
-                    </Badge>
-                    <EliminarInstancia
-                        grupoCuadroId={grupoCuadroId}
-                        instanciaIndex={instanciaIndex}
-                        totalInstancias={totalInstancias}
-                        onEliminar={onEliminar}
-                    />
-                </div>
-            )}
+                <>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <Badge bg="primary" style={{ fontSize: '1rem' }}>
+                            Respuesta {instanciaIndex + 1}
+                        </Badge>
+                        <EliminarInstancia
+                            grupoCuadroId={grupoCuadroId}
+                            instanciaIndex={instanciaIndex}
+                            totalInstancias={totalInstancias}
+                            onEliminar={onEliminar}
+                        />
+                    </div>
 
-            {index===0 && instrumento?.tipo === "INFORME_SINTETICO" &&
-                <h5 className="fw-semibold mb-1"> materiaNombre</h5>
-            }
+                    {instrumento?.tipo === "INFORME_SINTETICO" && materiaNombre && (
+                        <div className="mb-3 p-3 rounded" style={{ 
+                            backgroundColor: '#f0f6ff', 
+                            borderLeft: '4px solid #0d6efd' 
+                        }}>
+                            <p className="mb-0 fw-semibold text-primary">
+                                <i className="fas fa-book me-2"></i>
+                                {materiaNombre}
+                                {materiaId && <span className="ms-2 text-muted">(Código: {materiaId})</span>}
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
 
             <div className="mb-4 pb-3">
                 <div className="mb-3 d-flex align-items-center gap-3">
@@ -92,10 +119,10 @@ function PreguntaMultiple({
                     <Form.Control
                         as="textarea"
                         rows={4}
-                        value={respuesta?.texto || ''}
-                        onChange={(e) =>
-                            onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
-                        }
+                        value={valor}
+                        onChange={(e) =>{ setValor(e.target.value)
+                            ;onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
+                        }}
                         placeholder="Escriba su respuesta..."
                         className="input-pregunta"
                     />
@@ -120,7 +147,7 @@ function PreguntaMultiple({
                 {pregunta.pregunta_fuente_id &&
                 <div className='text-end mb-1 mt-1'>
 
-                    <Button  style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas</Button>
+                    <Button  onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
                 </div>
                 }
             </div>

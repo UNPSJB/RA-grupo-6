@@ -1,31 +1,43 @@
-import { useEffect, useState } from "react";
-import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
+import type { RespuestaTemporal } from "../types";
 
-export async function enviarFormularioCompleto(
-    instrumentoSeleccionado: any,
-    usuarioActual: any,
-    respuestas: RespuestaTemporal[],
-    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
-): Promise<boolean> {
-    try {
-    
-        if (!instrumentoSeleccionado) {
-            throw new Error('No hay instrumento seleccionado');
-        }
-        if (!usuarioActual) {
-            throw new Error('No hay usuario actual');
-        }
-        const formularioCreado = await crearFormulario(instrumentoSeleccionado, usuarioActual);
-        
-        await enviarRespuestasSimples(respuestas, formularioCreado.id);
-        
-        await enviarRespuestasMultiples(respuestasMultiples, formularioCreado.id);
-        
-        return true;
-    } catch (err: unknown) {
-        const mensaje = err instanceof Error ? err.message : 'Error desconocido';
-        return false;
+export interface InstanciaRespuestas {
+    [preguntaId: number]: RespuestaTemporal;
+}
+
+type Pregunta = {
+    id: number;
+    texto: string;
+    grupo_cuadro_id: number | null;
+};
+
+let preguntasCache: Record<number, Pregunta[]> | null = null;
+
+
+async function obtenerPreguntasPorGrupoCuadro(): Promise<Record<number, Pregunta[]>> {
+    if (preguntasCache) {
+        return preguntasCache;
     }
+    
+    const response = await fetch('http://127.0.0.1:8000/preguntas/todos'); 
+    if (!response.ok) {
+        console.error("Error al obtener todas las preguntas para autocompletar. Verifique el error 422 en el Back-end.");
+        return {};
+    }
+    const todasLasPreguntas: Pregunta[] = await response.json();
+    
+    const preguntasAgrupadas: Record<number, Pregunta[]> = {};
+    for (const p of todasLasPreguntas) {
+        if (p.grupo_cuadro_id) {
+            const grupoId = p.grupo_cuadro_id;
+            if (!preguntasAgrupadas[grupoId]) {
+                preguntasAgrupadas[grupoId] = [];
+            }
+            preguntasAgrupadas[grupoId].push(p);
+        }
+    }
+    
+    preguntasCache = preguntasAgrupadas;
+    return preguntasAgrupadas;
 }
 
 async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any) {
@@ -62,7 +74,6 @@ async function crearFormulario(instrumentoSeleccionado: any, usuarioActual: any)
 async function enviarRespuestasSimples(respuestas: RespuestaTemporal[], formularioId: number) {
     const respuestasFiltradas = respuestas.filter((r) => r.texto?.trim() || r.opcion_id);
 
-
     const promesas = respuestasFiltradas.map(async (r) => {
         const cuerpoRespuesta = {
             pregunta_id: r.pregunta_id,
@@ -71,7 +82,6 @@ async function enviarRespuestasSimples(respuestas: RespuestaTemporal[], formular
             formulario_id: formularioId,
             instancia_respuesta: null,
         };
-        
         
         const respuestaResponse = await fetch('http://127.0.0.1:8000/respuestas/', {
             method: 'POST',
@@ -84,12 +94,12 @@ async function enviarRespuestasSimples(respuestas: RespuestaTemporal[], formular
             throw new Error(`Error al enviar respuesta ${r.pregunta_id}: ${respuestaResponse.status} - ${errorText}`);
         }
 
-        const resultado = await respuestaResponse.json();
-        return resultado;
+        return await respuestaResponse.json();
     });
     
     await Promise.all(promesas);
 }
+
 
 async function enviarRespuestasMultiples(
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
@@ -97,17 +107,70 @@ async function enviarRespuestasMultiples(
 ) {
     let totalEnviadas = 0;
     
-    for (const grupoCuadroId in respuestasMultiples) {
-        const instancias = respuestasMultiples[grupoCuadroId] || [];
+    const preguntasPorGrupo = await obtenerPreguntasPorGrupoCuadro(); 
+
+    for (const grupoCuadroIdStr in respuestasMultiples) {
+        const grupoCuadroId = parseInt(grupoCuadroIdStr);
+        const instancias = respuestasMultiples[grupoCuadroIdStr] || [];
+        
+        const preguntasGrupo = preguntasPorGrupo[grupoCuadroId] || [];
+        const preguntaCodigo = preguntasGrupo.find(p => p.texto === "Código de actividad curricular");
+        const preguntaNombre = preguntasGrupo.find(p => p.texto === "Nombre de la actividad curricular");
 
         for (let instanciaIndex = 0; instanciaIndex < instancias.length; instanciaIndex++) {
             const instancia = instancias[instanciaIndex];
+            
+            let materiaNombre: string | undefined = undefined;
+            let materiaId: string | undefined = undefined;
+            let respuestaConMetadataKey: string | undefined = undefined; 
 
-            for (const preguntaId in instancia) {
+            for (const key in instancia) {
+                const preguntaId = parseInt(key);
+                const r = instancia[preguntaId];
+
+                if (r?.materia_nombre) { 
+                    materiaNombre = r.materia_nombre;
+                    materiaId = r.materia_id;
+                    respuestaConMetadataKey = key; 
+                    break; 
+                }
+            }
+            
+            if (materiaNombre && materiaId && preguntaCodigo && preguntaNombre) {
+                const codigoPreguntaId = preguntaCodigo.id;
+                const nombrePreguntaId = preguntaNombre.id;
+
+                instancia[codigoPreguntaId] = {
+                    pregunta_id: codigoPreguntaId,
+                    texto: materiaId, 
+                    opcion_id: null,
+                } as RespuestaTemporal; 
+                
+                instancia[nombrePreguntaId] = {
+                    pregunta_id: nombrePreguntaId,
+                    texto: materiaNombre,
+                    opcion_id: null,
+                } as RespuestaTemporal;
+                
+                console.log(`Inyectado autocompletado para Mat. ${materiaNombre} en Instancia ${instanciaIndex + 1}`);
+            }
+
+            if (respuestaConMetadataKey) {
+                const claveNumber = parseInt(respuestaConMetadataKey);
+                
+               const respuestaOriginal = instancia[claveNumber];
+                
+                delete respuestaOriginal.materia_nombre;
+                delete respuestaOriginal.materia_id;
+            }
+
+            for (const key in instancia) {
+                const preguntaId = parseInt(key);
                 const respuesta = instancia[preguntaId];
-                if (respuesta.texto?.trim() || respuesta.opcion_id) {
+                
+               if (respuesta.texto?.trim() || respuesta.opcion_id) {
                     const cuerpoRespuesta = {
-                        pregunta_id: parseInt(preguntaId),
+                        pregunta_id: preguntaId,
                         texto: respuesta.texto?.trim() || null,
                         opcion_id: respuesta.opcion_id || null,
                         formulario_id: formularioId,
@@ -125,8 +188,7 @@ async function enviarRespuestasMultiples(
                         throw new Error(`Error al enviar respuesta múltiple ${preguntaId}: ${respuestaResponse.status} - ${errorText}`);
                     }
 
-                    const resultado = await respuestaResponse.json();
-                    console.log(`    Respuesta múltiple enviada:`, resultado);
+                    await respuestaResponse.json();
                     totalEnviadas++;
                 }
             }
@@ -134,4 +196,27 @@ async function enviarRespuestasMultiples(
     }
     
     console.log(`Total de respuestas múltiples enviadas: ${totalEnviadas}`);
+}
+
+export async function enviarFormularioCompleto(
+    instrumentoSeleccionado: any,
+    usuarioActual: any,
+    respuestas: RespuestaTemporal[],
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+): Promise<boolean> {
+    try {
+        if (!instrumentoSeleccionado || !usuarioActual) return false;
+        
+        const formularioCreado = await crearFormulario(instrumentoSeleccionado, usuarioActual);
+        
+        await enviarRespuestasSimples(respuestas, formularioCreado.id);
+        
+        await enviarRespuestasMultiples(respuestasMultiples, formularioCreado.id);
+        
+        return true;
+    } catch (err: unknown) {
+        const mensaje = err instanceof Error ? err.message : 'Error desconocido';
+        console.error("Error en enviarFormularioCompleto:", mensaje);
+        return false;
+    }
 }

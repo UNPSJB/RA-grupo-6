@@ -14,6 +14,7 @@ import PreguntaMultiple from '../Pregunta/PreguntaMultiples';
 import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
 import { DatosInstrumento } from './DatosInstrumento';
+import { DatosInstrumentoSintetico } from './DatosInstrumentoSintetico';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -293,6 +294,12 @@ export default function ResponderInstrumento() {
                                     </p>
                                 </div>
 
+
+                                {   instrumentoSeleccionado?.tipo === "INFORME_SINTETICO"&&
+                                         instrumentoSeleccionado && paginaActual === 0 &&
+                                    <DatosInstrumentoSintetico instrumento={instrumentoSeleccionado} />
+                                
+                                }
                                 {grupoActual.tipo === 'simple' ? (
                                     grupoActual.preguntas.map((pregunta: any, idx: number) => (
                                         <PreguntaSimple
@@ -320,6 +327,7 @@ export default function ResponderInstrumento() {
                                                         onActualizar={actualizarRespuestaMultiple}
                                                         onEliminar={eliminarInstancia}
                                                         instrumento={instrumentoSeleccionado}
+                                                        instrumento_id={Number(instrumentoIdParam)}
                                                     />
                                                 ))}
                                             </div>

@@ -37,6 +37,8 @@ export default function ResponderInstrumento() {
     const [paginaActual, setPaginaActual] = useState(0);
     const [mostrarResumen, setMostrarResumen] = useState(false);
 
+    const [preguntaInfoGeneralId, setPreguntaInfoGeneralId] = useState<number | null>(null);
+
     const locationState = location.state || {};
     const rolActual = locationState.rol || user?.rol?.nombre || localStorage.getItem('rol_actual');
     const esDocente = rolActual === 'docente' || user?.rol?.nombre === 'docente';
@@ -44,11 +46,9 @@ export default function ResponderInstrumento() {
     const materiaNombre = locationState.materiaNombre || '';
     const rutaVolver = esDocente ? '/instrumentos-docente' : esAlumno ? '/materias' : '/';
 
-
     useEffect(() => {
-        
         if (!user) {
-            console.warn(' No hay usuario autenticado');
+            console.warn('No hay usuario autenticado');
         }
     }, [user, navigate]);
 
@@ -130,12 +130,31 @@ export default function ResponderInstrumento() {
         }));
     };
 
+    const handleDatosInfoGeneralListos = (datos: any[], preguntaId: number | null) => {
+        if (preguntaId) {
+            setPreguntaInfoGeneralId(preguntaId);
+            
+            const respuestaInfoGeneral: RespuestaTemporal = {
+                pregunta_id: preguntaId,
+                texto: JSON.stringify(datos),
+                opcion_id: null
+            };
+            
+            setRespuestas(prev => {
+                const existe = prev.find(r => r.pregunta_id === preguntaId);
+                if (existe) {
+                    return prev.map(r => r.pregunta_id === preguntaId ? respuestaInfoGeneral : r);
+                }
+                return [...prev, respuestaInfoGeneral];
+            });
+        }
+    };
+
     const todasRespondidas = (): boolean => {
         return validarTodasRespuestasCompletas(respuestas, respuestasMultiples, plantillaFormulario);
     };
 
     const enviarRespuestas = async (): Promise<boolean> => {
-        
         if (!instrumentoSeleccionado) {
             alert('Error: No hay instrumento seleccionado');
             return false;
@@ -159,7 +178,7 @@ export default function ResponderInstrumento() {
             console.log('Resultado del envío:', exito);
             return exito;
         } catch (error) {
-            console.error(' Error en enviarRespuestas:', error);
+            console.error('Error en enviarRespuestas:', error);
             alert('Error al enviar: ' + (error instanceof Error ? error.message : 'Error desconocido'));
             return false;
         } finally {
@@ -167,7 +186,10 @@ export default function ResponderInstrumento() {
         }
     };
 
-    const gruposOrganizados: GrupoPreguntas[] = organizarPreguntasEnGrupos(plantillaFormulario);
+    const gruposOrganizados: GrupoPreguntas[] = organizarPreguntasEnGrupos(
+        plantillaFormulario,
+        instrumentoSeleccionado
+    );
     const totalPaginas = gruposOrganizados.length;
 
     const avanzarPagina = () => {
@@ -220,6 +242,8 @@ export default function ResponderInstrumento() {
     const grupoActual =
         !mostrarResumen && paginaActual < gruposOrganizados.length ? gruposOrganizados[paginaActual] : null;
 
+    const esInformeSintetico = instrumentoSeleccionado?.tipo === "INFORME_SINTETICO";
+    const esPaginaInfoGeneral = esInformeSintetico && paginaActual === 0;
 
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
@@ -229,13 +253,12 @@ export default function ResponderInstrumento() {
                     {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
                 </Button>
 
-                <Card className=" w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                <Card className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
                     <Card.Body className="p-4">
 
-                        {
-                            instrumentoSeleccionado &&
-                            <DatosInstrumento instrumento={instrumentoSeleccionado} ></DatosInstrumento>
-                        }
+                        {instrumentoSeleccionado && (
+                            <DatosInstrumento instrumento={instrumentoSeleccionado} />
+                        )}
 
                         <div className="text-center mb-4">
                             <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
@@ -277,69 +300,93 @@ export default function ResponderInstrumento() {
 
                         {!mostrarResumen && grupoActual && (
                             <>
-                                <div
-                                    className="mb-4 p-3 rounded"
-                                    style={{
-                                        backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
-                                        borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`,
-                                    }}
-                                >
-                                    <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
-                                        {grupoActual.nombre}
-                                    </h4>
-                                    <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                                        {grupoActual.tipo === 'multiple'
-                                            ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
-                                            : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
-                                    </p>
-                                </div>
-
-
-                                {   instrumentoSeleccionado?.tipo === "INFORME_SINTETICO"&&
-                                         instrumentoSeleccionado && paginaActual === 0 &&
-                                    <DatosInstrumentoSintetico instrumento={instrumentoSeleccionado} />
-                                
-                                }
-                                {grupoActual.tipo === 'simple' ? (
-                                    grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                        <PreguntaSimple
-                                            key={pregunta.id}
-                                            pregunta={pregunta}
-                                            index={idx}
-                                            respuesta={obtenerRespuesta(pregunta.id)}
-                                            onActualizar={actualizarRespuesta}
-                                            instrumento_id={Number(instrumentoIdParam)}
-                                        />
-                                    ))
-                                ) : (
+                                {esPaginaInfoGeneral && (
                                     <div>
-                                        {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
-                                            <div key={instanciaIdx} className="mb-4">
-                                                {grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                    <PreguntaMultiple
-                                                        key={pregunta.id}
-                                                        pregunta={pregunta}
-                                                        index={idx}
-                                                        instancia={instancia}
-                                                        instanciaIndex={instanciaIdx}
-                                                        grupoCuadroId={grupoActual.id}
-                                                        totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
-                                                        onActualizar={actualizarRespuestaMultiple}
-                                                        onEliminar={eliminarInstancia}
-                                                        instrumento={instrumentoSeleccionado}
-                                                        instrumento_id={Number(instrumentoIdParam)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        ))}
+                                        <div
+                                            className="mb-4 p-3 rounded"
+                                            style={{
+                                                backgroundColor: '#f0f7ff',
+                                                borderLeft: '4px solid #816767ff',
+                                            }}
+                                        >
+                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                                {grupoActual.nombre}
+                                            </h4>
+                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                                Vista de todas las actividades curriculares asociadas a este informe
+                                            </p>
+                                        </div>
 
-                                        <AgregarInstancia
-                                            grupoCuadroId={grupoActual.id}
-                                            preguntasDelGrupo={grupoActual.preguntas}
-                                            instancias={respuestasMultiples[grupoActual.id] || []}
-                                            onAgregar={agregarInstanciaRespuestas}
-                                        />
+                                        {instrumentoSeleccionado && (
+                                            <DatosInstrumentoSintetico 
+                                                instrumento={instrumentoSeleccionado}
+                                                onDatosListos={handleDatosInfoGeneralListos}
+                                            />
+                                        )}
                                     </div>
+                                )}
+
+                                {!esPaginaInfoGeneral && (
+                                    <>
+                                        <div
+                                            className="mb-4 p-3 rounded"
+                                            style={{
+                                                backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
+                                                borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`,
+                                            }}
+                                        >
+                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                                {grupoActual.nombre}
+                                            </h4>
+                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                                {grupoActual.tipo === 'multiple'
+                                                    ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
+                                                    : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
+                                            </p>
+                                        </div>
+
+                                        {grupoActual.tipo === 'simple' ? (
+                                            grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                <PreguntaSimple
+                                                    key={pregunta.id}
+                                                    pregunta={pregunta}
+                                                    index={idx}
+                                                    respuesta={obtenerRespuesta(pregunta.id)}
+                                                    onActualizar={actualizarRespuesta}
+                                                    instrumento_id={Number(instrumentoIdParam)}
+                                                />
+                                            ))
+                                        ) : (
+                                            <div>
+                                                {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                                    <div key={instanciaIdx} className="mb-4">
+                                                        {grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                            <PreguntaMultiple
+                                                                key={pregunta.id}
+                                                                pregunta={pregunta}
+                                                                index={idx}
+                                                                instancia={instancia}
+                                                                instanciaIndex={instanciaIdx}
+                                                                grupoCuadroId={grupoActual.id}
+                                                                totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
+                                                                onActualizar={actualizarRespuestaMultiple}
+                                                                onEliminar={eliminarInstancia}
+                                                                instrumento={instrumentoSeleccionado}
+                                                                instrumento_id={Number(instrumentoIdParam)}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                ))}
+
+                                                <AgregarInstancia
+                                                    grupoCuadroId={grupoActual.id}
+                                                    preguntasDelGrupo={grupoActual.preguntas}
+                                                    instancias={respuestasMultiples[grupoActual.id] || []}
+                                                    onAgregar={agregarInstanciaRespuestas}
+                                                />
+                                            </div>
+                                        )}
+                                    </>
                                 )}
 
                                 <NavegacionPaginas

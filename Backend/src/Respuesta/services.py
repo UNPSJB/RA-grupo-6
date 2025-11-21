@@ -9,8 +9,6 @@ from src.Pregunta.models import Pregunta
 from src.Opciones.models import Opcion
 from src.Materias.models import Materia
 
-# En src/Respuesta/services.py - SIMPLIFICAR
-
 def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.Respuesta:
     pregunta = db.scalar(select(Pregunta).where(Pregunta.id == respuesta.pregunta_id))
     if not pregunta:
@@ -22,8 +20,6 @@ def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.
         raise exceptions.RespuestaInvalida()
     if pregunta.multiple_respuestas and not respuesta.instancia_respuesta:
         raise exceptions.RespuestaInvalida()
-    
-    # Ya no necesitamos crear preguntas aquí porque se pre-crean antes
     
     nueva_respuesta = Respuesta(**respuesta.model_dump())
     db.add(nueva_respuesta)

@@ -4,8 +4,6 @@ from src.database import get_db
 from src.Pregunta import services, schemas
 router = APIRouter(prefix="/preguntas", tags=["Preguntas"])     
 
-#Rutas de Preguntas
-
 @router.post("/cerrada")
 def crear_pregunta_cerrada(pregunta: schemas.PreguntaCerradaCreate, db: Session = Depends(get_db)):
     return services.crear_pregunta_cerrada(db, pregunta)
@@ -35,3 +33,7 @@ def borrar_pregunta(pregunta_id: int, db: Session = Depends(get_db)) -> schemas.
 @router.post("/preparar-preguntas-materia/{pregunta_id}")
 def preparar_preguntas_materia_endpoint(pregunta_id: int, db: Session = Depends(get_db)):
     return services.preparar_preguntas_materia(pregunta_id=pregunta_id, db=db)
+
+@router.post("/preparar-pregunta-info-general/{instrumento_id}")
+def preparar_pregunta_info_general_endpoint(instrumento_id: int, db: Session = Depends(get_db)):
+    return services.preparar_pregunta_info_general_sintetico(instrumento_id=instrumento_id, db=db)

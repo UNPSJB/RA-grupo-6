@@ -4,6 +4,7 @@ from sqlalchemy import delete, select, update, func
 from src.Pregunta.models import Pregunta, Opcion, EnumTipoPregunta
 from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
+from src.Instrumento.models import Instrumento, TipoInstrumento
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
     _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id, multiple_respuestas = pregunta.multiple_respuestas, grupo_cuadro_id = pregunta.grupo_cuadro_id, orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, obligatoria = pregunta.obligatoria)
@@ -170,4 +171,63 @@ def preparar_preguntas_materia(pregunta_id: int, db: Session):
         "mensaje": "Preguntas creadas exitosamente",
         "pregunta_codigo_id": pregunta_codigo.id,
         "pregunta_nombre_id": pregunta_nombre.id
+    }
+
+def preparar_pregunta_info_general_sintetico(instrumento_id: int, db: Session):
+    
+    # Obtener el instrumento
+    instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+    
+    if not instrumento or instrumento.tipo != TipoInstrumento.INFORME_SINTETICO:
+        return {"pregunta_creada": False, "mensaje": "No es un informe sintético"}
+    
+    plantilla = instrumento.plantilla_formulario
+    if not plantilla:
+        return {"pregunta_creada": False, "mensaje": "La plantilla no existe"}
+    
+    # Obtener el primer grupo de preguntas usando la relación directa
+    primer_grupo = None
+    if plantilla.preguntas and len(plantilla.preguntas) > 0:
+        # Tomar el grupo_pregunta del primer pregunta de la plantilla
+        primer_grupo = plantilla.preguntas[0].grupo_pregunta
+    
+    if not primer_grupo:
+        return {"pregunta_creada": False, "mensaje": "No hay grupos de preguntas asociados"}
+    
+    # Verificar si la pregunta ya existe
+    pregunta_existente = db.scalar(
+        select(Pregunta).where(
+            Pregunta.texto == "Información general de actividades curriculares",
+            Pregunta.grupo_pregunta_id == primer_grupo.id
+        )
+    )
+    
+    if pregunta_existente:
+        return {
+            "pregunta_creada": False,
+            "mensaje": "La pregunta ya existe",
+            "pregunta_id": pregunta_existente.id
+        }
+    
+    # Crear la nueva pregunta
+    nueva_pregunta = Pregunta(
+        texto="Información general de actividades curriculares",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=primer_grupo.id,
+        estadistica=False,
+        rol_id=plantilla.rol_id,
+        multiple_respuestas=False,
+        grupo_cuadro_id=None,
+        orden_en_grupo=None,
+        obligatoria=False
+    )
+    
+    db.add(nueva_pregunta)
+    db.commit()
+    db.refresh(nueva_pregunta)
+    
+    return {
+        "pregunta_creada": True,
+        "mensaje": "Pregunta creada exitosamente",
+        "pregunta_id": nueva_pregunta.id
     }

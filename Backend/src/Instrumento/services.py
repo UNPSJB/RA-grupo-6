@@ -242,3 +242,40 @@ def getDatosInstrumento(db:Session, instrumento_id: int) -> dict :
         datos['integrantes'] = "-"
     
     return datos
+
+
+def getDatosInstrumentoSintetico(db:Session, instrumento_id: int) -> dict:
+    
+    instrumento_actual = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+
+    if instrumento_actual.tipo == TipoInstrumento.INFORME_SINTETICO:
+
+        if not instrumento_actual.dictado_id or not instrumento_actual.departamento_id:
+            return None
+
+        instrumentos_catedra = db.scalars(
+            select(Instrumento)
+            .join(Materia, Instrumento.materia_id == Materia.id)
+            .where(Instrumento.dictado_id == instrumento_actual.dictado_id, 
+                   Instrumento.tipo == TipoInstrumento.INFORME_CATEDRA,
+                   Materia.departamento_id == instrumento_actual.departamento_id)
+        ).all()
+
+        if not instrumentos_catedra:
+            return None
+        
+        datos = []
+
+
+        for instrumento_catedra in instrumentos_catedra:
+            inscriptos = 0
+            instrumento = {}
+            instrumento['codAsignatura'] = instrumento_catedra.materia.id
+            instrumento['asignatura'] = instrumento_catedra.materia.nombre
+            instrumento['inscriptos'] = inscriptos
+            instrumento['comisionesTeoricas'] = "-",
+            instrumento['comisionesPracticas'] = "-"
+
+            datos.append(instrumento)
+
+    return datos

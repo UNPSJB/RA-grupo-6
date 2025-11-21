@@ -21,3 +21,5 @@ class Respuesta(ModeloBase):
     formulario: Mapped["RespuestasFormulario"] = relationship(back_populates="respuestas")
 
     instancia_respuesta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+

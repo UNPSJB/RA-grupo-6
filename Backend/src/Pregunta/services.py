@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, func
 from src.Pregunta.models import Pregunta, Opcion, EnumTipoPregunta
 from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
@@ -104,3 +104,70 @@ def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
     return db_pregunta 
 
 
+def preparar_preguntas_materia(pregunta_id: int, db: Session):
+    pregunta = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_id))
+    
+    if not pregunta or not pregunta.grupo_cuadro_id:
+        return {"preguntas_creadas": False, "mensaje": "Pregunta no válida o sin grupo_cuadro"}
+    
+    grupo_cuadro_id = pregunta.grupo_cuadro_id
+    rol_id = pregunta.rol_id
+    grupo_pregunta_id = pregunta.grupo_pregunta_id
+    
+    preguntas_existentes = db.scalars(
+        select(Pregunta).where(
+            Pregunta.grupo_cuadro_id == grupo_cuadro_id,
+            Pregunta.texto.in_([
+                "Código de actividad curricular",
+                "Nombre de la actividad curricular"
+            ])
+        )
+    ).all()
+    
+    if len(preguntas_existentes) >= 2:
+        return {"preguntas_creadas": False, "mensaje": "Las preguntas ya existen"}
+
+    orden_minimo = db.scalar(
+        select(func.min(Pregunta.orden_en_grupo)).where(
+            Pregunta.grupo_cuadro_id == grupo_cuadro_id
+        )
+    )
+    
+    orden_codigo = 1 if orden_minimo is None else orden_minimo - 2
+    orden_nombre = 2 if orden_minimo is None else orden_minimo - 1
+
+    pregunta_codigo = Pregunta(
+        texto="Código de actividad curricular",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=grupo_pregunta_id,
+        estadistica=False,
+        rol_id=rol_id,
+        multiple_respuestas=pregunta.multiple_respuestas,
+        grupo_cuadro_id=grupo_cuadro_id,
+        orden_en_grupo=orden_codigo,
+        obligatoria=False
+    )
+    
+
+    pregunta_nombre = Pregunta(
+        texto="Nombre de la actividad curricular",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=grupo_pregunta_id,
+        estadistica=False,
+        rol_id=rol_id,
+        multiple_respuestas=pregunta.multiple_respuestas,
+        grupo_cuadro_id=grupo_cuadro_id,
+        orden_en_grupo=orden_nombre,
+        obligatoria=False
+    )
+    
+    db.add(pregunta_codigo)
+    db.add(pregunta_nombre)
+    db.commit()
+    
+    return {
+        "preguntas_creadas": True, 
+        "mensaje": "Preguntas creadas exitosamente",
+        "pregunta_codigo_id": pregunta_codigo.id,
+        "pregunta_nombre_id": pregunta_nombre.id
+    }

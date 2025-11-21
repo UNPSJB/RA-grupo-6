@@ -100,6 +100,55 @@ async function enviarRespuestasSimples(respuestas: RespuestaTemporal[], formular
     await Promise.all(promesas);
 }
 
+async function preCrearPreguntasMateria(
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+): Promise<void> {
+   const gruposConMetadata: Map<number, number> = new Map();
+    
+    for (const grupoCuadroIdStr in respuestasMultiples) {
+        const grupoCuadroId = parseInt(grupoCuadroIdStr);
+        const instancias = respuestasMultiples[grupoCuadroIdStr] || [];
+        
+        if (instancias.length > 0) {
+            const primeraInstancia = instancias[0];
+
+            for (const key in primeraInstancia) {
+                const r = primeraInstancia[key];
+                if (r?.materia_nombre) {
+                    gruposConMetadata.set(grupoCuadroId, parseInt(key));
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (gruposConMetadata.size > 0) {
+        console.log(` Pre-creando preguntas para ${gruposConMetadata.size} grupos_cuadro...`);
+        
+        for (const [grupoCuadroId, preguntaId] of gruposConMetadata) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/preguntas/preparar-preguntas-materia/${preguntaId}`, {
+                    method: 'POST',
+                });
+                
+                if (response.ok) {
+                    const resultado = await response.json();
+                    if (resultado.preguntas_creadas) {
+                        console.log(`Preguntas creadas para grupo_cuadro ${grupoCuadroId}`);
+                    } else {
+                        console.log(`Preguntas ya existían para grupo_cuadro ${grupoCuadroId}`);
+                    }
+                } else {
+                    console.warn(`Error al pre-crear preguntas para grupo_cuadro ${grupoCuadroId}`);
+                }
+            } catch (error) {
+                console.error(`Error al pre-crear preguntas para grupo_cuadro ${grupoCuadroId}:`, error);
+            }
+        }
+        
+        preguntasCache = null;    }
+}
+
 
 async function enviarRespuestasMultiples(
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
@@ -152,13 +201,12 @@ async function enviarRespuestasMultiples(
                     opcion_id: null,
                 } as RespuestaTemporal;
                 
-                console.log(`Inyectado autocompletado para Mat. ${materiaNombre} en Instancia ${instanciaIndex + 1}`);
+                console.log(`Inyectado autocompletado para ${materiaNombre} en grupo_cuadro ${grupoCuadroId}, instancia ${instanciaIndex + 1}`);
             }
 
             if (respuestaConMetadataKey) {
                 const claveNumber = parseInt(respuestaConMetadataKey);
-                
-               const respuestaOriginal = instancia[claveNumber];
+                const respuestaOriginal = instancia[claveNumber];
                 
                 delete respuestaOriginal.materia_nombre;
                 delete respuestaOriginal.materia_id;
@@ -168,7 +216,7 @@ async function enviarRespuestasMultiples(
                 const preguntaId = parseInt(key);
                 const respuesta = instancia[preguntaId];
                 
-               if (respuesta.texto?.trim() || respuesta.opcion_id) {
+                if (respuesta.texto?.trim() || respuesta.opcion_id) {
                     const cuerpoRespuesta = {
                         pregunta_id: preguntaId,
                         texto: respuesta.texto?.trim() || null,
@@ -207,11 +255,15 @@ export async function enviarFormularioCompleto(
     try {
         if (!instrumentoSeleccionado || !usuarioActual) return false;
         
+        await preCrearPreguntasMateria(respuestasMultiples);
+        
         const formularioCreado = await crearFormulario(instrumentoSeleccionado, usuarioActual);
         
         await enviarRespuestasSimples(respuestas, formularioCreado.id);
         
         await enviarRespuestasMultiples(respuestasMultiples, formularioCreado.id);
+    
+        preguntasCache = null;
         
         return true;
     } catch (err: unknown) {

@@ -9,6 +9,8 @@ from src.Pregunta.models import Pregunta
 from src.Opciones.models import Opcion
 from src.Materias.models import Materia
 
+# En src/Respuesta/services.py - SIMPLIFICAR
+
 def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.Respuesta:
     pregunta = db.scalar(select(Pregunta).where(Pregunta.id == respuesta.pregunta_id))
     if not pregunta:
@@ -21,78 +23,13 @@ def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.
     if pregunta.multiple_respuestas and not respuesta.instancia_respuesta:
         raise exceptions.RespuestaInvalida()
     
-    if pregunta.multiple_respuestas and respuesta.instancia_respuesta == 1 and pregunta.grupo_cuadro_id:
-        _crear_preguntas_materia_si_no_existen(db, pregunta)
-
+    # Ya no necesitamos crear preguntas aquí porque se pre-crean antes
+    
     nueva_respuesta = Respuesta(**respuesta.model_dump())
     db.add(nueva_respuesta)
     db.commit()
     db.refresh(nueva_respuesta)
     return nueva_respuesta
-
-def _crear_preguntas_materia_si_no_existen(db: Session, pregunta_referencia: Pregunta):
-    grupo_cuadro_id = pregunta_referencia.grupo_cuadro_id
-    rol_id = pregunta_referencia.rol_id
-    grupo_pregunta_id = pregunta_referencia.grupo_pregunta_id
-    
-    preguntas_existentes = db.scalars(
-        select(Pregunta).where(
-            Pregunta.grupo_cuadro_id == grupo_cuadro_id,
-            Pregunta.texto.in_([
-                "Código de actividad curricular",
-                "Nombre de la actividad curricular"
-            ])
-        )
-    ).all()
-    
-    if len(preguntas_existentes) >= 2:
-        return
-    
-    ultima_pregunta = db.scalar(select(Pregunta).order_by(Pregunta.id.desc()))
-    proximo_id = (ultima_pregunta.id + 1) if ultima_pregunta else 1
-    
-    orden_minimo = db.scalar(
-        select(func.min(Pregunta.orden_en_grupo)).where(
-            Pregunta.grupo_cuadro_id == grupo_cuadro_id
-        )
-    )
-    orden_codigo = (orden_minimo - 2) if orden_minimo and orden_minimo > 0 else -2
-    orden_nombre = (orden_minimo - 1) if orden_minimo and orden_minimo > 0 else -1
-    
-    textos_existentes = {p.texto for p in preguntas_existentes}
-    
-    if "Código de actividad curricular" not in textos_existentes:
-        pregunta_codigo = Pregunta(
-            texto="Código de actividad curricular",
-            tipo="abierta",
-            grupo_pregunta_id=grupo_pregunta_id,
-            rol_id=rol_id,
-            multiple_respuestas=True,
-            grupo_cuadro_id=grupo_cuadro_id,
-            orden_en_grupo=orden_codigo,
-            obligatoria=True,
-            estadistica=False,
-            pregunta_fuente_id=None
-        )
-        db.add(pregunta_codigo)
-        
-    
-    if "Nombre de la actividad curricular" not in textos_existentes:
-        pregunta_nombre = Pregunta(
-            texto="Nombre de la actividad curricular",
-            tipo="abierta",
-            grupo_pregunta_id=grupo_pregunta_id,
-            rol_id=rol_id,
-            multiple_respuestas=True,
-            grupo_cuadro_id=grupo_cuadro_id,
-            orden_en_grupo=orden_nombre,
-            obligatoria=True,
-            estadistica=False,
-            pregunta_fuente_id=None
-        )
-        db.add(pregunta_nombre)
-    
-    db.commit()
 
 def listar_respuestas(db: Session) -> List[schemas.Respuesta]:
     return db.scalars(select(Respuesta)).all()

@@ -31,3 +31,7 @@ def actualizar_pregunta(pregunta_id: int, pregunta: schemas.PreguntaUpdate, db: 
 @router.delete("/{pregunta_id}", response_model=schemas.PreguntaDelete)
 def borrar_pregunta(pregunta_id: int, db: Session = Depends(get_db)) -> schemas.PreguntaDelete:
     return services.eliminar_pregunta(db, pregunta_id)  
+
+@router.post("/preparar-preguntas-materia/{pregunta_id}")
+def preparar_preguntas_materia_endpoint(pregunta_id: int, db: Session = Depends(get_db)):
+    return services.preparar_preguntas_materia(pregunta_id=pregunta_id, db=db)

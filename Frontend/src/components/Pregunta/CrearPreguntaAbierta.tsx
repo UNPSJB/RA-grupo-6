@@ -8,6 +8,7 @@ import ElegirGrupoPregunta from '../GrupoPregunta/GrupoPregunta';
 import ELegirRol from '../Rol/ElegirRol';
 import ElegirGrupoCuadro from '../GrupoCuadro/ElegirGrupoCuadro';
 import type { ErrorPreguntaAbierta } from '../types';
+import { Row } from 'react-bootstrap';
 
 type Props = {
     manejarPestania: () => void;
@@ -109,6 +110,9 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         }
       }, [texto, grupoSeleccionado, rolSeleccionado, errores]);
     
+
+    const [tipoDato, setTipoDato] = useState("Texto")
+
     return (
         <>
             <div className="contenedor-scroll"style={{maxHeight: '400px', 
@@ -163,6 +167,51 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
                             onChange={(e) => setObligatoria(e.target.checked)}
                         />
                     </div>
+
+                    <div className='d-flex flex-column gap-3 border rounded p-2 px-3 shadow-sm'>
+                        
+                        <Row className='d-flex align-items-center justify-content-between'>
+                            <Col className='d-flex flex-column'>
+                                <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                                    Tipo de respuesta
+                                </span>
+                                <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                                    Que tipo de respuesta se espera
+                                </small>
+                            </Col>
+                            
+                            <Col >
+                                <Form.Select onChange={(e) => setTipoDato(e.target.value)}>
+                                    <option value="Texto">Texto</option>
+                                    <option value="Entero">Entero </option>
+                                    <option value="Decimal">Decimal </option>
+                                    <option value="Rango-entero">Rango entero</option>
+                                    <option value="Rango-real">Rango decimal</option>
+                                </Form.Select>
+                            </Col>
+                        </Row>
+
+
+                        {(tipoDato == "Rango-entero" || tipoDato == "Rango-real") && 
+
+                        <Row>
+                            <Col className='text-muted'>
+                                <Form>
+                                    <Form.Control type="number" placeholder="Ingrese el valor minimo..." />
+                                </Form>
+                            </Col>
+
+                            <Col className='text-muted'>
+                                <Form>
+                                    <Form.Control type="number" placeholder="Ingrese el valor maximo..." />
+                                </Form>
+                            </Col>
+                        </Row>
+                        }
+
+                    </div>
+
+
                     </div>
 
                 </Form.Group>

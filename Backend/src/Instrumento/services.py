@@ -279,7 +279,10 @@ def getDatosInstrumentoSintetico(db:Session, instrumento_id: int) -> dict:
 
             datos.append(instrumento)
 
-    return datosdef obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
+    return datos
+
+
+def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
     from sqlalchemy import select, and_
     from sqlalchemy.orm import joinedload
     

@@ -14,8 +14,13 @@ export function validarInstanciaCompleta(instancia: InstanciaRespuestas): boolea
     
         const pregunta = getPregunta(r.pregunta_id)
 
-        if(!pregunta || !((r?.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))
-            return false;
+        if (r?.opcion_id){
+            continue
+        }
+        else{
+            if(!pregunta || !((r?.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))
+                return false;
+        }
     }
     return true;
 }

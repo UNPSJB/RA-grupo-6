@@ -13,11 +13,11 @@ def obtener_respuesta_fuente(pregunta_id: int,instrumento_id: int,db: Session = 
 @router.post("/")
 def crear_respuesta(respuesta: schemas.RespuestaCreate, db: Session = Depends(get_db)):
     return services.crear_respuesta(db, respuesta)
-
+"""
 @router.get("/", response_model=list[schemas.Respuesta])
 def leer_respuesta(db: Session = Depends(get_db)) -> list[schemas.Respuesta]:
     return services.listar_respuestas(db)
-
+"""
 @router.get("/{respuesta_id}", response_model=schemas.Respuesta)
 def leer_una_respuesta(respuesta_id: int, db: Session = Depends(get_db)) -> schemas.Respuesta:
     return services.obtner_respuesta(db, respuesta_id)    
@@ -30,3 +30,12 @@ def actualizar_respuesta(respuesta_id: int, respuesta: schemas.RespuestaUpdate, 
 def borrar_respuesta(respuesta_id: int, db: Session = Depends(get_db)) -> schemas.RespuestaDelete:
     return services.eliminar_respuesta(db, respuesta_id)  
 
+### version ampliada del GET "/"
+@router.get("/", response_model=list[schemas.Respuesta])
+def leer_respuestas(
+    formulario_id: int = Query(None),
+    db: Session = Depends(get_db)
+) -> list[schemas.Respuesta]: ##Devuelve todas las respuestas o las filtradas por formulario_id si se proporciona.
+    if formulario_id is not None:
+        return services.obtener_respuestas_por_formulario(db, formulario_id)
+    return services.listar_respuestas(db)

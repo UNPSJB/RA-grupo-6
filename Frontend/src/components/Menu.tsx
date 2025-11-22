@@ -35,7 +35,10 @@ function Menu(){
                         <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
                         <Nav.Link href="/MostrarEstadisticas">Ver Estadisticas Encuestados</Nav.Link>
                         <Nav.Link href="/monitoreo-recordatorios">Testing de emails</Nav.Link>
-                         <Nav.Link href="/PlanificarPeriodos">Planificacion de Formularios</Nav.Link>
+                        <Nav.Link href="/PlanificarPeriodos">Planificacion de Formularios</Nav.Link>
+                        <Nav.Link href="/respuestas-encuesta-estudiante">Ver Mis Respuestas</Nav.Link>
+                        <Nav.Link href="/respuestas-informe-catedra">Informes de Cátedra Respondidos</Nav.Link>
+                        <Nav.Link href="/respuestas-informe-sintetico">Informes Sintéticos Respondidos</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

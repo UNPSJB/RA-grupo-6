@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import delete, or_, select, update, func
+from src.Respuesta.models import Respuesta
 from src.Instrumento.models import Instrumento, TipoInstrumento
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Respuesta.models import Respuesta
@@ -274,3 +275,6 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         }
     
     return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+
+def obtener_respuestas_por_formulario(db, formulario_id: int):
+    return db.query(Respuesta).filter(Respuesta.formulario_id == formulario_id).all()

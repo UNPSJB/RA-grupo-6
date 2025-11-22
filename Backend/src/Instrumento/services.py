@@ -6,6 +6,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from src.Materias.services import get_Docente
+from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Dictados.models import Dictado
 from src.Departamento.models import Departamento
 from src.Materias.models import Materia
@@ -278,4 +279,96 @@ def getDatosInstrumentoSintetico(db:Session, instrumento_id: int) -> dict:
 
             datos.append(instrumento)
 
-    return datos
+    return datosdef obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import joinedload
+    
+    instrumentos = db.scalars(
+        select(Instrumento)
+        .where(Instrumento.tipo == tipo)
+        .options(
+            joinedload(Instrumento.materia),
+            joinedload(Instrumento.plantilla_formulario)
+        )
+    ).all()
+    
+    instrumentos_con_info = []
+    
+    for instrumento in instrumentos: # Verificar si el user tiene RespuestasFormulario para el instrumento
+        respuestas_form = db.scalar(
+            select(RespuestasFormulario)
+            .where(
+                and_(
+                    RespuestasFormulario.instrumento_id == instrumento.id,
+                    RespuestasFormulario.usuario_id == usuario_id
+                )
+            )
+        )
+        
+        respondido = respuestas_form is not None
+        
+        # Filtrar mostrar_respondidos
+        if (mostrar_respondidos and respondido) or (not mostrar_respondidos and not respondido):
+            instrumentos_con_info.append({
+                "id": instrumento.id,
+                "tipo": instrumento.tipo,
+                "fecha_inicio": instrumento.fecha_inicio,
+                "fecha_cierre": instrumento.fecha_cierre,
+                "materia": {
+                    "id": instrumento.materia.id,
+                    "nombre": instrumento.materia.nombre
+                },
+                "plantilla_formulario": {
+                    "id": instrumento.plantilla_formulario.id,
+                    "titulo": instrumento.plantilla_formulario.titulo
+                } if instrumento.plantilla_formulario else None,
+                "respondido": respondido,
+                "respuestas_formulario_id": respuestas_form.id if respuestas_form else None,
+                "fecha_envio": respuestas_form.fecha_envio if respuestas_form else None
+            })
+    
+    return instrumentos_con_info
+
+##
+#Obtiene informes de cátedra respondidos por un usuario 
+def obtener_informes_catedra_por_usuario(db: Session, usuario_id: int):
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import joinedload
+    
+    # Buscar respuestas formulario para instrumentos INFORME_CATEDRA
+    respuestas_form = db.scalars(
+        select(RespuestasFormulario)
+        .join(Instrumento)
+        .options(
+            joinedload(RespuestasFormulario.instrumento)
+            .joinedload(Instrumento.materia),
+            joinedload(RespuestasFormulario.instrumento)
+            .joinedload(Instrumento.plantilla_formulario)
+        )
+        .where(and_(
+            RespuestasFormulario.usuario_id == usuario_id,
+            Instrumento.tipo == TipoInstrumento.INFORME_CATEDRA
+        ))
+    ).all()
+    
+    return [
+        {
+            "id": rf.id,
+            "fecha_envio": rf.fecha_envio,
+            "instrumento_id": rf.instrumento_id,
+            "instrumento": {
+                "id": rf.instrumento.id,
+                "nombre": rf.instrumento.plantilla_formulario.titulo,
+                "tipo": rf.instrumento.tipo,
+                "fecha_inicio": rf.instrumento.fecha_inicio,
+                "fecha_cierre": rf.instrumento.fecha_cierre
+            },
+            "materia": {
+                "id": rf.instrumento.materia.id,
+                "nombre": rf.instrumento.materia.nombre
+            },
+            "plantilla_formulario_id": rf.instrumento.plantilla_formulario_id,
+            "respondido": True
+        }
+        for rf in respuestas_form
+    ]

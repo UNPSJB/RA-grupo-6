@@ -40,7 +40,7 @@ function MateriaList(){
                                 <h5 className="card-subtitle"> Cod. {materia.id}</h5>
                                 <div className="button-container">
 
-                                    <Button className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</button>
+                                    <Button className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</Button>
                                 </div>
                                 {/* <a href="#" className="card-link"> Realizar informe </a> */}
                             </div>

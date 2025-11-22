@@ -4,6 +4,7 @@ import type { Pregunta} from "../types";
 import CrearPregunta from "./CrearPregunta";
 import { EnumTipoPregunta } from "../types";
 import ModalExito from "../ModalEnvio";
+import { CButton, CCol, CRow } from "@coreui/react";
 
 
 type Props = {
@@ -181,20 +182,26 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
           </option>
         ))}
       </Form.Select>
-      <div className="d-flex gap-2">
-        <Button onClick={agregarPregunta} style={{ flex: 1 }}>
-          + Agregar
-        </Button>
+      <CCol xs="auto">
+          <CButton color="primary" onClick={agregarPregunta} >
+            Agregar
+          </CButton>
+        </CCol>
+      <CRow className="justify-content-center mt-4 pt-4 border-top">
+        
+        
+        <CCol xs="auto">
         {onCrearFormulario && (
           <ModalExito
             onEnviar={onCrearFormulario}
             desactivado={false}
             variante="success"
-            className="btn-success"
+            className="btn-success text-white"
             textoBoton="Crear Formulario"
           />
         )}
-      </div>
+      </CCol>
+      </CRow>
       <CrearPregunta
         mostrar={showModal}
         manejarPestania={() => setShowModal(false)}

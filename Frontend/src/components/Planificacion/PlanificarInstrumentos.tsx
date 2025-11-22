@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import type { Parametros, PlantillaFormulario} from "../types";
 import ModalExito from "../ModalEnvio";
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CForm, CFormLabel, CFormSelect, CRow } from "@coreui/react";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 export function PlanificarPeriodos() {
 
@@ -162,107 +164,105 @@ export function PlanificarPeriodos() {
     ];
 
     return (
-        <Container className="d-flex flex-column gap-5 pb-5">
-            <Row>
-                <h2>Parametrización de los dictados</h2>
-                <p>Configure los dictados para su asignación automática</p>
-            </Row>
-
-
-            <Row className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
-                <h4 className="mb-4">Primer Dictado</h4>
-                <Col>
-                    <Form.Label className="text-muted">Fecha de inicio:</Form.Label>
+            <ShadowedCard >
+                <CCardHeader>
+                    <div className="m-2">
+                       <h4>Parametrización de los dictados</h4>
+                        <p className="text-medium-emphasis">Configure los dictados para su asignación automática</p>
+                    </div>
+                </CCardHeader>
+            
+                <CCardBody className="m-2">
+                    <CRow className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
+                    <h5 >Primer Dictado</h5>
+                    <CCol>
+                    <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
                     <div className="d-flex gap-2">
-                        <Form.Select
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("inicio_primer_dictado", "mes", e.target.value)}
                         >
                             {meses.slice(0,6).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
-                        </Form.Select>
-                        <Form.Select
+                        </CFormSelect>
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[2] || ""}
                             onChange={(e) => handleFechaChange("inicio_primer_dictado", "dia", e.target.value)}
                         >
                             {renderOpcionesDias(formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1], "inicio_primer_dictado")}
-                        </Form.Select>
+                        </CFormSelect>
                     </div>
-                </Col>
-                <Col>
-                    <Form.Label className="text-muted">Fecha de cierre:</Form.Label>
+                    </CCol>
+                    <CCol>
+                    <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
                     <div className="d-flex gap-2">
-                        <Form.Select
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
                         >
                             {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1]) - 1, 6).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
-                        </Form.Select>
-                        <Form.Select
+                        </CFormSelect>
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[2] || ""}
                             onChange={(e) => handleFechaChange("cierre_primer_dictado", "dia", e.target.value)}
                         >
                             {renderOpcionesDias(formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1], "cierre_primer_dictado")}
-                        </Form.Select>
+                        </CFormSelect>
                     </div>
-                </Col>
-            </Row>
+                    </CCol>
+                    </CRow>
 
-
-
-
-
-            {/* Segundo dictado */}
-            <Row className="p-2" style={{ borderLeft: "3px solid #198754" }}>
-                <h4 className="mb-4">Segundo Dictado</h4>
-                <Col>
-                    <Form.Label className="text-muted">Fecha de inicio:</Form.Label>
+                    {/* Segundo dictado */}
+                    <CRow className="p-2" style={{ borderLeft: "3px solid #198754" }}>
+                    <h5>Segundo Dictado</h5>
+                    <CCol>
+                    <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
                     <div className="d-flex gap-2">
-                        <Form.Select
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("inicio_segundo_dictado", "mes", e.target.value)}
                         >
                             {meses.slice(6,12).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
-                        </Form.Select>
-                        <Form.Select
+                        </CFormSelect>
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[2] || ""}
                             onChange={(e) => handleFechaChange("inicio_segundo_dictado", "dia", e.target.value)}
                         >
                             {renderOpcionesDias(formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1], "inicio_segundo_dictado")}
-                        </Form.Select>
+                        </CFormSelect>
                     </div>
-                </Col>
-                <Col>
-                    <Form.Label className="text-muted">Fecha de cierre:</Form.Label>
+                    </CCol>
+                    <CCol>
+                    <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
                     <div className="d-flex gap-2">
-                        <Form.Select
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1] || ""}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "mes", e.target.value)}
                         >
                             {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1]) - 1,12).map(m => (
                                 <option key={m.valor} value={m.valor}>{m.nombre}</option>
                             ))}
-                        </Form.Select>
-                        <Form.Select
+                        </CFormSelect>
+                        <CFormSelect
                             value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[2] || ""}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "dia", e.target.value)}
                         >
                             {renderOpcionesDias(formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1], "cierre_segundo_dictado")}
-                        </Form.Select>
+                        </CFormSelect>
                     </div>
-                </Col>
-            </Row>
+                    </CCol>
+                    </CRow>
 
-            <Row className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
-                <h4 className="mb-4">Plantillas</h4>
-                    <Col >
-                        <Form.Label className="text-muted"> Plantilla del estudiante</Form.Label>
-                        <Form.Select
+                    <CRow className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
+                    <h5 >Plantillas</h5>
+                    <CCol >
+                        <CFormLabel className="text-muted"> Plantilla del estudiante</CFormLabel>
+                        <CFormSelect
                             value={modificacionesParametros?.plantilla_estudiante}
                             onChange={(e) => {
                                 const selectedId = Number(e.target.value);
@@ -281,12 +281,12 @@ export function PlanificarPeriodos() {
                             {plantillasEstudiante?.map((plantilla) => (
                                 <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
                             ))}
-                        </Form.Select>
-                    </Col>
+                        </CFormSelect>
+                    </CCol>
 
-                    <Col >
-                        <Form.Label className="text-muted"> Plantilla del docente</Form.Label>
-                        <Form.Select
+                    <CCol >
+                        <CFormLabel className="text-muted"> Plantilla del docente</CFormLabel>
+                        <CFormSelect
                             value={modificacionesParametros?.plantilla_docente}
                             onChange={(e) => {
                                 const selectedId = Number(e.target.value);
@@ -304,12 +304,12 @@ export function PlanificarPeriodos() {
                             {plantillasDocente?.map((plantilla) => (
                                 <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
                             ))}
-                        </Form.Select>
-                    </Col>
+                        </CFormSelect>
+                    </CCol>
 
-                    <Col >
-                        <Form.Label className="text-muted"> Plantilla del departamento</Form.Label>
-                        <Form.Select value={modificacionesParametros?.plantilla_departamento}   
+                    <CCol >
+                        <CFormLabel className="text-muted"> Plantilla del departamento</CFormLabel>
+                        <CFormSelect value={modificacionesParametros?.plantilla_departamento}   
                         onChange={(e) => {
                             const selectedId = Number(e.target.value);
                             const plantillaSeleccionada = plantillasDepartamento?.find(p => p.id === selectedId);
@@ -326,17 +326,17 @@ export function PlanificarPeriodos() {
                             {plantillasDepartamento?.map((plantilla) => (
                                 <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
                             ))}
-                        </Form.Select>
-                    </Col>
-            </Row>
+                        </CFormSelect>
+                    </CCol>
+                    </CRow>
 
-            <Row className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
-                <h4 className="mb-4">Disponibilidad de Formularios</h4>
-                {["estudiante", "docente", "departamento"].map((tipo) => {
+                    <CRow className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
+                    <h5>Disponibilidad de Formularios</h5>
+                    {["estudiante", "docente", "departamento"].map((tipo) => {
                     const key = `disponibilidad_${tipo}` as keyof Parametros;
                     return (
-                        <Col key={tipo} className="d-flex justify-content-center flex-column">
-                            <Form.Label>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</Form.Label>
+                        <CCol key={tipo} className="d-flex justify-content-center flex-column">
+                            <CFormLabel>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</CFormLabel>
                             <Form.Control
                                 type="number"
                                 min={0}
@@ -353,28 +353,31 @@ export function PlanificarPeriodos() {
                                     }
                                 }}
                             />
-                        </Col>
+                        </CCol>
                     );
-                })}
-            </Row>
+                    })}
+                    </CRow>
 
-            <Row className="d-flex align-items-center justify-content-center">
-                <Col xs={3}>
-                    <ModalExito 
-                        onEnviar={() => modificacionesParametros ? actualizarParametros(modificacionesParametros) : Promise.resolve(false)}
-                        onExito={() => setParametros(modificacionesParametros)}
-                        desactivado={!modificacionesParametros}
-                        textoBoton="Guardar configuración"
-                        variante="success"
-                        className=""
-                    />
-                </Col>
-                <Col xs={1}>
-                    <Button variant="outline-secondary" onClick={() => setModificacionesParametros(parametros)}>
-                        Limpiar
-                    </Button>
-                </Col>
-            </Row>
-        </Container>
+                    <CRow className="justify-content-center mt-4 pt-4 border-top">
+                        <CCol xs="auto">
+                            <ModalExito 
+                                onEnviar={() => modificacionesParametros ? actualizarParametros(modificacionesParametros) : Promise.resolve(false)}
+                                onExito={() => setParametros(modificacionesParametros)}
+                                desactivado={!modificacionesParametros}
+                                textoBoton="Guardar configuración"
+                                variante="success"
+                                className="text-white"
+                            />
+                        </CCol>
+                        <CCol xs="auto">
+                            <CButton color="secondary" variant="outline" onClick={() => setModificacionesParametros(parametros)}>
+                                Restablecer
+                            </CButton>
+                        </CCol>
+                    </CRow>
+                </CCardBody>
+
+            
+            </ShadowedCard>
     );
 }

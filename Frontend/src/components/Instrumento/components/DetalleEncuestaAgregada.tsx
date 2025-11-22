@@ -3,6 +3,8 @@ import { Card, Button, ListGroup, Badge, Spinner, Alert } from "react-bootstrap"
 import type { instrumentoList, EstadisticaPregunta, GrupoPreguntasAbiertas } from "../types";
 import Estadisticas from "./Estadisticas";
 import { mockDetalleCompleto } from "../MockInformes";
+import ShadowedCard from "../../coreui-components/ShadowedCard";
+import { CCardBody, CCardHeader } from "@coreui/react";
 
 // --------------------------------------------------------------------------------
 
@@ -38,15 +40,15 @@ export default function DetalleEncuestaAgregada({ instrumento, onVolver }: Props
   }, [instrumento.id]);
 
   return (
-    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-      <Card.Body className="p-4 p-md-5">
-        <div className="mb-4">
-          <h1 className="fw-bold mb-2">{instrumento.plantilla_formulario.titulo}</h1>
-          <p className="text-muted mb-0">Resultados agregados de la encuesta</p>
+    <ShadowedCard>
+      <CCardHeader>
+        <div className="m-2">
+          <h4>{instrumento.plantilla_formulario.titulo}</h4>
+          <p className="text-medium-emphasis">Resultados agregados de la encuesta</p>
         </div>
+      </CCardHeader>
+      <CCardBody className="p-4 p-md-5">
         
-        <hr className="my-4" />
-
         <Estadisticas 
           stats={estadisticas}
           loading={loading}
@@ -93,8 +95,8 @@ export default function DetalleEncuestaAgregada({ instrumento, onVolver }: Props
             Volver al Listado
           </Button>
         </div>
-      </Card.Body>
-    </Card>
+      </CCardBody>
+    </ShadowedCard>
   );
 }
 

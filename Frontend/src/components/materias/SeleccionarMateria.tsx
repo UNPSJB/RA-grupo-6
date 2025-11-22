@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, ListGroup, Badge, Spinner, Alert, Container } from 'react-bootstrap';
-import {capitalizarCadena} from "../Funciones";
+import {
+    CCard,
+    CButton,
+    CListGroup,
+    CListGroupItem,
+    CBadge,
+    CSpinner,
+    CAlert,
+    CCardBody,
+    CCardHeader
+} from '@coreui/react';
+import { capitalizarCadena } from "../Funciones";
+import ShadowedCard from '../coreui-components/ShadowedCard';
 
 interface Materia {
     id: string;
@@ -77,117 +88,99 @@ function SeleccionarMateria() {
 
     if (cargando) {
         return (
-            <Container className="mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5 text-center">
-                                <Spinner animation="border" role="status" className="mb-3">
-                                    <span className="visually-hidden">Cargando materias...</span>
-                                </Spinner>
-                                <p className="text-muted">Cargando materias con encuestas activas...</p>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
+            <CCard className="text-center p-5">
+                <CCardBody>
+                    <CSpinner className="mb-3" />
+                    <p className="text-medium-emphasis">Cargando materias con encuestas activas...</p>
+                </CCardBody>
+            </CCard>
         );
     }
 
     return (
-        <Container className="mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                        <Card.Body className="p-4 p-md-5">
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <h1 className="fw-bold mb-2">Encuestas para Alumnos</h1>
-                                        <p className="text-muted mb-0">
-                                            Selecciona una materia para responder la encuesta correspondiente
-                                        </p>
+        <ShadowedCard >
+            <CCardHeader>
+                <div className="m-2">
+                    <h4 >Encuestas para Alumnos</h4>
+                    <p className="text-medium-emphasis mb-0">
+                        Selecciona una materia para responder la encuesta correspondiente
+                    </p>
+                </div>
+            </CCardHeader>
+            <CCardBody className="p-4 p-md-5">
+                
+
+                {mensaje && (
+                    <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                        {mensaje}
+                    </CAlert>
+                )}
+
+                {materias.length > 0 ? (
+                    <CListGroup flush>
+                        {materias.map((materia) => (
+                            <CListGroupItem
+                                key={materia.id}
+                                onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(materia)}
+                                className="d-flex justify-content-between align-items-center p-4"
+                                disabled={!materia.tieneEncuestaActiva}
+                            >
+                                <div className="flex-grow-1 text-start">
+                                    <div className="fw-bold fs-5 mb-1">{capitalizarCadena(materia.nombre)}</div>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <small className="text-medium-emphasis">
+                                            Código: {materia.id}
+                                        </small>
+                                        {materia.tieneEncuestaActiva && (
+                                            <>
+                                                <CBadge color="success" className="ms-2">
+                                                    Encuesta Activa
+                                                </CBadge>
+                                                <small className="text-medium-emphasis">
+                                                    Vence: {new Date(materia.fechaCierre!).toLocaleDateString()}
+                                                </small>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                            
-                            {mensaje && (
-                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
-                                    {mensaje}
-                                </Alert>
-                            )}
-                            
-                            {materias.length > 0 ? (
-                                <ListGroup variant="flush">
-                                    {materias.map((materia) => (
-                                        <ListGroup.Item 
-                                            key={materia.id} 
-                                            action 
-                                            onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(materia)}
-                                            className="d-flex justify-content-between align-items-center p-4"
-                                            style={{ 
-                                                cursor: materia.tieneEncuestaActiva ? 'pointer' : 'not-allowed',
-                                                borderBottom: '1px solid #e9ecef'
-                                            }}
-                                        >
-                                            <div className="flex-grow-1">
-                                                <div className="fw-bold fs-5 mb-1">{capitalizarCadena(materia.nombre)}</div>
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <small className="text-muted">
-                                                        Código: {materia.id} 
-                                                    </small>
-                                                    {materia.tieneEncuestaActiva && (
-                                                        <>
-                                                            <Badge bg="success" className="ms-2">
-                                                                Encuesta Activa
-                                                            </Badge>
-                                                            <small className="text-muted">
-                                                                Vence: {new Date(materia.fechaCierre!).toLocaleDateString()}
-                                                            </small>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            {materia.tieneEncuestaActiva ? (
-                                                <Button 
-                                                    variant="primary"
-                                                    size="sm" 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleResponderEncuesta(materia);
-                                                    }}
-                                                    className="px-4 py-2"
-                                                >
-                                                    <i className="fas fa-edit me-2"></i>
-                                                    Responder Encuesta
-                                                </Button>
-                                            ) : (
-                                                <Button 
-                                                    variant="outline-secondary" 
-                                                    size="sm"
-                                                    disabled
-                                                >
-                                                    Sin Encuesta
-                                                </Button>
-                                            )}
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            ) : (
-                                <div className="text-center py-5">
-                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay encuestas disponibles</h5>
-                                    <p className="text-muted">
-                                        No se encontraron encuestas pendientes para tus materias cursadas.
-                                    </p>
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
-        </Container>
+
+                                {materia.tieneEncuestaActiva ? (
+                                    <CButton
+                                        color="primary"
+                                        size="sm"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleResponderEncuesta(materia);
+                                        }}
+                                        className="px-4 py-2"
+                                    >
+                                        <i className="fas fa-edit me-2"></i>
+                                        Responder Encuesta
+                                    </CButton>
+                                ) : (
+                                    <CButton
+                                        variant="outline"
+                                        color="secondary"
+                                        size="sm"
+                                        disabled
+                                    >
+                                        Sin Encuesta
+                                    </CButton>
+                                )}
+                            </CListGroupItem>
+                        ))}
+                    </CListGroup>
+                ) : (
+                    <div className="text-center py-5">
+                        <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>
+                        <h5 className="text-medium-emphasis mb-3">No hay encuestas disponibles</h5>
+                        <p className="text-medium-emphasis">
+                            No se encontraron encuestas pendientes para tus materias cursadas.
+                        </p>
+                    </div>
+                )}
+            </CCardBody>
+        </ShadowedCard>
     );
 }
 

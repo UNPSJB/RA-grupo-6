@@ -19,7 +19,6 @@ type Props = {
 
 function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
 
-  //Definicion de constantes
   const [texto, setTexto] = useState("")
   const [mostrar, setMostrar] = useState(false);
   const [TextoMostrar, setTextoMostrar] = useState("Mostrar");

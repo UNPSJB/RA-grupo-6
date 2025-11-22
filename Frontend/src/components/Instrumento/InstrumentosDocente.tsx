@@ -1,7 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Card, Button, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
+import { 
+    CButton, 
+    CBadge, 
+    CSpinner, 
+    CAlert,
+    CCardBody,
+    CCardHeader,
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell, CTableBody, CTableDataCell
+} from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
+import ShadowedCard from '../coreui-components/ShadowedCard';
 
 interface InstrumentoDocente {
     id: number;
@@ -59,7 +71,7 @@ function InstrumentosDocente() {
                 
             } catch (error) {
                 console.error('Error completo:', error);
-                setMensaje(`Error al cargar los informes de cátedra: ${error.message}`);
+                setMensaje(`Error al cargar los informes de cátedra: ${error}`);
                 setCargando(false);
                 
                 const datosEjemplo: InstrumentoDocente[] = [
@@ -111,126 +123,89 @@ function InstrumentosDocente() {
 
     if (cargando) {
         return (
-            <Container className="mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5 text-center">
-                                <Spinner animation="border" role="status" className="mb-3">
-                                    <span className="visually-hidden">Cargando informes...</span>
-                                </Spinner>
-                                <p className="text-muted">Cargando informes de cátedra disponibles...</p>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
+                <ShadowedCard className="text-center">
+                    <CCardBody className="p-5">
+                        <CSpinner color="primary" className="mb-3" />
+                        <p className="text-medium-emphasis">Cargando informes de cátedra disponibles...</p>
+                    </CCardBody>
+                </ShadowedCard>
         );
     }
 
     return (
-        <Container className="mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                        <Card.Body className="p-4 p-md-5">
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <h1 className="fw-bold mb-2">Informes de Cátedra Pendientes</h1>
-                                        <p className="text-muted mb-0">
-                                            Selecciona un informe de cátedra para completar
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {mensaje && (
-                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
-                                    {mensaje}
-                                </Alert>
-                            )}
-                            
-                            {instrumentos.length > 0 ? (
-                                <ListGroup variant="flush">
-                                    {instrumentos.map((instrumento) => {
-                                        const activo = estaActivo(instrumento);
-                                        return (
-                                            <ListGroup.Item 
-                                                key={instrumento.id} 
-                                                action 
-                                                onClick={() => activo && handleSeleccionarInstrumento(instrumento)}
-                                                className="d-flex justify-content-between align-items-center p-4"
-                                                style={{ 
-                                                    cursor: activo ? 'pointer' : 'not-allowed',
-                                                    borderBottom: '1px solid #e9ecef',
+            <ShadowedCard>
+                <CCardHeader>
+                    <div className="m-2">
+                        <h4 >Informes de Cátedra Pendientes</h4>
+                        <p className="text-medium-emphasis">
+                            Selecciona un informe de cátedra para completar.
+                        </p>
+                    </div>
+                </CCardHeader>
+                <CCardBody >
+                    {mensaje && (
+                        <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                            {mensaje}
+                        </CAlert>
+                    )}
+                    
+                    {instrumentos.length > 0 ? (
+                        <CTable className='border mb-1'  hover responsive>
+                            <CTableHead color="light">
+                                <CTableRow>
+                                    <CTableHeaderCell>Materia</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+                                    <CTableHeaderCell>Vencimiento</CTableHeaderCell>
+                                    <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
+                            {instrumentos.map((instrumento) => {
+                                const activo = estaActivo(instrumento);
+                                return (
+                                    <CTableRow key={instrumento.id} onClick={() => activo && handleSeleccionarInstrumento(instrumento)} style={{ cursor: activo ? 'pointer' : 'not-allowed' }}>
+                                        <CTableDataCell>
+                                            <div className="fw-bold">{capitalizarCadena(instrumento.materia.nombre)}</div>
+                                            <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CBadge color={activo ? "success" : "secondary"}>
+                                                {activo ? "Activo" : "Inactivo"}
+                                            </CBadge>
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {activo ? new Date(instrumento.fecha_cierre).toLocaleDateString() : '-'}
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CButton
+                                                color="primary"
+                                                size="sm"
+                                                disabled={!activo}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleSeleccionarInstrumento(instrumento);
                                                 }}
                                             >
-                                                <div className="flex-grow-1">
-                                                    <div className="fw-bold fs-5 mb-1">
-                                                        {capitalizarCadena(instrumento.materia.nombre)}
-                                                    </div>
-                                                    <div className="d-flex align-items-center gap-3">
-                                                        <small className="text-muted">
-                                                            Código: {instrumento.materia.id}
-                                                        </small>
-                                                        {activo ? (
-                                                            <>
-                                                                <Badge bg="success" className="ms-2">
-                                                                   Informe Activo
-                                                                </Badge>
-                                                                <small className="text-muted">
-                                                                    Vence: {new Date(instrumento.fecha_cierre).toLocaleDateString()}
-                                                                </small>
-                                                            </>
-                                                        ) : (
-                                                            <Badge bg="secondary" className="ms-2">
-                                                                Inactivo
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                
-                                                {activo ? (
-                                                    <Button 
-                                                        variant="primary"
-                                                        size="sm" 
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleSeleccionarInstrumento(instrumento);
-                                                        }}
-                                                        className="px-4 py-2"
-                                                    >
-                                                        <i className="fas fa-edit me-2"></i>
-                                                        Completar Informe
-                                                    </Button>
-                                                ) : (
-                                                    <Button 
-                                                        variant="outline-secondary" 
-                                                        size="sm"
-                                                        disabled
-                                                    >
-                                                        No Disponible
-                                                    </Button>
-                                                )}
-                                            </ListGroup.Item>
-                                        );
-                                    })}
-                                </ListGroup>
-                            ) : (
-                                <div className="text-center py-5">
-                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay informes de cátedra pendientes</h5>
-                                    <p className="text-muted">
-                                        No se encontraron informes de cátedra pendientes para completar.
-                                    </p>
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
-        </Container>
+                                                <i className="fas fa-edit me-2"></i>
+                                                Completar Informe
+                                            </CButton>
+                                        </CTableDataCell>
+                                    </CTableRow>
+                                );
+                            })}
+                            </CTableBody>
+                        </CTable>
+                    ) : (
+                        <div className="text-center py-5">
+                            <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>
+                            <h5 className="text-medium-emphasis mb-3">No hay informes de cátedra pendientes</h5>
+                            <p className="text-medium-emphasis">
+                                No se encontraron informes de cátedra pendientes para completar.
+                            </p>
+                        </div>
+                    )}
+                </CCardBody>
+            </ShadowedCard>
     );
 }
 

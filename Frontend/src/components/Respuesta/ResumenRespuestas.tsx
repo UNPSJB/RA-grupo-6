@@ -1,4 +1,4 @@
-import { Alert, Row, Col, Badge, ProgressBar } from 'react-bootstrap';
+import { Alert, Row, Col, ProgressBar } from 'react-bootstrap';
 import ModalExito from '../ModalEnvio';
 import type { GrupoPreguntas, RespuestaTemporal, InstanciaRespuestas } from '../types';
 
@@ -138,8 +138,6 @@ function ResumenRespuestas({
 
                 {gruposOrganizados.map((grupo, index) => {
                     const { 
-                        completadas, 
-                        total, 
                         completadasObligatorias,
                         totalObligatorias,
                         porcentajeObligatorias, 
@@ -149,7 +147,7 @@ function ResumenRespuestas({
                     } = calcularProgresoGrupo(grupo);
 
                     const backgroundColor = !obligatoriasCompletas 
-                        ? '#dc3545'  
+                        ? '#dc3545' 
                         : todoCompleto 
                             ? '#198754'  
                             : '#75b798'; 
@@ -181,20 +179,21 @@ function ResumenRespuestas({
                                             backgroundColor,
                                             color: 'white',
                                             fontSize: '0.9rem',
-                                            padding: '0.4rem 0.6rem',
+                                            padding: '0.4rem',
                                             borderRadius: '0.375rem',
                                             fontWeight: 'bold',
                                             flexShrink: 0,
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '0.25rem'
+                                            justifyContent: 'center',
+                                            gap: '0.25rem',
+                                            minWidth: '32px',
+                                            height: '28px'
                                         }}
                                     >
                                         {obligatoriasCompletas ? (
                                             todoCompleto ? (
                                                 <>
-                                                    <i className="fa-solid fa-check"></i>
-                                                    <br></br>
                                                     <i className="fa-solid fa-check"></i>
                                                 </>
                                             ) : (

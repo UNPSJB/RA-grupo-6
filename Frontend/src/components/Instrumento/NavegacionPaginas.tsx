@@ -65,7 +65,7 @@ function NavegacionPaginas({
           )}
 
           {mostrarIndicadores && (
-            <div className="d-flex justify-content-center align-items-center gap-2 mb-4 flex-wrap">
+            <div className="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
               {gruposOrganizados.map((grupo, index) => {
                 const completada = validarPaginaCompleta(
                   index,
@@ -125,6 +125,20 @@ function NavegacionPaginas({
                 );
               })}
             </div>
+          )}
+          
+          {mostrarIndicadores && mostrarAlerta && !paginaCompleta && (
+            <Alert variant="warning" className="mb-4">
+              <i className="fas fa-info-circle me-2"></i>
+              Complete todas las preguntas obligatorias de esta sección para continuar
+            </Alert>
+          )}
+
+          {mostrarIndicadores && mostrarAlerta && paginaCompleta && tieneOpcionalesIncompletos && (
+            <Alert variant="info" className="mb-4">
+              <i className="fas fa-circle-info me-2"></i>
+              Hay preguntas opcionales incompletas. Puedes continuar si lo deseas.
+            </Alert>
           )}
 
           {mostrarBotones && (

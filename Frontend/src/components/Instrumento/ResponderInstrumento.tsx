@@ -281,7 +281,7 @@ export default function ResponderInstrumento() {
                             mostrarProgreso={true}
                             mostrarIndicadores={true}
                             mostrarBotones={false}
-                            mostrarAlerta={false}
+                            mostrarAlerta={true}
                             onAvanzar={avanzarPagina}
                             onRetroceder={retrocederPagina}
                             onIrAPagina={irAPagina}

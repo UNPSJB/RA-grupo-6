@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
-import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail} from '../types';
+import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail, PlantillaFormulario} from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
-import { validarTodasRespuestasCompletas } from '../Respuesta/ValidarRespuestas';
+import { validarTodasRespuestasCompletas} from '../Respuesta/ValidarRespuestas';
 import { enviarFormularioCompleto } from '../Respuesta/EnviarRespuestas';
 import NavegacionPaginas from './NavegacionPaginas';
 import PreguntaSimple from '../Pregunta/PreguntaSimple';
@@ -23,7 +23,7 @@ export default function ResponderInstrumento() {
     const { user } = useAuth(); 
 
     const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<InstrumentoDetail>();
-    const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
+    const [plantillaFormulario, setPlantillaFormulario] = useState<PlantillaFormulario>();
 
     const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
     const [respuestasMultiples, setRespuestasMultiples] = useState<{
@@ -131,6 +131,11 @@ export default function ResponderInstrumento() {
     };
 
     const todasRespondidas = (): boolean => {
+
+        if (instrumentoSeleccionado == undefined) {
+            return false;
+        }
+
         return validarTodasRespuestasCompletas(respuestas, respuestasMultiples, plantillaFormulario);
     };
 

@@ -13,7 +13,7 @@ type Props = {
     instrumento_id: number;
 };
 
-function getMensajeError(jsonTipoDato: string){
+export function getMensajeError(jsonTipoDato: string){
 
     const valorTipoDato = JSON.parse(jsonTipoDato) 
 

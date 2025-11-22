@@ -1,22 +1,29 @@
 import { esTipoRespuestaValido } from "../Funciones";
-import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
+import type { RespuestaTemporal, InstanciaRespuestas} from "../types";
+
+
+function getPregunta(pregunta_id:number){
+
+    return fetch(`http://127.0.0.1:8000/preguntas/${pregunta_id}`)
+        .then((res) => res.ok ? res.json() : null)
+}
 
 export function validarInstanciaCompleta(instancia: InstanciaRespuestas): boolean {
     for (const key in instancia) {
         const r = instancia[key];
-        if (!(r.texto?.trim() || r.opcion_id)) 
+    
+        const pregunta = getPregunta(r.pregunta_id)
+
+        if(!pregunta || !((r?.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))
             return false;
     }
     return true;
 }
 
-// ((respuesta?.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(respuesta.texto, pregunta.tipo_respuesta) : respuesta.texto)
-
-
 export function validarTodasRespuestasCompletas(
     respuestas: RespuestaTemporal[],
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
-    plantillaFormulario: any
+    plantillaFormulario: any, 
 ): boolean {
 
     const preguntasObligatorias = plantillaFormulario.preguntas.filter((pregunta: any) => pregunta.obligatoria && !pregunta.multiple_respuestas)
@@ -80,7 +87,7 @@ export function validarPaginaCompleta(
     paginaActual: number,
     gruposOrganizados: any[],
     respuestas: RespuestaTemporal[],
-    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
 ): boolean {
     if (paginaActual >= gruposOrganizados.length) return false;
 

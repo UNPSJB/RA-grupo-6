@@ -1,9 +1,11 @@
-import { Badge, Button, Form } from 'react-bootstrap';
+import { Alert, Badge, Button, Form } from 'react-bootstrap';
 import { EnumTipoPregunta } from '../types';
 import type { InstanciaRespuestas, InstrumentoDetail } from '../types';
 import EliminarInstancia from '../Instrumento/EliminarInstancia';
 import { cargarRespuesta } from '../Respuesta/CargarRespuestasIniciales';
 import { useState } from 'react';
+import { getMensajeError } from './PreguntaSimple';
+import { esTipoRespuestaValido } from '../Funciones';
 
 type Props = {
     pregunta: any;
@@ -41,7 +43,7 @@ function PreguntaMultiple({
     let materiaNombre: string | undefined = undefined;
     let materiaId: string | undefined = undefined;
     const [valor, setValor] = useState(respuesta?.texto? respuesta.texto : "")
-    
+    const [respuestaValida, setRespuestaValida] = useState(true)
 
     for (const key in instancia) {
         const r = instancia[key];
@@ -115,17 +117,27 @@ function PreguntaMultiple({
                     </div>
                 </div>
 
-                {pregunta.tipo === EnumTipoPregunta.abierta ? (
-                    <Form.Control
-                        as="textarea"
-                        rows={4}
-                        value={valor}
-                        onChange={(e) =>{ setValor(e.target.value)
-                            ;onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
-                        }}
-                        placeholder="Escriba su respuesta..."
-                        className="input-pregunta"
-                    />
+                {(pregunta.tipo === EnumTipoPregunta.abierta) ? (
+                    <>
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            value={valor}
+                            onChange={(e) =>{ setValor(e.target.value); pregunta.tipo_respuesta? setRespuestaValida(esTipoRespuestaValido(e.target.value, pregunta.tipo_respuesta)) : null;
+                                ;onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
+                            }}
+                            placeholder="Escriba su respuesta..."
+                            className="input-pregunta"
+                        />
+
+                        {!respuestaValida && 
+                            
+                            <Alert key={pregunta.id} className="mt-3" variant='danger'>
+                                <i className="fa-solid fa-circle-exclamation" style={{color: "red"}}> </i> {getMensajeError(pregunta.tipo_respuesta)}
+                            </Alert>
+                        }
+                    </>
+
                 ) : (
                     <Form.Group>
                         {pregunta.opciones?.map((opcion: any) => (

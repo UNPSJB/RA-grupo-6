@@ -12,95 +12,144 @@ import {
     cilBuilding,
     cilEducation,
     cilUser,
+    cilBarChart,
+    cilChartLine,
+    cilChart,
+    cilCalendar,
+    cilDoubleQuoteSansLeft,
+    cilBalanceScale,
+    cilClone,
+    cilInbox,
+    cilInput,
+    cilCommentBubble,
+    cilShortText,
+    cilCalendarCheck,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const navSecretaria = [
-    { component: CNavTitle, name: 'Secretaría Académica' },
+    /* { component: CNavTitle, name: 'Secretaría Académica' }, */
+    
+    { component: CNavTitle, name: 'Formularios y Reportes' },
     {
         component: CNavItem,
-        name: 'Estadísticas Generales',
+        name: 'Tasa de Respuestas',
         to: '/MostrarEstadisticas',
         icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     },
     {
         component: CNavItem,
-        name: 'Estadísticas por Docente',
-        to: '/EstadisticasDeDocente',
-        icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+        name: 'Comparar plantillas',
+        to: '/comparar-plantillas',
+        icon: <CIcon icon={cilClone} customClassName="nav-icon" />,
     },
     {
         component: CNavItem,
-        name: 'Planificar Períodos',
-        to: '/PlanificarPeriodos',
-        icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
+        name: 'Informes Sintéticos',
+        to: '/VerInformesSinteticos',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
-    { component: CNavTitle, name: 'Formularios y Reportes' },
+    {
+        component: CNavItem,
+        name: 'Banco de Preguntas',
+        to: '/VerPregunta',
+        icon: <CIcon icon={cilShortText} customClassName="nav-icon" />,
+    },
+    { component: CNavTitle, name: 'Acciones' },
+    
     {
         component: CNavItem,
         name: 'Crear Formulario',
         to: '/CrearFormulario',
         icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
     },
+    
+    
     {
         component: CNavItem,
-        name: 'Ver Informes Sintéticos',
-        to: '/VerInformesSinteticos',
-        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+        name: 'Planificar Períodos',
+        to: '/PlanificarPeriodos',
+        icon: <CIcon icon={cilCalendarCheck} customClassName="nav-icon" />,
     },
     {
         component: CNavItem,
-        name: 'Monitoreo de Recordatorios',
+        name: 'Enviar Recordatorios',
         to: '/monitoreo-recordatorios',
         icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
     },
+    
+    
+    
 ];
 
 const navDepartamento = [
     { component: CNavTitle, name: 'Departamento' },
     {
         component: CNavItem,
-        name: 'Completar Informe Sintético',
+        name: 'Responder formularios',
         to: '/seleccionar-informe-sintetico',
         icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
     },
     {
         component: CNavItem,
-        name: 'Ver Informes de Cátedra',
-        to: '/VerInformeActividadCurricular',
-        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+        name: 'Desempeño de Cátedras',
+        to: '/EstadisticasDeDocente',
+        icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    },
+    
+    {
+        component: CNavItem,
+        name: 'Tasa de Respuestas',
+        to: '/mostrar-estadisticas-departamento',
+        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     },
     {
         component: CNavItem,
-        name: 'Ver Encuestas de Estudiantes',
-        to: '/VerEncuestasEstudiante',
-        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+        name: 'Mis Respuestas',
+        to: '/respuestas-informe-sintetico',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
+
+
 ];
 
 const navDocente = [
     { component: CNavTitle, name: 'Docente' },
     {
         component: CNavItem,
-        name: 'Completar Informe de Cátedra',
+        name: 'Responder Formularios',
         to: '/instrumentos-docente',
         icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
     },
-    {
+    /* {
         component: CNavItem,
         name: 'Ver Encuestas',
         to: '/VerEncuestasEstudiante',
         icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    }, */
+    {
+        component: CNavItem,
+        name: 'Mis Respuestas',
+        to: '/respuestas-informe-catedra',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
+    
+    
 ];
 
 const navEstudiante = [
     { component: CNavTitle, name: 'Estudiante' },
     {
         component: CNavItem,
-        name: 'Responder Encuestas',
+        name: 'Responder Formularios',
         to: '/materias',
         icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
+        name: 'Mis Respuestas',
+        to: '/respuestas-encuesta-estudiante',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
 ];
 
@@ -109,10 +158,10 @@ const navDefault = [
 ];
 
 const navigation = {
-    'secretaria': navSecretaria,
+    'secretaria academica': navSecretaria,
     'departamento': navDepartamento,
     'docente': navDocente,
-    'alumno': navEstudiante,
+    'estudiante': navEstudiante,
     'default': navDefault
 };
 

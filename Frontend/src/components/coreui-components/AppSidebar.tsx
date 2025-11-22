@@ -31,7 +31,7 @@ const AppSidebar = () => {
   const userRole = user?.rol?.nombre.toLowerCase() || 'default';
   const navItems = navigation[userRole as keyof typeof navigation] || navigation['default'];
   const homePath = {
-    'secretaria': '/MostrarEstadisticas',
+    'secretaria academica': '/MostrarEstadisticas',
     'departamento': '/seleccionar-informe-sintetico',
     'docente': '/instrumentos-docente',
     'alumno': '/materias',

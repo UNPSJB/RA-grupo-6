@@ -244,8 +244,8 @@ export function paginaTotalmenteCompleta(
             });
         });
     }
-
-    return esPaginaCompleta;
+    /* esPaginaCompleta = instancias.length > 0 && instancias.every((instancia) => validarInstanciaCompleta(instancia));
+    return esPaginaCompleta; */
 
 }
 

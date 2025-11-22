@@ -66,7 +66,8 @@ def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
                 multiple_respuestas= preg.multiple_respuestas,
                 grupo_cuadro_id = preg.grupo_cuadro_id,
                 orden_en_grupo= preg.orden_en_grupo,
-                obligatoria= preg.obligatoria
+                obligatoria= preg.obligatoria,
+                tipo_respuesta= preg.tipo_respuesta,
             )
         )
     return resultado

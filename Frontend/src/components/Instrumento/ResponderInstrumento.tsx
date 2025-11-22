@@ -285,6 +285,7 @@ export default function ResponderInstrumento() {
                             onAvanzar={avanzarPagina}
                             onRetroceder={retrocederPagina}
                             onIrAPagina={irAPagina}
+                            plantillaFormulario={plantillaFormulario}
                         />
 
                         {esDocente && !mostrarResumen && instrumentoSeleccionado && (
@@ -403,6 +404,7 @@ export default function ResponderInstrumento() {
                                     onAvanzar={avanzarPagina}
                                     onRetroceder={retrocederPagina}
                                     onIrAPagina={irAPagina}
+                                    plantillaFormulario={plantillaFormulario}
                                 />
                             </>
                         )}

@@ -85,20 +85,25 @@ function PreguntaMultiple({
 
             <div className="mb-4 pb-3">
                 <div className="mb-3 d-flex align-items-center gap-3">
-                    <Badge
-                        bg="secondary"
-                        className="rounded-circle"
+                    <div
                         style={{
-                            width: '35px',
-                            height: '35px',
-                            fontSize: '1rem',
+                            minWidth: '40px',
+                            minHeight: '40px',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#6c757d',
+                            color: 'white',
+                            fontSize: '0.95rem',
+                            fontWeight: 'bold',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            flexShrink: 0,
                         }}
                     >
                         {index + 1}
-                    </Badge>
+                    </div>
                     <div className="flex-grow-1">
                         <h5 className="fw-semibold mb-1">{pregunta.texto} {pregunta.obligatoria && (<span style={{ color: "red" }}>*</span>)} </h5>
                         <div className="d-flex gap-2 align-items-center">
@@ -120,8 +125,9 @@ function PreguntaMultiple({
                         as="textarea"
                         rows={4}
                         value={valor}
-                        onChange={(e) =>{ setValor(e.target.value)
-                            ;onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
+                        onChange={(e) =>{ 
+                            setValor(e.target.value);
+                            onActualizar(grupoCuadroId, instanciaIndex, pregunta.id, e.target.value)
                         }}
                         placeholder="Escriba su respuesta..."
                         className="input-pregunta"
@@ -146,8 +152,7 @@ function PreguntaMultiple({
 
                 {pregunta.pregunta_fuente_id &&
                 <div className='text-end mb-1 mt-1'>
-
-                    <Button  onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
+                    <Button onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
                 </div>
                 }
             </div>

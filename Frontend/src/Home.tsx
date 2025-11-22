@@ -3,10 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
 const roleHomePages: { [key: string]: string } = {
-    secretaria: '/MostrarEstadisticas',
-    departamento: '/seleccionar-informe-sintetico',
-    docente: '/instrumentos-docente',
-    alumno: '/materias',
+    'secretaria academica': '/MostrarEstadisticas',
+    'departamento': '/seleccionar-informe-sintetico',
+    'docente': '/instrumentos-docente',
+    'estudiante': '/materias',
 };
 
 const Home = () => {

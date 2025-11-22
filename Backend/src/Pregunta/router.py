@@ -10,6 +10,7 @@ def crear_pregunta_cerrada(pregunta: schemas.PreguntaCerradaCreate, db: Session 
 
 @router.post("/abierta", response_model=schemas.Pregunta) 
 def crear_pregunta_abierta(pregunta: schemas.PreguntaAbiertaCreate, db: Session = Depends(get_db)):
+
     """Crea una nueva pregunta de tipo ABIERTA."""
     return services.crear_pregunta_abierta(db, pregunta)
 

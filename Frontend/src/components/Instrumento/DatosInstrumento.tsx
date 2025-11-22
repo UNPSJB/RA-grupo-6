@@ -13,7 +13,7 @@ function obtenerFilas(datosInstrumento: any){
         for (const [clave, valor] of Object.entries(datosInstrumento)){
                 
                 filas.push(
-                    <td>
+                    <td key={clave}>
                     <p className="mb-0 text-center">
                         <span className='fw-bold'> {capitalizarCadena(clave)}</span> {String(valor)}
                     </p>

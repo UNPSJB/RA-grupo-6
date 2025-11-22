@@ -1,4 +1,12 @@
-import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
+import { esTipoRespuestaValido } from "../Funciones";
+import type { RespuestaTemporal, InstanciaRespuestas} from "../types";
+
+
+function getPregunta(pregunta_id:number){
+
+    return fetch(`http://127.0.0.1:8000/preguntas/${pregunta_id}`)
+        .then((res) => res.ok ? res.json() : null)
+}
 
 export function validarInstanciaCompleta(instancia: InstanciaRespuestas, preguntasDelGrupo?: any[]): boolean {
     for (const key in instancia) {
@@ -30,7 +38,7 @@ export function validarInstanciaObligatoriasCompletas(instancia: InstanciaRespue
 export function validarTodasRespuestasCompletas(
     respuestas: RespuestaTemporal[],
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
-    plantillaFormulario: any
+    plantillaFormulario: any, 
 ): boolean {
     if (!plantillaFormulario || !plantillaFormulario.preguntas) {
         return false;
@@ -144,11 +152,13 @@ export function calcularProgresoTotal(respuestas: RespuestaTemporal[], respuesta
 
 export function validarPaginaCompleta(paginaActual: number,gruposOrganizados: any[],
     respuestas: RespuestaTemporal[],
-    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] }
+    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
 ): boolean {
     if (paginaActual >= gruposOrganizados.length) return false;
 
     const grupoActual = gruposOrganizados[paginaActual];
+
+    let esPaginaCompleta : boolean
 
     if (grupoActual.tipo === 'simple') {
         const preguntasObligatorias = grupoActual.preguntas.filter((p: any) => p.obligatoria);
@@ -157,7 +167,12 @@ export function validarPaginaCompleta(paginaActual: number,gruposOrganizados: an
 
         return preguntasObligatorias.every((pregunta: any) => {
             const respuesta = respuestas.find((r) => r.pregunta_id === pregunta.id);
-            return respuesta?.texto?.trim() || respuesta?.opcion_id;
+            
+            if (!respuesta){
+                return false
+            }
+
+            return  respuesta?.opcion_id || ((respuesta?.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(respuesta.texto, pregunta.tipo_respuesta) : respuesta.texto);
         });
     } else {
         const preguntasObligatorias = grupoActual.preguntas.filter((p: any) => p.obligatoria);
@@ -229,4 +244,9 @@ export function paginaTotalmenteCompleta(
             });
         });
     }
+
+    return esPaginaCompleta;
+
 }
+
+

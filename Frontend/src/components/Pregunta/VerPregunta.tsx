@@ -5,7 +5,7 @@ import EliminarPregunta from "./EliminarPregunta";
 import { EnumTipoPregunta } from "../types";
 import ModificarPregunta from "./ModificarPregunta";
 
-const url_base = 'http://127.0.0.1:8000/preguntas/';
+const url_base = 'http://127.0.0.1:8000/preguntas/todos';
 
 import type { Pregunta } from "../types";
 
@@ -20,7 +20,7 @@ function VerPregunta() {
     }, []);
 
     const handleDeleted = (id: string) => {
-        setPreguntas(prev => prev.filter(p => p.id !== id));
+        setPreguntas(prev => prev.filter(p => p.id !== Number(id)));
     };
 
     const handleEdited = (preguntaActualizada: Pregunta) => {
@@ -67,7 +67,7 @@ function VerPregunta() {
                                                 <ModificarPregunta pregunta={pregunta} onEditar={handleEdited}/>
                                             )}
                                             {pregunta.puede_eliminarse && (
-                                                <EliminarPregunta preguntaId={pregunta.id} onDeleted={handleDeleted} />
+                                                <EliminarPregunta preguntaId={Number(pregunta.id)} onDeleted={handleDeleted} />
                                             )}
                                         </div>
                                     </Card.Title>

@@ -7,7 +7,19 @@ from src.Opciones.models import Opcion
 from src.Instrumento.models import Instrumento, TipoInstrumento
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id, multiple_respuestas = pregunta.multiple_respuestas, grupo_cuadro_id = pregunta.grupo_cuadro_id, orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, obligatoria = pregunta.obligatoria)
+
+    _nueva_pregunta = Pregunta(
+                    texto=pregunta.texto, 
+                    tipo=EnumTipoPregunta.abierta, 
+                    grupo_pregunta_id = pregunta.grupo_pregunta_id, 
+                    estadistica = pregunta.estadistica, 
+                    rol_id = pregunta.rol_id, 
+                    multiple_respuestas = pregunta.multiple_respuestas, 
+                    grupo_cuadro_id = pregunta.grupo_cuadro_id, 
+                    orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, 
+                    obligatoria = pregunta.obligatoria, 
+                    tipo_respuesta = pregunta.tipo_respuesta,
+                    pregunta_fuente_id = pregunta.pregunta_fuente_id)
     
     db.add(_nueva_pregunta)
     db.commit()

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
-import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail} from '../types';
+import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail, PlantillaFormulario} from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
-import { validarTodasRespuestasCompletas } from '../Respuesta/ValidarRespuestas';
+import { validarTodasRespuestasCompletas} from '../Respuesta/ValidarRespuestas';
 import { enviarFormularioCompleto } from '../Respuesta/EnviarRespuestas';
 import NavegacionPaginas from './NavegacionPaginas';
 import PreguntaSimple from '../Pregunta/PreguntaSimple';
@@ -23,7 +23,7 @@ export default function ResponderInstrumento() {
     const { user } = useAuth(); 
 
     const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<InstrumentoDetail>();
-    const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
+    const [plantillaFormulario, setPlantillaFormulario] = useState<PlantillaFormulario>();
 
     const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
     const [respuestasMultiples, setRespuestasMultiples] = useState<{
@@ -151,6 +151,11 @@ export default function ResponderInstrumento() {
     };
 
     const todasRespondidas = (): boolean => {
+
+        if (instrumentoSeleccionado == undefined) {
+            return false;
+        }
+
         return validarTodasRespuestasCompletas(respuestas, respuestasMultiples, plantillaFormulario);
     };
 
@@ -346,38 +351,44 @@ export default function ResponderInstrumento() {
                                             </p>
                                         </div>
 
-                                        {grupoActual.tipo === 'simple' ? (
-                                            grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                <PreguntaSimple
-                                                    key={pregunta.id}
-                                                    pregunta={pregunta}
-                                                    index={idx}
-                                                    respuesta={obtenerRespuesta(pregunta.id)}
-                                                    onActualizar={actualizarRespuesta}
-                                                    instrumento_id={Number(instrumentoIdParam)}
-                                                />
-                                            ))
-                                        ) : (
-                                            <div>
-                                                {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
-                                                    <div key={instanciaIdx} className="mb-4">
-                                                        {grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                            <PreguntaMultiple
-                                                                key={pregunta.id}
-                                                                pregunta={pregunta}
-                                                                index={idx}
-                                                                instancia={instancia}
-                                                                instanciaIndex={instanciaIdx}
-                                                                grupoCuadroId={grupoActual.id}
-                                                                totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
-                                                                onActualizar={actualizarRespuestaMultiple}
-                                                                onEliminar={eliminarInstancia}
-                                                                instrumento={instrumentoSeleccionado}
-                                                                instrumento_id={Number(instrumentoIdParam)}
-                                                            />
-                                                        ))}
-                                                    </div>
+
+                                {   instrumentoSeleccionado?.tipo === "INFORME_SINTETICO"&&
+                                        instrumentoSeleccionado && paginaActual === 0 &&
+                                    <DatosInstrumentoSintetico instrumento={instrumentoSeleccionado} />
+                                
+                                }
+                                {grupoActual.tipo === 'simple' ? (
+                                    grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                        <PreguntaSimple
+                                            key={pregunta.id}
+                                            pregunta={pregunta}
+                                            index={idx}
+                                            respuesta={obtenerRespuesta(pregunta.id)}
+                                            onActualizar={actualizarRespuesta}
+                                            instrumento_id={Number(instrumentoIdParam)}
+                                        />
+                                    ))
+                                ) : (
+                                    <div>
+                                        {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                            <div key={instanciaIdx} className="mb-4">
+                                                {grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                    <PreguntaMultiple
+                                                        key={pregunta.id}
+                                                        pregunta={pregunta}
+                                                        index={idx}
+                                                        instancia={instancia}
+                                                        instanciaIndex={instanciaIdx}
+                                                        grupoCuadroId={grupoActual.id}
+                                                        totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
+                                                        onActualizar={actualizarRespuestaMultiple}
+                                                        onEliminar={eliminarInstancia}
+                                                        instrumento={instrumentoSeleccionado}
+                                                        instrumento_id={Number(instrumentoIdParam)}
+                                                    />
                                                 ))}
+                                            </div>
+                                        ))}
 
                                                 <AgregarInstancia
                                                     grupoCuadroId={grupoActual.id}

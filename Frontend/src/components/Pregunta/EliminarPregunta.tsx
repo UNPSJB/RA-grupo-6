@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
 type Props = {
-  preguntaId: string;        
+  preguntaId: Number;        
   onDeleted: (id: string) => void;
 };
 
@@ -14,7 +14,7 @@ function EliminarPregunta({ preguntaId, onDeleted }: Props) {
       method: "DELETE",
     })
     .then((res) => {
-      if (res.ok) onDeleted(preguntaId);
+      if (res.ok) onDeleted(String(preguntaId));
       else res.text().then(err => alert(`No se puede eliminar la pregunta: ${err}`));
     })
     .catch(() => alert("No se puede eliminar la pregunta"));

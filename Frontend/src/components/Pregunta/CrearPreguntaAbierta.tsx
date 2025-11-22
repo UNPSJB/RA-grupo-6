@@ -3,11 +3,12 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
-import { EnumTipoPregunta } from "../types";
+import { EnumTipoPregunta, TipoRespuesta } from "../types";
 import ElegirGrupoPregunta from '../GrupoPregunta/GrupoPregunta';
 import ELegirRol from '../Rol/ElegirRol';
 import ElegirGrupoCuadro from '../GrupoCuadro/ElegirGrupoCuadro';
 import type { ErrorPreguntaAbierta } from '../types';
+import { Row } from 'react-bootstrap';
 
 type Props = {
     manejarPestania: () => void;
@@ -21,12 +22,13 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
     const [estadisticaSeleccionada, setEstadistica] = useState<boolean>(false);
     const [errores, setErrores] = useState<ErrorPreguntaAbierta>({});
     const [multiplesRespuestas, setMultiplesRespuestas] = useState<boolean>(false);
-
-
-
     const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
     const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
     const [obligatoria, setObligatoria] =useState<boolean>(false);
+
+    const [valorMinimo, setValorMinimo] = useState(0)
+    const [valorMaximo, setValorMaximo] = useState(0)
+    
 
     const crearPregunta = (event: React.FormEvent) => {
         const nuevosErrores: ErrorPreguntaAbierta = {};
@@ -51,17 +53,33 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
 
         if (erroresTotales > 0) return;
 
-        
+        let tipoDatoRespuesta
+        if(tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL){
+
+            tipoDatoRespuesta = {
+                tipo: tipoDato,
+                valor_minimo: valorMinimo,
+                valor_maximo: valorMaximo
+            }
+        }
+        else {
+            tipoDatoRespuesta = {
+                tipo: tipoDato
+            }
+        }
+
         const nuevaPregunta = {
             texto: texto,
             tipo: EnumTipoPregunta.abierta,
             grupo_pregunta_id: grupoSeleccionado,
-            rol_id: (rolSeleccionado),
             estadistica: estadisticaSeleccionada,
+            rol_id: (Number(rolSeleccionado)),
             multiple_respuestas: multiplesRespuestas,
+            obligatoria: obligatoria,
             grupo_cuadro_id: grupoCuadroSeleccionado,
             orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null,
-            obligatoria: obligatoria
+            tipo_respuesta: JSON.stringify(tipoDatoRespuesta),
+            pregunta_fuente_id: null
         };
 
         console.log("Payload que se envía:", nuevaPregunta);
@@ -109,6 +127,9 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         }
       }, [texto, grupoSeleccionado, rolSeleccionado, errores]);
     
+
+    const [tipoDato, setTipoDato] = useState<string>(TipoRespuesta.TEXTO)
+
     return (
         <>
             <div className="contenedor-scroll"style={{maxHeight: '400px', 
@@ -163,6 +184,61 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
                             onChange={(e) => setObligatoria(e.target.checked)}
                         />
                     </div>
+
+                    <div className='d-flex flex-column gap-3 border rounded p-2 px-3 shadow-sm'>
+                        
+                        <Row className='d-flex align-items-center justify-content-between'>
+                            <Col className='d-flex flex-column'>
+                                <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                                    Tipo de respuesta
+                                </span>
+                                <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                                    Que tipo de respuesta se espera
+                                </small>
+                            </Col>
+                            
+                            <Col >
+                                <Form.Select onChange={(e) => setTipoDato(e.target.value)}>
+                                    <option value={TipoRespuesta.TEXTO}>Texto</option>
+                                    <option value={TipoRespuesta.ENTERO}>Entero </option>
+                                    <option value={TipoRespuesta.DECIMAL}>Decimal </option>
+                                    <option value={TipoRespuesta.RANGO_ENTERO}>Rango entero</option>
+                                    <option value={TipoRespuesta.RANGO_DECIMAL}>Rango decimal</option>
+                                </Form.Select>
+                            </Col>
+                        </Row>
+
+
+                        {(tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL) && 
+
+                            <Form>
+                                <Row>
+                                    <Col className='text-muted'>
+                                        <Form.Group>
+                                            <Form.Control 
+                                                value={valorMinimo} 
+                                                onChange={(e) => setValorMinimo(Number(e.target.value))} 
+                                                placeholder="Ingrese el valor minimo..." 
+                                            />
+                                        </Form.Group>
+                                    </Col>
+
+                                    <Col className='text-muted'>
+                                        <Form.Group>
+                                            <Form.Control 
+                                                value={valorMaximo} 
+                                                onChange={(e) => setValorMaximo(Number(e.target.value))} 
+                                                placeholder="Ingrese el valor maximo..." 
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </Form>
+                        }
+
+                    </div>
+
+
                     </div>
 
                 </Form.Group>

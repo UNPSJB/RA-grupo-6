@@ -296,7 +296,7 @@ export default function ResponderInstrumento() {
 
 
                                 {   instrumentoSeleccionado?.tipo === "INFORME_SINTETICO"&&
-                                         instrumentoSeleccionado && paginaActual === 0 &&
+                                        instrumentoSeleccionado && paginaActual === 0 &&
                                     <DatosInstrumentoSintetico instrumento={instrumentoSeleccionado} />
                                 
                                 }

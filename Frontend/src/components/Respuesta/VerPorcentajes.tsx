@@ -8,8 +8,6 @@ export function Llamadora({ id_instrumento }: { id_instrumento: number }) {
   const [instrumento, setInstrumento] = useState<Instrumento>();
   const url_base = `http://127.0.0.1:8000/instrumentos/${1}/detail`;
 
-  console.log("ID instrumento recibido en Llamadora:", id_instrumento);
-
   useEffect(() => {
     fetch(url_base)
       .then(res => res.json())
@@ -28,8 +26,6 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
   
   const todasLasRespuestas = instrumento?.respuestas_formulario?.flatMap(rf => rf.respuestas) ?? [];
 
-    console.log("Todas las respuestas planas:", todasLasRespuestas);
-  console.log("Preguntas del formulario:", instrumento.plantilla_formulario.preguntas);
   useEffect(() => {
     if (instrumento) {
       const grupos = obtenerGrupos();

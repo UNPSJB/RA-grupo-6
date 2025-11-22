@@ -1,4 +1,3 @@
-import type { Materia } from "../types";
 
 export type TipoInstrumento = 
   | 'ENCUESTA_ESTUDIANTE' 

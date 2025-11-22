@@ -15,6 +15,7 @@ export type Pregunta = {
     puede_modificarse: boolean
     puede_eliminarse: boolean
     grupo_pregunta: GrupoPregunta
+    tipo_respuesta: string | null
 }
 
 export const EnumTipoPregunta = Object.freeze({
@@ -235,7 +236,7 @@ export interface RespuestaTemporal {
 export interface GrupoPreguntas {
     id: number;
     nombre: string;
-    preguntas: any[];
+    preguntas: Pregunta[];
     tipo: 'simple' | 'multiple';
 }
 
@@ -303,26 +304,10 @@ export type Dictado = {
 }
 
 
-export interface DatosInstrumentoDocente {
-    sede: string;
-    cicloLectivo: number;
-    asignatura: string;
-    codAsignatura: string;
-    docente: string;
-    inscriptos: number;
-    comisionesTeoricas: string;
-    comisionesPracticas: string;
-}
-
-export interface DatosInstrumentoEstudiante{
-  sede: string,
-  carrera: string,
-  asignatura: string
-}
-
-export interface DatosInstrumentoDepartamento{
-  sede: string,
-  cicloLectivo: number,
-  departamento: string,
-  integrantes: string
-}
+export const TipoRespuesta = {
+  ENTERO: "ENTERO",
+  DECIMAL: "DECIMAL",
+  TEXTO: "TEXTO",
+  RANGO_ENTERO: "RANGO_ENTERO",
+  RANGO_DECIMAL: "RANGO_DECIMAL"
+} 

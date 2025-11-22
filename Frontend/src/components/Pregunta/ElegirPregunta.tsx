@@ -20,7 +20,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
   const [showModal, setShowModal] = useState(false);
   
   const refrescarPreguntas = () => {
-    fetch("http://127.0.0.1:8000/preguntas/")
+    fetch("http://127.0.0.1:8000/preguntas/todos")
       .then(res => res.json())
       .then(data => setPreguntasDisponibles(data))
       .catch(err => console.error(err));

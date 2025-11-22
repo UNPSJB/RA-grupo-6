@@ -29,7 +29,6 @@ import VerRespuestasDocente from './components/RespuestasFormulario/VerRespuesta
 import VerRespuestasDepartamento from './components/RespuestasFormulario/VerRespuestasDepartamento.tsx';
 import VerRespuestas from './components/RespuestasFormulario/VerRespuestas.tsx';
 
-import SeleccionarMateria from './components/Materias/SeleccionarMateria.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>

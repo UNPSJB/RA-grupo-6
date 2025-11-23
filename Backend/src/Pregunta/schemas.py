@@ -18,6 +18,7 @@ class PreguntaBase(BaseModel):
     grupo_cuadro_id: Optional[int] = Field(default=None)
     orden_en_grupo: Optional[int] = Field(default=None)
     pregunta_fuente_id: Optional[int] = Field(default=None)
+    pregunta_fuente_dos_id: Optional[int] = Field(default=None)
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 class PreguntaAbiertaCreate(PreguntaBase):
@@ -51,6 +52,7 @@ class Pregunta(PreguntaBase):
     grupo_cuadro_id: Optional[int] = None
     orden_en_grupo: Optional[int] = None
     pregunta_fuente: Optional["Pregunta"] = None
+    pregunta_fuente_dos: Optional["Pregunta"] = None
     tipo_respuesta: str | None
 
     model_config = {

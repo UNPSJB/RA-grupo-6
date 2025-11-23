@@ -19,7 +19,8 @@ def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate)
                     orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, 
                     obligatoria = pregunta.obligatoria, 
                     tipo_respuesta = pregunta.tipo_respuesta,
-                    pregunta_fuente_id = pregunta.pregunta_fuente_id)
+                    pregunta_fuente_id = pregunta.pregunta_fuente_id,
+                    pregunta_fuente_dos_id = pregunta.pregunta_fuente_dos_id)
     
     db.add(_nueva_pregunta)
     db.commit()

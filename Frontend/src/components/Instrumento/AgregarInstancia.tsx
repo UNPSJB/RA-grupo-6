@@ -1,6 +1,6 @@
-import { Button } from 'react-bootstrap';
 import type { InstanciaRespuestas } from '../types';
 import { validarInstanciaCompleta } from '../Respuesta/ValidarRespuestas';
+import { CButton } from '@coreui/react';
 
 type Props = {
     grupoCuadroId: number;
@@ -30,16 +30,15 @@ function AgregarInstancia({ grupoCuadroId, preguntasDelGrupo, instancias, onAgre
 
     return (
         <div className="text-end">
-            <Button
-                variant="primary"
+            <CButton
                 size="sm"
                 onClick={agregarInstancia}
                 disabled={!ultimaInstanciaCompleta}
-                className="d-flex align-items-center gap-2 ms-auto"
+                className="d-flex align-items-center gap-2 ms-auto btn-primary"
             >
                 <i className="fas fa-plus"></i>
                 Agregar más
-            </Button>
+            </CButton>
 
             {!ultimaInstanciaCompleta && (
                 <small className="text-muted d-block mt-2">

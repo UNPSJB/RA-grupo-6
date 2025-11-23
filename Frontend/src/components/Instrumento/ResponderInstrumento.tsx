@@ -15,6 +15,7 @@ import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
 import { DatosInstrumento } from './DatosInstrumento';
 import { DatosInstrumentoSintetico } from './DatosInstrumentoSintetico';
+import { CAlert, CButton, CCard, CCardBody, CContainer, CSpinner } from '@coreui/react';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -224,25 +225,25 @@ export default function ResponderInstrumento() {
 
     if (cargando)
         return (
-            <Container className="mt-4 text-center">
-                <Spinner animation="border" role="status" className="mb-3" />
+            <CContainer className="mt-4 text-center">
+                <CSpinner role="status" className="mb-3" />
                 <p>Cargando formulario...</p>
-            </Container>
+            </CContainer>
         );
 
     if (error)
         return (
-            <Container className="mt-4">
-                <Alert variant="danger">
+            <CContainer className="mt-4">
+                <CAlert variant="danger" color={''}>
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     {error}
                     <div className="mt-3">
-                        <Button variant="outline-danger" onClick={() => navigate(rutaVolver)}>
+                        <CButton variant="outline" onClick={() => navigate(rutaVolver)}>
                             Volver atrás
-                        </Button>
+                        </CButton>
                     </div>
-                </Alert>
-            </Container>
+                </CAlert>
+            </CContainer>
         );
 
     const grupoActual =
@@ -253,14 +254,14 @@ export default function ResponderInstrumento() {
 
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
-            <Container style={{ maxWidth: '1200px' }}>
-                <Button variant="outline-secondary" className="mb-3" onClick={() => navigate(rutaVolver)}>
+            <CContainer style={{ maxWidth: '1200px' }}>
+                <CButton variant="outline" className="mb-3" onClick={() => navigate(rutaVolver)}>
                     <i className="fa-solid fa-arrow-left"></i> Volver{' '}
                     {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
-                </Button>
+                </CButton>
 
-                <Card className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
-                    <Card.Body className="p-4">
+                <CCard className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                    <CCardBody className="p-4">
 
                         {instrumentoSeleccionado && tabActiva === 'responder' && (
                             <DatosInstrumento instrumento={instrumentoSeleccionado} />
@@ -437,9 +438,9 @@ export default function ResponderInstrumento() {
                                 <Llamadora id_instrumento={instrumentoSeleccionado.id} />
                             </div>
                         )}
-                    </Card.Body>
-                </Card>
-            </Container>
+                    </CCardBody>
+                </CCard>
+            </CContainer>
         </div>
     );
 }

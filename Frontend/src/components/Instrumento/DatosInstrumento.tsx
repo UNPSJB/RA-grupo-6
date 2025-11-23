@@ -1,7 +1,7 @@
-import {Table} from "react-bootstrap";
 import type { InstrumentoDetail} from "../types";
 import { capitalizarCadena} from "../Funciones";
 import { useEffect, useState } from "react";
+import { CTable } from "@coreui/react";
 
 
 function obtenerFilas(datosInstrumento: any){
@@ -43,7 +43,7 @@ export function DatosInstrumento({instrumento} : {instrumento : InstrumentoDetai
         <div className="mb-3">
 
 
-            <Table striped bordered className="rounded-3 overflow-hidden mb-4" style={{tableLayout: "fixed"}}>
+            <CTable striped bordered className="rounded-3 overflow-hidden mb-4" style={{tableLayout: "fixed"}}>
                 <thead>
                     <tr className="text-center">
                         <th colSpan={filas.length} style={{fontSize:"18px", backgroundColor:"#816767ff", color:"white"}}> Información general </th>
@@ -55,7 +55,7 @@ export function DatosInstrumento({instrumento} : {instrumento : InstrumentoDetai
                         {filas.map((fila : any) =>  fila )}
                     </tr>
                 </tbody>
-            </Table>
+            </CTable>
 
         </div>
         

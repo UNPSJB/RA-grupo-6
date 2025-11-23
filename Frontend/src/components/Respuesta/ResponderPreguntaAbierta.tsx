@@ -1,3 +1,4 @@
+import { CAlert, CBadge, CButton } from '@coreui/react';
 import React, { useState } from 'react';
 import { Form, Button, Badge, Alert } from 'react-bootstrap';
 
@@ -85,25 +86,25 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
     < div className=" mb-4" style={{ borderRadius: '0.75rem' }}>
         <div className="d-flex justify-content-between align-items-start mb-3">
           <div className="d-flex align-items-center gap-2">
-            <Badge 
-              bg="primary"
+            <CBadge 
+              color="primary"
               className="rounded-circle d-flex align-items-center justify-content-center"
               style={{ width: '32px', height: '32px', fontSize: '0.875rem' }}
             >
               <i className="fa-solid fa-question"></i>
-            </Badge>
-            <Badge 
-              bg="success" 
+            </CBadge>
+            <CBadge 
+              color="success" 
               className="px-2 py-1"
               style={{ fontSize: "0.75rem" }}
             >
               Pregunta Abierta
-            </Badge>
+            </CBadge>
           </div>
           {!formularioId && (
-            <Badge bg="warning" className="px-2 py-1" style={{ fontSize: "0.75rem" }}>
+            <CBadge color="warning" className="px-2 py-1" style={{ fontSize: "0.75rem" }}>
               Formulario no inicializado o inexistente
-            </Badge>
+            </CBadge>
           )}
         </div>
 
@@ -153,7 +154,7 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
           </Form.Group>
 
           <div className="d-flex justify-content-end">
-            <Button 
+            <CButton 
               variant="primary" 
               type="submit"
               className="px-4 py-2 d-flex align-items-center gap-2"
@@ -173,21 +174,20 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
                   Enviar Respuesta
                 </>
               )}
-            </Button>
+            </CButton>
           </div>
         </Form>
 
         {mostrarAlerta && (
-          <Alert 
-            variant={tipoAlerta} 
-            className="mt-3 d-flex align-items-center justify-content-between"
-            style={{ borderRadius: '0.5rem' }}
-          >
+          <CAlert 
+          variant={tipoAlerta}
+          className="mt-3 d-flex align-items-center justify-content-between"
+          style={{ borderRadius: '0.5rem' }} color={''}          >
             <span className="flex-grow-1">
               <i className={`fas ${tipoAlerta === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2`}></i>
               {mensaje}
             </span>
-            <Button 
+            <CButton 
               variant={`outline-${tipoAlerta}`} 
               size="sm" 
               onClick={() => setMostrarAlerta(false)}
@@ -195,8 +195,8 @@ function ResponderPreguntaAbierta({ pregunta, formularioId, onRespuestaEnviada }
               style={{ minWidth: '30px' }}
             >
               <i className="fas fa-times"></i>
-            </Button>
-          </Alert>
+            </CButton>
+          </CAlert>
         )}
     </div>
   );

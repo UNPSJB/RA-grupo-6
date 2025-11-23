@@ -3,6 +3,7 @@ import { Badge, Button, Container, ListGroup, ListGroupItem, Row, Stack } from "
 import { EnumTipoPregunta } from "../types";
 import { useParams } from "react-router-dom";
 import { capitalizarCadena } from "../Funciones";
+import { CBadge, CButton, CContainer, CListGroup, CListGroupItem, CRow } from "@coreui/react";
 
 export interface Respuestas {
     id: number;
@@ -52,7 +53,7 @@ export function RespuestasFormulario() {
     const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
 
     return (
-        <Container className="pb-5 w-50 mt-5">
+        <CContainer className="pb-5 w-50 mt-5">
             
             <div className="title p-4 pb-0 border rounded-3">
                 <h2>Tus respuestas</h2>
@@ -80,42 +81,42 @@ export function RespuestasFormulario() {
 
             
             <Stack className="pt-3 pb-3 mb-2 mt-2" direction="horizontal" gap={4}>
-                <Button style={activo === "1" ? estiloBotonActivo : estiloBotonInactivo}onClick={() => {setRespuestasMostradas(todas); setActivo("1");}}> Todas ({numeroPreguntas}) </Button>
+                <CButton style={activo === "1" ? estiloBotonActivo : estiloBotonInactivo}onClick={() => {setRespuestasMostradas(todas); setActivo("1");}}> Todas ({numeroPreguntas}) </CButton>
                 
-                <Button style={activo === "2" ? estiloBotonActivo : estiloBotonInactivo} onClick={() => {setRespuestasMostradas(abiertas); setActivo("2");}}> Abiertas ({abiertas.length})</Button>
+                <CButton style={activo === "2" ? estiloBotonActivo : estiloBotonInactivo} onClick={() => {setRespuestasMostradas(abiertas); setActivo("2");}}> Abiertas ({abiertas.length})</CButton>
                 
-                <Button style={activo === "3" ? estiloBotonActivo : estiloBotonInactivo} onClick={() => {setRespuestasMostradas(cerradas); setActivo("3");}}> Cerradas ({cerradas.length})</Button>
+                <CButton style={activo === "3" ? estiloBotonActivo : estiloBotonInactivo} onClick={() => {setRespuestasMostradas(cerradas); setActivo("3");}}> Cerradas ({cerradas.length})</CButton>
             </Stack>
 
             
             {respuestasMostradas.length > 0 && (
-                <ListGroup className="d-flex gap-3">
+                <CListGroup className="d-flex gap-3">
                     
                     {respuestasMostradas.map((r, i) => (
-                        <ListGroupItem key={r.id} className="mb-2 d-flex border rounded align-items-start gap-3 p-3">
-                            <Badge bg="primary" className="rounded-circle" style={{width: "30px",height: "30px", fontSize: "1rem",display: "flex", alignItems: "center", justifyContent: "center",}}>
+                        <CListGroupItem key={r.id} className="mb-2 d-flex border rounded align-items-start gap-3 p-3">
+                            <CBadge color="primary" className="rounded-circle" style={{width: "30px",height: "30px", fontSize: "1rem",display: "flex", alignItems: "center", justifyContent: "center",}}>
                                 {i + 1}
-                            </Badge>
+                            </CBadge>
 
                             <div className="container-fluid me-3">
-                                <Badge className="p-2"style={{backgroundColor: r.pregunta.tipo === EnumTipoPregunta.abierta ? "#24c798" : "#6284bf" }}>
+                                <CBadge className="p-2"style={{backgroundColor: r.pregunta.tipo === EnumTipoPregunta.abierta ? "#24c798" : "#6284bf" }}>
                                     {r.pregunta.tipo.toUpperCase()}
-                                </Badge>
+                                </CBadge>
 
                                 <h5 className="fw-semibold mb-2 mt-2">{r.pregunta.texto}</h5>
 
-                                <Row className="mb-3 mt-2 ms-1 rounded p-3" style={{border: "1px solid #dee2e6", borderLeft: r.pregunta.tipo === EnumTipoPregunta.abierta? "5px solid #24c798" : "5px solid #6284bf",backgroundColor: "#fbfafe",}}>
+                                <CRow className="mb-3 mt-2 ms-1 rounded p-3" style={{border: "1px solid #dee2e6", borderLeft: r.pregunta.tipo === EnumTipoPregunta.abierta? "5px solid #24c798" : "5px solid #6284bf",backgroundColor: "#fbfafe",}}>
                                     <p className="mb-0">
                                         <span style={{ color: "grey", fontSize: "12px" }}>TU RESPUESTA:</span>
                                         <br />
                                         {r.pregunta.tipo === EnumTipoPregunta.abierta? `"${r.texto_respuesta ?? ""}"` : `• ${r.opcion?.texto ?? ""}`}
                                     </p>
-                                </Row>
+                                </CRow>
                             </div>
-                        </ListGroupItem>
+                        </CListGroupItem>
                     ))}
-                </ListGroup>
+                </CListGroup>
             )}
-        </Container>
+        </CContainer>
     );
 }

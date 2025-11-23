@@ -1,6 +1,7 @@
 import { Alert, Row, Col, ProgressBar } from 'react-bootstrap';
 import ModalExito from '../ModalEnvio';
 import type { GrupoPreguntas, RespuestaTemporal, InstanciaRespuestas } from '../types';
+import { CAlert, CCol, CRow } from '@coreui/react';
 
 type Props = {
     gruposOrganizados: GrupoPreguntas[];
@@ -119,16 +120,16 @@ function ResumenRespuestas({
             </div>
 
             {todasRespondidas ? (
-                <Alert variant="success" className="text-center border-0 mb-4">
+                <CAlert variant="success" className="text-center border-0 mb-4" color={''}>
                     <i className="fas fa-check-circle me-2"></i>
                     ¡Excelente! Has completado todas las preguntas obligatorias. Puedes revisar tus respuestas o enviar el
                     formulario.
-                </Alert>
+                </CAlert>
             ) : (
-                <Alert variant="warning" className="text-center border-0 mb-4">
+                <CAlert variant="warning" className="text-center border-0 mb-4" color={''}>
                     <i className="fas fa-exclamation-circle me-2"></i>
                     Algunas preguntas obligatorias están incompletas. Debes completarlas antes de enviar.
-                </Alert>
+                </CAlert>
             )}
 
             <div className="mb-4">
@@ -262,8 +263,8 @@ function ResumenRespuestas({
                 })}
             </div>
 
-            <Row className="mt-4 pt-3 border-top">
-                <Col md={6} className="mb-2">
+            <CRow className="mt-4 pt-3 border-top">
+                <CCol md={6} className="mb-2">
                     <button
                         className="btn btn-outline-secondary w-100"
                         onClick={onRetroceder}
@@ -272,8 +273,8 @@ function ResumenRespuestas({
                         <i className="fa-solid fa-arrow-left me-2"></i>
                         Volver a editar
                     </button>
-                </Col>
-                <Col md={6} className="mb-2">
+                </CCol>
+                <CCol md={6} className="mb-2">
                     <ModalExito
                         onEnviar={onEnviar}
                         onExito={onExito}
@@ -288,8 +289,8 @@ function ResumenRespuestas({
                         }
                         className="w-100"
                     />
-                </Col>
-            </Row>
+                </CCol>
+            </CRow>
         </div>
     );
 }

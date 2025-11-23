@@ -1,6 +1,6 @@
-import { Card, Col, Container, Row, Button, Alert} from "react-bootstrap";
 import { GraficoRespondidos } from "../Graficos/GraficoRespondidos";
 import { useEffect, useState } from "react";
+import { CAlert, CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CRow } from "@coreui/react";
 
 
 export interface EstadisticaBase {
@@ -107,11 +107,11 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
 
 
     const renderTarjetaEstadistica = (titulo: string, stats: EstadisticaBase, key: string) => (
-        <Col lg={4} md={6} xs={12} key={key} className="d-flex justify-content-center mb-2">
-            <Card className="shadow-none" style={{width: '100%', maxWidth: '400px'}}>
-                <Card.Header className="bg-light text-center py-2">
+        <CCol lg={4} md={6} xs={12} key={key} className="d-flex justify-content-center mb-2">
+            <CCard className="shadow-none" style={{width: '100%', maxWidth: '400px'}}>
+                <CCardHeader className="bg-light text-center py-2">
                     <h6 className="mb-0 fw-bold">{titulo}</h6>
-                </Card.Header>
+                </CCardHeader>
                 <div className="d-flex justify-content-center align-items-center" style={{minHeight: '200px'}}>
                     <GraficoRespondidos 
                         titulo="" 
@@ -120,36 +120,36 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
                     />
                 </div>
                 <hr style={{margin: '0'}} />
-                <Card.Body style={{padding: '10px'}}>
-                    <Row>
-                        <Col className="text-center">
+                <CCardBody style={{padding: '10px'}}>
+                    <CRow>
+                        <CCol className="text-center">
                             <p className="mb-0">
                                 <span className="fw-bold text-success d-block" style={{fontSize: '20px'}}>
                                     {stats.respondidos}
                                 </span>
                                 <small>Respondidos</small>
                             </p>
-                        </Col>
-                        <Col className="text-center">
+                        </CCol>
+                        <CCol className="text-center">
                             <p className="mb-0">
                                 <span className="fw-bold text-danger d-block" style={{fontSize: '20px'}}>
                                     {stats.no_respondidos}
                                 </span>
                                 <small>Sin responder</small>
                             </p>
-                        </Col>
-                        <Col className="text-center">
+                        </CCol>
+                        <CCol className="text-center">
                             <p className="mb-0">
                                 <span className="fw-bold d-block" style={{fontSize: '20px'}}>
                                     {stats.asignados}
                                 </span>
                                 <small>Total</small>
                             </p>
-                        </Col>
-                    </Row>
+                        </CCol>
+                    </CRow>
                     {stats.asignados > 0 && (
-                        <Row className="mt-2">
-                            <Col>
+                        <CRow className="mt-2">
+                            <CCol>
                                 <p className="mb-0 text-center">
                                     <hr style={{margin: '8px 0'}}/>
                                     <span className="fw-bold text-secondary d-block" style={{fontSize: '16px'}}>
@@ -157,16 +157,16 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
                                     </span>
                                     <small className="text-muted">Tasa de respuesta</small>
                                 </p>
-                            </Col>
-                        </Row>
+                            </CCol>
+                        </CRow>
                     )}
-                </Card.Body>
-            </Card>
-        </Col>
+                </CCardBody>
+            </CCard>
+        </CCol>
     );
 
     return (
-        <Container className="py-4">
+        <CContainer className="py-4">
             {/* Header */}
             <div className="text-center mb-4">
                 <h2 className="mb-2">Estadísticas de Respuestas</h2>
@@ -177,35 +177,36 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
 
             {/* Botones de Vista Filtrada */}
 
-            <Card.Body className="py-3">
-                <Row className="g-2">
+            <CCardBody className="py-3">
+                <CRow className="g-2">
                     {["carrera", "detallada", "anio"].map((v) => (
-                        <Col sm={4} key={v}>
-                            <Button 
-                                variant={vistaActiva === v ? "primary" : "outline-primary"} 
-                                onClick={() => setVistaActiva(v)} 
+                        <CCol sm={4} key={v}>
+                            <CButton
+                                color="primary"
+                                variant={vistaActiva === v ? undefined : "outline"}
+                                onClick={() => setVistaActiva(v)}
                                 className="w-100 text-truncate"
                             >
                                 {v === "carrera" ? "Carreras" : v === "anio" ? "Años" : "Materias"}
-                            </Button>
-                        </Col>
+                            </CButton>
+                        </CCol>
                     ))}
-                </Row>
-            </Card.Body>
+                </CRow>
+            </CCardBody>
 
 
             {/* Contenido según Vista */}
             {!departamento_id ? (
-                <Alert variant="warning" className="text-center py-4">
+                <CAlert variant="warning" className="text-center py-4" color={""}>
                     <h5>Seleccione un departamento para comenzar</h5>
                     <p className="mb-0 fs-6">
                         Elige un departamento del filtro superior para visualizar las estadísticas de encuestas.
                     </p>
-                </Alert>
+                </CAlert>
             ) : vistaActiva === "carrera" ? (
                 <div>
                     <h4 className="text-center mb-3 mt-4">Estadísticas por Carrera</h4>
-                    <Row className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
+                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
                         {Object.entries(datosAgrupadosPorCarrera).map(([carreraId, stats]) =>
                             renderTarjetaEstadistica(
                                 stats.carrera_nombre || `Carrera ${carreraId}`, 
@@ -214,34 +215,34 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
                             )
                         )}
                         {Object.keys(datosAgrupadosPorCarrera).length === 0 && !cargando && (
-                            <Col xs={12}>
-                                <Alert variant="info" className="text-center py-4">
+                            <CCol xs={12}>
+                                <CAlert variant="info" className="text-center py-4" color={""}>
                                     No hay estadísticas disponibles para los filtros aplicados.
-                                </Alert>
-                            </Col>
+                                </CAlert>
+                            </CCol>
                         )}
-                    </Row>
+                    </CRow>
                 </div>
             ) : vistaActiva === "anio" ? (
                 <div>
                     <h4 className="text-center mb-3 mt-4">Estadísticas por Año</h4>
-                    <Row className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
+                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
                         {Object.entries(datosAgrupadosPorAnio).map(([anio, stats]) =>
                             renderTarjetaEstadistica(`Año ${anio}`, stats, `anio-${anio}`)
                         )}
                         {Object.keys(datosAgrupadosPorAnio).length === 0 && !cargando && (
-                            <Col xs={12}>
-                                <Alert variant="info" className="text-center py-4">
+                            <CCol xs={12}>
+                                <CAlert variant="info" className="text-center py-4" color={""}>
                                     No hay estadísticas disponibles para los filtros aplicados.
-                                </Alert>
-                            </Col>
+                                </CAlert>
+                            </CCol>
                         )}
-                    </Row>
+                    </CRow>
                 </div>
             ) : vistaActiva === "detallada" ? (
                 <div>
                     <h4 className="text-center mb-3 mt-4">Estadística Detallada por Materia</h4>
-                    <Row className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
+                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
                         {estadisticasDetalladas.map((item) =>
                             renderTarjetaEstadistica(
                                 `${item.materia_nombre} - ${item.anio}`, 
@@ -250,15 +251,15 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
                             )
                         )}
                         {estadisticasDetalladas.length === 0 && !cargando && (
-                            <Col xs={12}>
-                                <Alert variant="info" className="text-center py-4">
+                            <CCol xs={12}>
+                                <CAlert variant="info" className="text-center py-4" color={""}>
                                     No hay estadísticas disponibles para los filtros aplicados.
-                                </Alert>
-                            </Col>
+                                </CAlert>
+                            </CCol>
                         )}
-                    </Row>
+                    </CRow>
                 </div>
             ) : null}
-        </Container>
+        </CContainer>
     );
 }

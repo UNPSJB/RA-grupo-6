@@ -5,6 +5,7 @@ import { Button, Form} from "react-bootstrap";
 import RespuestaCerradaView from "./RespuestaCerradaView";
 
 import type { RespuestaCerrada } from "../types";
+import { CButton, CForm } from "@coreui/react";
 
 // Guardar las respuestas
 const url_envio = "http://127.0.0.1:8000/respuestas/"
@@ -43,17 +44,17 @@ function ResponderPreguntas(){
     return(
         <>
 
-            <Form onSubmit={() => manejarEnvio(respuestas)}>
+            <CForm onSubmit={() => manejarEnvio(respuestas)}>
                 {preguntas.map((pregunta) =>
                     pregunta.tipo == EnumTipoPregunta.cerrada &&
                     <RespuestaCerradaView pregunta_id = {pregunta.id} respuestas = {respuestas} actualizarRespuestas= {setRespuestas}/>
 
                 )}
                 
-                <Button variant="primary" type="submit" >
+                <CButton variant="primary" type="submit" >
                     Enviar Respuestas
-                </Button>
-            </Form>
+                </CButton>
+            </CForm>
         </>
     )
 }

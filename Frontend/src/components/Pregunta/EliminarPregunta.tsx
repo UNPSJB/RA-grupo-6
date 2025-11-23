@@ -1,3 +1,4 @@
+import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from "@coreui/react";
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
@@ -22,24 +23,24 @@ function EliminarPregunta({ preguntaId, onDeleted }: Props) {
 
   return (
     <>
-        <Button size="sm" className="bg-transparent border-secondary" onClick={() => setMostrarConfirmacion(true)}>
+        <CButton size="sm" className="bg-transparent border-secondary" onClick={() => setMostrarConfirmacion(true)}>
             <i className="fa-solid fa-trash" style={{ fontSize: '18px', color: "rgba(163, 32, 52, 1)" }}></i>
-        </Button>
+        </CButton>
 
-        <Modal show={mostrarConfirmacion} onHide={() => setMostrarConfirmacion(false)}>
-            <Modal.Header closeButton>
-                <Modal.Title>Confirmar eliminación</Modal.Title>
-            </Modal.Header>
-                <Modal.Body>¿Seguro que querés eliminar esta pregunta?</Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setMostrarConfirmacion(false)}>
+        <CModal visible={mostrarConfirmacion} onClose={() => setMostrarConfirmacion(false)}>
+            <CModalHeader closeButton>
+                <CModalTitle>Confirmar eliminación</CModalTitle>
+            </CModalHeader>
+                <CModalBody>¿Seguro que querés eliminar esta pregunta?</CModalBody>
+            <CModalFooter>
+                <CButton variant="secondary" onClick={() => setMostrarConfirmacion(false)}>
                     Cancelar
-                </Button>
-                <Button variant="danger" onClick={eliminarPregunta}>
+                </CButton>
+                <CButton variant="danger" onClick={eliminarPregunta}>
                     Eliminar
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                </CButton>
+            </CModalFooter>
+        </CModal>
     </>
   );
 }

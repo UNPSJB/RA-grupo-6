@@ -1,7 +1,7 @@
-import { Table, Button, Modal } from "react-bootstrap";
 import type { InstrumentoDetail } from "../types";
 import { capitalizarCadena } from "../Funciones";
 import { useEffect, useState, useRef } from "react";
+import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CTable } from "@coreui/react";
 
 function obtenerFilas(datosInstrumento: any) {
     const celdas = [];
@@ -116,18 +116,19 @@ export function DatosInstrumentoSintetico({ instrumento, onDatosListos }: Props)
                         Información General
                     </h5>
                     {hayMasMaterias && (
-                        <Button
-                            variant="outline-primary"
+                        <CButton
+                            color="primary"
+                            variant="outline"
                             size="sm"
                             onClick={() => setMostrarModal(true)}
                         >
                             <i className="fas fa-expand-alt me-2"></i>
                             Ver tabla completa ({filas.length} materias)
-                        </Button>
+                        </CButton>
                     )}
                 </div>
 
-                <Table
+                <CTable
                     striped
                     bordered
                     className="rounded-3 overflow-hidden"
@@ -153,27 +154,26 @@ export function DatosInstrumentoSintetico({ instrumento, onDatosListos }: Props)
                             <tr key={i}>{fila}</tr>
                         ))}
                     </tbody>
-                </Table>
+                </CTable>
 
 
             </div>
 
-            <Modal
-                show={mostrarModal}
-                onHide={() => setMostrarModal(false)}
+            <CModal
+                visible={mostrarModal}
+                onClose={() => setMostrarModal(false)}
                 size="xl"
-                centered
             >
-                <Modal.Header closeButton style={{ backgroundColor: "#816767ff", color: "white" }}>
-                    <Modal.Title>
+                <CModalHeader closeButton style={{ backgroundColor: "#816767ff", color: "white" }}>
+                    <CModalTitle>
                         <i className="fas fa-table me-2"></i>
                         Información General Completa
-                    </Modal.Title>
-                </Modal.Header>
+                    </CModalTitle>
+                </CModalHeader>
 
-                <Modal.Body>
+                <CModalBody>
                 <div className="contenedor-scroll" style={{maxHeight: '400px', overflowY: 'auto', padding: '1.25rem'}}>
-                    <Table
+                    <CTable
                         striped
                         bordered
                         className="rounded-3 overflow-hidden"
@@ -199,16 +199,16 @@ export function DatosInstrumentoSintetico({ instrumento, onDatosListos }: Props)
                                 <tr key={i}>{fila}</tr>
                             ))}
                         </tbody>
-                    </Table>
+                    </CTable>
                 </div>
-                </Modal.Body>
+                </CModalBody>
 
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setMostrarModal(false)}>
+                <CModalFooter>
+                    <CButton color="secondary" onClick={() => setMostrarModal(false)}>
                         Cerrar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                    </CButton>
+                </CModalFooter>
+            </CModal>
         </>
     );
 }

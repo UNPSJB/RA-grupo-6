@@ -36,6 +36,7 @@ export default function ResponderInstrumento() {
 
     const [paginaActual, setPaginaActual] = useState(0);
     const [mostrarResumen, setMostrarResumen] = useState(false);
+    const [tabActiva, setTabActiva] = useState<'responder' | 'estadisticas'>('responder');
 
     const [preguntaInfoGeneralId, setPreguntaInfoGeneralId] = useState<number | null>(null);
 
@@ -261,7 +262,7 @@ export default function ResponderInstrumento() {
                 <Card className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
                     <Card.Body className="p-4">
 
-                        {instrumentoSeleccionado && (
+                        {instrumentoSeleccionado && tabActiva === 'responder' && (
                             <DatosInstrumento instrumento={instrumentoSeleccionado} />
                         )}
 
@@ -276,35 +277,37 @@ export default function ResponderInstrumento() {
                             </p>
                         </div>
 
-                        <NavegacionPaginas
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            gruposOrganizados={gruposOrganizados}
-                            respuestas={respuestas}
-                            respuestasMultiples={respuestasMultiples}
-                            mostrarResumen={mostrarResumen}
-                            mostrarProgreso={true}
-                            mostrarIndicadores={true}
-                            mostrarBotones={false}
-                            mostrarAlerta={true}
-                            onAvanzar={avanzarPagina}
-                            onRetroceder={retrocederPagina}
-                            onIrAPagina={irAPagina}
-                            plantillaFormulario={plantillaFormulario}
-                        />
+                        {tabActiva === 'responder' && (
+                            <NavegacionPaginas
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                gruposOrganizados={gruposOrganizados}
+                                respuestas={respuestas}
+                                respuestasMultiples={respuestasMultiples}
+                                mostrarResumen={mostrarResumen}
+                                mostrarProgreso={true}
+                                mostrarIndicadores={true}
+                                mostrarBotones={false}
+                                mostrarAlerta={true}
+                                onAvanzar={avanzarPagina}
+                                onRetroceder={retrocederPagina}
+                                onIrAPagina={irAPagina}
+                                plantillaFormulario={plantillaFormulario}
+                            />
+                        )}
 
-                        {esDocente && !mostrarResumen && instrumentoSeleccionado && (
-                            <Tabs defaultActiveKey="responder" className="mb-4">
+                        {esDocente && instrumentoSeleccionado && (
+                            <Tabs 
+                                activeKey={tabActiva}
+                                onSelect={(k) => setTabActiva(k as 'responder' | 'estadisticas')}
+                                className="mb-4"
+                            >
                                 <Tab eventKey="responder" title="Responder Informe"></Tab>
-                                <Tab eventKey="estadisticas" title="Ver Estadísticas">
-                                    <div className="mt-4">
-                                        <Llamadora id_instrumento={instrumentoSeleccionado.id} />
-                                    </div>
-                                </Tab>
+                                <Tab eventKey="estadisticas" title="Ver Estadísticas"></Tab>
                             </Tabs>
                         )}
 
-                        {!mostrarResumen && grupoActual && (
+                        {tabActiva === 'responder' && !mostrarResumen && grupoActual && (
                             <>
                                 {esPaginaInfoGeneral && (
                                     <div>
@@ -351,44 +354,38 @@ export default function ResponderInstrumento() {
                                             </p>
                                         </div>
 
-
-                                {   instrumentoSeleccionado?.tipo === "INFORME_SINTETICO"&&
-                                        instrumentoSeleccionado && paginaActual === 0 &&
-                                    <DatosInstrumentoSintetico instrumento={instrumentoSeleccionado} />
-                                
-                                }
-                                {grupoActual.tipo === 'simple' ? (
-                                    grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                        <PreguntaSimple
-                                            key={pregunta.id}
-                                            pregunta={pregunta}
-                                            index={idx}
-                                            respuesta={obtenerRespuesta(pregunta.id)}
-                                            onActualizar={actualizarRespuesta}
-                                            instrumento_id={Number(instrumentoIdParam)}
-                                        />
-                                    ))
-                                ) : (
-                                    <div>
-                                        {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
-                                            <div key={instanciaIdx} className="mb-4">
-                                                {grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                    <PreguntaMultiple
-                                                        key={pregunta.id}
-                                                        pregunta={pregunta}
-                                                        index={idx}
-                                                        instancia={instancia}
-                                                        instanciaIndex={instanciaIdx}
-                                                        grupoCuadroId={grupoActual.id}
-                                                        totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
-                                                        onActualizar={actualizarRespuestaMultiple}
-                                                        onEliminar={eliminarInstancia}
-                                                        instrumento={instrumentoSeleccionado}
-                                                        instrumento_id={Number(instrumentoIdParam)}
-                                                    />
+                                        {grupoActual.tipo === 'simple' ? (
+                                            grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                <PreguntaSimple
+                                                    key={pregunta.id}
+                                                    pregunta={pregunta}
+                                                    index={idx}
+                                                    respuesta={obtenerRespuesta(pregunta.id)}
+                                                    onActualizar={actualizarRespuesta}
+                                                    instrumento_id={Number(instrumentoIdParam)}
+                                                />
+                                            ))
+                                        ) : (
+                                            <div>
+                                                {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                                    <div key={instanciaIdx} className="mb-4">
+                                                        {grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                            <PreguntaMultiple
+                                                                key={pregunta.id}
+                                                                pregunta={pregunta}
+                                                                index={idx}
+                                                                instancia={instancia}
+                                                                instanciaIndex={instanciaIdx}
+                                                                grupoCuadroId={grupoActual.id}
+                                                                totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
+                                                                onActualizar={actualizarRespuestaMultiple}
+                                                                onEliminar={eliminarInstancia}
+                                                                instrumento={instrumentoSeleccionado}
+                                                                instrumento_id={Number(instrumentoIdParam)}
+                                                            />
+                                                        ))}
+                                                    </div>
                                                 ))}
-                                            </div>
-                                        ))}
 
                                                 <AgregarInstancia
                                                     grupoCuadroId={grupoActual.id}
@@ -420,7 +417,7 @@ export default function ResponderInstrumento() {
                             </>
                         )}
 
-                        {mostrarResumen && (
+                        {tabActiva === 'responder' && mostrarResumen && (
                             <ResumenRespuestas
                                 gruposOrganizados={gruposOrganizados}
                                 respuestas={respuestas}
@@ -433,6 +430,12 @@ export default function ResponderInstrumento() {
                                 onEnviar={enviarRespuestas}
                                 onExito={() => navigate(rutaVolver)}
                             />
+                        )}
+
+                        {tabActiva === 'estadisticas' && instrumentoSeleccionado && (
+                            <div className="mt-4">
+                                <Llamadora id_instrumento={instrumentoSeleccionado.id} />
+                            </div>
                         )}
                     </Card.Body>
                 </Card>

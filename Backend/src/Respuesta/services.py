@@ -72,23 +72,19 @@ def obtener_respuesta_fuente(db: Session, pregunta_id: int, instrumento_actual_i
     if not instrumento_actual:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     
-    # Determinar qué pregunta fuente usar según el ciclo
     pregunta_fuente_id = None
     
     if instrumento_actual.materia and instrumento_actual.materia.ciclo:
         ciclo = instrumento_actual.materia.ciclo
         
-        # Priorizar según el ciclo
         if ciclo == "CICLO_SUPERIOR":
             pregunta_fuente_id = pregunta.pregunta_fuente_id
         elif ciclo == "CICLO_BASICO":
             pregunta_fuente_id = pregunta.pregunta_fuente_dos_id
         
-        # Fallback: si no existe para ese ciclo, intentar con el otro
         if not pregunta_fuente_id:
             pregunta_fuente_id = pregunta.pregunta_fuente_dos_id if ciclo == "CICLO_SUPERIOR" else pregunta.pregunta_fuente_id
     
-    # Si no hay ninguna pregunta fuente, usar la pregunta actual
     if not pregunta_fuente_id:
         pregunta_fuente_id = pregunta.pregunta_fuente_id or pregunta.id
     

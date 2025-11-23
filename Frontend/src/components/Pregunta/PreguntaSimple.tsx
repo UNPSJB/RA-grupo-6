@@ -103,6 +103,7 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar, instrumento_
                         placeholder="Escriba su respuesta..."
                         className="input-pregunta"
                     />
+                    
                     {!respuestaValida && 
                     
                         <Alert key={pregunta.id} className="mt-3" variant='danger'>

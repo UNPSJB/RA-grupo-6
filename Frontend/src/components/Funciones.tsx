@@ -13,6 +13,23 @@ export function capitalizarCadena(cadena: string): string {
     return cadenaCapitalizada
 }
 
+export function separarPalabras(cadena: string) : string {
+
+    let nuevaCadena = ""
+
+    for(let i = 0; i < cadena.length; i++){
+        if ((cadena[i].charCodeAt(0) >= 65) && (cadena[i].charCodeAt(0)  <= 90)){
+            nuevaCadena = nuevaCadena + " " + cadena[i]
+        }
+        else{
+            nuevaCadena = nuevaCadena + cadena[i]
+        }
+    }
+    return nuevaCadena
+}
+
+
+
 export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
 
     const valorTipoDato = JSON.parse(jsonTipoDato)

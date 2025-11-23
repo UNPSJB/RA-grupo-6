@@ -1,6 +1,6 @@
 import {Table} from "react-bootstrap";
 import type { InstrumentoDetail} from "../types";
-import { capitalizarCadena} from "../Funciones";
+import { capitalizarCadena, separarPalabras} from "../Funciones";
 import { useEffect, useState } from "react";
 
 
@@ -15,7 +15,7 @@ function obtenerFilas(datosInstrumento: any){
                 filas.push(
                     <td key={clave}>
                     <p className="mb-0 text-center">
-                        <span className='fw-bold'> {capitalizarCadena(clave)}</span> {String(valor)}
+                        <span className='fw-bold'> {capitalizarCadena(separarPalabras(clave))}</span> {String(valor)}
                     </p>
                 </td>
             )

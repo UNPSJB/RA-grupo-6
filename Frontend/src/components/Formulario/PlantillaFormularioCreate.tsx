@@ -1,16 +1,5 @@
 import { useState } from "react";
-import {
-  CForm,
-  CContainer,
-  CCard,
-  CCardBody,
-  CAlert,
-  CModal,
-  CModalHeader,
-  CModalTitle,
-  CModalBody, CFormLabel, CFormInput,
-  CCardHeader
-} from "@coreui/react";
+import {CForm, CCardBody, CAlert, CModal, CModalHeader, CModalTitle, CModalBody, CFormLabel, CFormInput, CCardHeader} from "@coreui/react";
 import ElegirRol from "../Rol/ElegirRol";
 import ElegirPregunta from "../Pregunta/ElegirPregunta";
 import type { Pregunta } from "../types";

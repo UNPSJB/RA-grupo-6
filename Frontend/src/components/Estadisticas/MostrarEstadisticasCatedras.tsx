@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-    CCol,
-    CContainer,
-    CRow,
-    CCard,
-    CCardBody,
-    CSpinner,
-    CCardHeader,
-} from "@coreui/react";
+import {CCol,CRow,CCard,CCardBody,CSpinner,CCardHeader,} from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { cilCheckCircle, cilWarning, cilXCircle, cilChevronRight } from "@coreui/icons";
-//import { DetalleMateria } from "../materias/DetalleMateria";
 import { capitalizarCadena } from "../Funciones";
 import { DetalleMateria } from "../materias/DetalleMateria";
 import ShadowedCard from "../coreui-components/ShadowedCard";

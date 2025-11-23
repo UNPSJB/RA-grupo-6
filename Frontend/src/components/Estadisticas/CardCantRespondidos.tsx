@@ -1,8 +1,5 @@
-import { CCard, CCol, CRow, CCardBody, CCardHeader } from "@coreui/react";
+import { CCol, CRow, CCardBody, CCardHeader } from "@coreui/react";
 import { GraficoRespondidos } from "../Graficos/GraficoRespondidos";
-import { Row } from "react-bootstrap";
-
-
 
 export function CardCantRespondidos({titulo, totalesRespondidos, totalesAsignadas} : {titulo: string, totalesRespondidos:number, totalesAsignadas: number}){
 

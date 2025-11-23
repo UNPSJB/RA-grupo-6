@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CButton, CCol, CContainer, CRow, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CCard, CCardHeader, CCardBody } from "@coreui/react";
+import { CButton, CCol, CRow, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody,CCard, CCardHeader, CCardBody } from "@coreui/react";
 import type { PlantillaFormulario } from "../types";
 import ShadowedCard from "../coreui-components/ShadowedCard";
 

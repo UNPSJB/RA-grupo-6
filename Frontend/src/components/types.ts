@@ -189,6 +189,9 @@ export type ErrorPreguntaAbierta = {
   texto?: string;
   grupo?: string;
   rol?: string;
+  minimoMayor?: string;
+  valorMinimo?: string;
+  valorMaximo?: string;
 };
 
 export type PlantillaFormulario = {

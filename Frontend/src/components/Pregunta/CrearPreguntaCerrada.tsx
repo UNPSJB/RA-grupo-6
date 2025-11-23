@@ -167,7 +167,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
 
 
 
-      <Form.Group className='mb-3 text-start mt-3'>
+      <Form.Group className='mb-2 text-start mt-3'>
           <Form.Label className='fw-semibold mb-2'>Configuración</Form.Label>
           <div className='d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm'>
               <div className='d-flex flex-column'>
@@ -186,6 +186,24 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
               />
           </div>
       </Form.Group>
+
+      <div className='d-flex align-items-center justify-content-between border rounded p-2 px-3 shadow-sm mb-3'>
+          <div className='d-flex flex-column'>
+              <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                  Respuesta obligatoria
+              </span>
+              <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                  La respuesta será requerida antes de continuar
+              </small>
+          </div>
+                              
+          <Form.Check
+              type='switch'
+              id='switch-pregunta-obligatoria'
+              checked={obligatoria}
+              onChange={(e) => setObligatoria(e.target.checked)}
+          />
+      </div>
 
       <ElegirGrupoCuadro seleccionarGrupo={grupoCuadroSeleccionado} cambiarGrupo={setGrupoCuadroSeleccionado}/>
 

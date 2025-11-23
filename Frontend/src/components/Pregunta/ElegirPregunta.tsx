@@ -107,15 +107,9 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
                       </Badge>
                     </div>
 
-                    <Button
-                      onClick={() => eliminarPregunta(String(pregunta.id))}
-                      className="bg-transparent border-0 p-0"
-                    >
-                      <i
-                        className="fa-solid fa-xmark"
-                        style={{ fontSize: "20px", color: "#dc3545" }}
-                      ></i>
-                    </Button>
+                    <CButton onClick={() => eliminarPregunta(String(pregunta.id))} className="bg-transparent border-0 p-0">
+                      <i className="fa-solid fa-xmark" style={{ fontSize: "20px", color: "#dc3545" }}> </i>
+                    </CButton>
                   </div>
 
                   <p
@@ -152,7 +146,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
         <div
           className="text-center mb-3 rounded"
           style={{
-            backgroundColor: error? "#fff5f5":"#f8f9fa",
+            // backgroundColor: error? "#fff5f5":"#f8f9fa",
             border: `2px dashed ${error ? "#dc3545" : "#dee2e6"}`,
             padding: "2rem 1rem",
           }}
@@ -183,7 +177,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
         ))}
       </Form.Select>
       <CCol xs="auto">
-          <CButton color="primary" onClick={agregarPregunta} >
+          <CButton color="primary" onClick={agregarPregunta} disabled={preguntaSeleccionadaId == ""}>
             Agregar
           </CButton>
         </CCol>

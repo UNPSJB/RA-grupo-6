@@ -1,4 +1,3 @@
-import { Badge, Button, ListGroup, Modal } from "react-bootstrap";
 import type { Pregunta, Respuesta} from "../types";
 
 import "./RespuestasAbiertas.css"

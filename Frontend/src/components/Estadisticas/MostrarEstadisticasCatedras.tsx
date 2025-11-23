@@ -12,7 +12,7 @@ import CIcon from "@coreui/icons-react";
 import { cilCheckCircle, cilWarning, cilXCircle, cilChevronRight } from "@coreui/icons";
 //import { DetalleMateria } from "../materias/DetalleMateria";
 import { capitalizarCadena } from "../Funciones";
-import { DetalleMateria } from "../Materias/DetalleMateria";
+import { DetalleMateria } from "../materias/DetalleMateria";
 import ShadowedCard from "../coreui-components/ShadowedCard";
 
 

@@ -147,101 +147,94 @@ def getCantRespInstUltDic(db: Session):
 
     return estadisticas
 
-#Obtine los porcentajes de los promedios que tuvieron los docentes en las encuestas de los alumnos en el ultimo cuatrimestre
 def getPromedioDocentes(db: Session):
     instrumentos = getInstrumentosUltDictado(db)
     dictado = getUltimoDictado(db)
 
-    promedios = []
+    promedios_materias = []
+    
+    opcion_a_valor = {
+        "Malo, No satisfactorio": 1,
+        "Regular, Poco satisfactorio": 2,
+        "Bueno, Satisfactorio": 3,
+        "Muy Bueno, Muy Satisfactorio": 4,
+        "Si": 4, 
+        "No": 1, 
+        "NPO": 2 
+    }
+
     for instrumento in instrumentos:
+        if instrumento.plantilla_formulario.rol.nombre.strip().lower() != "estudiante":
+            continue
 
-        rol_usuario_encuestado = instrumento.plantilla_formulario.rol.nombre.strip().lower()
+        materia = instrumento.materia
+        
+        rol_usuario_encuestado = "estudiante" 
+        ciclo_materia = materia.ciclo.strip().upper() 
+
+        docente_nombre = "Desconocido"
+        docente_apellido = "Desconocido"
+        for periodo in materia.periodos_vinculados:
+            if periodo.usuario.rol.nombre.strip().lower() == "docente" and periodo.fecha_hasta is None:
+                docente_nombre = periodo.usuario.nombre
+                docente_apellido = periodo.usuario.apellido
+                break
+        
         estadisticas = {
-            "Respondidas_Alumno": 0,
-            "Asignadas_Alumno": 0
+            "Respondidas_Alumno": len(instrumento.respuestas_formulario),
         }
+        asignados = list(filter(lambda x: esAsignado(x, dictado), materia.periodos_vinculados))
+        estudiantes = list(filter(lambda x: x.usuario.rol.nombre.lower() == "estudiante", asignados))
+        estadisticas["Asignadas_Alumno"] = len(estudiantes)
 
-        match rol_usuario_encuestado:
-            case "estudiante":
-                estadisticas["Respondidas_Alumno"] += len(instrumento.respuestas_formulario)
+        grupos_valores = {}
+        for respuesta_formulario in instrumento.respuestas_formulario:
+            for respuesta in respuesta_formulario.respuestas:
+                if respuesta.pregunta.tipo == "cerrada" and respuesta.opcion:
+                    letra = respuesta.pregunta.grupo_pregunta.letra
+                    titulo = respuesta.pregunta.grupo_pregunta.titulo
+                    texto_opcion = respuesta.opcion.texto.strip()
+                    
+                    if letra == "A":
+                        continue
 
-                asignados = list(filter(lambda x: esAsignado(x, dictado), instrumento.materia.periodos_vinculados))
-                estudiantes = list(filter(lambda x: x.usuario.rol.nombre.lower() == "estudiante", asignados))
-                estadisticas["Asignadas_Alumno"] += len(estudiantes)
+                    valor = opcion_a_valor.get(texto_opcion, None)
 
-                # Obtener docente actual
-                periodos = instrumento.materia.periodos_vinculados
-
-                for periodo in periodos:
-                    if periodo.fecha_hasta is None:
+                    if valor is not None:
                         
-                        docente_nombre = periodo.usuario.nombre
-                        docente_apellido = periodo.usuario.apellido
+                        grupos_valores.setdefault(letra, {"titulo": titulo, "valores": []})
+                        grupos_valores[letra]["valores"].append(valor)
 
-
-                respuestas_formularios = instrumento.respuestas_formulario
-
-                # Agrupar valores por letra y título
-                grupos_valores = {}
-                for respuesta_formulario in respuestas_formularios:
-                    for respuesta in respuesta_formulario.respuestas:
-                        if respuesta.pregunta.tipo == "cerrada":
-                            letra = respuesta.pregunta.grupo_pregunta.letra
-
-                            if letra != "A":
-                                titulo = respuesta.pregunta.grupo_pregunta.titulo
-                                texto_opcion = respuesta.opcion.texto.strip()
-
-                                valor = None
-                                match texto_opcion:
-                                    case "Malo, No satisfactorio":
-                                        valor = 1
-                                    case "Regular, Poco satisfactorio":
-                                        valor = 2
-                                    case "Bueno, Satisfactorio":
-                                        valor = 3
-                                    case "Muy Bueno, Muy Satisfactorio":
-                                        valor = 4
-
-                                if valor is not None:
-                                    if letra not in grupos_valores:
-                                        grupos_valores[letra] = {"titulo": titulo, "valores": []}
-                                    grupos_valores[letra]["valores"].append(valor)
-
-                # Calcular promedios por grupo 
-                promedios_por_grupo = []
-                for letra, data in grupos_valores.items():
-                    valores = data["valores"]
-                    promedio = round(sum(valores) / len(valores), 2) if valores else 0
-                    promedios_por_grupo.append({
-                        "letra": letra,
-                        "titulo": data["titulo"],  
-                        "promedio": promedio
-                    })
-
-                
-                total = 0
-                cantidad = 0
-
-                for data in grupos_valores.values():
-                    valores = data["valores"]
-                    total += sum(valores)
-                    cantidad += len(valores)
-
-                promedio_general = round(total / cantidad, 2) if cantidad > 0 else 0
-
-                promedios.append({
-                    "id": instrumento.materia.id,
-                    "nombre": instrumento.materia.nombre,
-                    "docente_apellido": docente_apellido,
-                    "docente_nombre": docente_nombre,
-                    "promedios_por_grupo": promedios_por_grupo,
-                    "promedio_general": promedio_general,
-                    "tasa_de_respuesta": estadisticas,
-                    "cuatrimestre": dictado.fecha_inicio.year
+        promedios_por_grupo = []
+        total_promedios_sum = 0
+        total_grupos_count = 0
+        
+        for letra, data in grupos_valores.items():
+            valores = data["valores"]
+            if valores:
+                promedio = round(sum(valores) / len(valores), 2)
+                promedios_por_grupo.append({
+                    "letra": letra,
+                    "titulo": data["titulo"], 
+                    "promedio": promedio,
                 })
+                total_promedios_sum += promedio
+                total_grupos_count += 1
 
-    return promedios
+        promedio_general = round(total_promedios_sum / total_grupos_count, 2) if total_grupos_count > 0 else 0
+
+        promedios_materias.append({
+            "id": materia.id,
+            "nombre": materia.nombre,
+            "docente_apellido": docente_apellido,
+            "docente_nombre": docente_nombre,
+            "promedios_por_grupo": promedios_por_grupo,
+            "promedio_general": promedio_general,
+            "tasa_de_respuesta": estadisticas,
+            "cuatrimestre": dictado.fecha_inicio.year
+        })
+
+    return promedios_materias
 
 def getEstadisticasPorCarrera(db: Session, departamento_id: int = None) -> Dict[str, Any]:
     """Obtiene estadísticas de TODOS los instrumentos ENCUESTA_ESTUDIANTE agrupados por carrera"""

@@ -41,8 +41,8 @@ function CardDimension({ grupo }: CardDimensionProps) {
             </div>
 
             <CProgressBar
-                now={(grupo.promedio / 4) * 100}
-                variant={estado.color}
+                value={(grupo.promedio / 4) * 100}
+                color={estado.color}
             >
                 {`${((grupo.promedio / 4) * 100).toFixed(1)}%`}
             </CProgressBar>

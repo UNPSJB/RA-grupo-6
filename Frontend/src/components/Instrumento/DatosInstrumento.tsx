@@ -14,14 +14,12 @@ function obtenerFilas(datosInstrumento: any){
                 
                 filas.push(
                     <td key={clave}>
-                    <p className="mb-0 text-center">
-                        <span className='fw-bold'> {capitalizarCadena(separarPalabras(clave))}</span> {String(valor)}
-                    </p>
+                    <p className='fw-bold mb-0 text-center'> {capitalizarCadena(separarPalabras(clave))} </p>
+                    <p className="mb-0 text-center"> {String(valor)} </p>
                 </td>
             )
         }
     }
-
     return filas
 
 }

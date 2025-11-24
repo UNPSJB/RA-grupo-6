@@ -14,6 +14,7 @@ export type Pregunta = {
     estadistica: boolean
     puede_modificarse: boolean
     puede_eliminarse: boolean
+    obligatoria:boolean
     grupo_pregunta: GrupoPregunta
     tipo_respuesta: string | null
 }

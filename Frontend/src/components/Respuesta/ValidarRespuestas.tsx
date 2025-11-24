@@ -2,18 +2,12 @@ import { esTipoRespuestaValido } from "../Funciones";
 import type { RespuestaTemporal, InstanciaRespuestas} from "../types";
 
 
-function getPregunta(pregunta_id:number){
-
-    return fetch(`http://127.0.0.1:8000/preguntas/${pregunta_id}`)
-        .then((res) => res.ok ? res.json() : null)
-}
-
 export function validarInstanciaCompleta(instancia: InstanciaRespuestas, preguntasDelGrupo?: any[]): boolean {
     for (const key in instancia) {
         const r = instancia[key];
         if (preguntasDelGrupo) {
             const pregunta = preguntasDelGrupo.find(p => p.id === Number(key));
-            if (pregunta?.obligatoria && !(r.texto?.trim() || r.opcion_id)) {
+            if ((pregunta?.obligatoria) && (!(r.texto?.trim() || r.opcion_id))) {
                 return false;
             }
         } else {
@@ -28,9 +22,14 @@ export function validarInstanciaObligatoriasCompletas(instancia: InstanciaRespue
     
     for (const pregunta of preguntasObligatorias) {
         const r = instancia[pregunta.id];
-        if (!(r?.texto?.trim() || r?.opcion_id)) {
-            return false;
+
+        if (!(r.texto?.trim() || r.opcion_id)){
+            console.log(r)
+            return false
         }
+
+        if ( (r.texto && pregunta.tipo_respuesta && !(esTipoRespuestaValido(r?.texto, pregunta.tipo_respuesta))))
+            return false
     }
     return true;
 }
@@ -51,7 +50,8 @@ export function validarTodasRespuestasCompletas(
     const simplesCompletas = preguntasObligatorias.every((pregunta: any) => {
         return respuestas.some(
             (respuesta) =>
-                respuesta.pregunta_id === pregunta.id && (respuesta.texto?.trim() || respuesta.opcion_id)
+                // respuesta.pregunta_id === pregunta.id && (respuesta.texto?.trim() || respuesta.opcion_id)
+            (respuesta.pregunta_id === pregunta.id && (respuesta?.opcion_id || ((respuesta.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(respuesta.texto, pregunta.tipo_respuesta) : respuesta.texto)))
         );
     });
 
@@ -98,7 +98,9 @@ export function calcularProgresoTotal(respuestas: RespuestaTemporal[], respuesta
         preguntasRespondidas = preguntasObligatorias.filter((p: any) =>
             respuestas.some(
                 (r) =>
-                    r.pregunta_id === p.id && (r.texto?.trim() || r.opcion_id)
+                    // r.pregunta_id === p.id && (r.texto?.trim() || r.opcion_id)
+                    (r.pregunta_id === p.id && (r?.opcion_id || ((r?.texto && (p.tipo_respuesta))? esTipoRespuestaValido(r.texto, p.tipo_respuesta) : r.texto)))
+
             )
         ).length;
 
@@ -154,15 +156,14 @@ export function validarPaginaCompleta(paginaActual: number,gruposOrganizados: an
     respuestas: RespuestaTemporal[],
     respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] },
 ): boolean {
+
     if (paginaActual >= gruposOrganizados.length) return false;
 
     const grupoActual = gruposOrganizados[paginaActual];
 
-    let esPaginaCompleta : boolean
-
     if (grupoActual.tipo === 'simple') {
         const preguntasObligatorias = grupoActual.preguntas.filter((p: any) => p.obligatoria);
-     
+
         if (preguntasObligatorias.length === 0) return true;
 
         return preguntasObligatorias.every((pregunta: any) => {
@@ -231,7 +232,11 @@ export function paginaTotalmenteCompleta(
     if (grupo.tipo === 'simple') {
         return grupo.preguntas.every((pregunta: any) => {
             const respuesta = respuestas.find((r) => r.pregunta_id === pregunta.id);
-            return respuesta?.texto?.trim() || respuesta?.opcion_id;
+            
+            return (respuesta && (respuesta?.opcion_id || ((respuesta.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(respuesta.texto, pregunta.tipo_respuesta) : respuesta.texto))) 
+            
+            
+            // respuesta?.texto?.trim() || respuesta?.opcion_id;
         });
     } else {
         const instancias = respuestasMultiples[grupo.id] || [];
@@ -240,7 +245,9 @@ export function paginaTotalmenteCompleta(
         return instancias.every((instancia) => {
             return grupo.preguntas.every((pregunta: any) => {
                 const respuesta = instancia[pregunta.id];
-                return respuesta?.texto?.trim() || respuesta?.opcion_id;
+
+                return (respuesta && (respuesta?.opcion_id || ((respuesta.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(respuesta.texto, pregunta.tipo_respuesta) : respuesta.texto))) 
+                // return respuesta?.texto?.trim() || respuesta?.opcion_id;
             });
         });
     }

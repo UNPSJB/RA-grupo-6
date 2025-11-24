@@ -1,6 +1,7 @@
 import { Alert, Row, Col, ProgressBar } from 'react-bootstrap';
 import ModalExito from '../ModalEnvio';
 import type { GrupoPreguntas, RespuestaTemporal, InstanciaRespuestas } from '../types';
+import { esTipoRespuestaValido } from '../Funciones';
 
 type Props = {
     gruposOrganizados: GrupoPreguntas[];
@@ -41,14 +42,17 @@ function ResumenRespuestas({
 
             completadas = grupo.preguntas.filter((p: any) => {
                 const resp = obtenerRespuesta(p.id);
-                return resp?.texto?.trim() || resp?.opcion_id;
+                // return resp?.texto?.trim() || resp?.opcion_id;
+
+                return (resp && (resp?.opcion_id || ((resp.texto && (p.tipo_respuesta))? esTipoRespuestaValido(resp.texto, p.tipo_respuesta) : resp.texto))) 
             }).length;
 
             completadasObligatorias = grupo.preguntas
                 .filter((p: any) => p.obligatoria)
                 .filter((p: any) => {
                     const resp = obtenerRespuesta(p.id);
-                    return resp?.texto?.trim() || resp?.opcion_id;
+                    // return resp?.texto?.trim() || resp?.opcion_id;
+                    return (resp && (resp?.opcion_id || ((resp.texto && (p.tipo_respuesta))? esTipoRespuestaValido(resp.texto, p.tipo_respuesta) : resp.texto))) 
                 }).length;
         } else {
             const instancias = respuestasMultiples[grupo.id] || [];
@@ -60,13 +64,15 @@ function ResumenRespuestas({
                     
                     if (pregunta?.obligatoria) {
                         totalObligatorias++;
-                        if (r.texto?.trim() || r.opcion_id) {
+                        if((r?.opcion_id || ((r.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))){
+                        // if (r.texto?.trim() || r.opcion_id) {
                             completadasObligatorias++;
                         }
                     }
                     
                     total++;
-                    if (r.texto?.trim() || r.opcion_id) {
+                    if(pregunta && (r?.opcion_id || ((r.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))){
+                    // if (r.texto?.trim() || r.opcion_id) {
                         completadas++;
                     }
                 }

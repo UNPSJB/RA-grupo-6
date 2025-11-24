@@ -75,11 +75,11 @@ export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
         }
     }
 
-    if (TipoRespuesta.ENTERO || TipoRespuesta.DECIMAL){
-        if((resultado <= Number(valorTipoDato.valor_minimo)) && (resultado >= Number(valorTipoDato.valor_maximo)) ){
+    if ((valorTipoDato.tipo == TipoRespuesta.RANGO_ENTERO) || (valorTipoDato.tipo == TipoRespuesta.RANGO_DECIMAL)){
+        if((Number(valorTipoDato.valor_minimo) > resultado) || (resultado > Number(valorTipoDato.valor_maximo) ) ){
             esValido = false;
         }
     }
-    
+
     return esValido
 }

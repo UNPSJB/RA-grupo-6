@@ -163,7 +163,7 @@ function PreguntaMultiple({
 
                 {pregunta.pregunta_fuente_id &&
                 <div className='text-end mb-1 mt-1'>
-                    <Button onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(valor.texto))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
+                    <Button onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(String(valor.texto)))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
                 </div>
                 }
             </div>

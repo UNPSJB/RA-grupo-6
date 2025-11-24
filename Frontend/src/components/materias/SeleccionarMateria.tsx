@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    CCard,
     CButton,
-    CListGroup,
-    CListGroupItem,
     CBadge,
     CSpinner,
     CAlert,
     CCardBody,
-    CCardHeader
+    CCardHeader,
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell,
+    CTableBody,
+    CTableDataCell
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
@@ -38,7 +41,6 @@ function SeleccionarMateria() {
     useEffect(() => {
         const cargarMateriasConEncuestas = async () => {
             try {
-                // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
                 const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=${USUARIO_ACTUAL.id}&mostrar_respondidos=false`);
                 
                 if (!response.ok) {
@@ -47,7 +49,6 @@ function SeleccionarMateria() {
                 
                 const instrumentos = await response.json();
                 
-                // Mapear instrumentos a materias con encuesta activa
                 const materiasConEncuesta = instrumentos.map((instrumento: any) => ({
                     id: instrumento.materia.id,
                     nombre: instrumento.materia.nombre,
@@ -76,7 +77,6 @@ function SeleccionarMateria() {
             return;
         }
         
-        // Navegar al instrumento para responder encuesta
         navigate(`/responder-instrumento/${materia.instrumentoId}`, { 
             state: { 
                 materiaNombre: materia.nombre,
@@ -86,90 +86,88 @@ function SeleccionarMateria() {
         });
     };
 
+    const estaActiva = (materia: Materia) => {
+        return materia.tieneEncuestaActiva === true;
+    };
+
     if (cargando) {
         return (
-            <CCard className="text-center p-5">
-                <CCardBody>
-                    <CSpinner className="mb-3" />
+            <ShadowedCard className="text-center">
+                <CCardBody className="p-5">
+                    <CSpinner color="primary" className="mb-3" />
                     <p className="text-medium-emphasis">Cargando materias con encuestas activas...</p>
                 </CCardBody>
-            </CCard>
+            </ShadowedCard>
         );
     }
 
     return (
-        <ShadowedCard >
+        <ShadowedCard>
             <CCardHeader>
                 <div className="m-2">
-                    <h4 >Encuestas para Alumnos</h4>
-                    <p className="text-medium-emphasis mb-0">
-                        Selecciona una materia para responder la encuesta correspondiente
+                    <h4>Encuestas para Alumnos</h4>
+                    <p className="text-medium-emphasis">
+                        Selecciona una materia para responder la encuesta correspondiente.
                     </p>
                 </div>
             </CCardHeader>
-            <CCardBody className="p-4 p-md-5">
-                
-
+            <CCardBody>
                 {mensaje && (
                     <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
                         {mensaje}
                     </CAlert>
                 )}
-
+                
                 {materias.length > 0 ? (
-                    <CListGroup flush>
-                        {materias.map((materia) => (
-                            <CListGroupItem
-                                key={materia.id}
-                                onClick={() => materia.tieneEncuestaActiva && handleResponderEncuesta(materia)}
-                                className="d-flex justify-content-between align-items-center p-4"
-                                disabled={!materia.tieneEncuestaActiva}
-                            >
-                                <div className="flex-grow-1 text-start">
-                                    <div className="fw-bold fs-5 mb-1">{capitalizarCadena(materia.nombre)}</div>
-                                    <div className="d-flex align-items-center gap-3">
-                                        <small className="text-medium-emphasis">
-                                            Código: {materia.id}
-                                        </small>
-                                        {materia.tieneEncuestaActiva && (
-                                            <>
-                                                <CBadge color="success" className="ms-2">
-                                                    Encuesta Activa
-                                                </CBadge>
-                                                <small className="text-medium-emphasis">
-                                                    Vence: {new Date(materia.fechaCierre!).toLocaleDateString()}
-                                                </small>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {materia.tieneEncuestaActiva ? (
-                                    <CButton
-                                        color="primary"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleResponderEncuesta(materia);
-                                        }}
-                                        className="px-4 py-2"
+                    <CTable className='border mb-1' hover responsive>
+                        <CTableHead color="light">
+                            <CTableRow>
+                                <CTableHeaderCell>Materia</CTableHeaderCell>
+                                <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+                                <CTableHeaderCell>Vencimiento</CTableHeaderCell>
+                                <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+                            </CTableRow>
+                        </CTableHead>
+                        <CTableBody>
+                            {materias.map((materia) => {
+                                const activa = estaActiva(materia);
+                                return (
+                                    <CTableRow 
+                                        key={materia.id} 
+                                        onClick={() => activa && handleResponderEncuesta(materia)} 
+                                        style={{ cursor: activa ? 'pointer' : 'not-allowed' }}
                                     >
-                                        <i className="fas fa-edit me-2"></i>
-                                        Responder Encuesta
-                                    </CButton>
-                                ) : (
-                                    <CButton
-                                        variant="outline"
-                                        color="secondary"
-                                        size="sm"
-                                        disabled
-                                    >
-                                        Sin Encuesta
-                                    </CButton>
-                                )}
-                            </CListGroupItem>
-                        ))}
-                    </CListGroup>
+                                        <CTableDataCell>
+                                            <div className="fw-bold">{capitalizarCadena(materia.nombre)}</div>
+                                            <div className="small text-medium-emphasis">Código: {materia.id}</div>
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CBadge color={activa ? "success" : "secondary"}>
+                                                {activa ? "Activo" : "Inactivo"}
+                                            </CBadge>
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {activa ? new Date(materia.fechaCierre!).toLocaleDateString() : '-'}
+                                        </CTableDataCell>
+                                        <CTableDataCell className="text-center">
+                                            <CButton
+                                                color="primary"
+                                                size="sm"
+                                                disabled={!activa}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleResponderEncuesta(materia);
+                                                }}
+                                            >
+                                                <i className="fas fa-edit me-2"></i>
+                                                Responder Encuesta
+                                            </CButton>
+                                        </CTableDataCell>
+                                    </CTableRow>
+                                );
+                            })}
+                        </CTableBody>
+                    </CTable>
                 ) : (
                     <div className="text-center py-5">
                         <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>

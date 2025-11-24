@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    CButton, 
-    CBadge, 
-    CSpinner, 
-    CAlert,
-    CCardBody,
-    CCardHeader,
-    CTable,
-    CTableHead,
-    CTableRow,
-    CTableHeaderCell, CTableBody, CTableDataCell
-} from '@coreui/react';
+import { CButton, CBadge, CSpinner, CAlert,CCardBody,CCardHeader,CTable,CTableHead,CTableRow,CTableHeaderCell, CTableBody, CTableDataCell} from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
 

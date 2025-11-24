@@ -1,7 +1,5 @@
 import { CButton } from "@coreui/react";
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
-
 
 type Materia = {
     id:string;
@@ -33,9 +31,7 @@ function MateriaList(){
             <ul className="list-group">
                 {materias.map((materia) => (
                     <>
-                        {/* <li className="list-group-item"> {materia.id} - {materia.nombre}</li>
-                        <button className={materia.id}> Seleccionar materia </button> */}
-                        <div className="card">
+                       <div className="card">
                             <div className="card-body">
                                 <h2 className="card-title">{materia.nombre}</h2>
                                 <h5 className="card-subtitle"> Cod. {materia.id}</h5>
@@ -43,7 +39,7 @@ function MateriaList(){
 
                                     <CButton className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</CButton>
                                 </div>
-                                {/* <a href="#" className="card-link"> Realizar informe </a> */}
+                               
                             </div>
                         </div>
                     </>

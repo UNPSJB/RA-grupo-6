@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Form} from "react-bootstrap";
 import type { Parametros, PlantillaFormulario} from "../types";
 import ModalExito from "../ModalEnvio";
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CForm, CFormLabel, CFormSelect, CRow } from "@coreui/react";
+import { CButton, CCardBody, CCardHeader, CCol, CFormLabel, CFormSelect, CRow } from "@coreui/react";
 import ShadowedCard from "../coreui-components/ShadowedCard";
 
 export function PlanificarPeriodos() {
@@ -50,12 +50,11 @@ export function PlanificarPeriodos() {
     const esBisiesto = (anio: number) =>
         (anio % 4 === 0 && anio % 100 !== 0) || anio % 400 === 0;
 
-    const obtenerDiasDelMes = (mes: string, anio?: number) => {
-        if (!mes) return 31;
-        const mesNum = parseInt(mes);
+    const obtenerDiasDelMes = (mes: number, anio?: number) => {
+        // if (!mes) return 31;
         const anioActual = anio || new Date().getFullYear();
-        if (mesNum === 2) return esBisiesto(anioActual) ? 29 : 28;
-        if ([4, 6, 9, 11].includes(mesNum)) return 30;
+        if (mes == 2) return esBisiesto(anioActual) ? 29 : 28;
+        if ([4, 6, 9, 11].includes(mes)) return 30;
         return 31;
     };
 
@@ -64,8 +63,8 @@ export function PlanificarPeriodos() {
         const d = new Date(fecha);
         if (isNaN(d.getTime())) return "";
         const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const dd = String(d.getUTCDate()).padStart(2, "0");
         return `${yyyy}-${mm}-${dd}`;
     };
 
@@ -80,12 +79,12 @@ export function PlanificarPeriodos() {
 
         if (parte === "mes") {
             partes[1] = valor;
-            const maxDias = obtenerDiasDelMes(valor, anioActual);
+            const maxDias = obtenerDiasDelMes(Number(valor), anioActual);
             const diaSeleccionado = parseInt(partes[2] || "1");
             partes[2] = String(Math.min(diaSeleccionado, maxDias)).padStart(2, "0");
         } else {
             const mesActual = partes[1] || "01";
-            const maxDias = obtenerDiasDelMes(mesActual, anioActual);
+            const maxDias = obtenerDiasDelMes(Number(mesActual), anioActual);
             partes[2] = String(Math.min(parseInt(valor), maxDias)).padStart(2, "0");
         }
 
@@ -97,9 +96,9 @@ export function PlanificarPeriodos() {
         });
     };
 
-    const renderOpcionesDias = (mes: string, campo?: keyof Parametros) => {
+    const renderOpcionesDias = (mes: number, campo?: keyof Parametros) => {
         let anioActual = new Date().getFullYear();
-        
+
         if (campo && modificacionesParametros?.[campo]) {
             const fechaStr = formatearFecha(modificacionesParametros[campo]);
             if (fechaStr) {
@@ -108,10 +107,35 @@ export function PlanificarPeriodos() {
         }
         
         const maxDias = obtenerDiasDelMes(mes, anioActual);
-        const opciones = [<option key="empty" value="">Día</option>];
-        for (let i = 1; i <= maxDias; i++) {
+        // const opciones = [<option key="empty" value="">Día</option>];
+        let opciones = []
+
+        let i = 1
+
+        if (modificacionesParametros){
+                let fechaInicio
+                let fechaCierre
+
+                if (campo == "cierre_primer_dictado"){
+                    fechaInicio = new Date(modificacionesParametros.inicio_primer_dictado)
+                    fechaCierre = new Date(modificacionesParametros.cierre_primer_dictado)
+                    
+                }
+                if (campo == "cierre_segundo_dictado"){
+                    fechaInicio = new Date(modificacionesParametros.inicio_segundo_dictado)
+                    fechaCierre = new Date(modificacionesParametros.cierre_segundo_dictado)
+                    
+                }
+
+                if (fechaInicio && fechaCierre && (fechaInicio.getUTCMonth() == fechaCierre.getUTCMonth())){
+                    i = fechaInicio.getUTCDate();                 
+                }
+
+        }
+
+        for (i; i <= maxDias; i++) {
             opciones.push(
-                <option key={i} value={String(i).padStart(2, "0")}>
+                <option key={i} value={i}>
                     {i}
                 </option>
             );
@@ -149,15 +173,15 @@ export function PlanificarPeriodos() {
     }
 
     const meses = [
-        { valor: "01", nombre: "Enero" },
-        { valor: "02", nombre: "Febrero" },
-        { valor: "03", nombre: "Marzo" },
-        { valor: "04", nombre: "Abril" },
-        { valor: "05", nombre: "Mayo" },
-        { valor: "06", nombre: "Junio" },
-        { valor: "07", nombre: "Julio" },
-        { valor: "08", nombre: "Agosto" },
-        { valor: "09", nombre: "Septiembre" },
+        { valor: "1", nombre: "Enero" },
+        { valor: "2", nombre: "Febrero" },
+        { valor: "3", nombre: "Marzo" },
+        { valor: "4", nombre: "Abril" },
+        { valor: "5", nombre: "Mayo" },
+        { valor: "6", nombre: "Junio" },
+        { valor: "7", nombre: "Julio" },
+        { valor: "8", nombre: "Agosto" },
+        { valor: "9", nombre: "Septiembre" },
         { valor: "10", nombre: "Octubre" },
         { valor: "11", nombre: "Noviembre" },
         { valor: "12", nombre: "Diciembre" }
@@ -167,51 +191,56 @@ export function PlanificarPeriodos() {
             <ShadowedCard >
                 <CCardHeader>
                     <div className="m-2">
-                       <h4>Parametrización de los dictados</h4>
+                        <h4>Parametrización de los dictados</h4>
                         <p className="text-medium-emphasis">Configure los dictados para su asignación automática</p>
                     </div>
                 </CCardHeader>
             
                 <CCardBody className="m-2">
                     <CRow className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
+
                     <h5 >Primer Dictado</h5>
+                    
                     <CCol>
-                    <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
-                    <div className="d-flex gap-2">
-                        <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1] || ""}
-                            onChange={(e) => handleFechaChange("inicio_primer_dictado", "mes", e.target.value)}
-                        >
-                            {meses.slice(0,6).map(m => (
-                                <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                            ))}
-                        </CFormSelect>
-                        <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[2] || ""}
-                            onChange={(e) => handleFechaChange("inicio_primer_dictado", "dia", e.target.value)}
-                        >
-                            {renderOpcionesDias(formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1], "inicio_primer_dictado")}
-                        </CFormSelect>
-                    </div>
-                    </CCol>
+                        <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
+                            <div className="d-flex gap-2">
+                                <CFormSelect
+                                    value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_primer_dictado)).getUTCMonth() + 1)}
+                                    onChange={(e) => handleFechaChange("inicio_primer_dictado", "mes", e.target.value)}
+                                >
+                                    {meses.slice(0,6).map(m => (
+                                        <option key={m.valor} value={m.valor}>{m.nombre}</option>
+                                    ))}
+                                </CFormSelect>
+
+                                <CFormSelect
+                                    value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_primer_dictado)).getUTCDate())}
+                                    onChange={(e) => handleFechaChange("inicio_primer_dictado", "dia", e.target.value)}
+                                >
+                                    {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_primer_dictado)).getUTCMonth() + 1, "inicio_primer_dictado")}
+                                </CFormSelect>
+                            </div>
+                        </CCol>
                     <CCol>
+
                     <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
-                    <div className="d-flex gap-2">
-                        <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1] || ""}
-                            onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
-                        >
-                            {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_primer_dictado).split("-")[1]) - 1, 6).map(m => (
-                                <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                            ))}
-                        </CFormSelect>
-                        <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[2] || ""}
-                            onChange={(e) => handleFechaChange("cierre_primer_dictado", "dia", e.target.value)}
-                        >
-                            {renderOpcionesDias(formatearFecha(modificacionesParametros?.cierre_primer_dictado).split("-")[1], "cierre_primer_dictado")}
-                        </CFormSelect>
-                    </div>
+                        <div className="d-flex gap-2">
+                            <CFormSelect
+                                value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_primer_dictado)).getUTCMonth() + 1)}
+                                onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
+                            >
+                                {modificacionesParametros && meses.filter(m => Number(m.valor) >= (new Date(modificacionesParametros.inicio_primer_dictado).getUTCMonth() + 1)).map(m => (
+                                    <option key={m.valor} value={m.valor}>{m.nombre}</option>
+                                ))}
+                            </CFormSelect>
+                            
+                            <CFormSelect
+                                value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_primer_dictado)).getUTCDate())}
+                                onChange={(e) => handleFechaChange("cierre_primer_dictado", "dia", e.target.value)}
+                            >
+                                {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.cierre_primer_dictado)).getUTCMonth() + 1, "cierre_primer_dictado")}
+                            </CFormSelect>
+                        </div>
                     </CCol>
                     </CRow>
 
@@ -222,7 +251,7 @@ export function PlanificarPeriodos() {
                     <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
                     <div className="d-flex gap-2">
                         <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1] || ""}
+                            value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth() + 1)}
                             onChange={(e) => handleFechaChange("inicio_segundo_dictado", "mes", e.target.value)}
                         >
                             {meses.slice(6,12).map(m => (
@@ -230,34 +259,37 @@ export function PlanificarPeriodos() {
                             ))}
                         </CFormSelect>
                         <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[2] || ""}
+                            value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCDate())}
                             onChange={(e) => handleFechaChange("inicio_segundo_dictado", "dia", e.target.value)}
                         >
-                            {renderOpcionesDias(formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1], "inicio_segundo_dictado")}
+                            { modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth() + 1, "inicio_segundo_dictado")}
                         </CFormSelect>
                     </div>
                     </CCol>
                     <CCol>
+
                     <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
                     <div className="d-flex gap-2">
                         <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1] || ""}
+                            value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_segundo_dictado)).getUTCMonth() + 1)}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "mes", e.target.value)}
                         >
-                            {meses.slice(Number(formatearFecha(modificacionesParametros?.inicio_segundo_dictado).split("-")[1]) - 1,12).map(m => (
-                                <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                            ))}
+                            {modificacionesParametros && meses.slice((new Date(modificacionesParametros?.inicio_segundo_dictado)).getUTCMonth(), 12).map(m => (
+                                    <option key={m.valor} value={m.valor}>{m.nombre}</option>
+                                ))}
                         </CFormSelect>
+
                         <CFormSelect
-                            value={formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[2] || ""}
+                            value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_segundo_dictado)).getUTCDate())}
                             onChange={(e) => handleFechaChange("cierre_segundo_dictado", "dia", e.target.value)}
                         >
-                            {renderOpcionesDias(formatearFecha(modificacionesParametros?.cierre_segundo_dictado).split("-")[1], "cierre_segundo_dictado")}
+                            {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth()+ 1, "cierre_segundo_dictado")}
                         </CFormSelect>
                     </div>
                     </CCol>
                     </CRow>
 
+                    {/* Plantillas */}
                     <CRow className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
                     <h5 >Plantillas</h5>
                     <CCol >
@@ -330,6 +362,8 @@ export function PlanificarPeriodos() {
                     </CCol>
                     </CRow>
 
+
+                    {/* Disponibilidad */}
                     <CRow className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
                     <h5>Disponibilidad de Formularios</h5>
                     {["estudiante", "docente", "departamento"].map((tipo) => {

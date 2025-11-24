@@ -37,7 +37,6 @@ export default function SeleccionarInformeSintetico() {
             setLoading(true);
             setError(null);
 
-           
             const usuarioActual = JSON.parse(localStorage.getItem('usuario_actual') || '{}');
             const usuarioId = usuarioActual.id || 3; 
 

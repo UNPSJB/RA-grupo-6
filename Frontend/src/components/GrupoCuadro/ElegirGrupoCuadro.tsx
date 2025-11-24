@@ -43,7 +43,7 @@ function ElegirGrupoCuadro ({seleccionarGrupo, cambiarGrupo, error}: Props){
                     </p>
                 </div>
                 <Button
-                    className="bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
+                    className="bg-transparent border-0 fw-semibold d-flex align-items-center gap-2"
                     onClick={cambiarMostrar}
                 >
                     <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />

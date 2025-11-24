@@ -25,8 +25,6 @@ export function CompararPlantillas(){
 
 
     const [activo, setActivo] = useState("1")
-    const estiloBotonActivo = {backgroundColor: "#0d6efd", border: "none", color:"#ffffffff"}
-    const estiloBotonInactivo = {backgroundColor: "#E8ECEF", border: "none", color:"#5A5B65"}
 
     useEffect(() => {
         fetch(url_base)
@@ -51,10 +49,12 @@ export function CompararPlantillas(){
                 <CCardHeader>
                         <div className='m-2'>
                             <h4>Comparación de Estadísticas</h4>
+                            <p className="text-medium-emphasis">
+                                Presenta los resultados obtenidos entre las diferentes plantillas de formularios.
+                            </p>
                         </div>
-                            
-                        
                 </CCardHeader>
+
                 <CCardHeader >
                     <CButton className='m-1' color={activo === "1" ? "primary" : "outline-primary" } onClick={() => {setRol(1); setActivo("1")}}>Estudiantes</CButton>
                     <CButton className='m-1' color={activo === "2" ? "primary" : "outline-primary"} onClick={() => {setRol(2); setActivo("2")}}>Docentes</CButton>
@@ -63,7 +63,6 @@ export function CompararPlantillas(){
                 <CCardBody>
 
                     <CCard className="mb-4">
-                        
                         
                         <CCardHeader>
                             <h5 className="mb-0">Resumen General</h5>
@@ -105,12 +104,12 @@ export function CompararPlantillas(){
                             <CTable responsive="sm" hover>
                                 <CTableHead>
                                     <CTableRow className="text-center">
-                                        <CTableHeaderCell> <i className="fa-solid fa-clipboard-list text-medium-emphasis"></i> Plantilla</CTableHeaderCell>
-                                        <CTableHeaderCell> <i className="fa-regular fa-circle-question text-medium-emphasis"></i> <br /> Preguntas</CTableHeaderCell>
-                                        <CTableHeaderCell> <i className="fa-solid fa-circle-exclamation text-medium-emphasis"></i> <br />Obligatorias</CTableHeaderCell>
-                                        <CTableHeaderCell> <i className="fa-solid fa-layer-group text-medium-emphasis"></i> <br /> Secciones</CTableHeaderCell>
-                                        <CTableHeaderCell> <i className="fa-light fa-percent text-medium-emphasis"> </i> <br />  Tasa respuestas</CTableHeaderCell>
-                                        <CTableHeaderCell> <i className="fa-regular fa-circle-check text-medium-emphasis"></i> <br /> Completitud</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"40%"}}> <i className="fa-solid fa-clipboard-list text-medium-emphasis"></i> Plantilla</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"12%"}}> <i className="fa-regular fa-circle-question text-medium-emphasis"></i> <br /> Preguntas</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"12%"}}> <i className="fa-solid fa-circle-exclamation text-medium-emphasis"></i> <br />Obligatorias</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"12%"}}> <i className="fa-solid fa-layer-group text-medium-emphasis"></i> <br /> Secciones</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"12%"}}> <i className="fa-light fa-percent text-medium-emphasis"> </i> <br />  Tasa respuestas</CTableHeaderCell>
+                                        <CTableHeaderCell style={{width:"12%"}}> <i className="fa-regular fa-circle-check text-medium-emphasis"></i> <br /> Completitud</CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>

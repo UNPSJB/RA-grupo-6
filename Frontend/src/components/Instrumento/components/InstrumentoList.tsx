@@ -52,12 +52,12 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
               <p className="text-medium-emphasis">{config.subtitulo}</p>
         </div>
       </CCardHeader>
-      <CCardBody>
+      <CCardBody >
         
         
         {instrumentos.length > 0 ? (
-          <CTable className='border mb-1'  hover responsive>
-            <CTableHead color="light" >
+          <CTable className='border rounded-3 mb-1'  hover responsive>
+            <CTableHead color="light">
               <CTableRow>
                 <CTableHeaderCell>Materia</CTableHeaderCell>
                 <CTableHeaderCell>Período</CTableHeaderCell>
@@ -65,7 +65,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                 <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
-            <CTableBody>
+            <CTableBody className="align-middle">
               {instrumentos.map((instrumento) => (
                 <CTableRow key={instrumento.id} onClick={() => onSeleccionar(instrumento)} style={{ cursor: 'pointer' }} >
                   <CTableDataCell>
@@ -89,7 +89,6 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
                         onSeleccionar(instrumento);
                       }}
                     >
-                      <i className={`fas ${config.buttonIcon}`}></i>
                       {config.buttonText}
                     </CButton>
                   </CTableDataCell>

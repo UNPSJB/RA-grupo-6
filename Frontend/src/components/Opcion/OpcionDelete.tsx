@@ -1,5 +1,4 @@
 import { CButton } from "@coreui/react";
-import { Button } from "react-bootstrap";
 
 type Props = {
     opcionId: number;
@@ -17,7 +16,7 @@ function EliminarOpcion ({opcionId, onDeleted}: Props){
         .catch((err) => window.alert("No se puede eliminar la opcion"));
     };
     return(
-    <CButton size="sm"variant="outline-secondary" onClick={eliminarOpcion}>
+    <CButton size="sm" variant="outline-primary" onClick={eliminarOpcion}>
         <i className="fas fa-xmark"></i>
     </CButton>
     );

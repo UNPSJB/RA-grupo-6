@@ -31,7 +31,7 @@ const data = {
                 legend: {
                     position: 'bottom' as const,
                     onClick: () => {},
-                    align: 'start' as const,
+                    align: 'center' as const,
                     labels: {
                         padding: 15,
                         boxWidth: 15,

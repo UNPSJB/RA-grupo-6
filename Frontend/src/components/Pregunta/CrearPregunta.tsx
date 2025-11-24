@@ -3,7 +3,6 @@ import CrearPreguntaCerrada from "./CrearPreguntaCerrada";
 import { EnumTipoPregunta } from "../types";
 import type { TipoPregunta } from "../types";
 import { useState } from "react";
-import { Form, Modal, Button } from 'react-bootstrap';
 
 type Props = {
     mostrar: boolean;
@@ -20,21 +19,21 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
     return (
         <CModal visible={mostrar} onClose={manejarPestania} size="lg">
             <CModalHeader closeButton className="border-bottom" style={{ padding: "1.5rem" }}>
-                <CModalTitle className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </CModalTitle>
+                <CModalTitle style={{ fontSize: "1.5rem"}}> Crear Pregunta </CModalTitle>
             </CModalHeader>
             <CModalBody className="px-4 py-4">
                 <CForm>
                     <div className="mb-4 text-center">
                         <CFormLabel 
-                            className="fw-semibold mb-3 d-block"
-                            style={{ fontSize: "0.875rem", color: "#4b5563" }}
+                            className="fw-semibold mb-3 d-block text-muted"
+                            style={{ fontSize: "0.875rem"}}
                         >
                             Tipo de pregunta
                         </CFormLabel>
                         
                         <div className="d-flex justify-content-center align-items-center gap-3">
                             <CButton
-                                variant={tipoPregunta === EnumTipoPregunta.abierta ? "success" : "light"}
+                                color={tipoPregunta === EnumTipoPregunta.abierta ? "primary" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
                                     tipoPregunta === EnumTipoPregunta.abierta ? "shadow-sm" : ""
                                 }`}
@@ -50,7 +49,7 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
                             </CButton>
 
                             <CButton
-                                variant={tipoPregunta === EnumTipoPregunta.cerrada ? "primary" : "light"}
+                                color={tipoPregunta === EnumTipoPregunta.cerrada ? "primary" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
                                     tipoPregunta === EnumTipoPregunta.cerrada ? "shadow-sm" : ""
                                 }`}
@@ -84,7 +83,7 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
 
             </CModalBody>
             <CModalFooter className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
-                <CButton variant="outline-secondary" onClick={manejarPestania}>
+                <CButton variant="outline" color="secondary" onClick={manejarPestania}>
                     Cerrar
                 </CButton>
             </CModalFooter>

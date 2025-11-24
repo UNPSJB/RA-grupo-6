@@ -1,6 +1,5 @@
 import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from "@coreui/react";
 import { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
 
 type Props = {
   preguntaId: Number;        
@@ -33,10 +32,10 @@ function EliminarPregunta({ preguntaId, onDeleted }: Props) {
             </CModalHeader>
                 <CModalBody>¿Seguro que querés eliminar esta pregunta?</CModalBody>
             <CModalFooter>
-                <CButton variant="secondary" onClick={() => setMostrarConfirmacion(false)}>
+                <CButton color="secondary" onClick={() => setMostrarConfirmacion(false)}>
                     Cancelar
                 </CButton>
-                <CButton variant="danger" onClick={eliminarPregunta}>
+                <CButton color="danger" onClick={eliminarPregunta}>
                     Eliminar
                 </CButton>
             </CModalFooter>

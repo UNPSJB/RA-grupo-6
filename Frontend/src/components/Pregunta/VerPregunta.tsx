@@ -6,6 +6,7 @@ import {
   CBadge,
   CCard,
   CCardBody,
+  CCardHeader,
   CCardSubtitle,
   CCardText,
   CCardTitle,
@@ -15,6 +16,7 @@ import {
 const url_base = 'http://127.0.0.1:8000/preguntas/todos';
 
 import type { Pregunta } from "../types";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 function VerPregunta() {
     const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -58,14 +60,21 @@ function VerPregunta() {
     }
 
     return (
-        <>
-            <div className="mb-4">
-                <h3>Banco de Preguntas</h3>
-                <p className="text-medium-emphasis">Gestiona todas las preguntas del sistema</p>
-            </div>
-            <div className="d-flex flex-wrap justify-content-start gap-3">
+        <ShadowedCard>
+
+            <CCardHeader>
+                <div className="m-2">
+                    <h4 >Banco de Preguntas</h4>
+                    <p className="text-medium-emphasis">
+                        Gestiona todas las preguntas del sistema
+                    </p>
+                </div>
+            </CCardHeader>
+
+            <CCardBody className="d-flex flex-wrap justify-content-around gap-3">
+            
                 {preguntas.map((pregunta) => (
-                    <CCard style={{ width: '30rem' }} key={pregunta.id}>
+                    <CCard style={{ width: '35rem' }} key={pregunta.id}>
                         <CCardBody className="d-flex flex-column gap-3">
                             <CCardTitle className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex gap-2 align-items-center">
@@ -109,8 +118,9 @@ function VerPregunta() {
                         </CCardBody>
                     </CCard>
                 ))}
-            </div>
-        </>
+            </CCardBody>
+        </ShadowedCard>
+
     );
 }
 

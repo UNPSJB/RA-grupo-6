@@ -24,7 +24,7 @@ function ELegirRol({ selectedRol, onChangeRol, error }: ELegirRolProps){
 
     return(
     <div>
-        <h5 className="mb-3 fw-semibold text-secondary" style={{ fontSize: "0.95rem" }}>
+        <h5 className="mb-3 fw-semibold " style={{ fontSize: "0.95rem" }}>
         Dirigido a
         </h5>
         <Form.Select

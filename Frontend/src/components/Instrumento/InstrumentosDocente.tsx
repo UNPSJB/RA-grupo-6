@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    CButton, 
-    CBadge, 
-    CSpinner, 
-    CAlert,
-    CCardBody,
-    CCardHeader,
-    CTable,
-    CTableHead,
-    CTableRow,
-    CTableHeaderCell, CTableBody, CTableDataCell
-} from '@coreui/react';
+import { CButton, CBadge, CSpinner, CAlert,CCardBody,CCardHeader,CTable,CTableHead,CTableRow,CTableHeaderCell, CTableBody, CTableDataCell} from '@coreui/react';
 import {capitalizarCadena} from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
 
@@ -118,7 +107,7 @@ function InstrumentosDocente() {
     const estaActivo = (instrumento: InstrumentoDocente) => {
         const hoy = new Date('2025-10-20')
         return new Date(instrumento.fecha_inicio) <= new Date(hoy) && 
-               new Date(instrumento.fecha_cierre) >= new Date(hoy);
+            new Date(instrumento.fecha_cierre) >= new Date(hoy);
     };
 
     if (cargando) {

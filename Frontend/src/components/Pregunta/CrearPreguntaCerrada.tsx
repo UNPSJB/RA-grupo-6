@@ -226,7 +226,7 @@ function CrearPreguntaCerrada({manejarPestaña, refrescarPreguntas}: Props) {
         <div className="d-flex justify-content-between align-items-center">
           <h6>Gestión de opciones</h6>
           <Button
-            className="show-options bg-transparent text-dark border-0 fw-semibold d-flex align-items-center gap-2"
+            className="show-options bg-transparent border-0 fw-semibold d-flex align-items-center gap-2"
             onClick={cambiarMostrar}
             >
             <i className="fa-solid fa-gear text-dark" style={{ fontSize: "13px" }} />

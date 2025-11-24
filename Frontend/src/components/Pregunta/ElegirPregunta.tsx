@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Form, Button, Card, Badge} from "react-bootstrap";
 import type { Pregunta} from "../types";
 import CrearPregunta from "./CrearPregunta";
 import { EnumTipoPregunta } from "../types";
@@ -56,11 +55,11 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
     <div>
       <div>
         <div className="mb-3">
-          <h5 className="mb-3 fw-semibold text-secondary" style={{ fontSize: "0.95rem" }}>
+          <h5 className="mb-3 fw-semibold" style={{ fontSize: "0.95rem" }}>
             Preguntas del Formulario
           </h5>
           {preguntasSeleccionadas.length > 0 && (
-            <CBadge bg="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
+            <CBadge color="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
               {preguntasSeleccionadas.length}{" "}
               {preguntasSeleccionadas.length === 1 ? "pregunta" : "preguntas"}
             </CBadge>
@@ -68,7 +67,8 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
         </div>
         
           <CButton 
-            variant="outline-primary" 
+            variant="outline"
+            color= "secondary" 
             size="sm"
             onClick={() => setShowModal(true)}
             className="d-flex align-items-center gap-2 mb-3"
@@ -91,7 +91,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <div className="d-flex gap-2 align-items-center">
                       <CBadge
-                        bg="primary"
+                        color="primary"
                         className="rounded-circle d-inline-flex justify-content-center align-items-center"
                         style={{ width: "24px", height: "24px", fontSize: "0.75rem" }}
                       >
@@ -99,7 +99,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
                       </CBadge>
 
                       <CBadge
-                        bg={pregunta.tipo === EnumTipoPregunta.cerrada? "secondary" : "success"}
+                        color={pregunta.tipo === EnumTipoPregunta.cerrada? "secondary" : "success"}
                         className="px-2 py-1"
                         style={{ fontSize: "0.7rem", fontWeight: "500" }}
                       >

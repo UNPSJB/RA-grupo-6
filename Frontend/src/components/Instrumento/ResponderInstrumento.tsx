@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
+import { Tabs, Tab} from 'react-bootstrap';
 import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail, PlantillaFormulario} from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';

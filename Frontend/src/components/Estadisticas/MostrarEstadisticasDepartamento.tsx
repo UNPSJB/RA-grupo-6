@@ -1,6 +1,7 @@
 import { GraficoRespondidos } from "../Graficos/GraficoRespondidos";
 import { useEffect, useState } from "react";
 import { CAlert, CButton, CCard, CCardBody, CCardHeader, CCol, CContainer, CRow } from "@coreui/react";
+import ShadowedCard from "../coreui-components/ShadowedCard";
 
 
 export interface EstadisticaBase {
@@ -109,7 +110,7 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
     const renderTarjetaEstadistica = (titulo: string, stats: EstadisticaBase, key: string) => (
         <CCol lg={4} md={6} xs={12} key={key} className="d-flex justify-content-center mb-2">
             <CCard className="shadow-none" style={{width: '100%', maxWidth: '400px'}}>
-                <CCardHeader className="bg-light text-center py-2">
+                <CCardHeader className="text-center py-2">
                     <h6 className="mb-0 fw-bold">{titulo}</h6>
                 </CCardHeader>
                 <div className="d-flex justify-content-center align-items-center" style={{minHeight: '200px'}}>
@@ -167,98 +168,115 @@ export function MostrarEstadisticasDepartamento({departamento_id} : {departament
 
     return (
         <CContainer className="py-4">
-            {/* Header */}
-            <div className="text-center mb-4">
-                <h2 className="mb-2">Estadísticas de Respuestas</h2>
-                <p className="text-muted mb-0">
-                    Visualiza las tasas de respuesta por carrera, materia y año
-                </p>
-            </div>
+            <ShadowedCard className="mb-4">
+                <CCardHeader>
+                    <div className="m-2">
+                        <h4 className="mb-2">Estadísticas de Respuestas</h4>
+                        <p className="text-medium-emphasis mb-0">
+                            Visualiza las tasas de respuesta por carrera, materia y año
+                        </p>
+                    </div>
+                </CCardHeader>
+                <CCardBody className="py-3">
+                    <CRow className="g-2">
+                        {["carrera", "detallada", "anio"].map((v) => (
+                            <CCol sm={4} key={v}>
+                                <CButton
+                                    color="primary"
+                                    variant={vistaActiva === v ? undefined : "outline"}
+                                    onClick={() => setVistaActiva(v)}
+                                    className="w-100 text-truncate"
+                                >
+                                    {v === "carrera" ? "Carreras" : v === "anio" ? "Años" : "Materias"}
+                                </CButton>
+                            </CCol>
+                        ))}
+                    </CRow>
+                </CCardBody>
+            </ShadowedCard>
 
-            {/* Botones de Vista Filtrada */}
 
-            <CCardBody className="py-3">
-                <CRow className="g-2">
-                    {["carrera", "detallada", "anio"].map((v) => (
-                        <CCol sm={4} key={v}>
-                            <CButton
-                                color="primary"
-                                variant={vistaActiva === v ? undefined : "outline"}
-                                onClick={() => setVistaActiva(v)}
-                                className="w-100 text-truncate"
-                            >
-                                {v === "carrera" ? "Carreras" : v === "anio" ? "Años" : "Materias"}
-                            </CButton>
-                        </CCol>
-                    ))}
-                </CRow>
-            </CCardBody>
-
-
-            {/* Contenido según Vista */}
             {!departamento_id ? (
-                <CAlert variant="warning" className="text-center py-4" color={""}>
+                <CAlert color="warning" className="text-center py-4">
                     <h5>Seleccione un departamento para comenzar</h5>
                     <p className="mb-0 fs-6">
                         Elige un departamento del filtro superior para visualizar las estadísticas de encuestas.
                     </p>
                 </CAlert>
             ) : vistaActiva === "carrera" ? (
-                <div>
-                    <h4 className="text-center mb-3 mt-4">Estadísticas por Carrera</h4>
-                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
-                        {Object.entries(datosAgrupadosPorCarrera).map(([carreraId, stats]) =>
-                            renderTarjetaEstadistica(
-                                stats.carrera_nombre || `Carrera ${carreraId}`, 
-                                stats, 
-                                `carrera-${carreraId}`
-                            )
-                        )}
-                        {Object.keys(datosAgrupadosPorCarrera).length === 0 && !cargando && (
-                            <CCol xs={12}>
-                                <CAlert variant="info" className="text-center py-4" color={""}>
-                                    No hay estadísticas disponibles para los filtros aplicados.
-                                </CAlert>
-                            </CCol>
-                        )}
-                    </CRow>
-                </div>
+                <ShadowedCard>
+                    <CCardHeader>
+                        <div className="m-2">
+                            <h4 className="mb-0">Estadísticas por Carrera</h4>
+                        </div>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow className="gx-3 justify-content-center">
+                            {Object.entries(datosAgrupadosPorCarrera).map(([carreraId, stats]) =>
+                                renderTarjetaEstadistica(
+                                    stats.carrera_nombre || `Carrera ${carreraId}`, 
+                                    stats, 
+                                    `carrera-${carreraId}`
+                                )
+                            )}
+                            {Object.keys(datosAgrupadosPorCarrera).length === 0 && !cargando && (
+                                <CCol xs={12}>
+                                    <CAlert color="info" className="text-center py-4">
+                                        No hay estadísticas disponibles para los filtros aplicados.
+                                    </CAlert>
+                                </CCol>
+                            )}
+                        </CRow>
+                    </CCardBody>
+                </ShadowedCard>
             ) : vistaActiva === "anio" ? (
-                <div>
-                    <h4 className="text-center mb-3 mt-4">Estadísticas por Año</h4>
-                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
-                        {Object.entries(datosAgrupadosPorAnio).map(([anio, stats]) =>
-                            renderTarjetaEstadistica(`Año ${anio}`, stats, `anio-${anio}`)
-                        )}
-                        {Object.keys(datosAgrupadosPorAnio).length === 0 && !cargando && (
-                            <CCol xs={12}>
-                                <CAlert variant="info" className="text-center py-4" color={""}>
-                                    No hay estadísticas disponibles para los filtros aplicados.
-                                </CAlert>
-                            </CCol>
-                        )}
-                    </CRow>
-                </div>
+                <ShadowedCard>
+                    <CCardHeader>
+                        <div className="m-2">
+                            <h4 className="mb-0">Estadísticas por Año</h4>
+                        </div>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow className="gx-3 justify-content-center">
+                            {Object.entries(datosAgrupadosPorAnio).map(([anio, stats]) =>
+                                renderTarjetaEstadistica(`Año ${anio}`, stats, `anio-${anio}`)
+                            )}
+                            {Object.keys(datosAgrupadosPorAnio).length === 0 && !cargando && (
+                                <CCol xs={12}>
+                                    <CAlert color="info" className="text-center py-4">
+                                        No hay estadísticas disponibles para los filtros aplicados.
+                                    </CAlert>
+                                </CCol>
+                            )}
+                        </CRow>
+                    </CCardBody>
+                </ShadowedCard>
             ) : vistaActiva === "detallada" ? (
-                <div>
-                    <h4 className="text-center mb-3 mt-4">Estadística Detallada por Materia</h4>
-                    <CRow className="gx-3 justify-content-center" style={{marginLeft: '0px', marginRight: '0px', marginTop: '8px', marginBottom: '16px'}}>
-                        {estadisticasDetalladas.map((item) =>
-                            renderTarjetaEstadistica(
-                                `${item.materia_nombre} - ${item.anio}`, 
-                                item, 
-                                `detalle-${item.instrumento_id}`
-                            )
-                        )}
-                        {estadisticasDetalladas.length === 0 && !cargando && (
-                            <CCol xs={12}>
-                                <CAlert variant="info" className="text-center py-4" color={""}>
-                                    No hay estadísticas disponibles para los filtros aplicados.
-                                </CAlert>
-                            </CCol>
-                        )}
-                    </CRow>
-                </div>
+                <ShadowedCard>
+                    <CCardHeader>
+                        <div className="m-2">
+                            <h4 className="mb-0">Estadística Detallada por Materia</h4>
+                        </div>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow className="gx-3 justify-content-center">
+                            {estadisticasDetalladas.map((item) =>
+                                renderTarjetaEstadistica(
+                                    `${item.materia_nombre} - ${item.anio}`, 
+                                    item, 
+                                    `detalle-${item.instrumento_id}`
+                                )
+                            )}
+                            {estadisticasDetalladas.length === 0 && !cargando && (
+                                <CCol xs={12}>
+                                    <CAlert color="info" className="text-center py-4">
+                                        No hay estadísticas disponibles para los filtros aplicados.
+                                    </CAlert>
+                                </CCol>
+                            )}
+                        </CRow>
+                    </CCardBody>
+                </ShadowedCard>
             ) : null}
         </CContainer>
     );

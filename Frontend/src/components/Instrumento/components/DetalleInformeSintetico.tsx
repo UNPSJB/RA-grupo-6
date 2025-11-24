@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Card, Button, ListGroup, Badge, Spinner, Accordion } from "react-bootstrap";
+import { Button, ListGroup, Badge, Spinner} from "react-bootstrap";
 import type {DetalleInformeSinteticoCompleto, DetalleInformeProps } from "../types"; 
 import { mockInformeSinteticoCompleto } from "../MockInformes";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InformePDFDocument from "./InformePDFDocument";
-import { CAccordion, CAccordionBody, CAccordionHeader, CAccordionItem, CButton, CCard, CCardBody } from "@coreui/react";
+import { CAccordion, CAccordionBody, CAccordionHeader, CAccordionItem, CButton,CCardBody, CSpinner } from "@coreui/react";
 import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 export default function DetalleInformeSintetico({ informe, onVolver }: DetalleInformeProps) {
@@ -23,10 +23,10 @@ export default function DetalleInformeSintetico({ informe, onVolver }: DetalleIn
   if (loading || !detalleCompleto) {
     return (
       <ShadowedCard className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-        <Card.Body className="p-4 p-md-5 text-center">
-          <Spinner animation="border" />
+        <CCardBody className="p-4 p-md-5 text-center">
+          <CSpinner color="primary" className="mb-3" />
           <p className="mt-2">Cargando detalle del informe sintético...</p>
-        </Card.Body>
+        </CCardBody>
       </ShadowedCard>
     );
   }

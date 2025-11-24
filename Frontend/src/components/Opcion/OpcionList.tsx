@@ -47,7 +47,7 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
 
       {opciones.length > 0 && (
         <CListGroup variant="flush" className="border p-3 rounded">
-          <p className="text-muted mb-3" style={{ fontSize: "0.875rem" }}>
+          <p className="mb-3" style={{ fontSize: "0.875rem" }}>
             Selecciona las opciones disponibles:
           </p>
           <div>

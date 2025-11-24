@@ -50,6 +50,8 @@ function CardMateria({ materia, onClick }: CardMateriaProps) {
                 onClick={onClick}
                 className="h-100 shadow-sm"
                 style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
                 <CCardBody className="p-4 d-flex flex-column justify-content-between">
                     <div>
@@ -65,12 +67,11 @@ function CardMateria({ materia, onClick }: CardMateriaProps) {
                             <CIcon icon={cilChevronRight} size="xl" className="text-medium-emphasis" />
                         </div>
 
-                        <div className={`bg-${estado.color}-subtle text-${estado.color} rounded p-3 mb-4 d-flex align-items-center gap-3`}>
-                            <CIcon icon={estado.icon} size="xxl" />
+                        <div className={`border border-${estado.color} border-opacity-50 bg-${estado.color} bg-opacity-25 rounded p-3 mb-4 d-flex align-items-center gap-3`}>
+                            <CIcon icon={estado.icon} size="xxl" className={`text-${estado.color}`} />
                             <div className="flex-grow-1 text-center">
-                                <div className="fw-bold display-6" style={{ lineHeight: "1" }}>
-                                    {materia.promedio_general.toFixed(1)}
-                                    <span className="fs-5">/ 4.0</span>
+                                <div className="fw-bold fs-3" style={{ lineHeight: "1" }}>
+                                    {materia.promedio_general.toFixed(1)} / 4.0
                                 </div>
                                 <small className="fw-medium">{estado.label}</small>
                             </div>
@@ -90,7 +91,7 @@ function CardMateria({ materia, onClick }: CardMateriaProps) {
                                 </div>
                             </CCol>
                         </CRow>
-                            </div>
+                    </div>
                 </CCardBody>
             </CCard>
         </CCol>
@@ -135,37 +136,37 @@ export function EstadisticasCatedras() {
     const materiasOrdenadas = [...materias].sort((a, b) => a.promedio_general - b.promedio_general);
 
     return (
-            <>
+        <>
             <ShadowedCard className="mb-4">
-            <CCardHeader>
-                <div className="m-2">
-                    <h4>Evaluación de Cátedras</h4>
-                    <p className="text-medium-emphasis">
-                        Cuatrimestre {cuatrimestre}
-                    </p>
-                </div>
-            </CCardHeader>
-            <CCardBody>
-                <CRow className="text-center">
-                    <CCol md={4}>
-                        <div className="text-medium-emphasis small text-uppercase">Total Cátedras</div>
-                        <div className="fs-4 fw-semibold">{totalCatedras}</div>
-                    </CCol>
-                    <CCol md={4}>
-                        <div className="text-medium-emphasis small text-uppercase">Promedio General</div>
-                        <div className="fs-4 fw-semibold text-primary">{promedioGeneral}</div>
-                    </CCol>
-                    <CCol md={4}>
-                        <div className="text-medium-emphasis small text-uppercase">Requieren Atención</div>
-                        <div className="fs-4 fw-semibold text-danger">{requierenAtencion}</div>
-                    </CCol>
-                </CRow>
-            </CCardBody>
-        </ShadowedCard>
-        <ShadowedCard >
                 <CCardHeader>
                     <div className="m-2">
-                        <h4 className="fw-semibold ">
+                        <h4>Evaluación de Cátedras</h4>
+                        <p className="text-medium-emphasis">
+                            Cuatrimestre {cuatrimestre}
+                        </p>
+                    </div>
+                </CCardHeader>
+                <CCardBody>
+                    <CRow className="text-center">
+                        <CCol md={4}>
+                            <div className="text-medium-emphasis small text-uppercase">Total Cátedras</div>
+                            <div className="fs-4 fw-semibold">{totalCatedras}</div>
+                        </CCol>
+                        <CCol md={4}>
+                            <div className="text-medium-emphasis small text-uppercase">Promedio General</div>
+                            <div className="fs-4 fw-semibold text-primary">{promedioGeneral}</div>
+                        </CCol>
+                        <CCol md={4}>
+                            <div className="text-medium-emphasis small text-uppercase">Requieren Atención</div>
+                            <div className="fs-4 fw-semibold text-danger">{requierenAtencion}</div>
+                        </CCol>
+                    </CRow>
+                </CCardBody>
+            </ShadowedCard>
+            <ShadowedCard>
+                <CCardHeader>
+                    <div className="m-2">
+                        <h4 className="fw-semibold">
                             Cátedras (ordenadas por prioridad de atención)
                         </h4>
                     </div>
@@ -186,7 +187,6 @@ export function EstadisticasCatedras() {
                             ))}
                         </CRow>
                     )}
-
                 </CCardBody>
             </ShadowedCard>
         </>

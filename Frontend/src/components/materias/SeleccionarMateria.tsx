@@ -41,6 +41,7 @@ function SeleccionarMateria() {
     useEffect(() => {
         const cargarMateriasConEncuestas = async () => {
             try {
+                // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
                 const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=${USUARIO_ACTUAL.id}&mostrar_respondidos=false`);
                 
                 if (!response.ok) {
@@ -49,6 +50,7 @@ function SeleccionarMateria() {
                 
                 const instrumentos = await response.json();
                 
+                // Mapear instrumentos a materias con encuesta activa
                 const materiasConEncuesta = instrumentos.map((instrumento: any) => ({
                     id: instrumento.materia.id,
                     nombre: instrumento.materia.nombre,
@@ -77,6 +79,7 @@ function SeleccionarMateria() {
             return;
         }
         
+        // Navegar al instrumento para responder encuesta
         navigate(`/responder-instrumento/${materia.instrumentoId}`, { 
             state: { 
                 materiaNombre: materia.nombre,
@@ -120,7 +123,7 @@ function SeleccionarMateria() {
                 
                 {materias.length > 0 ? (
                     <CTable className='border mb-1' hover responsive>
-                        <CTableHead color="light">
+                        <CTableHead>
                             <CTableRow>
                                 <CTableHeaderCell>Materia</CTableHeaderCell>
                                 <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>

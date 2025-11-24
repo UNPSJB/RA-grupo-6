@@ -127,8 +127,8 @@ export function PlanificarPeriodos() {
                     
                 }
 
-                if (fechaInicio && fechaCierre && (fechaInicio.getUTCMonth() == fechaCierre.getUTCMonth())){
-                    i = fechaInicio.getUTCDate();                 
+                if ((fechaInicio?.getUTCMonth() == fechaCierre?.getUTCMonth())){
+                    i = fechaInicio? fechaInicio.getUTCDate() : 1;                 
                 }
 
         }

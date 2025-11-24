@@ -100,7 +100,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
       </CInputGroup>
 
       {/* Campo de Contraseña */}
-      <CInputGroup className="mb-4">
+      <CInputGroup className="mb-2">
         <CInputGroupText>
           <CIcon icon={cilLockLocked} />
         </CInputGroupText>
@@ -128,30 +128,30 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
         </CAlert>
       )}
 
-      <CRow>
-        <CCol xs={6}>
-          <CButton
-            color="primary"
-            type="submit"
-            className="px-4"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <CSpinner size="sm"  aria-hidden="true" className="me-2" />
-                Cargando
-              </>
-            ) : (
-              'Ingresar'
-            )}
-          </CButton>
-        </CCol>
-        <CCol xs={6} className="text-end">
-           <CButton color="link" className="px-0" disabled={isSubmitting} style={{ whiteSpace: 'nowrap' }}>
-             ¿Olvidó su contraseña?
-           </CButton>
-        </CCol>
-      </CRow>
+      <div className="text-end">
+        <CButton color="link" className="text-decoration-none" disabled={isSubmitting}>
+          ¿Olvidó su contraseña?
+        </CButton>
+      </div>
+      
+      <div className="d-grid mb-2">
+        <CButton className='mt-2'
+          color="primary"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <CSpinner size="sm"  aria-hidden="true" className="me-2" />
+              Cargando...
+            </>
+          ) : (
+            'Ingresar'
+          )}
+        </CButton>
+      </div>
+      
+
     </CForm>
   );
 
@@ -199,7 +199,7 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
                 filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))'
               }}
             />
-            <h4 className="fw-bold text-primary mb-2">Sistema de Reportes Académicos</h4>
+            <h4 className="fw-bold mb-2" color='dark'>Sistema de Reportes Académicos</h4>
             <p className="text-muted mb-0">
               Universidad Nacional de la Patagonia San Juan Bosco
             </p>
@@ -208,17 +208,16 @@ export default function Login({ showModal = false, onClose }: LoginProps) {
 
         {/* Card de login centrada */}
         <CRow className="justify-content-center">
-          <CCol md={8} lg={6} xl={5}>
+          <CCol xs={12} sm={10} md={8} lg={6} xl={5}>
             <CCard className="shadow-lg">
               <CCardBody className="p-4 p-md-5">
                 {FormContent}
                 
                 {/* Link de registro */}
-                <div className="text-center mt-4">
-                  <p className="text-muted mb-2">¿No tienes cuenta?</p>
-                  <Link to="/register">
-                    <CButton color="primary" variant="outline" className="w-100">
-                      Registrarse
+                <div className="text-center mt-1">
+                  <Link to="/register" className="text-decoration-none">
+                    <CButton color="secondary"  className="w-100">
+                     Registrarse
                     </CButton>
                   </Link>
                 </div>

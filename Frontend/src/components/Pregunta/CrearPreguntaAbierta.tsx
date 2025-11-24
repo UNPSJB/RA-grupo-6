@@ -9,6 +9,7 @@ import ELegirRol from '../Rol/ElegirRol';
 import ElegirGrupoCuadro from '../GrupoCuadro/ElegirGrupoCuadro';
 import type { ErrorPreguntaAbierta } from '../types';
 import { Row } from 'react-bootstrap';
+import { capitalizarCadena, esTipoRespuestaValido } from '../Funciones';
 
 type Props = {
     manejarPestania: () => void;
@@ -26,8 +27,9 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
     const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
     const [obligatoria, setObligatoria] =useState<boolean>(false);
 
-    const [valorMinimo, setValorMinimo] = useState(0)
-    const [valorMaximo, setValorMaximo] = useState(0)
+    const [valorMinimo, setValorMinimo] = useState("")
+    const [valorMaximo, setValorMaximo] = useState("")
+    const [tipoDato, setTipoDato] = useState<string>(TipoRespuesta.TEXTO)
     
 
     const crearPregunta = (event: React.FormEvent) => {
@@ -47,26 +49,38 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         if (!rolSeleccionado) {
             nuevosErrores.rol = "Debes seleccionar un rol";
             erroresTotales++;
-    }
+        }
+
+        let tipoDatoRespuesta
+        if ((tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL)){
+
+            const tipoDatoCampo = (tipoDato == TipoRespuesta.RANGO_ENTERO? TipoRespuesta.ENTERO : TipoRespuesta.DECIMAL)
+            tipoDatoRespuesta = { tipo: tipoDato, valor_minimo: valorMinimo, valor_maximo: valorMaximo}
+
+            if (valorMinimo > valorMaximo){
+                nuevosErrores.minimoMayor = "El valor minimo debe ser menor que el valor maximo"
+                erroresTotales++;
+            }
+
+            if(! esTipoRespuestaValido(valorMinimo, JSON.stringify({tipo: tipoDatoCampo}))){
+                nuevosErrores.valorMinimo = `El valor minimo debe ser de tipo ${capitalizarCadena(tipoDatoCampo)}`
+                erroresTotales++;
+            } 
+
+            if(! esTipoRespuestaValido(valorMaximo, JSON.stringify({tipo: tipoDatoCampo}))){
+                nuevosErrores.valorMaximo = `El valor maximo debe ser de tipo ${capitalizarCadena(tipoDatoCampo)}`
+                erroresTotales++;
+            }  
+
+        }
+        else{
+            tipoDatoRespuesta = { tipo: tipoDato }
+        }
+
 
         setErrores(nuevosErrores);
 
         if (erroresTotales > 0) return;
-
-        let tipoDatoRespuesta
-        if(tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL){
-
-            tipoDatoRespuesta = {
-                tipo: tipoDato,
-                valor_minimo: valorMinimo,
-                valor_maximo: valorMaximo
-            }
-        }
-        else {
-            tipoDatoRespuesta = {
-                tipo: tipoDato
-            }
-        }
 
         const nuevaPregunta = {
             texto: texto,
@@ -81,8 +95,6 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
             tipo_respuesta: JSON.stringify(tipoDatoRespuesta),
             pregunta_fuente_id: null
         };
-
-        console.log("Payload que se envía:", nuevaPregunta);
 
         fetch("http://127.0.0.1:8000/preguntas/abierta",{
             method: "POST",
@@ -103,33 +115,50 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         });
     };
 
-      useEffect(() => {
+    useEffect(() => {
         const nuevosErrores = { ...errores };
         let huboCambios = false;
     
         if (texto.trim() && nuevosErrores.texto) {
-          delete nuevosErrores.texto;
-          huboCambios = true;
+            delete nuevosErrores.texto;
+            huboCambios = true;
         }
     
         if (grupoSeleccionado !== 0 && nuevosErrores.grupo) {
-          delete nuevosErrores.grupo;
-          huboCambios = true;
+            delete nuevosErrores.grupo;
+            huboCambios = true;
         }
     
         if (rolSeleccionado && nuevosErrores.rol) {
-          delete nuevosErrores.rol;
-          huboCambios = true;
+            delete nuevosErrores.rol;
+            huboCambios = true;
         }
-    
+
+        if ((tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL)){
+
+            const tipoDatoCampo = (tipoDato == TipoRespuesta.RANGO_ENTERO? TipoRespuesta.ENTERO : TipoRespuesta.DECIMAL)
+
+            if (((valorMinimo <= valorMaximo) && nuevosErrores.minimoMayor)){
+                delete nuevosErrores.minimoMayor;
+                huboCambios = true;
+            }
+
+            if (esTipoRespuestaValido(valorMinimo, JSON.stringify({tipo: tipoDatoCampo})) && nuevosErrores.valorMinimo){
+                delete nuevosErrores.valorMinimo;
+                huboCambios = true;
+            }
+
+            if (esTipoRespuestaValido(valorMaximo, JSON.stringify({tipo: tipoDatoCampo})) && nuevosErrores.valorMaximo){
+                delete nuevosErrores.valorMaximo;
+                huboCambios = true;
+            }
+        }
+        
         if (huboCambios) {
-          setErrores(nuevosErrores);
+            setErrores(nuevosErrores);
         }
-      }, [texto, grupoSeleccionado, rolSeleccionado, errores]);
+    }, [texto, grupoSeleccionado, rolSeleccionado, tipoDato, valorMinimo, valorMaximo,errores]);
     
-
-    const [tipoDato, setTipoDato] = useState<string>(TipoRespuesta.TEXTO)
-
     return (
         <>
             <div className="contenedor-scroll"style={{maxHeight: '400px', 
@@ -211,29 +240,29 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
 
                         {(tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL) && 
 
-                            <Form>
-                                <Row>
-                                    <Col className='text-muted'>
-                                        <Form.Group>
-                                            <Form.Control 
-                                                value={valorMinimo} 
-                                                onChange={(e) => setValorMinimo(Number(e.target.value))} 
-                                                placeholder="Ingrese el valor minimo..." 
-                                            />
-                                        </Form.Group>
-                                    </Col>
+                            <Row>
+                                <Col className='text-muted'>
+                                    <Form.Group>
+                                        <Form.Control 
+                                            onChange={(e) => setValorMinimo(e.target.value)} 
+                                            placeholder="Ingrese el valor minimo..." 
+                                        />
+                                    </Form.Group>
+                                    {errores.valorMinimo && <div className="form-text text-danger">{errores.valorMinimo}</div>}
+                                </Col>
 
-                                    <Col className='text-muted'>
-                                        <Form.Group>
-                                            <Form.Control 
-                                                value={valorMaximo} 
-                                                onChange={(e) => setValorMaximo(Number(e.target.value))} 
-                                                placeholder="Ingrese el valor maximo..." 
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Form>
+                                <Col className='text-muted'>
+                                    <Form.Group>
+                                        <Form.Control 
+                                            onChange={(e) => setValorMaximo(e.target.value)} 
+                                            placeholder="Ingrese el valor maximo..." 
+                                        />
+                                    </Form.Group>
+                                    {errores.valorMaximo && <div className="form-text text-danger">{errores.valorMaximo}</div>}
+                                </Col>
+
+                                {errores.minimoMayor && <div className="form-text text-danger">{errores.minimoMayor}</div>}
+                            </Row>
                         }
 
                     </div>

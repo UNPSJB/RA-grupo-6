@@ -1,10 +1,10 @@
 import type { InstrumentoDetail} from "../types";
-import { capitalizarCadena} from "../Funciones";
+import { capitalizarCadena, separarPalabras} from "../Funciones";
 import { useEffect, useState } from "react";
 import { CTable } from "@coreui/react";
 
 
-function obtenerFilas(datosInstrumento: any){
+export function obtenerFilas(datosInstrumento: any){
 
     let filas = []
 
@@ -14,14 +14,12 @@ function obtenerFilas(datosInstrumento: any){
                 
                 filas.push(
                     <td key={clave}>
-                    <p className="mb-0 text-center">
-                        <span className='fw-bold'> {capitalizarCadena(clave)}</span> {String(valor)}
-                    </p>
+                    <p className='fw-bold mb-0 text-center'> {capitalizarCadena(separarPalabras(clave))} </p>
+                    <p className="mb-0 text-center"> {String(valor)} </p>
                 </td>
             )
         }
     }
-
     return filas
 
 }

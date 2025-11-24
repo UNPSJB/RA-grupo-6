@@ -14,6 +14,7 @@ export type Pregunta = {
     estadistica: boolean
     puede_modificarse: boolean
     puede_eliminarse: boolean
+    obligatoria:boolean
     grupo_pregunta: GrupoPregunta
     tipo_respuesta: string | null
 }
@@ -189,6 +190,9 @@ export type ErrorPreguntaAbierta = {
   texto?: string;
   grupo?: string;
   rol?: string;
+  minimoMayor?: string;
+  valorMinimo?: string;
+  valorMaximo?: string;
 };
 
 export type PlantillaFormulario = {

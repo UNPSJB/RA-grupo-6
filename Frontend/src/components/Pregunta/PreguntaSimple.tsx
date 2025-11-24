@@ -25,19 +25,19 @@ export function getMensajeError(jsonTipoDato: string){
             mensaje = "Formato inválido. Por favor, ingrese un numero entero."
             break;
 
-        case (valorTipoDato.tipo = TipoRespuesta.DECIMAL):
+        case (TipoRespuesta.DECIMAL):
             mensaje = "Formato inválido. Por favor, ingrese un numero decimal."
             break;
 
-        case(valorTipoDato.tipo = TipoRespuesta.TEXTO):
+        case(TipoRespuesta.TEXTO):
             mensaje = "Formato inválido. Por favor, ingrese un texto."
             break;
     
-        case(valorTipoDato.tipo = TipoRespuesta.RANGO_ENTERO):
+        case(TipoRespuesta.RANGO_ENTERO):
             mensaje = `Formato inválido. Por favor, ingrese un numero entero comprendido entre ${valorTipoDato.valor_minimo} y ${valorTipoDato.valor_maximo}.`
             break;
     
-        case (valorTipoDato.tipo = TipoRespuesta.RANGO_DECIMAL):
+        case (TipoRespuesta.RANGO_DECIMAL):
             mensaje = `Formato inválido. Por favor, ingrese un numero decimal comprendido entre ${valorTipoDato.valor_minimo} y ${valorTipoDato.valor_maximo}.`
         break;
     
@@ -97,12 +97,13 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar, instrumento_
                 <>
                     <Form.Control
                         as="textarea"
-                        rows={4}
                         value={valor}
-                        onChange={(e) => {setValor(e.target.value); pregunta.tipo_respuesta? setRespuestaValida(esTipoRespuestaValido(e.target.value, pregunta.tipo_respuesta)) : null;  onActualizar(pregunta.id, valor, undefined)}}
+                        rows={4}
+                        onChange={(e) => {setValor(e.target.value); pregunta.tipo_respuesta? setRespuestaValida(esTipoRespuestaValido(e.target.value, pregunta.tipo_respuesta)) : null;  onActualizar(pregunta.id, e.target.value, undefined)}}
                         placeholder="Escriba su respuesta..."
                         className="input-pregunta"
                     />
+                    
                     {!respuestaValida && 
                     
                         <Alert key={pregunta.id} className="mt-3" variant='danger'>

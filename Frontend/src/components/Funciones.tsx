@@ -13,6 +13,23 @@ export function capitalizarCadena(cadena: string): string {
     return cadenaCapitalizada
 }
 
+export function separarPalabras(cadena: string) : string {
+
+    let nuevaCadena = ""
+
+    for(let i = 0; i < cadena.length; i++){
+        if ((cadena[i].charCodeAt(0) >= 65) && (cadena[i].charCodeAt(0)  <= 90)){
+            nuevaCadena = nuevaCadena + " " + cadena[i]
+        }
+        else{
+            nuevaCadena = nuevaCadena + cadena[i]
+        }
+    }
+    return nuevaCadena
+}
+
+
+
 export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
 
     const valorTipoDato = JSON.parse(jsonTipoDato)
@@ -58,11 +75,11 @@ export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
         }
     }
 
-    if (TipoRespuesta.ENTERO || TipoRespuesta.DECIMAL){
-        if((resultado <= Number(valorTipoDato.valor_minimo)) && (resultado >= Number(valorTipoDato.valor_maximo)) ){
+    if ((valorTipoDato.tipo == TipoRespuesta.RANGO_ENTERO) || (valorTipoDato.tipo == TipoRespuesta.RANGO_DECIMAL)){
+        if((Number(valorTipoDato.valor_minimo) > resultado) || (resultado > Number(valorTipoDato.valor_maximo) ) ){
             esValido = false;
         }
     }
-    
+
     return esValido
 }

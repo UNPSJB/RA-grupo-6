@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Badge, Button, ListGroup } from "react-bootstrap";
 import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta } from "../types";
 import { ModalRespuestasAbiertas } from "./ModalRespuestasAbiertas";
-import { CBadge, CButton, CListGroup, CListGroupItem } from "@coreui/react";
+import { CBadge, CButton, CCardHeader, CCardTitle, CListGroup, CListGroupItem } from "@coreui/react";
 
 
 export function Llamadora({ id_instrumento }: { id_instrumento: number }) {
@@ -23,6 +23,7 @@ export function Llamadora({ id_instrumento }: { id_instrumento: number }) {
 export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
   const [respuestasMostradas, setRespuestasMostradas] = useState<Pregunta[]>([]);
   const [mostrar, setMostrar] = useState(false);
+  const [grupoActivoId, setGrupoActivoId] = useState<number | null>(null);
 
   
   const todasLasRespuestas = instrumento?.respuestas_formulario?.flatMap(rf => rf.respuestas) ?? [];
@@ -32,6 +33,7 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
       const grupos = obtenerGrupos();
       if (grupos.length > 0) {
         const primerGrupo = grupos[0];
+        setGrupoActivoId(primerGrupo.id);
         setRespuestasMostradas(
           instrumento.plantilla_formulario.preguntas.filter(
             p => p.grupo_pregunta.id === primerGrupo.id
@@ -62,23 +64,28 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
   }
 
   return (
-    <div className="container border rounded p-3">
-      <div className="d-flex align-items-end justify-content-between m-3">
-        <h3>
-          <i className="fa-solid fa-graduation-cap m-3"></i> Respuestas de los estudiantes
-        </h3>
-        <h4>{instrumento?.plantilla_formulario.preguntas.length} preguntas</h4>
-      </div>
-
+    <>
+      <CCardHeader className='border-0 rounded'>
+        <div className='m-2'>
+        <CCardTitle>
+          {/* <i className="fa-solid fa-graduation-cap"></i>  */}
+          Respuestas de los estudiantes
+        
+        </CCardTitle>
+        <p className='text-muted'>{instrumento?.plantilla_formulario.preguntas.length} preguntas</p>
+        </div>
+      </CCardHeader>
       <div className="choose-group d-flex gap-3 m-3">
         {obtenerGrupos().map(grupo => (
           <CButton
+            color={grupoActivoId === grupo.id ? 'primary' : 'outline-primary'}
             key={grupo.id}
-            onClick={() =>
+            onClick={() => {
+              setGrupoActivoId(grupo.id);
               setRespuestasMostradas(
                 instrumento?.plantilla_formulario.preguntas.filter(p => p.grupo_pregunta.id === grupo.id) ?? []
-              )
-            }
+              );
+            }}
           >
             Grupo {grupo.letra}
           </CButton>
@@ -88,15 +95,15 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
       {respuestasMostradas.map((pregunta, numero) => (
         <CListGroup key={pregunta.id} className="border p-3 mb-3">
           <div className="d-flex gap-3">
-            <CBadge className="p-2 align-content-center">
+            <CBadge color='primary'>
               {pregunta.grupo_pregunta.letra}{numero + 1}
             </CBadge>
-            <CBadge className="p-2 align-content-center">Pregunta {pregunta.tipo}</CBadge>
+            <CBadge color='secondary'>Pregunta {pregunta.tipo}</CBadge>
           </div>
 
           <p className="mb-3 mt-3">{pregunta.texto}</p>
 
-          {pregunta.tipo.toLowerCase() === EnumTipoPregunta.cerrada.toLowerCase() ? (
+          {pregunta.tipo?.toLowerCase() === EnumTipoPregunta.cerrada.toLowerCase() ? (
             pregunta.opciones.map(opcion => {
               const total = obtenerCantRespuestas(pregunta.id);
               const cantOpcion = obtenerCantRespuestasOpcion(pregunta.id, opcion.texto);
@@ -110,7 +117,7 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
                   <p className="mb-0">{opcion.texto}</p>
                   <div className="d-flex gap-3">
                     <p className="mb-0">({cantOpcion} respuestas)</p>
-                    <CBadge className="p-2">{porcentaje}%</CBadge>
+                    <CBadge color='info' className="p-2">{porcentaje}%</CBadge>
                   </div>
                 </CListGroupItem>
               );
@@ -146,6 +153,6 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
           )}
         </CListGroup>
       ))}
-    </div>
+    </>
   );
 }

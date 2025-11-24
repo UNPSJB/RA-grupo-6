@@ -151,8 +151,9 @@ function InstrumentosDocente() {
                     
                     {instrumentos.length > 0 ? (
                         <CTable className='border mb-1'  hover responsive>
-                            <CTableHead color="light">
-                                <CTableRow>
+                            <CTableHead >
+                                
+                                <CTableRow >
                                     <CTableHeaderCell>Materia</CTableHeaderCell>
                                     <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
                                     <CTableHeaderCell>Vencimiento</CTableHeaderCell>
@@ -186,8 +187,7 @@ function InstrumentosDocente() {
                                                     handleSeleccionarInstrumento(instrumento);
                                                 }}
                                             >
-                                                <i className="fas fa-edit me-2"></i>
-                                                Completar Informe
+                                                Completar
                                             </CButton>
                                         </CTableDataCell>
                                     </CTableRow>
@@ -196,13 +196,15 @@ function InstrumentosDocente() {
                             </CTableBody>
                         </CTable>
                     ) : (
-                        <div className="text-center py-5">
-                            <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>
-                            <h5 className="text-medium-emphasis mb-3">No hay informes de cátedra pendientes</h5>
-                            <p className="text-medium-emphasis">
+                        <CAlert color="info" className="text-center mt-4">
+                            <div className="mb-3">
+                                <i className="fas fa-inbox fa-3x text-medium-emphasis"></i>
+                            </div>
+                            <h5 className="mb-3">No hay informes de cátedra pendientes</h5>
+                            <p className="mb-0">
                                 No se encontraron informes de cátedra pendientes para completar.
                             </p>
-                        </div>
+                        </CAlert>
                     )}
                 </CCardBody>
             </ShadowedCard>

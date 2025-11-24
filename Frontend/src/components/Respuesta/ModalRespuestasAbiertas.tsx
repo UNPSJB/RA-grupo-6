@@ -8,51 +8,45 @@ export function ModalRespuestasAbiertas({ListaRespuestas, pregunta, numeroPregun
     return (
         <CModal size="xl" visible={mostrar} onClose={() => setMostrar(false)} >
                 <CModalHeader closeButton className=" m-3 align-items-start">
-                    <CModalTitle> 
-                        <div className="d-flex gap-3 ">
-
-                            <CBadge className="p-2 align-content-center">
-                                {pregunta.grupo_pregunta.letra}{numeroPregunta + 1}
-                            </CBadge>
-
-                            <CBadge className="p-2 align-content-center">
-                                Pregunta {pregunta.tipo}
-                            </CBadge>
-                        </div>
-        
-                        <h4 className="mb-0 mt-3">
+                    <div className='m-2'> 
+                        <CBadge className='m-1' color='primary' >
+                            {pregunta.grupo_pregunta.letra}{numeroPregunta + 1}
+                        </CBadge>
+                        <CBadge color='secondary' >
+                            Pregunta {pregunta.tipo}
+                        </CBadge>
+                        <h4 className="mb-0 mt-2">
                             {pregunta.texto}
                         </h4>
-
-                        <h5 className="mb-0 mt-3 fw-normal">
+        
+                        <p className="mb-0 mt-2 text-muted">
                             {ListaRespuestas.filter((respuesta) => respuesta.pregunta.id === pregunta.id).length} respuestas totales
-                        </h5>
-                    </CModalTitle>
+                        </p>
+                    </div>
                 </CModalHeader>
 
 
                 <CModalBody className="border rounded m-3">
                     <div className="contenedor-scroll" style={{maxHeight: '400px', overflowY: 'auto',  padding: '1.25rem'}}>
                         {ListaRespuestas.filter((respuesta) => respuesta.pregunta.id === pregunta.id).map((respuesta, numero) => 
-                                
                                 respuesta.pregunta.id == pregunta.id &&
-                                <CListGroupItem className="mb-3 rounded p-3" style={{border: "1px solid #dee2e6", borderLeft: "5px solid #0d6efd"}}  >
+                        <CListGroupItem className="mb-3 rounded p-3" style={{border: "1px solid #dee2e6", borderLeft: "5px solid #0d6efd"}}  >
 
-                                        <CBadge className="mb-2">
-                                            Estudiante {numero +  1} 
-                                        </CBadge>
+                                <CBadge color='info' className="mb-2">
+                                    Estudiante {numero +  1} 
+                                </CBadge>
 
-                                        <p className="mb-0 ms-2">
-                                            {respuesta.texto}
-                                        </p>
-                                </CListGroupItem>    
+                                <p className="mb-0 ms-2">
+                                    {respuesta.texto}
+                                </p>
+                        </CListGroupItem>    
 
                         )}
                     </div>
                 </CModalBody>
 
                 <CModalFooter>
-                    <CButton onClick={() => setMostrar(false)} variant="primary"> Cerrar </CButton>
+                    <CButton onClick={() => setMostrar(false)} color="primary"> Cerrar </CButton>
                 </CModalFooter>
             </CModal>
     );

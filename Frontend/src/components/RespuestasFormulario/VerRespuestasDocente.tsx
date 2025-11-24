@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Spinner, Alert, Badge, ListGroup } from 'react-bootstrap';
+import ShadowedCard from '../coreui-components/ShadowedCard';
+import { CCard, CCardBody, CCardHeader, CHeader } from '@coreui/react';
 
 interface InstrumentoRespondido {
     id: number;
@@ -64,88 +66,79 @@ export default function VerRespuestasDocente() {
     }
 
     return (
-        <Container className="mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                        <Card.Body className="p-4 p-md-5">
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <h1 className="fw-bold mb-2">Informes de Cátedra Respondidos</h1>
-                                        <p className="text-muted mb-0">
-                                            Selecciona un informe para ver tus respuestas
-                                        </p>
+        <ShadowedCard>
+            <CCardHeader>
+                <div className="m-2">
+                    <h4> Informes de Cátedra Respondidos</h4>
+                    <p className="text-muted mb-0">
+                        Selecciona un informe para ver tus respuestas
+                    </p>
+                </div>
+            </CCardHeader>
+            <CCardBody>
+                {mensaje && (
+                    <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                        {mensaje}
+                    </Alert>
+                )}
+
+                {instrumentos.length > 0 ? (
+                    <ListGroup variant="flush">
+                        {instrumentos.map((instrumento) => (
+                            <ListGroup.Item
+                                key={instrumento.id}
+                                className="d-flex justify-content-between align-items-center p-4"
+                                style={{ borderBottom: '1px solid #e9ecef' }}
+                            >
+                                <div className="flex-grow-1">
+                                    <div className="fw-bold fs-5 mb-1">{instrumento.materia.nombre}</div>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <small className="text-muted">
+                                            Fecha de envío: {new Date(instrumento.fecha_envio).toLocaleDateString()}
+                                        </small>
+                                        <Badge bg="primary" className="ms-2">
+                                            Informe de Cátedra
+                                        </Badge>
+                                        {instrumento.plantilla_formulario && (
+                                            <Badge bg="success" className="ms-2">
+                                                Formulario respondido
+                                            </Badge>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
 
-                            {mensaje && (
-                                <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
-                                    {mensaje}
-                                </Alert>
-                            )}
-
-                            {instrumentos.length > 0 ? (
-                                <ListGroup variant="flush">
-                                    {instrumentos.map((instrumento) => (
-                                        <ListGroup.Item
-                                            key={instrumento.id}
-                                            className="d-flex justify-content-between align-items-center p-4"
-                                            style={{ borderBottom: '1px solid #e9ecef' }}
-                                        >
-                                            <div className="flex-grow-1">
-                                                <div className="fw-bold fs-5 mb-1">{instrumento.materia.nombre}</div>
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <small className="text-muted">
-                                                        Fecha de envío: {new Date(instrumento.fecha_envio).toLocaleDateString()}
-                                                    </small>
-                                                    <Badge bg="primary" className="ms-2">
-                                                        Informe de Cátedra
-                                                    </Badge>
-                                                    {instrumento.plantilla_formulario && (
-                                                        <Badge bg="success" className="ms-2">
-                                                            Formulario respondido
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() =>
-                                                    navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
-                                                        state: {
-                                                            materiaNombre: instrumento.materia.nombre,
-                                                            fechaEnvio: instrumento.fecha_envio,
-                                                            instrumentoId: instrumento.instrumento_id || instrumento.id,
-                                                            plantillaFormularioId: instrumento.plantilla_formulario?.id,
-                                                            tipoInstrumento: 'INFORME_CATEDRA'
-                                                        }
-                                                    })
-                                                }
-                                                className="px-4 py-2"
-                                            >
-                                                <i className="fas fa-eye me-2"></i>
-                                                Ver Respuestas
-                                            </Button>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            ) : (
-                                <div className="text-center py-5">
-                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <h5 className="text-muted mb-3">No hay informes de cátedra respondidos</h5>
-                                    <p className="text-muted">
-                                        Aún no has respondido ningún informe de cátedra.
-                                    </p>
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
-        </Container>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() =>
+                                        navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
+                                            state: {
+                                                materiaNombre: instrumento.materia.nombre,
+                                                fechaEnvio: instrumento.fecha_envio,
+                                                instrumentoId: instrumento.instrumento_id || instrumento.id,
+                                                plantillaFormularioId: instrumento.plantilla_formulario?.id,
+                                                tipoInstrumento: 'INFORME_CATEDRA'
+                                            }
+                                        })
+                                    }
+                                    className="px-4 py-2"
+                                >
+                                    <i className="fas fa-eye me-2"></i>
+                                    Ver Respuestas
+                                </Button>
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                ) : (
+                    <div className="text-center py-5">
+                        <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 className="text-muted mb-3">No hay informes de cátedra respondidos</h5>
+                        <p className="text-muted">
+                            Aún no has respondido ningún informe de cátedra.
+                        </p>
+                    </div>
+                )}
+            </CCardBody>
+        </ShadowedCard>
     );
 }

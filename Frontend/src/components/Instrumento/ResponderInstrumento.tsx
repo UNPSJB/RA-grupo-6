@@ -15,7 +15,8 @@ import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
 import { DatosInstrumento } from './DatosInstrumento';
 import { DatosInstrumentoSintetico } from './DatosInstrumentoSintetico';
-import { CAlert, CButton, CCard, CCardBody, CContainer, CSpinner } from '@coreui/react';
+import { CAlert, CButton, CCard, CCardBody, CCardHeader, CContainer, CSpinner } from '@coreui/react';
+import ShadowedCard from '../coreui-components/ShadowedCard';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -253,32 +254,150 @@ export default function ResponderInstrumento() {
     const esPaginaInfoGeneral = esInformeSintetico && paginaActual === 0;
 
     return (
-        <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
-            <CContainer style={{ maxWidth: '1200px' }}>
-                <CButton variant="outline" className="mb-3" onClick={() => navigate(rutaVolver)}>
+    <>
+            <CButton variant="outline" className="mb-3" onClick={() => navigate(rutaVolver)}>
                     <i className="fa-solid fa-arrow-left"></i> Volver{' '}
                     {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
-                </CButton>
+            </CButton>
+            <ShadowedCard >
+                <CCardHeader>
+                    <div className="m-2">
+                        <h4 >
+                            {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}
+                        </h4>
+                        <p className="text-muted mb-0">
+                            {esDocente
+                                ? 'Complete el informe de cátedra'
+                                : 'Complete la encuesta con sus respuestas'}
+                        </p>
+                    </div>
+                </CCardHeader>
+                <CCardBody className="p-4">
 
-                <CCard className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
-                    <CCardBody className="p-4">
+                    {instrumentoSeleccionado && tabActiva === 'responder' && (
+                        <DatosInstrumento instrumento={instrumentoSeleccionado} />
+                    )}
 
-                        {instrumentoSeleccionado && tabActiva === 'responder' && (
-                            <DatosInstrumento instrumento={instrumentoSeleccionado} />
-                        )}
+                    
 
-                        <div className="text-center mb-4">
-                            <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
-                                {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}
-                            </h1>
-                            <p className="text-muted mb-3">
-                                {esDocente
-                                    ? 'Complete el informe de cátedra'
-                                    : 'Complete la encuesta con sus respuestas'}
-                            </p>
-                        </div>
+                    {tabActiva === 'responder' && (
+                        <NavegacionPaginas
+                            paginaActual={paginaActual}
+                            totalPaginas={totalPaginas}
+                            gruposOrganizados={gruposOrganizados}
+                            respuestas={respuestas}
+                            respuestasMultiples={respuestasMultiples}
+                            mostrarResumen={mostrarResumen}
+                            mostrarProgreso={true}
+                            mostrarIndicadores={true}
+                            mostrarBotones={false}
+                            mostrarAlerta={true}
+                            onAvanzar={avanzarPagina}
+                            onRetroceder={retrocederPagina}
+                            onIrAPagina={irAPagina}
+                            plantillaFormulario={plantillaFormulario}
+                        />
+                    )}
 
-                        {tabActiva === 'responder' && (
+                    {esDocente && instrumentoSeleccionado && (
+                        <Tabs 
+                            activeKey={tabActiva}
+                            onSelect={(k) => setTabActiva(k as 'responder' | 'estadisticas')}
+                            className="mb-4"
+                        >
+                            <Tab eventKey="responder" title="Responder Informe"></Tab>
+                            <Tab eventKey="estadisticas" title="Ver Estadísticas"></Tab>
+                        </Tabs>
+                    )}
+
+                    {tabActiva === 'responder' && !mostrarResumen && grupoActual && (
+                        <>
+                            {esPaginaInfoGeneral && (
+                                <div>
+                                    <div
+                                        className="mb-4 p-3 rounded"
+                                        style={{
+                                            backgroundColor: '#f0f7ff',
+                                            borderLeft: '4px solid #816767ff',
+                                        }}
+                                    >
+                                        <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                            {grupoActual.nombre}
+                                        </h4>
+                                        <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                            Vista de todas las actividades curriculares asociadas a este informe
+                                        </p>
+                                    </div>
+
+                                    {instrumentoSeleccionado && (
+                                        <DatosInstrumentoSintetico 
+                                            instrumento={instrumentoSeleccionado}
+                                            onDatosListos={handleDatosInfoGeneralListos}
+                                        />
+                                    )}
+                                </div>
+                            )}
+
+                            {!esPaginaInfoGeneral && (
+                                <>
+                                    <CCardHeader
+                                        className="mb-4 p-3 rounded border-0"
+                                        
+                                    >
+                                        <h4 className="fw-bold mb-1" >
+                                            {grupoActual.nombre}
+                                        </h4>
+                                        <p className="text-muted mb-0 text-dark" style={{ fontSize: '0.9rem' }}>
+                                            {grupoActual.tipo === 'multiple'
+                                                ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
+                                                : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
+                                        </p>
+                                    </CCardHeader>
+
+                                    {grupoActual.tipo === 'simple' ? (
+                                        grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                            <PreguntaSimple
+                                                key={pregunta.id}
+                                                pregunta={pregunta}
+                                                index={idx}
+                                                respuesta={obtenerRespuesta(pregunta.id)}
+                                                onActualizar={actualizarRespuesta}
+                                                instrumento_id={Number(instrumentoIdParam)}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div>
+                                            {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                                <div key={instanciaIdx} className="mb-4">
+                                                    {grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                        <PreguntaMultiple
+                                                            key={pregunta.id}
+                                                            pregunta={pregunta}
+                                                            index={idx}
+                                                            instancia={instancia}
+                                                            instanciaIndex={instanciaIdx}
+                                                            grupoCuadroId={grupoActual.id}
+                                                            totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
+                                                            onActualizar={actualizarRespuestaMultiple}
+                                                            onEliminar={eliminarInstancia}
+                                                            instrumento={instrumentoSeleccionado}
+                                                            instrumento_id={Number(instrumentoIdParam)}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            ))}
+
+                                            <AgregarInstancia
+                                                grupoCuadroId={grupoActual.id}
+                                                preguntasDelGrupo={grupoActual.preguntas}
+                                                instancias={respuestasMultiples[grupoActual.id] || []}
+                                                onAgregar={agregarInstanciaRespuestas}
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
                             <NavegacionPaginas
                                 paginaActual={paginaActual}
                                 totalPaginas={totalPaginas}
@@ -286,161 +405,40 @@ export default function ResponderInstrumento() {
                                 respuestas={respuestas}
                                 respuestasMultiples={respuestasMultiples}
                                 mostrarResumen={mostrarResumen}
-                                mostrarProgreso={true}
-                                mostrarIndicadores={true}
-                                mostrarBotones={false}
+                                mostrarProgreso={false}
+                                mostrarIndicadores={false}
+                                mostrarBotones={true}
                                 mostrarAlerta={true}
                                 onAvanzar={avanzarPagina}
                                 onRetroceder={retrocederPagina}
                                 onIrAPagina={irAPagina}
                                 plantillaFormulario={plantillaFormulario}
                             />
-                        )}
+                        </>
+                    )}
 
-                        {esDocente && instrumentoSeleccionado && (
-                            <Tabs 
-                                activeKey={tabActiva}
-                                onSelect={(k) => setTabActiva(k as 'responder' | 'estadisticas')}
-                                className="mb-4"
-                            >
-                                <Tab eventKey="responder" title="Responder Informe"></Tab>
-                                <Tab eventKey="estadisticas" title="Ver Estadísticas"></Tab>
-                            </Tabs>
-                        )}
+                    {tabActiva === 'responder' && mostrarResumen && (
+                        <ResumenRespuestas
+                            gruposOrganizados={gruposOrganizados}
+                            respuestas={respuestas}
+                            respuestasMultiples={respuestasMultiples}
+                            todasRespondidas={todasRespondidas()}
+                            enviando={enviando}
+                            esDocente={esDocente}
+                            onRetroceder={retrocederPagina}
+                            onIrAPagina={irAPagina}
+                            onEnviar={enviarRespuestas}
+                            onExito={() => navigate(rutaVolver)}
+                        />
+                    )}
 
-                        {tabActiva === 'responder' && !mostrarResumen && grupoActual && (
-                            <>
-                                {esPaginaInfoGeneral && (
-                                    <div>
-                                        <div
-                                            className="mb-4 p-3 rounded"
-                                            style={{
-                                                backgroundColor: '#f0f7ff',
-                                                borderLeft: '4px solid #816767ff',
-                                            }}
-                                        >
-                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
-                                                {grupoActual.nombre}
-                                            </h4>
-                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                                                Vista de todas las actividades curriculares asociadas a este informe
-                                            </p>
-                                        </div>
-
-                                        {instrumentoSeleccionado && (
-                                            <DatosInstrumentoSintetico 
-                                                instrumento={instrumentoSeleccionado}
-                                                onDatosListos={handleDatosInfoGeneralListos}
-                                            />
-                                        )}
-                                    </div>
-                                )}
-
-                                {!esPaginaInfoGeneral && (
-                                    <>
-                                        <div
-                                            className="mb-4 p-3 rounded"
-                                            style={{
-                                                backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
-                                                borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`,
-                                            }}
-                                        >
-                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
-                                                {grupoActual.nombre}
-                                            </h4>
-                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                                                {grupoActual.tipo === 'multiple'
-                                                    ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
-                                                    : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
-                                            </p>
-                                        </div>
-
-                                        {grupoActual.tipo === 'simple' ? (
-                                            grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                <PreguntaSimple
-                                                    key={pregunta.id}
-                                                    pregunta={pregunta}
-                                                    index={idx}
-                                                    respuesta={obtenerRespuesta(pregunta.id)}
-                                                    onActualizar={actualizarRespuesta}
-                                                    instrumento_id={Number(instrumentoIdParam)}
-                                                />
-                                            ))
-                                        ) : (
-                                            <div>
-                                                {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
-                                                    <div key={instanciaIdx} className="mb-4">
-                                                        {grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                            <PreguntaMultiple
-                                                                key={pregunta.id}
-                                                                pregunta={pregunta}
-                                                                index={idx}
-                                                                instancia={instancia}
-                                                                instanciaIndex={instanciaIdx}
-                                                                grupoCuadroId={grupoActual.id}
-                                                                totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
-                                                                onActualizar={actualizarRespuestaMultiple}
-                                                                onEliminar={eliminarInstancia}
-                                                                instrumento={instrumentoSeleccionado}
-                                                                instrumento_id={Number(instrumentoIdParam)}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                ))}
-
-                                                <AgregarInstancia
-                                                    grupoCuadroId={grupoActual.id}
-                                                    preguntasDelGrupo={grupoActual.preguntas}
-                                                    instancias={respuestasMultiples[grupoActual.id] || []}
-                                                    onAgregar={agregarInstanciaRespuestas}
-                                                />
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-
-                                <NavegacionPaginas
-                                    paginaActual={paginaActual}
-                                    totalPaginas={totalPaginas}
-                                    gruposOrganizados={gruposOrganizados}
-                                    respuestas={respuestas}
-                                    respuestasMultiples={respuestasMultiples}
-                                    mostrarResumen={mostrarResumen}
-                                    mostrarProgreso={false}
-                                    mostrarIndicadores={false}
-                                    mostrarBotones={true}
-                                    mostrarAlerta={true}
-                                    onAvanzar={avanzarPagina}
-                                    onRetroceder={retrocederPagina}
-                                    onIrAPagina={irAPagina}
-                                    plantillaFormulario={plantillaFormulario}
-                                />
-                            </>
-                        )}
-
-                        {tabActiva === 'responder' && mostrarResumen && (
-                            <ResumenRespuestas
-                                gruposOrganizados={gruposOrganizados}
-                                respuestas={respuestas}
-                                respuestasMultiples={respuestasMultiples}
-                                todasRespondidas={todasRespondidas()}
-                                enviando={enviando}
-                                esDocente={esDocente}
-                                onRetroceder={retrocederPagina}
-                                onIrAPagina={irAPagina}
-                                onEnviar={enviarRespuestas}
-                                onExito={() => navigate(rutaVolver)}
-                            />
-                        )}
-
-                        {tabActiva === 'estadisticas' && instrumentoSeleccionado && (
-                            <div className="mt-4">
-                                <Llamadora id_instrumento={instrumentoSeleccionado.id} />
-                            </div>
-                        )}
-                    </CCardBody>
-                </CCard>
-            </CContainer>
-        </div>
+                    {tabActiva === 'estadisticas' && instrumentoSeleccionado && (
+                        <div className="mt-4">
+                            <Llamadora id_instrumento={instrumentoSeleccionado.id} />
+                        </div>
+                    )}
+                </CCardBody>
+        </ShadowedCard>
+    </>
     );
 }

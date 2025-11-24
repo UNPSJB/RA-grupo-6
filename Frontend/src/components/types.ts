@@ -279,7 +279,6 @@ export type ParametrosUpdate = {
     disponibilidad_departamento: number
 }
 
-<<<<<<< HEAD
 //types para informesintetico
 export type RespuestaSintesis = {
   pregunta_texto: string;
@@ -300,7 +299,6 @@ export type DetalleInformeSinteticoCompleto = {
   estadisticas?: EstadisticaPregunta[];
   respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
 };
-=======
 export type Departamento = {
     usuarios_info: UsuarioDepartamento[]
     carreras: Carrera 
@@ -322,7 +320,6 @@ export type UsuarioDepartamento = {
 
 }
 
-
 export type Dictado = {
     fecha_inicio: Date
     fecha_cierre: Date
@@ -337,4 +334,3 @@ export const TipoRespuesta = {
   RANGO_ENTERO: "RANGO_ENTERO",
   RANGO_DECIMAL: "RANGO_DECIMAL"
 } 
->>>>>>> dev

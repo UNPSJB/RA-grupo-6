@@ -278,33 +278,29 @@ export default function VerRespuestas() {
         const datosPDF = getDatosParaPDF();
         
         return (
-            <Container fluid className="mt-4 px-4">
-                <div className="row justify-content-center">
-                    <div className="col-12">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5">
-                                {/* Vista */}
-                                {renderVistaEncuesta()}
-                                
-                                {/* Botón PDF*/}
-                                <div className="d-grid gap-2 mb-4">
-                                    <PDFDownloadLink
-                                        document={<InformeSinteticoPDFDocument informe={datosPDF} />}
-                                        fileName={`Informe-Sintetico-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
-                                        className="btn btn-primary"
-                                    >
-                                        {({ loading: pdfLoading }) => 
-                                            pdfLoading 
-                                                ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
-                                                : 'Descargar Informe Sintético en PDF'
-                                        }
-                                    </PDFDownloadLink>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
+            <div className="row justify-content-center">
+                <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                    <Card.Body className="p-4 p-md-5">
+                        {/* Vista */}
+                        {renderVistaEncuesta()}
+                        
+                        {/* Botón PDF*/}
+                        <div className="d-grid gap-2 mb-4">
+                        <PDFDownloadLink
+                            document={<InformeSinteticoPDFDocument informe={datosPDF} />}
+                            fileName={`Informe-Sintetico-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
+                            className="btn btn-primary"
+                        >
+                            {({ loading: pdfLoading }) => 
+                                pdfLoading 
+                                    ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
+                                    : 'Descargar Informe Sintético en PDF'
+                            }
+                        </PDFDownloadLink>
+                        </div>
+                    </Card.Body>
+                </Card>
+            </div>
         );
     };
 
@@ -332,33 +328,40 @@ export default function VerRespuestas() {
         const estiloBotonActivo = { backgroundColor: "#0d6efd", border: "none", color: "#fff" };
         const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
 
-        const badgeConfig = getBadgeConfig();
-
         return (
             <Container fluid className="mt-4 px-4">
                 <div className="row justify-content-center">
                     <div className="col-12">
                         <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5">
+                                {/* Botón volver */}
+                                <div className="mb-1">
+                                    <Button
+                                        variant="outline-secondary"
+                                        onClick={() => navigate(-1)}
+                                        className="mb-3"
+                                    >
+                                        <i className="fa-solid me-2"></i>
+                                        Volver
+                                    </Button>
+                                </div>
+
                                 {/* Encabezado */}
                                 <div className="mb-4">
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div>
                                             <h1 className="fw-bold mb-2">Respuestas enviadas</h1>
                                             <p className="text-muted mb-0">
-                                                Materia: {materiaNombre}
+                                                {materiaNombre}
                                             </p>
                                         </div>
                                     </div>
                                     
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div className="d-flex gap-3">
-                                            <Badge bg="secondary" className="fs-6">
+                                            <Badge bg="primary" className="fs-6">
                                                 <i className="fas fa-calendar me-1" />
                                                 {new Date(fechaEnvio).toLocaleDateString()}
-                                            </Badge>
-                                            <Badge bg={badgeConfig.bg} className="fs-6">
-                                                {badgeConfig.text}
                                             </Badge>
                                         </div>
 
@@ -372,18 +375,6 @@ export default function VerRespuestas() {
                                             </div>
                                         )}
                                     </div>
-                                </div>
-
-                                {/* Botón volver */}
-                                <div className="mb-4">
-                                    <Button
-                                        variant="outline-secondary"
-                                        onClick={() => navigate(-1)}
-                                        className="mb-3"
-                                    >
-                                        <i className="fa-solid fa-arrow-left me-2"></i>
-                                        Volver
-                                    </Button>
                                 </div>
 
                                 {/* Contenido de respuestas */}
@@ -401,19 +392,20 @@ export default function VerRespuestas() {
                                         {gruposOrganizados.length > 1 ? (
                                             <>
                                                 {/* Botones de navegación entre grupos */}
-                                                <Stack className="pt-3 pb-3 mb-4" direction="horizontal" gap={3}>
-                                                    {gruposOrganizados.map((grupo, index) => (
-                                                        <Button
-                                                            key={grupo.id}
-                                                            style={grupoActivo === index ? estiloBotonActivo : estiloBotonInactivo}
-                                                            onClick={() => setGrupoActivo(index)}
-                                                            className="flex-grow-1"
-                                                        >
-                                                            {grupo.nombre} ({grupo.preguntas.length})
-                                                        </Button>
-                                                    ))}
-                                                </Stack>
-
+                                                <div className="row justify-content-center">
+                                                    <Stack className="pt-3 pb-3 mb-4" direction="horizontal" gap={3}>
+                                                        {gruposOrganizados.map((grupo, index) => (
+                                                            <Button
+                                                                key={grupo.id}
+                                                                style={grupoActivo === index ? estiloBotonActivo : estiloBotonInactivo}
+                                                                onClick={() => setGrupoActivo(index)}
+                                                                className="flex-grow-1"
+                                                            >
+                                                                {grupo.nombre} ({grupo.preguntas.length})
+                                                            </Button>
+                                                        ))}
+                                                    </Stack>
+                                                </div>
                                                 {gruposOrganizados.map((grupo, grupoIdx) => (
                                                     grupoIdx === grupoActivo && (
                                                         <div key={grupo.id}>
@@ -455,7 +447,7 @@ export default function VerRespuestas() {
                                         onClick={() => navigate(-1)}
                                         className="me-3"
                                     >
-                                        <i className="fas fa-arrow-left me-2"></i>
+                                        <i className="fas me-2"></i>
                                         Volver
                                     </Button>
                                 </div>

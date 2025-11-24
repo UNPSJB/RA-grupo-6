@@ -12,7 +12,7 @@ interface InstrumentoRespondido {
     respuestas_formulario_id?: number;
 }
 
-export default function VerRespuestasDepartamento() {
+export default function () {
     const navigate = useNavigate();
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);

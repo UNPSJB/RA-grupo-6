@@ -4,7 +4,7 @@ import { capitalizarCadena, separarPalabras} from "../Funciones";
 import { useEffect, useState } from "react";
 
 
-function obtenerFilas(datosInstrumento: any){
+export function obtenerFilas(datosInstrumento: any){
 
     let filas = []
 

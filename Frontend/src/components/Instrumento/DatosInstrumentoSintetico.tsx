@@ -1,25 +1,8 @@
 import { Table, Button, Modal } from "react-bootstrap";
 import type { InstrumentoDetail } from "../types";
-import { capitalizarCadena } from "../Funciones";
 import { useEffect, useState, useRef } from "react";
+import { obtenerFilas } from "./DatosInstrumento";
 
-function obtenerFilas(datosInstrumento: any) {
-    const celdas = [];
-
-    if (datosInstrumento) {
-        for (const [clave, valor] of Object.entries(datosInstrumento)) {
-            celdas.push(
-                <td key={clave}>
-                    <p className="mb-0 text-center">
-                        <span className="fw-bold">{capitalizarCadena(clave)}:</span> {String(valor)}
-                    </p>
-                </td>
-            );
-        }
-    }
-
-    return celdas;
-}
 
 type Props = {
     instrumento: InstrumentoDetail;

@@ -94,13 +94,14 @@ export function DatosInstrumentoSintetico({ instrumento, onDatosListos }: Props)
         <>
             <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="fw-bold mb-0" style={{ color: '#1f2937' }}>
+                    
+                    <h5 className="fw-bold mb-0" >
                         <i className="fas fa-table me-2"></i>
                         Información General
                     </h5>
                     {hayMasMaterias && (
                         <CButton
-                            color="primary"
+                            color="secondary"
                             variant="outline"
                             size="sm"
                             onClick={() => setMostrarModal(true)}
@@ -148,14 +149,14 @@ export function DatosInstrumentoSintetico({ instrumento, onDatosListos }: Props)
                 size="xl"
             >
                 <CModalHeader closeButton style={{ backgroundColor: "#816767ff", color: "white" }}>
-                    <CModalTitle>
+                    <CModalTitle >
                         <i className="fas fa-table me-2"></i>
                         Información General Completa
                     </CModalTitle>
                 </CModalHeader>
 
                 <CModalBody>
-                <div className="contenedor-scroll" style={{maxHeight: '400px', overflowY: 'auto', padding: '1.25rem'}}>
+                <div className="contenedor-scroll" style={{maxHeight: '400px', overflowY: 'auto', padding: '1.5rem'}}>
                     <CTable
                         striped
                         bordered

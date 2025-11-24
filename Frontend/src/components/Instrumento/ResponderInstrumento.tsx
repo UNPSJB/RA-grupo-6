@@ -15,7 +15,7 @@ import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
 import { DatosInstrumento } from './DatosInstrumento';
 import { DatosInstrumentoSintetico } from './DatosInstrumentoSintetico';
-import { CAlert, CButton, CCard, CCardBody, CCardHeader, CContainer, CSpinner } from '@coreui/react';
+import { CAlert, CButton,CCardBody, CCardHeader, CContainer, CSpinner } from '@coreui/react';
 import ShadowedCard from '../coreui-components/ShadowedCard';
 
 export default function ResponderInstrumento() {
@@ -314,20 +314,15 @@ export default function ResponderInstrumento() {
                         <>
                             {esPaginaInfoGeneral && (
                                 <div>
-                                    <div
-                                        className="mb-4 p-3 rounded"
-                                        style={{
-                                            backgroundColor: '#f0f7ff',
-                                            borderLeft: '4px solid #816767ff',
-                                        }}
-                                    >
-                                        <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+
+                                    <CCardHeader className="mb-4 p-3 rounded" style={{ borderLeft: '4px solid #816767ff',}}>
+                                        <h4 className="fw-bold mb-1" >
                                             {grupoActual.nombre}
                                         </h4>
                                         <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
                                             Vista de todas las actividades curriculares asociadas a este informe
                                         </p>
-                                    </div>
+                                    </CCardHeader>
 
                                     {instrumentoSeleccionado && (
                                         <DatosInstrumentoSintetico 

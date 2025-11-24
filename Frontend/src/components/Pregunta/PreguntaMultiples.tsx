@@ -77,8 +77,8 @@ function PreguntaMultiple({
                         }}>
                             <p className="mb-0 fw-semibold text-primary">
                                 <i className="fas fa-book me-2"></i>
-                                {materiaNombre}
-                                {materiaId && <span className="ms-2 text-muted">(Código: {materiaId})</span>}
+                                {materiaNombre}  - 
+                                {materiaId && <span className="ms-2">(Código: {materiaId})</span>}
                             </p>
                         </div>
                     )}

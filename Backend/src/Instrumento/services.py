@@ -5,6 +5,7 @@ import array
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from src.Materias.services import get_Docente
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Dictados.models import Dictado
 from src.Departamento.models import Departamento
@@ -209,6 +210,77 @@ def getCompletitud(db:Session, instrumentos: List[Instrumento]):
 def getInstrumentosConPlantilla(db:Session, plantilla_id:int) -> list[Instrumento]:
 
     return db.scalars(select(Instrumento).where(Instrumento.plantilla_formulario == plantilla_id))
+
+
+def getDatosInstrumento(db:Session, instrumento_id: int) -> dict :
+
+    db_instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+
+    docente = get_Docente(db_instrumento.materia_id, db)
+    # inscriptos = get_inscriptos(db, db_instrumento.materia_id, db_instrumento.id)
+    inscriptos = 0
+    datos = {}
+
+    if (db_instrumento.plantilla_formulario.rol.nombre.lower() == "estudiante"):
+        
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['carrera'] = db_instrumento.materia.carrera.nombre
+        datos['asignatura'] = db_instrumento.materia.nombre
+
+    elif (db_instrumento.plantilla_formulario.rol.nombre.lower() == "docente"):   
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['cicloLectivo'] = db_instrumento.dictado.fecha_inicio.year
+        datos['asignatura'] = db_instrumento.materia.nombre
+        datos['codAsignatura'] = db_instrumento.materia.id
+        datos['docente'] = (docente.nombre + " " + docente.apellido).capitalize()
+        datos['inscriptos'] = inscriptos
+        datos['comisionesTeoricas'] = "-",
+        datos['comisionesPracticas'] = "-"
+    else:  
+        datos['sede'] = db_instrumento.departamento.sede
+        datos['cicloLectivo'] = db_instrumento.dictado.fecha_inicio.year
+        datos['departamento'] = db_instrumento.departamento.nombre
+        datos['integrantes'] = "-"
+    
+    return datos
+
+
+def getDatosInstrumentoSintetico(db:Session, instrumento_id: int) -> dict:
+    
+    instrumento_actual = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+
+    if instrumento_actual.tipo == TipoInstrumento.INFORME_SINTETICO:
+
+        if not instrumento_actual.dictado_id or not instrumento_actual.departamento_id:
+            return None
+
+        instrumentos_catedra = db.scalars(
+            select(Instrumento)
+            .join(Materia, Instrumento.materia_id == Materia.id)
+            .where(Instrumento.dictado_id == instrumento_actual.dictado_id, 
+                   Instrumento.tipo == TipoInstrumento.INFORME_CATEDRA,
+                   Materia.departamento_id == instrumento_actual.departamento_id)
+        ).all()
+
+        if not instrumentos_catedra:
+            return None
+        
+        datos = []
+
+
+        for instrumento_catedra in instrumentos_catedra:
+            inscriptos = 0
+            instrumento = {}
+            instrumento['codAsignatura'] = instrumento_catedra.materia.id
+            instrumento['asignatura'] = instrumento_catedra.materia.nombre
+            instrumento['inscriptos'] = inscriptos
+            instrumento['comisionesTeoricas'] = "-",
+            instrumento['comisionesPracticas'] = "-"
+
+            datos.append(instrumento)
+
+    return datos
+
 
 def obtener_instrumentos_por_tipo_usuario(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
     from sqlalchemy import select, and_

@@ -12,27 +12,28 @@ type Props = {
 };
 
 import "./pregunta.css";
+import { CButton, CForm, CFormLabel, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from "@coreui/react";
 
 function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) {
     const [tipoPregunta, setTipoPregunta] = useState<TipoPregunta>(EnumTipoPregunta.abierta);
 
     return (
-        <Modal show={mostrar} onHide={manejarPestania} size="lg" centered>
-            <Modal.Header closeButton className="border-bottom" style={{ padding: "1.5rem" }}>
-                <Modal.Title className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="px-4 py-4">
-                <Form>
+        <CModal visible={mostrar} onClose={manejarPestania} size="lg">
+            <CModalHeader closeButton className="border-bottom" style={{ padding: "1.5rem" }}>
+                <CModalTitle className="fw-bold" style={{ fontSize: "1.5rem", color: "#1f2937" }}> Crear Pregunta </CModalTitle>
+            </CModalHeader>
+            <CModalBody className="px-4 py-4">
+                <CForm>
                     <div className="mb-4 text-center">
-                        <Form.Label 
+                        <CFormLabel 
                             className="fw-semibold mb-3 d-block"
                             style={{ fontSize: "0.875rem", color: "#4b5563" }}
                         >
                             Tipo de pregunta
-                        </Form.Label>
+                        </CFormLabel>
                         
                         <div className="d-flex justify-content-center align-items-center gap-3">
-                            <Button
+                            <CButton
                                 variant={tipoPregunta === EnumTipoPregunta.abierta ? "success" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
                                     tipoPregunta === EnumTipoPregunta.abierta ? "shadow-sm" : ""
@@ -46,9 +47,9 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
                             >
                                 <i className="fa-solid fa-align-left"></i>
                                 Abierta
-                            </Button>
+                            </CButton>
 
-                            <Button
+                            <CButton
                                 variant={tipoPregunta === EnumTipoPregunta.cerrada ? "primary" : "light"}
                                 className={`flex-fill py-2 d-flex align-items-center justify-content-center gap-2 fw-medium ${
                                     tipoPregunta === EnumTipoPregunta.cerrada ? "shadow-sm" : ""
@@ -62,7 +63,7 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
                             >
                                 <i className="fa-solid fa-list-check"></i>
                                 Cerrada
-                            </Button>
+                            </CButton>
                         </div>
                     </div>
 
@@ -79,15 +80,15 @@ function CrearPregunta({ mostrar, manejarPestania, refrescarPreguntas }: Props) 
                             />
 
                     )}
-                </Form>
+                </CForm>
 
-            </Modal.Body>
-            <Modal.Footer className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
-                <Button variant="outline-secondary" onClick={manejarPestania}>
+            </CModalBody>
+            <CModalFooter className="border-top" style={{ padding: "1.25rem 1.5rem" }}>
+                <CButton variant="outline-secondary" onClick={manejarPestania}>
                     Cerrar
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                </CButton>
+            </CModalFooter>
+        </CModal>
     );
 }
 

@@ -10,7 +10,7 @@ import PaginaEncuestasEstudiantes from './components/Instrumento/pages/PaginaEnc
 import PaginaInformesCatedra from './components/Instrumento/pages/PaginaInformesCatedra.tsx';
 import { RespuestasFormulario } from './components/RespuestasFormulario/RespuestasFormulario.tsx';
 import Menu from './components/Menu.tsx';
-import SeleccionarMateria from './components/materias/SeleccionarMateria';
+import SeleccionarMateria from './components/Materias/SeleccionarMateria';
 import ResponderInstrumento from './components/Instrumento/ResponderInstrumento';
 import InstrumentosDocente from './components/Instrumento/InstrumentosDocente';
 import SeleccionarRespuestasFormularios from './components/RespuestasFormulario/SeleccionarRespuestasFormularios.tsx';

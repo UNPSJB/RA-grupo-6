@@ -1,205 +1,134 @@
 import type { RespuestaTemporal, InstanciaRespuestas } from "../types";
 
-export function cargarRespuestasIniciales(
+export function cargarRespuesta(pregunta: any, instrumentoId: number): Promise<RespuestaTemporal> {
+    if (pregunta.pregunta_fuente_id) {
+        return fetch(`http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`)
+            .then((res) => res.ok ? res.json() : null)
+            .then((prefillData) => {
+                const r = prefillData?.respuestas?.[0];
+                return {
+                    pregunta_id: pregunta.id,
+                    texto: r?.texto || '',
+                    opcion_id: r?.opcion_id,
+                };
+            })
+            .catch(() => ({
+                pregunta_id: pregunta.id,
+                texto: '',
+                opcion_id: undefined
+            }));
+    }
+
+    return Promise.resolve({
+        pregunta_id: pregunta.id,
+        texto: '',
+        opcion_id: undefined,
+    });
+}
+
+export async function cargarRespuestasIniciales(
     plantillaFormulario: any,
     instrumentoId: number
 ): Promise<{
     respuestasSimples: RespuestaTemporal[];
-    respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] };
+    respuestasMultiples: { [grupoId: number]: InstanciaRespuestas[] };
 }> {
-    
-    const preguntasSimples = plantillaFormulario.preguntas.filter((p: any) => !p.multiple_respuestas);
+    const todas = plantillaFormulario.preguntas;
 
-    const respuestasSimplesPromises = preguntasSimples.map((pregunta: any) => {
-        let textoPrefill = '';
-        let opcionPrefill = undefined;
-
-        if (pregunta.pregunta_fuente_id) {
-            return fetch(`http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`)
-                .then((res) => res.ok ? res.json() : null)
-                .then((prefillData) => {
-                    if (prefillData?.respuestas?.length > 0) {
-                        const primeraRespuesta = prefillData.respuestas[0];
-                        textoPrefill = primeraRespuesta.texto || '';
-                        opcionPrefill = primeraRespuesta.opcion_id;
-                    }
-                    return {
-                        pregunta_id: pregunta.id,
-                        texto: textoPrefill,
-                        opcion_id: opcionPrefill,
-                    };
-                })
-                .catch((error) => {
-                    console.error(`Error cargando prefill pregunta ${pregunta.id}:`, error);
-                    return { pregunta_id: pregunta.id, texto: '', opcion_id: undefined };
-                });
-        } else {
-            return Promise.resolve({
-                pregunta_id: pregunta.id,
-                texto: '',
-                opcion_id: undefined,
-            });
-        }
-    });
-
-    const preguntasMultiples = plantillaFormulario.preguntas.filter((p: any) => p.multiple_respuestas);
-    const gruposCuadro = new Set<number>(
-        preguntasMultiples.map((p: any) => p.grupo_cuadro_id).filter((id: any): id is number => id !== null && id !== undefined)
+    const preguntasSimples = todas.filter((p: any) => !p.multiple_respuestas);
+    const respuestasSimples = await Promise.all(
+        preguntasSimples.map((p: any) => cargarRespuesta(p, instrumentoId))
     );
 
-    return Promise.all(respuestasSimplesPromises).then((respuestasSimples) => {
-        const respuestasMultiples: { [grupoCuadroId: number]: InstanciaRespuestas[] } = {};
+    const preguntasMultiples = todas.filter((p: any) => p.multiple_respuestas);
+    const preguntasConFuente = todas.filter((p: any) => p.pregunta_fuente_id != null);
 
-        const grupoPromises = Array.from(gruposCuadro).map((grupoCuadroId) => {
-            const preguntasDelGrupo = preguntasMultiples
-                .filter((p: any) => p.grupo_cuadro_id === grupoCuadroId)
-                .sort((a: any, b: any) => (a.orden_en_grupo || 0) - (b.orden_en_grupo || 0));
+    const resultadosFuente = await Promise.all(
+        preguntasConFuente.map(async (pregunta: any) => {
+            try {
+                const res = await fetch(
+                    `http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${pregunta.id}&instrumento_id=${instrumentoId}`
+                );
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.respuestas?.length > 0) {
+                        return { pregunta, prefillData: data };
+                    }
+                }
+            } catch (_) {}
+            return null;
+        })
+    );
 
-            const preguntaConFuente = preguntasDelGrupo.find((p: any) => p.pregunta_fuente_id);
+    const preguntasPorGrupo: { [id: number]: any[] } = {};
+    const respuestasMultiples: { [id: number]: InstanciaRespuestas[] } = {};
 
-            if (!preguntaConFuente) {
-                const primeraInstancia: InstanciaRespuestas = {};
-                preguntasDelGrupo.forEach((pregunta: any) => {
-                    primeraInstancia[pregunta.id] = {
-                        pregunta_id: pregunta.id,
-                        texto: '',
-                        opcion_id: undefined,
-                        instancia_respuesta: 1,
-                    };
-                });
-                respuestasMultiples[grupoCuadroId] = [primeraInstancia];
-                return Promise.resolve();
+    for (const p of preguntasMultiples) {
+        if (!preguntasPorGrupo[p.grupo_cuadro_id]) {
+            preguntasPorGrupo[p.grupo_cuadro_id] = [];
+        }
+        preguntasPorGrupo[p.grupo_cuadro_id].push(p);
+    }
+
+    for (const resultado of resultadosFuente) {
+        if (!resultado) continue;
+
+        const { pregunta, prefillData } = resultado;
+        const grupoId = pregunta.grupo_cuadro_id;
+
+        if (grupoId && prefillData.multiple) {
+            if (!respuestasMultiples[grupoId]) {
+                respuestasMultiples[grupoId] = [];
             }
 
-            return fetch(`http://127.0.0.1:8000/respuestas/fuente?pregunta_id=${preguntaConFuente.id}&instrumento_id=${instrumentoId}`)
-                .then((res) => res.ok ? res.json() : null)
-                .then((prefillData) => {
-                    console.log(`📊 Prefill data para grupo ${grupoCuadroId}:`, prefillData);
-                    const instanciasCargadas: InstanciaRespuestas[] = [];
+            const instancias = respuestasMultiples[grupoId];
+            const pregGrupo = preguntasPorGrupo[grupoId] || [];
 
-                    if (prefillData?.respuestas?.length > 0) {
-                        const esInformeSintetico = prefillData.respuestas.some((r: any) => r.materia_nombre || r.materia_id);
-
-                        if (esInformeSintetico) {
-                            prefillData.respuestas.forEach((respuestaPrefill: any, index: number) => {
-                                const instancia: InstanciaRespuestas = {};
-                                
-                                preguntasDelGrupo.forEach((pregunta: any) => {
-                                    if (pregunta.id === preguntaConFuente.id) {
-                                        instancia[pregunta.id] = {
-                                            pregunta_id: pregunta.id,
-                                            texto: respuestaPrefill.texto || '',
-                                            opcion_id: respuestaPrefill.opcion_id,
-                                            instancia_respuesta: index + 1,
-                                        };
-                                    } else {
-                                        instancia[pregunta.id] = {
-                                            pregunta_id: pregunta.id,
-                                            texto: '',
-                                            opcion_id: undefined,
-                                            instancia_respuesta: index + 1,
-                                        };
-                                    }
-                                });
-                                
-                                instanciasCargadas.push(instancia);
-                            });
-                        } else if (prefillData.multiple) {
-                            const respuestasPorInstancia = new Map<number, any[]>();
-
-                            for (const respuesta of prefillData.respuestas) {
-                                const instancia = respuesta.instancia || 1;
-                                if (!respuestasPorInstancia.has(instancia)) {
-                                    respuestasPorInstancia.set(instancia, []);
-                                }
-                                respuestasPorInstancia.get(instancia)!.push(respuesta);
-                            }
-
-                            let instanciaNum = 1;
-                            respuestasPorInstancia.forEach((respuestasInstancia) => {
-                                const instancia: InstanciaRespuestas = {};
-                                
-                                const respuestasPorPregunta = new Map<number, any>();
-                                respuestasInstancia.forEach((resp) => {
-                                    const preguntaCorrespondiente = preguntasDelGrupo.find((p: any) => 
-                                        p.pregunta_fuente_id === resp.pregunta_id || p.id === resp.pregunta_id
-                                    );
-                                    if (preguntaCorrespondiente) {
-                                        respuestasPorPregunta.set(preguntaCorrespondiente.id, resp);
-                                    }
-                                });
-
-                                preguntasDelGrupo.forEach((pregunta: any) => {
-                                    const respuestaExistente = respuestasPorPregunta.get(pregunta.id);
-                                    instancia[pregunta.id] = {
-                                        pregunta_id: pregunta.id,
-                                        texto: respuestaExistente?.texto || '',
-                                        opcion_id: respuestaExistente?.opcion_id,
-                                        instancia_respuesta: instanciaNum,
-                                    };
-                                });
-                                
-                                instanciasCargadas.push(instancia);
-                                instanciaNum++;
-                            });
-                        } else {
-                           
-                            const primeraRespuesta = prefillData.respuestas[0];
-                            const instancia: InstanciaRespuestas = {};
-                            
-                            preguntasDelGrupo.forEach((pregunta: any) => {
-                                if (pregunta.id === preguntaConFuente.id) {
-                                    instancia[pregunta.id] = {
-                                        pregunta_id: pregunta.id,
-                                        texto: primeraRespuesta.texto || '',
-                                        opcion_id: primeraRespuesta.opcion_id,
-                                        instancia_respuesta: 1,
-                                    };
-                                } else {
-                                    instancia[pregunta.id] = {
-                                        pregunta_id: pregunta.id,
-                                        texto: '',
-                                        opcion_id: undefined,
-                                        instancia_respuesta: 1,
-                                    };
-                                }
-                            });
-                            
-                            instanciasCargadas.push(instancia);
-                        }
-
-                        respuestasMultiples[grupoCuadroId] = instanciasCargadas;
-                    } else {
-                        const primeraInstancia: InstanciaRespuestas = {};
-                        preguntasDelGrupo.forEach((pregunta: any) => {
-                            primeraInstancia[pregunta.id] = {
-                                pregunta_id: pregunta.id,
-                                texto: '',
-                                opcion_id: undefined,
-                                instancia_respuesta: 1,
-                            };
-                        });
-                        respuestasMultiples[grupoCuadroId] = [primeraInstancia];
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error al cargar grupo ${grupoCuadroId}:`, error);
-                    const primeraInstancia: InstanciaRespuestas = {};
-                    preguntasDelGrupo.forEach((pregunta: any) => {
-                        primeraInstancia[pregunta.id] = {
-                            pregunta_id: pregunta.id,
+            prefillData.respuestas.forEach((resp: any, index: number) => {
+                if (!instancias[index]) {
+                    const instancia: InstanciaRespuestas = {};
+                    pregGrupo.forEach((p: any) => {
+                        instancia[p.id] = {
+                            pregunta_id: p.id,
                             texto: '',
                             opcion_id: undefined,
-                            instancia_respuesta: 1,
+                            instancia_respuesta: index + 1,
                         };
                     });
-                    respuestasMultiples[grupoCuadroId] = [primeraInstancia];
-                });
-        });
+                    instancias.push(instancia);
+                }
 
-        return Promise.all(grupoPromises).then(() => ({
-            respuestasSimples,
-            respuestasMultiples,
-        }));
-    });
+                instancias[index][pregunta.id] = {
+                    pregunta_id: pregunta.id,
+                    texto: resp.texto || '',
+                    opcion_id: resp.opcion_id,
+                    instancia_respuesta: index + 1,
+                    materia_nombre: resp.materia_nombre,
+                    materia_id: resp.materia_id
+                };
+            });
+        }
+    }
+
+    for (const grupoId in preguntasPorGrupo) {
+        const num = parseInt(grupoId);
+        if (!respuestasMultiples[num] || respuestasMultiples[num].length === 0) {
+            const instancia: InstanciaRespuestas = {};
+            preguntasPorGrupo[num].forEach((p: any) => {
+                instancia[p.id] = {
+                    pregunta_id: p.id,
+                    texto: '',
+                    opcion_id: undefined,
+                    instancia_respuesta: 1
+                };
+            });
+            respuestasMultiples[num] = [instancia];
+        }
+    }
+
+    return {
+        respuestasSimples,
+        respuestasMultiples
+    };
 }
+

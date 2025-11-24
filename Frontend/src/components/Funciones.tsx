@@ -1,5 +1,5 @@
-
-
+import { TipoRespuesta } from "./types";
+import {z} from 'zod';
 
 export function capitalizarCadena(cadena: string): string {
     cadena = cadena.toLocaleLowerCase()
@@ -11,4 +11,75 @@ export function capitalizarCadena(cadena: string): string {
     });
 
     return cadenaCapitalizada
+}
+
+export function separarPalabras(cadena: string) : string {
+
+    let nuevaCadena = ""
+
+    for(let i = 0; i < cadena.length; i++){
+        if ((cadena[i].charCodeAt(0) >= 65) && (cadena[i].charCodeAt(0)  <= 90)){
+            nuevaCadena = nuevaCadena + " " + cadena[i]
+        }
+        else{
+            nuevaCadena = nuevaCadena + cadena[i]
+        }
+    }
+    return nuevaCadena
+}
+
+
+
+export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
+
+    const valorTipoDato = JSON.parse(jsonTipoDato)
+    const schemaEntero = z.coerce.number().int()
+    const schemaDecimal = z.coerce.number()
+    const schemaCadena = z.coerce.string()
+
+    let esValido : boolean = true;
+
+    if (valorTipoDato.tipo != TipoRespuesta.TEXTO && valor.trim() === "") return (!esValido);
+
+    let resultado : any = 0 
+    try{
+        switch (valorTipoDato.tipo){
+
+            case (TipoRespuesta.ENTERO):
+                resultado = schemaEntero.parse(valor);
+                break;
+            
+            case (TipoRespuesta.DECIMAL):
+                resultado = schemaDecimal.parse(valor);
+                break;
+
+            case (TipoRespuesta.TEXTO):
+                resultado = schemaCadena.parse(valor);
+                break;
+
+            case (TipoRespuesta.RANGO_ENTERO):
+                resultado = schemaEntero.parse(valor);
+                break;
+
+            case (TipoRespuesta.RANGO_DECIMAL):
+                resultado = schemaDecimal.parse(valor);
+                break;
+
+            default:
+                esValido = false;
+        }
+    }
+    catch(error){
+        if (error instanceof z.ZodError){
+            esValido = false
+        }
+    }
+
+    if ((valorTipoDato.tipo == TipoRespuesta.RANGO_ENTERO) || (valorTipoDato.tipo == TipoRespuesta.RANGO_DECIMAL)){
+        if((Number(valorTipoDato.valor_minimo) > resultado) || (resultado > Number(valorTipoDato.valor_maximo) ) ){
+            esValido = false;
+        }
+    }
+
+    return esValido
 }

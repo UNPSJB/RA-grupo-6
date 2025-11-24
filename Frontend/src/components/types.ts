@@ -14,7 +14,9 @@ export type Pregunta = {
     estadistica: boolean
     puede_modificarse: boolean
     puede_eliminarse: boolean
+    obligatoria:boolean
     grupo_pregunta: GrupoPregunta
+    tipo_respuesta: string | null
 }
 
 export const EnumTipoPregunta = Object.freeze({
@@ -50,6 +52,8 @@ export type Respuesta = {
 export type Materia = {
     id: string
     nombre: string
+    carrera: Carrera
+    dictado: Dictado
 }
 
 export type Rol = {
@@ -113,6 +117,10 @@ export type InstrumentoDetail = InstrumentoBase & {
   fecha_completado: string;
   respuestas: RespuestaDetalle[];
   docente?: Docente;
+  departamento: Departamento
+  materia: Materia
+  plantilla_formulario: PlantillaFormulario
+  dictado: Dictado
 };
 
 export type RespuestaDetalle = {
@@ -182,6 +190,9 @@ export type ErrorPreguntaAbierta = {
   texto?: string;
   grupo?: string;
   rol?: string;
+  minimoMayor?: string;
+  valorMinimo?: string;
+  valorMaximo?: string;
 };
 
 export type PlantillaFormulario = {
@@ -218,15 +229,18 @@ export interface InstanciaRespuestas {
 
 export interface RespuestaTemporal {
     pregunta_id: number;
-    texto?: string;
-    opcion_id?: number;
+    texto?: string | null;
+    opcion_id?: number |null;
     instancia_respuesta?: number;
+    materia_nombre?:string;
+    materia_id?:string;
+  
 }
 
 export interface GrupoPreguntas {
     id: number;
     nombre: string;
-    preguntas: any[];
+    preguntas: Pregunta[];
     tipo: 'simple' | 'multiple';
 }
 
@@ -265,6 +279,7 @@ export type ParametrosUpdate = {
     disponibilidad_departamento: number
 }
 
+<<<<<<< HEAD
 //types para informesintetico
 export type RespuestaSintesis = {
   pregunta_texto: string;
@@ -285,3 +300,41 @@ export type DetalleInformeSinteticoCompleto = {
   estadisticas?: EstadisticaPregunta[];
   respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
 };
+=======
+export type Departamento = {
+    usuarios_info: UsuarioDepartamento[]
+    carreras: Carrera 
+    nombre: string
+    sede: string
+}
+
+export type Carrera = {
+    departamento_id: number
+    departamento: Departamento[]
+    nombre: string
+}
+
+export type UsuarioDepartamento = {
+    id: number
+    nombre: string
+    apellido: string
+    legajo: number
+
+}
+
+
+export type Dictado = {
+    fecha_inicio: Date
+    fecha_cierre: Date
+    materias: Materia[] 
+}
+
+
+export const TipoRespuesta = {
+  ENTERO: "ENTERO",
+  DECIMAL: "DECIMAL",
+  TEXTO: "TEXTO",
+  RANGO_ENTERO: "RANGO_ENTERO",
+  RANGO_DECIMAL: "RANGO_DECIMAL"
+} 
+>>>>>>> dev

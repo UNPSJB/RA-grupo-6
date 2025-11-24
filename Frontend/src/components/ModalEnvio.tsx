@@ -1,3 +1,4 @@
+import { CButton } from "@coreui/react";
 import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
@@ -36,9 +37,9 @@ function ModalExito({ onEnviar, onExito, desactivado, textoBoton, variante, clas
 
     return (
         <>
-            <Button variant={variante} className={className} disabled={desactivado || enviando} onClick={mostrarModal} style={{flex:1}}>
-                <i className="fa-solid fa-check me-2"></i>{textoBoton}
-            </Button>
+            <CButton color={variante} className={className} disabled={desactivado || enviando} onClick={mostrarModal} >
+                {textoBoton}
+            </CButton>
 
             <Modal show={mostrar}>
                 <Modal.Header className="bg-success text-white">

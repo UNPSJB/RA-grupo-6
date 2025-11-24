@@ -1,12 +1,26 @@
 from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, func
 from src.Pregunta.models import Pregunta, Opcion, EnumTipoPregunta
 from src.Pregunta import schemas, exceptions
 from src.Opciones.models import Opcion
+from src.Instrumento.models import Instrumento, TipoInstrumento
 
 def crear_pregunta_abierta(db: Session, pregunta: schemas.PreguntaAbiertaCreate) -> Pregunta:
-    _nueva_pregunta = Pregunta(texto=pregunta.texto, tipo=EnumTipoPregunta.abierta, grupo_pregunta_id = pregunta.grupo_pregunta_id, estadistica = pregunta.estadistica, rol_id = pregunta.rol_id, multiple_respuestas = pregunta.multiple_respuestas, grupo_cuadro_id = pregunta.grupo_cuadro_id, orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, obligatoria = pregunta.obligatoria)
+
+    _nueva_pregunta = Pregunta(
+                    texto=pregunta.texto, 
+                    tipo=EnumTipoPregunta.abierta, 
+                    grupo_pregunta_id = pregunta.grupo_pregunta_id, 
+                    estadistica = pregunta.estadistica, 
+                    rol_id = pregunta.rol_id, 
+                    multiple_respuestas = pregunta.multiple_respuestas, 
+                    grupo_cuadro_id = pregunta.grupo_cuadro_id, 
+                    orden_en_grupo=pregunta.orden_en_grupo if pregunta.grupo_cuadro_id else None, 
+                    obligatoria = pregunta.obligatoria, 
+                    tipo_respuesta = pregunta.tipo_respuesta,
+                    pregunta_fuente_id = pregunta.pregunta_fuente_id,
+                    pregunta_fuente_dos_id = pregunta.pregunta_fuente_dos_id)
     
     db.add(_nueva_pregunta)
     db.commit()
@@ -53,7 +67,8 @@ def listar_preguntas(db: Session) -> List[schemas.Pregunta]:
                 multiple_respuestas= preg.multiple_respuestas,
                 grupo_cuadro_id = preg.grupo_cuadro_id,
                 orden_en_grupo= preg.orden_en_grupo,
-                obligatoria= preg.obligatoria
+                obligatoria= preg.obligatoria,
+                tipo_respuesta= preg.tipo_respuesta,
             )
         )
     return resultado
@@ -103,3 +118,130 @@ def eliminar_pregunta(db: Session, pregunta_id: int) -> schemas.PreguntaDelete:
 
     return db_pregunta 
 
+
+def preparar_preguntas_materia(pregunta_id: int, db: Session):
+    pregunta = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_id))
+    
+    if not pregunta or not pregunta.grupo_cuadro_id:
+        return {"preguntas_creadas": False, "mensaje": "Pregunta no válida o sin grupo_cuadro"}
+    
+    grupo_cuadro_id = pregunta.grupo_cuadro_id
+    rol_id = pregunta.rol_id
+    grupo_pregunta_id = pregunta.grupo_pregunta_id
+    
+    preguntas_existentes = db.scalars(
+        select(Pregunta).where(
+            Pregunta.grupo_cuadro_id == grupo_cuadro_id,
+            Pregunta.texto.in_([
+                "Código de actividad curricular",
+                "Nombre de la actividad curricular"
+            ])
+        )
+    ).all()
+    
+    if len(preguntas_existentes) >= 2:
+        return {"preguntas_creadas": False, "mensaje": "Las preguntas ya existen"}
+
+    orden_minimo = db.scalar(
+        select(func.min(Pregunta.orden_en_grupo)).where(
+            Pregunta.grupo_cuadro_id == grupo_cuadro_id
+        )
+    )
+    
+    orden_codigo = 1 if orden_minimo is None else orden_minimo - 2
+    orden_nombre = 2 if orden_minimo is None else orden_minimo - 1
+
+    pregunta_codigo = Pregunta(
+        texto="Código de actividad curricular",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=grupo_pregunta_id,
+        estadistica=False,
+        rol_id=rol_id,
+        multiple_respuestas=pregunta.multiple_respuestas,
+        grupo_cuadro_id=grupo_cuadro_id,
+        orden_en_grupo=orden_codigo,
+        obligatoria=False
+    )
+    
+
+    pregunta_nombre = Pregunta(
+        texto="Nombre de la actividad curricular",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=grupo_pregunta_id,
+        estadistica=False,
+        rol_id=rol_id,
+        multiple_respuestas=pregunta.multiple_respuestas,
+        grupo_cuadro_id=grupo_cuadro_id,
+        orden_en_grupo=orden_nombre,
+        obligatoria=False
+    )
+    
+    db.add(pregunta_codigo)
+    db.add(pregunta_nombre)
+    db.commit()
+    
+    return {
+        "preguntas_creadas": True, 
+        "mensaje": "Preguntas creadas exitosamente",
+        "pregunta_codigo_id": pregunta_codigo.id,
+        "pregunta_nombre_id": pregunta_nombre.id
+    }
+
+def preparar_pregunta_info_general_sintetico(instrumento_id: int, db: Session):
+    
+    # Obtener el instrumento
+    instrumento = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_id))
+    
+    if not instrumento or instrumento.tipo != TipoInstrumento.INFORME_SINTETICO:
+        return {"pregunta_creada": False, "mensaje": "No es un informe sintético"}
+    
+    plantilla = instrumento.plantilla_formulario
+    if not plantilla:
+        return {"pregunta_creada": False, "mensaje": "La plantilla no existe"}
+    
+    # Obtener el primer grupo de preguntas usando la relación directa
+    primer_grupo = None
+    if plantilla.preguntas and len(plantilla.preguntas) > 0:
+        # Tomar el grupo_pregunta del primer pregunta de la plantilla
+        primer_grupo = plantilla.preguntas[0].grupo_pregunta
+    
+    if not primer_grupo:
+        return {"pregunta_creada": False, "mensaje": "No hay grupos de preguntas asociados"}
+    
+    # Verificar si la pregunta ya existe
+    pregunta_existente = db.scalar(
+        select(Pregunta).where(
+            Pregunta.texto == "Información general de actividades curriculares",
+            Pregunta.grupo_pregunta_id == primer_grupo.id
+        )
+    )
+    
+    if pregunta_existente:
+        return {
+            "pregunta_creada": False,
+            "mensaje": "La pregunta ya existe",
+            "pregunta_id": pregunta_existente.id
+        }
+    
+    # Crear la nueva pregunta
+    nueva_pregunta = Pregunta(
+        texto="Información general de actividades curriculares",
+        tipo=EnumTipoPregunta.abierta,
+        grupo_pregunta_id=primer_grupo.id,
+        estadistica=False,
+        rol_id=plantilla.rol_id,
+        multiple_respuestas=False,
+        grupo_cuadro_id=None,
+        orden_en_grupo=None,
+        obligatoria=False
+    )
+    
+    db.add(nueva_pregunta)
+    db.commit()
+    db.refresh(nueva_pregunta)
+    
+    return {
+        "pregunta_creada": True,
+        "mensaje": "Pregunta creada exitosamente",
+        "pregunta_id": nueva_pregunta.id
+    }

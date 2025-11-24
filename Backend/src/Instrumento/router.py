@@ -68,7 +68,9 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
             .joinedload(RespuestaModel.pregunta),
         joinedload(InstrumentoModel.respuestas_formulario)
             .joinedload(RespuestasFormularioModel.respuestas)
-            .joinedload(RespuestaModel.opcion)
+            .joinedload(RespuestaModel.opcion),
+        joinedload(InstrumentoModel.departamento),
+        joinedload(InstrumentoModel.dictado),
     ).filter(InstrumentoModel.id == instrumento_id).first()
 
     if not instrumento:
@@ -84,7 +86,10 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
             respuestas=[],  # Lista vacía
             plantilla_formulario=instrumento.plantilla_formulario,
             respuestas_formulario=instrumento.respuestas_formulario,
-            materia=instrumento.materia
+            materia=instrumento.materia,
+            departamento=instrumento.departamento,
+            tipo = instrumento.tipo, 
+            dictado= instrumento.dictado
         )
     
     respuestas_form = instrumento.respuestas_formulario[0] 
@@ -109,8 +114,20 @@ def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):
         respuestas=respuestas_procesadas,
         plantilla_formulario=instrumento.plantilla_formulario,
         respuestas_formulario=instrumento.respuestas_formulario or [], 
-        materia=instrumento.materia
+        materia=instrumento.materia,
+        departamento=instrumento.departamento,
+        tipo=instrumento.tipo,
+        dictado=instrumento.dictado
     )
+
+
+@router.get("/ObtenerDatosInstrumento/{instrumento_id}", response_model=dict)
+def get_datos_instrumento(instrumento_id: int, db:Session = Depends(get_db)):
+    return services.getDatosInstrumento(db,instrumento_id)
+
+@router.get("/ObtenerDatosInstrumentoSintetico/{instrumento_id}", response_model=list)
+def get_datos_instrumento_sinteticos(instrumento_id: int, db:Session = Depends(get_db)):
+    return services.getDatosInstrumentoSintetico(db,instrumento_id)
 
 ###
 ##Obtener instrumentos por tipo y usuario, opcinal: filtrar por respondidos

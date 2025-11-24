@@ -1,5 +1,4 @@
-import { Button } from 'react-bootstrap';
-
+import { CButton } from '@coreui/react';
 type Props = {
     grupoCuadroId: number;
     instanciaIndex: number;
@@ -13,14 +12,14 @@ function EliminarInstancia({ grupoCuadroId, instanciaIndex, totalInstancias, onE
     }
 
     return (
-        <Button
+        <CButton
             variant="outline-danger"
             size="sm"
             onClick={() => onEliminar(grupoCuadroId, instanciaIndex)}
         >
             <i className="fas fa-trash me-1"></i>
             Eliminar
-        </Button>
+        </CButton>
     );
 }
 

@@ -2,6 +2,7 @@ import type { Pregunta, Respuesta } from "../types";
 import { Badge, Col, Row } from "react-bootstrap";
 import { EnumTipoPregunta } from "../types";
 import type { Opcion } from "../types";
+import { CBadge, CCol, CRow } from "@coreui/react";
 
 type RespuestaViewProps = {
     respuesta: Respuesta,
@@ -25,24 +26,24 @@ function MostrarOpciones({opciones} : mostrarOpcionesProp){
         
         filas.push(
             <>
-                <Row className="g-3 mb-3">                 
-                    <Col md={6} >
+                <CRow className="g-3 mb-3">                 
+                    <CCol md={6} >
                         <div className="border border-dark rounded p-2">
                             <p className="mb-0 ms-2">
                                 {primerElemento.texto}
                             </p>
                         </div>
-                    </Col>
+                    </CCol>
                     {segundoElemento &&
-                        <Col md={6} >
+                        <CCol md={6} >
                             <div className="border border-dark rounded p-2">
                                 <p className="mb-0 ms-2">
                                     {segundoElemento.texto}
                                 </p>
                             </div>
-                        </Col>
+                        </CCol>
                     }
-                </Row>
+                </CRow>
             </>
         )
     }
@@ -57,9 +58,9 @@ function RespuestaView({respuesta, numeroPregunta, cantidadPreguntas} : Respuest
         <>            
             <div className="d-flex gap-3 align-items-center justify-content-between pt-3 ps-3 pe-4">
                 <h4>{respuesta.pregunta.texto}</h4>
-                <Badge bg="secondary" className="p-2 ">
+                <CBadge color="secondary" className="p-2 ">
                     <p className="m-0">{numeroPregunta} de {cantidadPreguntas}</p>
-                </Badge>
+                </CBadge>
             </div>
 
             {respuesta.pregunta.tipo == EnumTipoPregunta.cerrada?
@@ -87,9 +88,9 @@ function RespuestaView({respuesta, numeroPregunta, cantidadPreguntas} : Respuest
                 
                 <div className="p-3 gap-3 d-flex align-items-start mb-3 ms-2 me-2">
 
-                    <Badge bg="secondary" className="p-3">
+                    <CBadge color="secondary" className="p-3">
                         <i  style={{ fontSize: '24px' }} className="fa-regular fa-lightbulb"></i>
-                    </Badge>
+                    </CBadge>
                     <p className="m-0 fs-4">
                         {respuesta.texto}
                     </p>

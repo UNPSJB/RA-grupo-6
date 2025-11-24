@@ -1,6 +1,7 @@
-import { Card, Button, ListGroup, Badge } from "react-bootstrap";
 import type { instrumentoList, TipoInstrumento } from "../types";
 import { capitalizarCadena } from "../../Funciones";
+import { CButton, CCardBody, CCardHeader, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react";
+import ShadowedCard from "../../coreui-components/ShadowedCard";
 
 
 const INSTRUMENTO_CONFIG = {
@@ -44,67 +45,58 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
   const config = INSTRUMENTO_CONFIG[tipo];
 
   return (
-    <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-      <Card.Body className="p-4 p-md-5">
-        <div className="mb-4">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h1 className="fw-bold mb-2">{config.titulo}</h1>
-              <p className="text-muted mb-0">{config.subtitulo}</p>
-            </div>
-          </div>
+    <ShadowedCard >
+      <CCardHeader>
+        <div className="m-2">
+              <h4 >{config.titulo}</h4>
+              <p className="text-medium-emphasis">{config.subtitulo}</p>
         </div>
+      </CCardHeader>
+      <CCardBody>
+        
         
         {instrumentos.length > 0 ? (
-          <ListGroup variant="flush">
-            {instrumentos.map((instrumento) => (
-              <ListGroup.Item 
-                key={instrumento.id} 
-                action 
-                onClick={() => onSeleccionar(instrumento)}
-                className="d-flex justify-content-between align-items-center p-4"
-                style={{ 
-                  cursor: 'pointer',
-                  borderBottom: '1px solid #e9ecef'
-                }}
-              >
-                <div className="flex-grow-1">
-                  <div className="fw-bold fs-5 mb-1">
-                    {capitalizarCadena(instrumento.materia.nombre)}
-                  </div>
-                  <div className="d-flex align-items-center gap-3 flex-wrap">
-                    <small className="text-muted">
-                      Código: {instrumento.materia.id}
-                    </small>
-                    <Badge bg={config.badgeColor}>
-                      {config.badgeText}
-                    </Badge>
-                    {instrumento.docente && (
-                      <small className="text-muted">
-                        Docente: {instrumento.docente.nombre} {instrumento.docente.apellido}
-                      </small>
-                    )}
-                    <small className="text-muted">
-                      Período {new Date(instrumento.fecha_inicio).toLocaleDateString()} al {new Date(instrumento.fecha_cierre).toLocaleDateString()}
-                    </small>
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="primary"
-                  size="sm" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSeleccionar(instrumento);
-                  }}
-                  className="px-4 py-2"
-                >
-                  <i className={`fas ${config.buttonIcon} me-2`}></i>
-                  {config.buttonText}
-                </Button>
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
+          <CTable className='border mb-1'  hover responsive>
+            <CTableHead color="light" >
+              <CTableRow>
+                <CTableHeaderCell>Materia</CTableHeaderCell>
+                <CTableHeaderCell>Período</CTableHeaderCell>
+                {tipo === 'INFORME_CATEDRA' && <CTableHeaderCell>Docente</CTableHeaderCell>}
+                <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {instrumentos.map((instrumento) => (
+                <CTableRow key={instrumento.id} onClick={() => onSeleccionar(instrumento)} style={{ cursor: 'pointer' }} >
+                  <CTableDataCell>
+                    <div className="fw-normal">{capitalizarCadena(instrumento.materia.nombre)}</div>
+                    <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    {new Date(instrumento.fecha_inicio).toLocaleDateString()} - {new Date(instrumento.fecha_cierre).toLocaleDateString()}
+                  </CTableDataCell>
+                  {tipo === 'INFORME_CATEDRA' && instrumento.docente && (
+                    <CTableDataCell>
+                      {instrumento.docente.nombre} {instrumento.docente.apellido}
+                    </CTableDataCell>
+                  )}
+                  <CTableDataCell className="text-center">
+                    <CButton
+                      color="primary"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSeleccionar(instrumento);
+                      }}
+                    >
+                      <i className={`fas ${config.buttonIcon}`}></i>
+                      {config.buttonText}
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
         ) : (
           <div className="text-center py-5">
             <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
@@ -112,7 +104,7 @@ export default function InstrumentoList({ instrumentos, tipo, onSeleccionar }: L
             <p className="text-muted">{config.emptyState}</p>
           </div>
         )}
-      </Card.Body>
-    </Card>
+      </CCardBody>
+    </ShadowedCard>
   );
 }

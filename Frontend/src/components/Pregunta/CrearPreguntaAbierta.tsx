@@ -3,11 +3,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 import IngresarPregunta from './IngresarPregunta';
-import { EnumTipoPregunta } from "../types";
+import { EnumTipoPregunta, TipoRespuesta } from "../types";
 import ElegirGrupoPregunta from '../GrupoPregunta/GrupoPregunta';
 import ELegirRol from '../Rol/ElegirRol';
 import ElegirGrupoCuadro from '../GrupoCuadro/ElegirGrupoCuadro';
 import type { ErrorPreguntaAbierta } from '../types';
+import { Row } from 'react-bootstrap';
+import { capitalizarCadena, esTipoRespuestaValido } from '../Funciones';
 
 type Props = {
     manejarPestania: () => void;
@@ -21,12 +23,14 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
     const [estadisticaSeleccionada, setEstadistica] = useState<boolean>(false);
     const [errores, setErrores] = useState<ErrorPreguntaAbierta>({});
     const [multiplesRespuestas, setMultiplesRespuestas] = useState<boolean>(false);
-
-
-
     const [grupoCuadroSeleccionado, setGrupoCuadroSeleccionado] = useState<number | null>(null)
     const [ordenEnGrupo, setOrdenEnGrupo] = useState<number>(1);
     const [obligatoria, setObligatoria] =useState<boolean>(false);
+
+    const [valorMinimo, setValorMinimo] = useState("")
+    const [valorMaximo, setValorMaximo] = useState("")
+    const [tipoDato, setTipoDato] = useState<string>(TipoRespuesta.TEXTO)
+    
 
     const crearPregunta = (event: React.FormEvent) => {
         const nuevosErrores: ErrorPreguntaAbierta = {};
@@ -45,26 +49,52 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         if (!rolSeleccionado) {
             nuevosErrores.rol = "Debes seleccionar un rol";
             erroresTotales++;
-    }
+        }
+
+        let tipoDatoRespuesta
+        if ((tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL)){
+
+            const tipoDatoCampo = (tipoDato == TipoRespuesta.RANGO_ENTERO? TipoRespuesta.ENTERO : TipoRespuesta.DECIMAL)
+            tipoDatoRespuesta = { tipo: tipoDato, valor_minimo: valorMinimo, valor_maximo: valorMaximo}
+
+            if (valorMinimo > valorMaximo){
+                nuevosErrores.minimoMayor = "El valor minimo debe ser menor que el valor maximo"
+                erroresTotales++;
+            }
+
+            if(! esTipoRespuestaValido(valorMinimo, JSON.stringify({tipo: tipoDatoCampo}))){
+                nuevosErrores.valorMinimo = `El valor minimo debe ser de tipo ${capitalizarCadena(tipoDatoCampo)}`
+                erroresTotales++;
+            } 
+
+            if(! esTipoRespuestaValido(valorMaximo, JSON.stringify({tipo: tipoDatoCampo}))){
+                nuevosErrores.valorMaximo = `El valor maximo debe ser de tipo ${capitalizarCadena(tipoDatoCampo)}`
+                erroresTotales++;
+            }  
+
+        }
+        else{
+            tipoDatoRespuesta = { tipo: tipoDato }
+        }
+
 
         setErrores(nuevosErrores);
 
         if (erroresTotales > 0) return;
 
-        
         const nuevaPregunta = {
             texto: texto,
             tipo: EnumTipoPregunta.abierta,
             grupo_pregunta_id: grupoSeleccionado,
-            rol_id: (rolSeleccionado),
             estadistica: estadisticaSeleccionada,
+            rol_id: (Number(rolSeleccionado)),
             multiple_respuestas: multiplesRespuestas,
+            obligatoria: obligatoria,
             grupo_cuadro_id: grupoCuadroSeleccionado,
             orden_en_grupo: grupoCuadroSeleccionado? ordenEnGrupo: null,
-            obligatoria: obligatoria
+            tipo_respuesta: JSON.stringify(tipoDatoRespuesta),
+            pregunta_fuente_id: null
         };
-
-        console.log("Payload que se envía:", nuevaPregunta);
 
         fetch("http://127.0.0.1:8000/preguntas/abierta",{
             method: "POST",
@@ -85,35 +115,55 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
         });
     };
 
-      useEffect(() => {
+    useEffect(() => {
         const nuevosErrores = { ...errores };
         let huboCambios = false;
     
         if (texto.trim() && nuevosErrores.texto) {
-          delete nuevosErrores.texto;
-          huboCambios = true;
+            delete nuevosErrores.texto;
+            huboCambios = true;
         }
     
         if (grupoSeleccionado !== 0 && nuevosErrores.grupo) {
-          delete nuevosErrores.grupo;
-          huboCambios = true;
+            delete nuevosErrores.grupo;
+            huboCambios = true;
         }
     
         if (rolSeleccionado && nuevosErrores.rol) {
-          delete nuevosErrores.rol;
-          huboCambios = true;
+            delete nuevosErrores.rol;
+            huboCambios = true;
         }
-    
+
+        if ((tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL)){
+
+            const tipoDatoCampo = (tipoDato == TipoRespuesta.RANGO_ENTERO? TipoRespuesta.ENTERO : TipoRespuesta.DECIMAL)
+
+            if (((valorMinimo <= valorMaximo) && nuevosErrores.minimoMayor)){
+                delete nuevosErrores.minimoMayor;
+                huboCambios = true;
+            }
+
+            if (esTipoRespuestaValido(valorMinimo, JSON.stringify({tipo: tipoDatoCampo})) && nuevosErrores.valorMinimo){
+                delete nuevosErrores.valorMinimo;
+                huboCambios = true;
+            }
+
+            if (esTipoRespuestaValido(valorMaximo, JSON.stringify({tipo: tipoDatoCampo})) && nuevosErrores.valorMaximo){
+                delete nuevosErrores.valorMaximo;
+                huboCambios = true;
+            }
+        }
+        
         if (huboCambios) {
-          setErrores(nuevosErrores);
+            setErrores(nuevosErrores);
         }
-      }, [texto, grupoSeleccionado, rolSeleccionado, errores]);
+    }, [texto, grupoSeleccionado, rolSeleccionado, tipoDato, valorMinimo, valorMaximo,errores]);
     
     return (
         <>
             <div className="contenedor-scroll"style={{maxHeight: '400px', 
             overflowY: 'auto',  padding: '1.25rem'}}>
-                <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto} />
+                <IngresarPregunta texto={texto} setTexto={setTexto} error={errores.texto} label={"Contenido de la pregunta"}/>
                 <ElegirGrupoPregunta
                     selectedGrupo={grupoSeleccionado}
                     onChangeGrupo={setGrupoSeleccionado}
@@ -163,6 +213,61 @@ function CrearPreguntaAbierta({ manejarPestania, refrescarPreguntas}: Props) {
                             onChange={(e) => setObligatoria(e.target.checked)}
                         />
                     </div>
+
+                    <div className='d-flex flex-column gap-3 border rounded p-2 px-3 shadow-sm'>
+                        
+                        <Row className='d-flex align-items-center justify-content-between'>
+                            <Col className='d-flex flex-column'>
+                                <span className='fw-semibold' style={{fontSize: "0.9rem"}}>
+                                    Tipo de respuesta
+                                </span>
+                                <small className='text-muted' style={{fontSize: "0.75rem"}}>
+                                    Que tipo de respuesta se espera
+                                </small>
+                            </Col>
+                            
+                            <Col >
+                                <Form.Select onChange={(e) => setTipoDato(e.target.value)}>
+                                    <option value={TipoRespuesta.TEXTO}>Texto</option>
+                                    <option value={TipoRespuesta.ENTERO}>Entero </option>
+                                    <option value={TipoRespuesta.DECIMAL}>Decimal </option>
+                                    <option value={TipoRespuesta.RANGO_ENTERO}>Rango entero</option>
+                                    <option value={TipoRespuesta.RANGO_DECIMAL}>Rango decimal</option>
+                                </Form.Select>
+                            </Col>
+                        </Row>
+
+
+                        {(tipoDato == TipoRespuesta.RANGO_ENTERO || tipoDato == TipoRespuesta.RANGO_DECIMAL) && 
+
+                            <Row>
+                                <Col className='text-muted'>
+                                    <Form.Group>
+                                        <Form.Control 
+                                            onChange={(e) => setValorMinimo(e.target.value)} 
+                                            placeholder="Ingrese el valor minimo..." 
+                                        />
+                                    </Form.Group>
+                                    {errores.valorMinimo && <div className="form-text text-danger">{errores.valorMinimo}</div>}
+                                </Col>
+
+                                <Col className='text-muted'>
+                                    <Form.Group>
+                                        <Form.Control 
+                                            onChange={(e) => setValorMaximo(e.target.value)} 
+                                            placeholder="Ingrese el valor maximo..." 
+                                        />
+                                    </Form.Group>
+                                    {errores.valorMaximo && <div className="form-text text-danger">{errores.valorMaximo}</div>}
+                                </Col>
+
+                                {errores.minimoMayor && <div className="form-text text-danger">{errores.minimoMayor}</div>}
+                            </Row>
+                        }
+
+                    </div>
+
+
                     </div>
 
                 </Form.Group>

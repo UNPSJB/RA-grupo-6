@@ -1,6 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import delete, select, update, func
+from sqlalchemy import delete, or_, select, update, func
 from src.Respuesta.models import Respuesta
 from src.Instrumento.models import Instrumento, TipoInstrumento
 from src.RespuestasFormulario.models import RespuestasFormulario
@@ -9,15 +9,12 @@ from src.Respuesta import schemas, exceptions
 from src.Pregunta.models import Pregunta
 from src.Opciones.models import Opcion
 from src.Materias.models import Materia
-#-------------- RESPUESTAS -----------------
 
 def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.Respuesta:
-    # Obtener la pregunta
     pregunta = db.scalar(select(Pregunta).where(Pregunta.id == respuesta.pregunta_id))
     if not pregunta:
         raise exceptions.PreguntaNoEncontrada()
     
-    # Validar tipo de respuesta
     if pregunta.tipo == "abierta" and not respuesta.texto:
         raise exceptions.RespuestaInvalida()
     if pregunta.tipo == "cerrada" and not respuesta.opcion_id:
@@ -25,8 +22,6 @@ def crear_respuesta(db: Session, respuesta: schemas.RespuestaCreate) -> schemas.
     if pregunta.multiple_respuestas and not respuesta.instancia_respuesta:
         raise exceptions.RespuestaInvalida()
     
-
-    # Crear nueva respuesta
     nueva_respuesta = Respuesta(**respuesta.model_dump())
     db.add(nueva_respuesta)
     db.commit()
@@ -72,15 +67,30 @@ def obtener_respuesta_fuente(db: Session, pregunta_id: int, instrumento_actual_i
     if not pregunta:
         return {"respuestas": [], "multiple": False}
     
-    pregunta_fuente_id = pregunta.pregunta_fuente_id if pregunta.pregunta_fuente_id else pregunta.id
-    pregunta_fuente = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_fuente_id))
-    
-    if not pregunta_fuente:
-        return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
-    
     instrumento_actual = db.scalar(select(Instrumento).where(Instrumento.id == instrumento_actual_id))
     
     if not instrumento_actual:
+        return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+    
+    pregunta_fuente_id = None
+    
+    if instrumento_actual.materia and instrumento_actual.materia.ciclo:
+        ciclo = instrumento_actual.materia.ciclo
+        
+        if ciclo == "CICLO_SUPERIOR":
+            pregunta_fuente_id = pregunta.pregunta_fuente_id
+        elif ciclo == "CICLO_BASICO":
+            pregunta_fuente_id = pregunta.pregunta_fuente_dos_id
+        
+        if not pregunta_fuente_id:
+            pregunta_fuente_id = pregunta.pregunta_fuente_dos_id if ciclo == "CICLO_SUPERIOR" else pregunta.pregunta_fuente_id
+    
+    if not pregunta_fuente_id:
+        pregunta_fuente_id = pregunta.pregunta_fuente_id or pregunta.id
+    
+    pregunta_fuente = db.scalar(select(Pregunta).where(Pregunta.id == pregunta_fuente_id))
+    
+    if not pregunta_fuente:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     
     if instrumento_actual.tipo == TipoInstrumento.INFORME_CATEDRA:
@@ -171,24 +181,31 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
     if not instrumentos_catedra:
         return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
     
-    respuestas_sintetizadas = []
     pregunta_id_a_buscar = pregunta_fuente.id 
     
-    if pregunta_fuente.tipo == "abierta":
+    if pregunta_fuente.tipo == "abierta" or (pregunta.tipo == "abierta" and pregunta_fuente.tipo == "cerrada"):
         
+        respuestas_sintetizadas = []
         for instrumento_catedra in instrumentos_catedra:
-            
             materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
             materia_nombre = materia.nombre if materia else None
             materia_id = materia.id if materia else None
+            
+            if pregunta_fuente.tipo == "abierta":
+                q = select(Respuesta.texto)
+                q = q.where(Respuesta.texto.isnot(None)) 
+                
+            else:
+                q = select(Opcion.texto).join(Respuesta, Respuesta.opcion_id == Opcion.id)
+                q = q.where(Respuesta.opcion_id.isnot(None))
+
 
             respuestas_de_texto = db.scalars(
-                select(Respuesta.texto)
+                q
                 .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
                 .where(
-                    Respuesta.pregunta_id == pregunta_id_a_buscar, 
-                    RespuestasFormulario.instrumento_id == instrumento_catedra.id,
-                    Respuesta.texto.isnot(None) 
+                    Respuesta.pregunta_id == pregunta_fuente.id,
+                    RespuestasFormulario.instrumento_id == instrumento_catedra.id
                 )
             ).all()
 
@@ -214,7 +231,7 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         preguntas_del_grupo = db.scalars(
             select(Pregunta)
             .where(
-                (Pregunta.grupo_pregunta_id == target_group_id) | (Pregunta.id == target_group_id),
+                or_(Pregunta.grupo_pregunta_id == target_group_id, Pregunta.id == target_group_id),
                 Pregunta.tipo == "cerrada",
                 Pregunta.estadistica == True
             )
@@ -223,53 +240,55 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
         
         if not preguntas_del_grupo:
             return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
+        
+        respuestas_sintetizadas = []
+        for instrumento_catedra in instrumentos_catedra: 
+             conteo_total_por_opcion_local = {}
+             total_respuestas_general_local = 0
+             
+             materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
+             materia_nombre = materia.nombre if materia else None
+             materia_id = materia.id if materia else None
 
-        for instrumento_catedra in instrumentos_catedra:
-            conteo_total_por_opcion_local = {}
-            total_respuestas_general_local = 0
+             for pregunta_grupo in preguntas_del_grupo:
+                 conteo_opciones = db.execute(
+                     select(Opcion.texto, func.count(Respuesta.id))
+                     .join(Respuesta, Respuesta.opcion_id == Opcion.id)
+                     .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
+                     .where(
+                         Respuesta.pregunta_id == pregunta_grupo.id, 
+                         RespuestasFormulario.instrumento_id == instrumento_catedra.id
+                     )
+                     .group_by(Opcion.id, Opcion.texto)
+                 ).all()
+
+                 for opcion_texto, count in conteo_opciones:
+                     if opcion_texto not in conteo_total_por_opcion_local:
+                         conteo_total_por_opcion_local[opcion_texto] = 0
+                     conteo_total_por_opcion_local[opcion_texto] += count
+                     total_respuestas_general_local += count
             
-            materia = db.scalar(select(Materia).where(Materia.id == instrumento_catedra.materia_id))
-            materia_nombre = materia.nombre if materia else None
-            materia_id = materia.id if materia else None
-
-            for pregunta_grupo in preguntas_del_grupo:
-                conteo_opciones = db.execute(
-                    select(Opcion.texto, func.count(Respuesta.id))
-                    .join(Respuesta, Respuesta.opcion_id == Opcion.id)
-                    .join(RespuestasFormulario, RespuestasFormulario.id == Respuesta.formulario_id)
-                    .where(
-                        Respuesta.pregunta_id == pregunta_grupo.id, 
-                        RespuestasFormulario.instrumento_id == instrumento_catedra.id
-                    )
-                    .group_by(Opcion.id, Opcion.texto)
-                ).all()
-
-                for opcion_texto, count in conteo_opciones:
-                    if opcion_texto not in conteo_total_por_opcion_local:
-                        conteo_total_por_opcion_local[opcion_texto] = 0
-                    conteo_total_por_opcion_local[opcion_texto] += count
-                    total_respuestas_general_local += count
-            
-            if total_respuestas_general_local > 0:
-                estadisticas_generales = []
-                for opcion_texto, count in sorted(conteo_total_por_opcion_local.items()):
-                    porcentaje = round((count / total_respuestas_general_local) * 100, 1)
-                    estadisticas_generales.append(f"{opcion_texto}: {porcentaje}%")
+             if total_respuestas_general_local > 0:
+                 estadisticas_generales = []
+                 for opcion_texto, count in sorted(conteo_total_por_opcion_local.items()):
+                     porcentaje = round((count / total_respuestas_general_local) * 100, 1)
+                     estadisticas_generales.append(f"{opcion_texto}: {porcentaje}%")
                 
-                texto_final = ", ".join(estadisticas_generales)
+                 texto_final = ", ".join(estadisticas_generales)
                 
-                respuestas_sintetizadas.append({
-                    "texto": texto_final,
-                    "instancia": None,
-                    "opcion_id": None,
-                    "materia_nombre": materia_nombre,
-                    "materia_id": materia_id
-                })
+                 respuestas_sintetizadas.append({
+                     "texto": texto_final,
+                     "instancia": None,
+                     "opcion_id": None,
+                     "materia_nombre": materia_nombre,
+                     "materia_id": materia_id
+                 })
 
         return {
             "respuestas": respuestas_sintetizadas,
             "multiple": pregunta.multiple_respuestas
         }
+    
     return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
 
 def obtener_respuestas_por_formulario(db, formulario_id: int):

@@ -37,7 +37,7 @@ class Instrumento(ModeloBase):
     plantilla_formulario_id: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
     materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"), nullable=False)
     dictado_id: Mapped[int] = mapped_column(ForeignKey("dictados.id"))
-    departamento_id: Mapped[Optional[int]] = mapped_column(ForeignKey("departamento.id"), nullable=True)
+    departamento_id: Mapped[Optional[int]] = mapped_column(ForeignKey("departamento.id"), nullable=False)
     
 
     instrumento_fuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("instrumento.id"), nullable=True)

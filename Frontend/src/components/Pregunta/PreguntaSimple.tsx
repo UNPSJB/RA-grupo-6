@@ -1,32 +1,82 @@
-import { Badge, Form } from 'react-bootstrap';
-import { EnumTipoPregunta } from '../types';
+import { Alert, Badge, Button, Form} from 'react-bootstrap';
+import { EnumTipoPregunta, TipoRespuesta } from '../types';
 import type { RespuestaTemporal } from '../types';
+import { useState } from 'react';
+import { cargarRespuesta } from '../Respuesta/CargarRespuestasIniciales';
+import { esTipoRespuestaValido } from '../Funciones';
 
 type Props = {
     pregunta: any;
     index: number;
     respuesta?: RespuestaTemporal;
     onActualizar: (preguntaId: number, texto?: string, opcionId?: number) => void;
+    instrumento_id: number;
 };
 
-function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
+export function getMensajeError(jsonTipoDato: string){
+
+    const valorTipoDato = JSON.parse(jsonTipoDato) 
+
+    let mensaje : string = ""
+
+    switch(valorTipoDato.tipo){
+
+        case(TipoRespuesta.ENTERO):
+            mensaje = "Formato inválido. Por favor, ingrese un numero entero."
+            break;
+
+        case (TipoRespuesta.DECIMAL):
+            mensaje = "Formato inválido. Por favor, ingrese un numero decimal."
+            break;
+
+        case(TipoRespuesta.TEXTO):
+            mensaje = "Formato inválido. Por favor, ingrese un texto."
+            break;
+    
+        case(TipoRespuesta.RANGO_ENTERO):
+            mensaje = `Formato inválido. Por favor, ingrese un numero entero comprendido entre ${valorTipoDato.valor_minimo} y ${valorTipoDato.valor_maximo}.`
+            break;
+    
+        case (TipoRespuesta.RANGO_DECIMAL):
+            mensaje = `Formato inválido. Por favor, ingrese un numero decimal comprendido entre ${valorTipoDato.valor_minimo} y ${valorTipoDato.valor_maximo}.`
+        break;
+    
+        default:
+            mensaje = "Tipo de dato incorrecto"
+    }
+
+    return mensaje
+}
+
+
+function PreguntaSimple({ pregunta, index, respuesta, onActualizar, instrumento_id }: Props) {
+
+    const [valor, setValor] = useState(respuesta?.texto? respuesta.texto : "")
+    const [respuestaValida, setRespuestaValida] = useState(true)
+    
+
     return (
         <div className="mb-4 pb-3">
             <div className="mb-3 d-flex align-items-center gap-3">
-                <Badge
-                    bg="secondary"
-                    className="rounded-circle"
+                <div
                     style={{
-                        width: '35px',
-                        height: '35px',
-                        fontSize: '1rem',
+                        minWidth: '40px',
+                        minHeight: '40px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        fontSize: '0.95rem',
+                        fontWeight: 'bold',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        flexShrink: 0,
                     }}
                 >
                     {index + 1}
-                </Badge>
+                </div>
                 <div className="flex-grow-1">
                     <h5 className="fw-semibold mb-1">{pregunta.texto} {pregunta.obligatoria && (<span style={{ color: "red" }}>*</span>)} </h5>
                     <div className="d-flex gap-2 align-items-center">
@@ -44,14 +94,24 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
             </div>
 
             {pregunta.tipo === EnumTipoPregunta.abierta ? (
-                <Form.Control
-                    as="textarea"
-                    rows={4}
-                    value={respuesta?.texto || ''}
-                    onChange={(e) => onActualizar(pregunta.id, e.target.value)}
-                    placeholder="Escriba su respuesta..."
-                    className="input-pregunta"
-                />
+                <>
+                    <Form.Control
+                        as="textarea"
+                        value={valor}
+                        rows={4}
+                        onChange={(e) => {setValor(e.target.value); pregunta.tipo_respuesta? setRespuestaValida(esTipoRespuestaValido(e.target.value, pregunta.tipo_respuesta)) : null;  onActualizar(pregunta.id, e.target.value, undefined)}}
+                        placeholder="Escriba su respuesta..."
+                        className="input-pregunta"
+                    />
+                    
+                    {!respuestaValida && 
+                    
+                        <Alert key={pregunta.id} className="mt-3" variant='danger'>
+                            <i className="fa-solid fa-circle-exclamation" style={{color: "red"}}> </i> {getMensajeError(pregunta.tipo_respuesta)}
+                        </Alert>
+                    }
+                </>
+
             ) : (
                 <Form.Group>
                     {pregunta.opciones?.map((opcion: any) => (
@@ -67,6 +127,13 @@ function PreguntaSimple({ pregunta, index, respuesta, onActualizar }: Props) {
                     ))}
                 </Form.Group>
             )}
+
+            {pregunta.pregunta_fuente_id &&
+            <div className='text-end mb-1 mt-1'>
+
+                <Button  onClick={() => cargarRespuesta(pregunta, instrumento_id).then(valor => setValor(String(valor.texto)))} style={{border: "none", color:"black", backgroundColor:"transparent"}}> <i className="fa-solid fa-arrow-rotate-left"></i> Actualizar respuestas  </Button>
+            </div>
+            }
         </div>
     );
 }

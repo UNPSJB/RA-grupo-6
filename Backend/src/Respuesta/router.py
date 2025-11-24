@@ -5,8 +5,6 @@ from src.Respuesta import services, schemas
 
 router = APIRouter(prefix="/respuestas", tags=["Respuestas"])
 
-#Rutas de Respuestas
-
 @router.get("/fuente")
 def obtener_respuesta_fuente(pregunta_id: int,instrumento_id: int,db: Session = Depends(get_db)):
     resultado = services.obtener_respuesta_fuente(db, pregunta_id, instrumento_id)

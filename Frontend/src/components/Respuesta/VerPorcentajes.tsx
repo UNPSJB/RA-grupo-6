@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { Badge, Button, ListGroup } from "react-bootstrap";
 import { EnumTipoPregunta, type GrupoPregunta, type Instrumento, type Pregunta } from "../types";
 import { ModalRespuestasAbiertas } from "./ModalRespuestasAbiertas";
+import { CBadge, CButton, CListGroup, CListGroupItem } from "@coreui/react";
 
 
 export function Llamadora({ id_instrumento }: { id_instrumento: number }) {
   const [instrumento, setInstrumento] = useState<Instrumento>();
   const url_base = `http://127.0.0.1:8000/instrumentos/${1}/detail`;
-
-  console.log("ID instrumento recibido en Llamadora:", id_instrumento);
 
   useEffect(() => {
     fetch(url_base)
@@ -28,8 +27,6 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
   
   const todasLasRespuestas = instrumento?.respuestas_formulario?.flatMap(rf => rf.respuestas) ?? [];
 
-    console.log("Todas las respuestas planas:", todasLasRespuestas);
-  console.log("Preguntas del formulario:", instrumento.plantilla_formulario.preguntas);
   useEffect(() => {
     if (instrumento) {
       const grupos = obtenerGrupos();
@@ -75,7 +72,7 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
 
       <div className="choose-group d-flex gap-3 m-3">
         {obtenerGrupos().map(grupo => (
-          <Button
+          <CButton
             key={grupo.id}
             onClick={() =>
               setRespuestasMostradas(
@@ -84,17 +81,17 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
             }
           >
             Grupo {grupo.letra}
-          </Button>
+          </CButton>
         ))}
       </div>
 
       {respuestasMostradas.map((pregunta, numero) => (
-        <ListGroup key={pregunta.id} className="border p-3 mb-3">
+        <CListGroup key={pregunta.id} className="border p-3 mb-3">
           <div className="d-flex gap-3">
-            <Badge className="p-2 align-content-center">
+            <CBadge className="p-2 align-content-center">
               {pregunta.grupo_pregunta.letra}{numero + 1}
-            </Badge>
-            <Badge className="p-2 align-content-center">Pregunta {pregunta.tipo}</Badge>
+            </CBadge>
+            <CBadge className="p-2 align-content-center">Pregunta {pregunta.tipo}</CBadge>
           </div>
 
           <p className="mb-3 mt-3">{pregunta.texto}</p>
@@ -106,16 +103,16 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
               const porcentaje = total ? Math.round((cantOpcion * 100) / total) : 0;
 
               return (
-                <ListGroup.Item
+                <CListGroupItem
                   key={opcion.id}
                   className="border rounded p-3 mb-3 d-flex justify-content-between align-items-center"
                 >
                   <p className="mb-0">{opcion.texto}</p>
                   <div className="d-flex gap-3">
                     <p className="mb-0">({cantOpcion} respuestas)</p>
-                    <Badge className="p-2">{porcentaje}%</Badge>
+                    <CBadge className="p-2">{porcentaje}%</CBadge>
                   </div>
-                </ListGroup.Item>
+                </CListGroupItem>
               );
             })
           ) : (
@@ -124,16 +121,16 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
                 .filter(r => r.pregunta.id === pregunta.id)
                 .slice(0, 3)
                 .map((r, idx) => (
-                  <ListGroup.Item key={idx} className="mb-3 border rounded p-3">
+                  <CListGroupItem key={idx} className="mb-3 border rounded p-3">
                     <p className="mb-0">{r.texto}</p>
-                  </ListGroup.Item>
+                  </CListGroupItem>
                 ))}
 
               {todasLasRespuestas.filter(r => r.pregunta.id === pregunta.id).length > 3 && (
                 <>
-                  <Button onClick={() => setMostrar(true)}>
+                  <CButton onClick={() => setMostrar(true)}>
                     Ver todas las respuestas ({obtenerCantRespuestas(pregunta.id)})
-                  </Button>
+                  </CButton>
                   {mostrar && (
                     <ModalRespuestasAbiertas
                       ListaRespuestas={todasLasRespuestas}
@@ -147,7 +144,7 @@ export function VerPorcentajes({ instrumento }: { instrumento: Instrumento }) {
               )}
             </>
           )}
-        </ListGroup>
+        </CListGroup>
       ))}
     </div>
   );

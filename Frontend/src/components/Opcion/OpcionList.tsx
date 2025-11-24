@@ -3,6 +3,7 @@ import type { Opcion } from "../types";
 import CrearOpcion from "./OpcionCreate";
 import { Form, ListGroup} from "react-bootstrap"
 import EliminarOpcion from "./OpcionDelete";
+import { CFormCheck, CListGroup, CListGroupItem } from "@coreui/react";
 
 const url_base = 'http://127.0.0.1:8000/opciones/'
 
@@ -45,17 +46,17 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
       <CrearOpcion onCrear={agregarOpcion} />
 
       {opciones.length > 0 && (
-        <ListGroup variant="flush" className="border p-3 rounded">
+        <CListGroup variant="flush" className="border p-3 rounded">
           <p className="text-muted mb-3" style={{ fontSize: "0.875rem" }}>
             Selecciona las opciones disponibles:
           </p>
           <div>
           {opciones.map((opcion) => (
-            <ListGroup.Item
+            <CListGroupItem
             key={opcion.id}
             className="d-flex align-items-center justify-content-between mb-2 border rounded p-2"
             >
-              <Form.Check
+              <CFormCheck
                 type="checkbox"
                 id={`opcion-${opcion.id}`}
                 label={opcion.texto}
@@ -63,10 +64,10 @@ function OpcionList({opcionesSeleccionadas, setOpcionesSeleccionadas} : Props){
                 onChange={() => agregarOpcionSeleccionada(opcion)}
               />
               <EliminarOpcion opcionId={opcion.id} onDeleted={eliminarOpcion} />
-            </ListGroup.Item>
+            </CListGroupItem>
           ))}
           </div>
-        </ListGroup>
+        </CListGroup>
       )}
     </>
 

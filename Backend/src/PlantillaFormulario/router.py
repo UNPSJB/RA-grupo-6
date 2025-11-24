@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from src.Usuarios.auth import require_role
 from src.database import get_db
 from src.PlantillaFormulario import services, schemas
 router = APIRouter(prefix="/formularios", tags=["Formularios"])

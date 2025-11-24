@@ -1,11 +1,26 @@
-import type { GrupoPreguntas } from '../types';
+import type { GrupoPreguntas, InstrumentoDetail } from '../types';
 
 const PREGUNTAS_POR_PAGINA = 5;
 
-export function organizarPreguntasEnGrupos(plantillaFormulario: any): GrupoPreguntas[] {
+export function organizarPreguntasEnGrupos(
+    plantillaFormulario: any,
+    instrumento?: InstrumentoDetail
+): GrupoPreguntas[] {
     if (!plantillaFormulario) return [];
     
     const grupos: GrupoPreguntas[] = [];
+    const esInformeSintetico = instrumento?.tipo === "INFORME_SINTETICO";
+
+    if (esInformeSintetico) {
+        grupos.push({
+            id: -1,
+            nombre: "Información General",
+            preguntas: [],
+            tipo: 'simple'
+        });
+    }
+
+
     const preguntasSimples = plantillaFormulario.preguntas.filter((p: any) => !p.multiple_respuestas);
     const preguntasMultiples = plantillaFormulario.preguntas.filter((p: any) => p.multiple_respuestas);
     
@@ -18,7 +33,8 @@ export function organizarPreguntasEnGrupos(plantillaFormulario: any): GrupoPregu
         preguntasSimplesPorGrupo.get(grupoId)!.push(pregunta);
     });
     
-    let contadorGrupo = 1;
+    let contadorGrupo = esInformeSintetico ? 2 : 1;
+
     preguntasSimplesPorGrupo.forEach((preguntas, grupoId) => {
         if (grupoId !== null && preguntas.length > 0) {
             grupos.push({
@@ -32,7 +48,7 @@ export function organizarPreguntasEnGrupos(plantillaFormulario: any): GrupoPregu
             for (let i = 0; i < preguntas.length; i += PREGUNTAS_POR_PAGINA) {
                 grupos.push({
                     id: -contadorGrupo,
-                    nombre: `Página ${contadorGrupo}`,
+                    nombre: `Sección ${contadorGrupo}`,
                     preguntas: preguntas.slice(i, i + PREGUNTAS_POR_PAGINA),
                     tipo: 'simple'
                 });
@@ -40,7 +56,7 @@ export function organizarPreguntasEnGrupos(plantillaFormulario: any): GrupoPregu
             }
         }
     });
-    
+
     const gruposCuadro = new Set<number>(
         preguntasMultiples
             .map((p: any) => p.grupo_cuadro_id)

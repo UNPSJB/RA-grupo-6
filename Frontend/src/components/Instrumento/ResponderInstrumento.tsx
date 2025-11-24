@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Spinner, Tabs, Tab } from 'react-bootstrap';
-import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas } from '../types';
+import { Container, Card, Button, Alert, Spinner, Tabs, Tab} from 'react-bootstrap';
+import type { RespuestaTemporal, InstanciaRespuestas, GrupoPreguntas, InstrumentoDetail, PlantillaFormulario} from '../types';
 import { useAuth } from '../../context/AuthContext'; 
 import { Llamadora } from '../Respuesta/VerPorcentajes';
 import { cargarRespuestasIniciales } from '../Respuesta/CargarRespuestasIniciales';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
-import { validarTodasRespuestasCompletas } from '../Respuesta/ValidarRespuestas';
+import { validarTodasRespuestasCompletas} from '../Respuesta/ValidarRespuestas';
 import { enviarFormularioCompleto } from '../Respuesta/EnviarRespuestas';
 import NavegacionPaginas from './NavegacionPaginas';
 import PreguntaSimple from '../Pregunta/PreguntaSimple';
 import PreguntaMultiple from '../Pregunta/PreguntaMultiples';
 import AgregarInstancia from './AgregarInstancia';
 import ResumenRespuestas from '../Respuesta/ResumenRespuestas';
+import { DatosInstrumento } from './DatosInstrumento';
+import { DatosInstrumentoSintetico } from './DatosInstrumentoSintetico';
+import { CAlert, CButton, CCard, CCardBody, CContainer, CSpinner } from '@coreui/react';
 
 export default function ResponderInstrumento() {
     const { instrumentoId: instrumentoIdParam } = useParams<{ instrumentoId: string }>();
@@ -20,8 +23,8 @@ export default function ResponderInstrumento() {
     const location = useLocation();
     const { user } = useAuth(); 
 
-    const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<any>(null);
-    const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
+    const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState<InstrumentoDetail>();
+    const [plantillaFormulario, setPlantillaFormulario] = useState<PlantillaFormulario>();
 
     const [respuestas, setRespuestas] = useState<RespuestaTemporal[]>([]);
     const [respuestasMultiples, setRespuestasMultiples] = useState<{
@@ -34,6 +37,9 @@ export default function ResponderInstrumento() {
 
     const [paginaActual, setPaginaActual] = useState(0);
     const [mostrarResumen, setMostrarResumen] = useState(false);
+    const [tabActiva, setTabActiva] = useState<'responder' | 'estadisticas'>('responder');
+
+    const [preguntaInfoGeneralId, setPreguntaInfoGeneralId] = useState<number | null>(null);
 
     const locationState = location.state || {};
     const rolActual = locationState.rol || user?.rol?.nombre || localStorage.getItem('rol_actual');
@@ -42,11 +48,9 @@ export default function ResponderInstrumento() {
     const materiaNombre = locationState.materiaNombre || '';
     const rutaVolver = esDocente ? '/instrumentos-docente' : esAlumno ? '/materias' : '/';
 
-
     useEffect(() => {
-        
         if (!user) {
-            console.warn('⚠️ No hay usuario autenticado');
+            console.warn('No hay usuario autenticado');
         }
     }, [user, navigate]);
 
@@ -128,12 +132,36 @@ export default function ResponderInstrumento() {
         }));
     };
 
+    const handleDatosInfoGeneralListos = (datos: any[], preguntaId: number | null) => {
+        if (preguntaId) {
+            setPreguntaInfoGeneralId(preguntaId);
+            
+            const respuestaInfoGeneral: RespuestaTemporal = {
+                pregunta_id: preguntaId,
+                texto: JSON.stringify(datos),
+                opcion_id: null
+            };
+            
+            setRespuestas(prev => {
+                const existe = prev.find(r => r.pregunta_id === preguntaId);
+                if (existe) {
+                    return prev.map(r => r.pregunta_id === preguntaId ? respuestaInfoGeneral : r);
+                }
+                return [...prev, respuestaInfoGeneral];
+            });
+        }
+    };
+
     const todasRespondidas = (): boolean => {
+
+        if (instrumentoSeleccionado == undefined) {
+            return false;
+        }
+
         return validarTodasRespuestasCompletas(respuestas, respuestasMultiples, plantillaFormulario);
     };
 
     const enviarRespuestas = async (): Promise<boolean> => {
-        
         if (!instrumentoSeleccionado) {
             alert('Error: No hay instrumento seleccionado');
             return false;
@@ -157,7 +185,7 @@ export default function ResponderInstrumento() {
             console.log('Resultado del envío:', exito);
             return exito;
         } catch (error) {
-            console.error('❌ Error en enviarRespuestas:', error);
+            console.error('Error en enviarRespuestas:', error);
             alert('Error al enviar: ' + (error instanceof Error ? error.message : 'Error desconocido'));
             return false;
         } finally {
@@ -165,7 +193,10 @@ export default function ResponderInstrumento() {
         }
     };
 
-    const gruposOrganizados: GrupoPreguntas[] = organizarPreguntasEnGrupos(plantillaFormulario);
+    const gruposOrganizados: GrupoPreguntas[] = organizarPreguntasEnGrupos(
+        plantillaFormulario,
+        instrumentoSeleccionado
+    );
     const totalPaginas = gruposOrganizados.length;
 
     const avanzarPagina = () => {
@@ -194,40 +225,48 @@ export default function ResponderInstrumento() {
 
     if (cargando)
         return (
-            <Container className="mt-4 text-center">
-                <Spinner animation="border" role="status" className="mb-3" />
+            <CContainer className="mt-4 text-center">
+                <CSpinner role="status" className="mb-3" />
                 <p>Cargando formulario...</p>
-            </Container>
+            </CContainer>
         );
 
     if (error)
         return (
-            <Container className="mt-4">
-                <Alert variant="danger">
+            <CContainer className="mt-4">
+                <CAlert variant="danger" color={''}>
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     {error}
                     <div className="mt-3">
-                        <Button variant="outline-danger" onClick={() => navigate(rutaVolver)}>
+                        <CButton variant="outline" onClick={() => navigate(rutaVolver)}>
                             Volver atrás
-                        </Button>
+                        </CButton>
                     </div>
-                </Alert>
-            </Container>
+                </CAlert>
+            </CContainer>
         );
 
     const grupoActual =
         !mostrarResumen && paginaActual < gruposOrganizados.length ? gruposOrganizados[paginaActual] : null;
 
+    const esInformeSintetico = instrumentoSeleccionado?.tipo === "INFORME_SINTETICO";
+    const esPaginaInfoGeneral = esInformeSintetico && paginaActual === 0;
+
     return (
         <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
-            <Container style={{ maxWidth: '1200px' }}>
-                <Button variant="outline-secondary" className="mb-3" onClick={() => navigate(rutaVolver)}>
+            <CContainer style={{ maxWidth: '1200px' }}>
+                <CButton variant="outline" className="mb-3" onClick={() => navigate(rutaVolver)}>
                     <i className="fa-solid fa-arrow-left"></i> Volver{' '}
                     {esDocente ? 'a Informes de Cátedra' : esAlumno ? 'a Materias' : 'atrás'}
-                </Button>
+                </CButton>
 
-                <Card className=" w-100 mb-4" style={{ borderRadius: '1rem' }}>
-                    <Card.Body className="p-4">
+                <CCard className="w-100 mb-4" style={{ borderRadius: '1rem' }}>
+                    <CCardBody className="p-4">
+
+                        {instrumentoSeleccionado && tabActiva === 'responder' && (
+                            <DatosInstrumento instrumento={instrumentoSeleccionado} />
+                        )}
+
                         <div className="text-center mb-4">
                             <h1 className="fw-bold mb-2" style={{ color: '#1f2937', fontSize: '1.875rem' }}>
                                 {plantillaFormulario?.titulo || `Informe de Cátedra - ${materiaNombre}`}
@@ -239,89 +278,125 @@ export default function ResponderInstrumento() {
                             </p>
                         </div>
 
-                        <NavegacionPaginas
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            gruposOrganizados={gruposOrganizados}
-                            respuestas={respuestas}
-                            respuestasMultiples={respuestasMultiples}
-                            mostrarResumen={mostrarResumen}
-                            mostrarProgreso={true}
-                            mostrarIndicadores={true}
-                            mostrarBotones={false}
-                            mostrarAlerta={false}
-                            onAvanzar={avanzarPagina}
-                            onRetroceder={retrocederPagina}
-                            onIrAPagina={irAPagina}
-                        />
+                        {tabActiva === 'responder' && (
+                            <NavegacionPaginas
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                gruposOrganizados={gruposOrganizados}
+                                respuestas={respuestas}
+                                respuestasMultiples={respuestasMultiples}
+                                mostrarResumen={mostrarResumen}
+                                mostrarProgreso={true}
+                                mostrarIndicadores={true}
+                                mostrarBotones={false}
+                                mostrarAlerta={true}
+                                onAvanzar={avanzarPagina}
+                                onRetroceder={retrocederPagina}
+                                onIrAPagina={irAPagina}
+                                plantillaFormulario={plantillaFormulario}
+                            />
+                        )}
 
-                        {esDocente && !mostrarResumen && instrumentoSeleccionado && (
-                            <Tabs defaultActiveKey="responder" className="mb-4">
+                        {esDocente && instrumentoSeleccionado && (
+                            <Tabs 
+                                activeKey={tabActiva}
+                                onSelect={(k) => setTabActiva(k as 'responder' | 'estadisticas')}
+                                className="mb-4"
+                            >
                                 <Tab eventKey="responder" title="Responder Informe"></Tab>
-                                <Tab eventKey="estadisticas" title="Ver Estadísticas">
-                                    <div className="mt-4">
-                                        <Llamadora id_instrumento={instrumentoSeleccionado.id} />
-                                    </div>
-                                </Tab>
+                                <Tab eventKey="estadisticas" title="Ver Estadísticas"></Tab>
                             </Tabs>
                         )}
 
-                        {!mostrarResumen && grupoActual && (
+                        {tabActiva === 'responder' && !mostrarResumen && grupoActual && (
                             <>
-                                <div
-                                    className="mb-4 p-3 rounded"
-                                    style={{
-                                        backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
-                                        borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`,
-                                    }}
-                                >
-                                    <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
-                                        {grupoActual.nombre}
-                                    </h4>
-                                    <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                                        {grupoActual.tipo === 'multiple'
-                                            ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
-                                            : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
-                                    </p>
-                                </div>
-
-                                {grupoActual.tipo === 'simple' ? (
-                                    grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                        <PreguntaSimple
-                                            key={pregunta.id}
-                                            pregunta={pregunta}
-                                            index={idx}
-                                            respuesta={obtenerRespuesta(pregunta.id)}
-                                            onActualizar={actualizarRespuesta}
-                                        />
-                                    ))
-                                ) : (
+                                {esPaginaInfoGeneral && (
                                     <div>
-                                        {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
-                                            <div key={instanciaIdx} className="mb-4">
-                                                {grupoActual.preguntas.map((pregunta: any, idx: number) => (
-                                                    <PreguntaMultiple
-                                                        key={pregunta.id}
-                                                        pregunta={pregunta}
-                                                        index={idx}
-                                                        instancia={instancia}
-                                                        instanciaIndex={instanciaIdx}
-                                                        grupoCuadroId={grupoActual.id}
-                                                        totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
-                                                        onActualizar={actualizarRespuestaMultiple}
-                                                        onEliminar={eliminarInstancia}
-                                                    />
-                                                ))}
-                                            </div>
-                                        ))}
+                                        <div
+                                            className="mb-4 p-3 rounded"
+                                            style={{
+                                                backgroundColor: '#f0f7ff',
+                                                borderLeft: '4px solid #816767ff',
+                                            }}
+                                        >
+                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                                {grupoActual.nombre}
+                                            </h4>
+                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                                Vista de todas las actividades curriculares asociadas a este informe
+                                            </p>
+                                        </div>
 
-                                        <AgregarInstancia
-                                            grupoCuadroId={grupoActual.id}
-                                            preguntasDelGrupo={grupoActual.preguntas}
-                                            instancias={respuestasMultiples[grupoActual.id] || []}
-                                            onAgregar={agregarInstanciaRespuestas}
-                                        />
+                                        {instrumentoSeleccionado && (
+                                            <DatosInstrumentoSintetico 
+                                                instrumento={instrumentoSeleccionado}
+                                                onDatosListos={handleDatosInfoGeneralListos}
+                                            />
+                                        )}
                                     </div>
+                                )}
+
+                                {!esPaginaInfoGeneral && (
+                                    <>
+                                        <div
+                                            className="mb-4 p-3 rounded"
+                                            style={{
+                                                backgroundColor: grupoActual.tipo === 'multiple' ? '#e7f5ff' : '#f8f9fa',
+                                                borderLeft: `4px solid ${grupoActual.tipo === 'multiple' ? '#0d6efd' : '#6c757d'}`,
+                                            }}
+                                        >
+                                            <h4 className="fw-bold mb-1" style={{ color: '#1f2937' }}>
+                                                {grupoActual.nombre}
+                                            </h4>
+                                            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                                                {grupoActual.tipo === 'multiple'
+                                                    ? 'Complete las siguientes preguntas. Puede agregar más respuestas según necesite.'
+                                                    : `Responda las siguientes ${grupoActual.preguntas.length} preguntas`}
+                                            </p>
+                                        </div>
+
+                                        {grupoActual.tipo === 'simple' ? (
+                                            grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                <PreguntaSimple
+                                                    key={pregunta.id}
+                                                    pregunta={pregunta}
+                                                    index={idx}
+                                                    respuesta={obtenerRespuesta(pregunta.id)}
+                                                    onActualizar={actualizarRespuesta}
+                                                    instrumento_id={Number(instrumentoIdParam)}
+                                                />
+                                            ))
+                                        ) : (
+                                            <div>
+                                                {(respuestasMultiples[grupoActual.id] || []).map((instancia, instanciaIdx) => (
+                                                    <div key={instanciaIdx} className="mb-4">
+                                                        {grupoActual.preguntas.map((pregunta: any, idx: number) => (
+                                                            <PreguntaMultiple
+                                                                key={pregunta.id}
+                                                                pregunta={pregunta}
+                                                                index={idx}
+                                                                instancia={instancia}
+                                                                instanciaIndex={instanciaIdx}
+                                                                grupoCuadroId={grupoActual.id}
+                                                                totalInstancias={respuestasMultiples[grupoActual.id]?.length || 0}
+                                                                onActualizar={actualizarRespuestaMultiple}
+                                                                onEliminar={eliminarInstancia}
+                                                                instrumento={instrumentoSeleccionado}
+                                                                instrumento_id={Number(instrumentoIdParam)}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                ))}
+
+                                                <AgregarInstancia
+                                                    grupoCuadroId={grupoActual.id}
+                                                    preguntasDelGrupo={grupoActual.preguntas}
+                                                    instancias={respuestasMultiples[grupoActual.id] || []}
+                                                    onAgregar={agregarInstanciaRespuestas}
+                                                />
+                                            </div>
+                                        )}
+                                    </>
                                 )}
 
                                 <NavegacionPaginas
@@ -338,11 +413,12 @@ export default function ResponderInstrumento() {
                                     onAvanzar={avanzarPagina}
                                     onRetroceder={retrocederPagina}
                                     onIrAPagina={irAPagina}
+                                    plantillaFormulario={plantillaFormulario}
                                 />
                             </>
                         )}
 
-                        {mostrarResumen && (
+                        {tabActiva === 'responder' && mostrarResumen && (
                             <ResumenRespuestas
                                 gruposOrganizados={gruposOrganizados}
                                 respuestas={respuestas}
@@ -356,9 +432,15 @@ export default function ResponderInstrumento() {
                                 onExito={() => navigate(rutaVolver)}
                             />
                         )}
-                    </Card.Body>
-                </Card>
-            </Container>
+
+                        {tabActiva === 'estadisticas' && instrumentoSeleccionado && (
+                            <div className="mt-4">
+                                <Llamadora id_instrumento={instrumentoSeleccionado.id} />
+                            </div>
+                        )}
+                    </CCardBody>
+                </CCard>
+            </CContainer>
         </div>
     );
 }

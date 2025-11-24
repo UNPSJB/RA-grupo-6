@@ -1,3 +1,4 @@
+import { CButton } from "@coreui/react";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 
@@ -40,7 +41,7 @@ function MateriaList(){
                                 <h5 className="card-subtitle"> Cod. {materia.id}</h5>
                                 <div className="button-container">
 
-                                    <Button className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</button>
+                                    <CButton className="button-materia" onClick={() => ElegirMateria({eleccion: materia.id})}> Realizar informe</CButton>
                                 </div>
                                 {/* <a href="#" className="card-link"> Realizar informe </a> */}
                             </div>

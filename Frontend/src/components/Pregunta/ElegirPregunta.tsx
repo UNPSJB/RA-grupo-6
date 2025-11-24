@@ -4,6 +4,7 @@ import type { Pregunta} from "../types";
 import CrearPregunta from "./CrearPregunta";
 import { EnumTipoPregunta } from "../types";
 import ModalExito from "../ModalEnvio";
+import { CBadge, CButton, CCard, CCardBody, CCol, CFormSelect, CRow } from "@coreui/react";
 
 
 type Props = {
@@ -20,7 +21,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
   const [showModal, setShowModal] = useState(false);
   
   const refrescarPreguntas = () => {
-    fetch("http://127.0.0.1:8000/preguntas/")
+    fetch("http://127.0.0.1:8000/preguntas/todos")
       .then(res => res.json())
       .then(data => setPreguntasDisponibles(data))
       .catch(err => console.error(err));
@@ -59,14 +60,14 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
             Preguntas del Formulario
           </h5>
           {preguntasSeleccionadas.length > 0 && (
-            <Badge bg="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
+            <CBadge bg="info" className="px-2 py-1" style={{ fontSize: "0.8rem" }}>
               {preguntasSeleccionadas.length}{" "}
               {preguntasSeleccionadas.length === 1 ? "pregunta" : "preguntas"}
-            </Badge>
+            </CBadge>
           )}
         </div>
         
-          <Button 
+          <CButton 
             variant="outline-primary" 
             size="sm"
             onClick={() => setShowModal(true)}
@@ -74,47 +75,41 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
           >
             <i className="fa-solid fa-plus"></i>
             Nueva Pregunta
-          </Button>
+          </CButton>
       </div>
 
       {preguntasSeleccionadas.length > 0 ? (
         <div className="mb-4">
           <div>
             {preguntasSeleccionadas.map((pregunta, index) => (
-              <Card
+              <CCard
                 key={pregunta.id}
                 className="border"
                 style={{ borderColor: "#e0e0e0" }}
               >
-                <Card.Body className="p-3">
+                <CCardBody className="p-3">
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <div className="d-flex gap-2 align-items-center">
-                      <Badge
+                      <CBadge
                         bg="primary"
                         className="rounded-circle d-inline-flex justify-content-center align-items-center"
                         style={{ width: "24px", height: "24px", fontSize: "0.75rem" }}
                       >
                         {index + 1}
-                      </Badge>
+                      </CBadge>
 
-                      <Badge
+                      <CBadge
                         bg={pregunta.tipo === EnumTipoPregunta.cerrada? "secondary" : "success"}
                         className="px-2 py-1"
                         style={{ fontSize: "0.7rem", fontWeight: "500" }}
                       >
                         {pregunta.tipo}
-                      </Badge>
+                      </CBadge>
                     </div>
 
-                    <Button
-                      onClick={() => eliminarPregunta(String(pregunta.id))}
-                      className="bg-transparent border-0 p-0"
-                    >
-                      <i
-                        className="fa-solid fa-xmark"
-                        style={{ fontSize: "20px", color: "#dc3545" }}
-                      ></i>
-                    </Button>
+                    <CButton onClick={() => eliminarPregunta(String(pregunta.id))} className="bg-transparent border-0 p-0">
+                      <i className="fa-solid fa-xmark" style={{ fontSize: "20px", color: "#dc3545" }}> </i>
+                    </CButton>
                   </div>
 
                   <p
@@ -142,8 +137,8 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
                       ))}
                     </div>
                   )}
-                </Card.Body>
-              </Card>
+                </CCardBody>
+              </CCard>
             ))}
           </div>
         </div>
@@ -151,7 +146,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
         <div
           className="text-center mb-3 rounded"
           style={{
-            backgroundColor: error? "#fff5f5":"#f8f9fa",
+            // backgroundColor: error? "#fff5f5":"#f8f9fa",
             border: `2px dashed ${error ? "#dc3545" : "#dee2e6"}`,
             padding: "2rem 1rem",
           }}
@@ -168,7 +163,7 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
         </div>
       )}
 
-      <Form.Select
+      <CFormSelect
         value={preguntaSeleccionadaId}
         onChange={(e) => setPreguntaSeleccionadaId(e.target.value)}
         className="border-2 mb-3"
@@ -180,21 +175,27 @@ function ElegirPregunta({ preguntasSeleccionadas, setPreguntasSeleccionadas, rol
             {p.tipo} - {p.texto}
           </option>
         ))}
-      </Form.Select>
-      <div className="d-flex gap-2">
-        <Button onClick={agregarPregunta} style={{ flex: 1 }}>
-          + Agregar
-        </Button>
+      </CFormSelect>
+      <CCol xs="auto">
+          <CButton color="primary" onClick={agregarPregunta} disabled={preguntaSeleccionadaId == ""}>
+            Agregar
+          </CButton>
+        </CCol>
+      <CRow className="justify-content-center mt-4 pt-4 border-top">
+        
+        
+        <CCol xs="auto">
         {onCrearFormulario && (
           <ModalExito
             onEnviar={onCrearFormulario}
             desactivado={false}
             variante="success"
-            className="btn-success"
+            className="btn-success text-white"
             textoBoton="Crear Formulario"
           />
         )}
-      </div>
+      </CCol>
+      </CRow>
       <CrearPregunta
         mostrar={showModal}
         manejarPestania={() => setShowModal(false)}

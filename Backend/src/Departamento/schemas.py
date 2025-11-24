@@ -9,10 +9,12 @@ if TYPE_CHECKING:
 class DepartamentoBase(BaseModel):
     id: int
     nombre: str
+    sede: str
 
 class Departamento(DepartamentoBase):
     usuarios_info: Optional[List[UsuarioDepartamentoRead]] = []
     carreras: List["Carrera"] = []
+
     model_config = {
         "from_attributes": True,
         "json_schema_mode_override": "serialization"

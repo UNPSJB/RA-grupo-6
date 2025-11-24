@@ -81,3 +81,16 @@ async def get_current_active_user_from_cookie(
     if not is_active or disabled:
         raise HTTPException(status_code=400, detail="Usuario inactivo")
     return current_user
+
+def require_role(allowed_roles: list[str]):
+    """
+    Dependencia que verifica si el usuario actual tiene uno de los roles permitidos.
+    """
+    def role_checker(current_user: UsuarioSchema = Depends(get_current_active_user_from_cookie)):
+        if current_user.rol.nombre not in allowed_roles + ["admin"]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tiene permisos para realizar esta acción"
+            )
+        return current_user
+    return role_checker

@@ -52,7 +52,7 @@ export function PlanificarPeriodos() {
 
     const obtenerDiasDelMes = (mes: number, anio?: number) => {
         // if (!mes) return 31;
-        const anioActual = anio || new Date().getFullYear();
+        const anioActual = anio || (new Date().getUTCFullYear()) + 1;
         if (mes == 2) return esBisiesto(anioActual) ? 29 : 28;
         if ([4, 6, 9, 11].includes(mes)) return 30;
         return 31;
@@ -62,7 +62,7 @@ export function PlanificarPeriodos() {
         if (!fecha) return "";
         const d = new Date(fecha);
         if (isNaN(d.getTime())) return "";
-        const yyyy = d.getFullYear();
+        const yyyy = (d.getUTCFullYear()) + 1;
         const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
         const dd = String(d.getUTCDate()).padStart(2, "0");
         return `${yyyy}-${mm}-${dd}`;
@@ -72,7 +72,7 @@ export function PlanificarPeriodos() {
     const handleFechaChange = (campo: keyof Parametros, parte: "mes" | "dia", valor: string) => {
         if (!valor) return;
 
-        const fechaActual = formatearFecha(modificacionesParametros?.[campo]) || `${new Date().getFullYear()}-01-01`;
+        const fechaActual = formatearFecha(modificacionesParametros?.[campo]) || `${(new Date().getUTCFullYear()) + 1}-01-01`;
         const partes = fechaActual.split("-");
 
         const anioActual = parseInt(partes[0]);
@@ -97,7 +97,7 @@ export function PlanificarPeriodos() {
     };
 
     const renderOpcionesDias = (mes: number, campo?: keyof Parametros) => {
-        let anioActual = new Date().getFullYear();
+        let anioActual = (new Date().getUTCFullYear()) + 1;
 
         if (campo && modificacionesParametros?.[campo]) {
             const fechaStr = formatearFecha(modificacionesParametros[campo]);

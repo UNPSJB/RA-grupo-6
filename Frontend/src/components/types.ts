@@ -264,3 +264,24 @@ export type ParametrosUpdate = {
     disponibilidad_docente: number
     disponibilidad_departamento: number
 }
+
+//types para informesintetico
+export type RespuestaSintesis = {
+  pregunta_texto: string;
+  respuesta_texto: string;
+};
+
+export type GrupoRespuestasSintesis = {
+  grupo: string;
+  titulo_grupo: string;
+  respuestas: RespuestaSintesis[];
+};
+
+export type DetalleInformeSinteticoCompleto = {
+  id: number;
+  titulo_formulario: string;
+  departamento: string;
+  fecha_completado: string;
+  estadisticas?: EstadisticaPregunta[];
+  respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
+};

@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Button, Alert, Spinner, Badge, Stack } from 'react-bootstrap';
-import type { GrupoPreguntas } from '../types';
+import type { DetalleInformeSinteticoCompleto, GrupoPreguntas, GrupoRespuestasSintesis, RespuestaSintesis } from '../types';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
+
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import InformeSinteticoPDFDocument from './InformeSinteticoPDFDocument';
 
 interface RespuestaGuardada {
     id: number;
@@ -211,47 +214,92 @@ export default function VerRespuestas() {
         });
     };
 
+    const getDatosParaPDF = (): DetalleInformeSinteticoCompleto => {
+        const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
+            ? organizarPreguntasEnGrupos(plantillaFormulario)
+            : [];
+
+        const respuestasSintesisAgrupadas: GrupoRespuestasSintesis[] = gruposOrganizados.map(grupo => {
+            const respuestasProcesadas: RespuestaSintesis[] = grupo.preguntas.map(pregunta => {
+                const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
+                
+                if (respuestasPregunta.length > 1) {
+                    const textosRespuestas = respuestasPregunta.map(respuesta => {
+                        const opcionTexto = respuesta.opcion?.texto || 
+                            (pregunta.opciones?.find((op: any) => op.id === respuesta.opcion_id)?.texto ?? '');
+                        return respuesta.texto || opcionTexto || 'No respondida';
+                    });
+                    
+                    // joinear respuestas múltiples en una
+                    return {
+                        pregunta_texto: pregunta.texto,
+                        respuesta_texto: textosRespuestas.join('; ')
+                    };
+                } 
+                // Si hay una sola respuesta
+                else if (respuestasPregunta.length === 1) {
+                    const respuesta = respuestasPregunta[0];
+                    const opcionTexto = respuesta.opcion?.texto || 
+                        (pregunta.opciones?.find((op: any) => op.id === respuesta.opcion_id)?.texto ?? '');
+                    const contenido = respuesta.texto || opcionTexto || 'No respondida';
+                    
+                    return {
+                        pregunta_texto: pregunta.texto,
+                        respuesta_texto: contenido
+                    };
+                } 
+                // Si no hay respuestas
+                else {
+                    return {
+                        pregunta_texto: pregunta.texto,
+                        respuesta_texto: 'No respondida'
+                    };
+                }
+            });
+
+            return {
+                grupo: grupo.id.toString(),
+                titulo_grupo: grupo.nombre,
+                respuestas: respuestasProcesadas
+            };
+        });
+
+        return {
+            id: parseInt(respuestasFormularioId || '0'),
+            titulo_formulario: plantillaFormulario?.titulo || 'Informe Sintético',
+            departamento: materiaNombre,
+            fecha_completado: fechaEnvio,
+            respuestas_sintesis_agrupadas: respuestasSintesisAgrupadas
+        };
+    };
+
     // Informe Sintético
     const renderInformeSintetico = () => {
+        const datosPDF = getDatosParaPDF();
+        
         return (
             <Container fluid className="mt-4 px-4">
                 <div className="row justify-content-center">
                     <div className="col-12">
                         <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5">
-                                
-                                {/* Encabezado Informe Sintético */}
-                                <div className="mb-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <div>
-                                            <h1 className="fw-bold mb-2">Informe Sintético</h1>
-                                            <p className="text-muted mb-0">
-                                                Materia: {materiaNombre}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div className="d-flex gap-3">
-                                            <Badge bg="secondary" className="fs-6">
-                                                <i className="fas fa-calendar me-1" />
-                                                {new Date(fechaEnvio).toLocaleDateString()}
-                                            </Badge>
-                                            <Badge bg="info" className="fs-6">
-                                                <i className="fas fa-chart-pie me-1" />
-                                                Informe Sintético
-                                            </Badge>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <Alert variant="info" className="mb-4">
-                                    <i className="fas fa-info-circle me-2"></i>
-                                    Vista de informe sintético - Esta vista mostrará análisis consolidados cuando esté disponible.
-                                </Alert>
-
-                                {/* Mostrar respuestas fallback */}
+                                {/* Vista */}
                                 {renderVistaEncuesta()}
+                                
+                                {/* Botón PDF*/}
+                                <div className="d-grid gap-2 mb-4">
+                                    <PDFDownloadLink
+                                        document={<InformeSinteticoPDFDocument informe={datosPDF} />}
+                                        fileName={`Informe-Sintetico-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
+                                        className="btn btn-primary"
+                                    >
+                                        {({ loading: pdfLoading }) => 
+                                            pdfLoading 
+                                                ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
+                                                : 'Descargar Informe Sintético en PDF'
+                                        }
+                                    </PDFDownloadLink>
+                                </div>
                             </Card.Body>
                         </Card>
                     </div>
@@ -260,7 +308,7 @@ export default function VerRespuestas() {
         );
     };
 
-    // Renderp ara encuestas e informes de çatedra
+    // Render para encuestas e informes de cátedra
     const renderVistaEncuesta = () => {
         const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
             ? organizarPreguntasEnGrupos(plantillaFormulario)
@@ -292,7 +340,6 @@ export default function VerRespuestas() {
                     <div className="col-12">
                         <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                             <Card.Body className="p-4 p-md-5">
-
                                 {/* Encabezado */}
                                 <div className="mb-4">
                                     <div className="d-flex justify-content-between align-items-center mb-3">

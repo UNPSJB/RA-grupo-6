@@ -49,7 +49,7 @@ async def login_for_access_token(
         httponly=True,
         secure=False,  # Poner en True en producción (con HTTPS)
         samesite="lax",
-        domain="localhost",
+        domain=None,
         path="/",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
@@ -61,7 +61,7 @@ async def logout(response: Response):
     """
     Borra la cookie de autenticación.
     """
-    response.delete_cookie(key="access_token", domain="localhost", path="/")
+    response.delete_cookie(key="access_token", domain=None, path="/")
     return {"status": "success"}
 
 @router.post("/register", response_model=schemas.AuthUsuarioSchema)

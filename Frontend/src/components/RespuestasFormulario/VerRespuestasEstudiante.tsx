@@ -16,6 +16,7 @@ import {
 } from '@coreui/react';
 import { capitalizarCadena } from '../Funciones';
 import ShadowedCard from '../coreui-components/ShadowedCard';
+import type { Usuario } from '../types';
 
 interface InstrumentoRespondido {
     id: number;
@@ -32,18 +33,39 @@ export default function VerRespuestasEstudiante() {
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
 
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me", {
+                    credentials: 'include' 
+                });
+                if (!response.ok) throw new Error("No se pudo autenticar al usuario");
+                const data = await response.json();
+                setUsuario(data);
+            } catch (error) {
+                console.error(error);
+                setMensaje("Error: No se pudo identificar al usuario. Intenta iniciar sesión nuevamente.");
+                setCargando(false);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if (!usuario) return;
+
         const fetchInstrumentos = async () => {
             try {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
-                
                 const res = await fetch(
-                    `http://127.0.0.1:8000/instrumentos/tipo/ENCUESTA_ESTUDIANTE?usuario_id=${userId}&mostrar_respondidos=true`
+                    `http://127.0.0.1:8000/instrumentos/tipo/ENCUESTA_ESTUDIANTE?usuario_id=${usuario.id}&mostrar_respondidos=true`,
+                    { credentials: 'include' }
                 );
+                
                 if (!res.ok) throw new Error('No se pudieron cargar las encuestas respondidas');
 
                 const data = await res.json();
@@ -57,7 +79,7 @@ export default function VerRespuestasEstudiante() {
         };
 
         fetchInstrumentos();
-    }, []);
+    }, [usuario]);
 
     const handleVerRespuestas = (instrumento: InstrumentoRespondido) => {
         navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {

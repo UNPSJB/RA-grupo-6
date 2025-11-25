@@ -291,14 +291,21 @@ export type GrupoRespuestasSintesis = {
   respuestas: RespuestaSintesis[];
 };
 
-export type DetalleInformeSinteticoCompleto = {
-  id: number;
-  titulo_formulario: string;
-  departamento: string;
-  fecha_completado: string;
-  estadisticas?: EstadisticaPregunta[];
-  respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
-};
+export interface DatosMateriaInstancia {
+    instancia: number;
+    codigo: string;
+    nombre: string;
+}
+
+export interface DetalleInformeSinteticoCompleto {
+    id: number;
+    titulo_formulario: string;
+    departamento: string;
+    fecha_completado: string;
+    respuestas_sintesis_agrupadas: GrupoRespuestasSintesis[];
+    datos_tabla?: any;
+    datos_materias?: DatosMateriaInstancia[];
+}
 export type Departamento = {
     usuarios_info: UsuarioDepartamento[]
     carreras: Carrera 

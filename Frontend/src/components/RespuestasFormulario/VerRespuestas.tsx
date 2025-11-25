@@ -1,36 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Card, Button, Alert, Spinner, Badge, Stack } from 'react-bootstrap';
-import type { DetalleInformeSinteticoCompleto, GrupoPreguntas, GrupoRespuestasSintesis, RespuestaSintesis } from '../types';
+import { Container, Spinner, Button, Badge } from 'react-bootstrap';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
-
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import InformeSinteticoPDFDocument from './InformeSinteticoPDFDocument';
 import ShadowedCard from '../coreui-components/ShadowedCard';
-import { CCard, CCardBody, CCardHeader } from '@coreui/react';
-
-interface RespuestaGuardada {
-    id: number;
-    texto: string | null;
-    opcion_id: number | null;
-    opcion?: { id: number; texto: string };
-    pregunta_id: number;
-    pregunta?: { id: number; texto: string; tipo: string };
-    formulario_id: number;
-}
+import {
+    CCardBody,
+    CCardHeader,
+    CTable,
+    CNav,
+    CNavItem,
+    CNavLink,
+    CCard,
+    CAlert
+} from '@coreui/react';
 
 export default function VerRespuestas() {
-    const { respuestasFormularioId } = useParams<{ respuestasFormularioId: string }>();
+    const { respuestasFormularioId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [respuestas, setRespuestas] = useState<RespuestaGuardada[]>([]);
-    const [plantillaFormulario, setPlantillaFormulario] = useState<any>(null);
-    const [cargando, setCargando] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
-    const [grupoActivo, setGrupoActivo] = useState<number>(0);
+    const [respuestas, setRespuestas] = useState([]);
+    const [plantillaFormulario, setPlantillaFormulario] = useState(null);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState('');
+    const [tabActiva, setTabActiva] = useState(0);
+    const [datosTabla, setDatosTabla] = useState(null);
+    const [datosMaterias, setDatosMaterias] = useState([]);
+    const [pdfLoading, setPdfLoading] = useState(false);
 
-    const locationState = location.state as any || {};
+    const locationState = location.state || {};
     const materiaNombre = locationState.materiaNombre || '';
     const fechaEnvio = locationState.fechaEnvio || '';
     const plantillaFormularioId = locationState.plantillaFormularioId;
@@ -42,13 +41,12 @@ export default function VerRespuestas() {
         }
     }, [respuestasFormularioId]);
 
-    const cargarTodosLosDatos = async (formId: number): Promise<void> => {
+    const cargarTodosLosDatos = async (formId) => {
         setCargando(true);
         setError('');
-
         try {
             await cargarDatosEncuesta(formId);
-        } catch (e: unknown) {
+        } catch (e) {
             const mensaje = e instanceof Error ? e.message : 'Error al cargar los datos';
             setError(mensaje);
         } finally {
@@ -56,448 +54,449 @@ export default function VerRespuestas() {
         }
     };
 
-    const cargarDatosEncuesta = async (formId: number): Promise<void> => {
+    const cargarDatosEncuesta = async (formId) => {
         try {
-            // Cargar respuestas
-            const resp = await fetch(
-                `http://127.0.0.1:8000/respuestas/?formulario_id=${formId}`
-            );
-
-            if (!resp.ok) throw new Error('No se pudieron cargar las respuestas');
-
-            const respuestasData: RespuestaGuardada[] = await resp.json();
+            // CAMBIO: Usar localhost para consistencia con cookies
+            const respResp = await fetch(`http://localhost:8000/respuestas/?formulario_id=${formId}`, {
+                credentials: 'include'
+            });
+            if (!respResp.ok) throw new Error('No se pudieron cargar las respuestas individuales');
+            
+            const respuestasData = await respResp.json();
             setRespuestas(respuestasData);
 
-            // Cargar plantilla del formulario
-            if (plantillaFormularioId) {
-                const plantillaResponse = await fetch(
-                    `http://127.0.0.1:8000/formularios/${plantillaFormularioId}`
-                );
-
-                if (plantillaResponse.ok) {
-                    const plantillaData = await plantillaResponse.json();
-                    setPlantillaFormulario(plantillaData);
-                } else {
-                    console.warn("No se pudo cargar PlantillaFormulario");
+            const respuestaTablaGeneral = respuestasData.find(r => r.pregunta?.texto === "Información general de actividades curriculares");
+            if (respuestaTablaGeneral && respuestaTablaGeneral.texto) {
+                try {
+                    setDatosTabla(JSON.parse(respuestaTablaGeneral.texto));
+                } catch (e) {
+                    console.error(e);
                 }
             }
-        } catch (e: unknown) {
+
+            const codigosMap = new Map();
+            const nombresMap = new Map();
+            respuestasData.forEach((respuesta) => {
+                if (respuesta.pregunta?.texto === "Código de actividad curricular" && respuesta.texto && respuesta.instancia_respuesta) {
+                    codigosMap.set(respuesta.instancia_respuesta, respuesta.texto);
+                }
+                if (respuesta.pregunta?.texto === "Nombre de la actividad curricular" && respuesta.texto && respuesta.instancia_respuesta) {
+                    nombresMap.set(respuesta.instancia_respuesta, respuesta.texto);
+                }
+            });
+
+            const materiasCombinadas = [];
+            codigosMap.forEach((codigo, instancia) => {
+                const nombre = nombresMap.get(instancia);
+                if (nombre) materiasCombinadas.push({ instancia, codigo, nombre });
+            });
+            setDatosMaterias(materiasCombinadas);
+
+            if (plantillaFormularioId) {
+                // CAMBIO: Usar localhost
+                const plantillaResponse = await fetch(`http://localhost:8000/formularios/${plantillaFormularioId}`, {
+                    credentials: 'include'
+                });
+                if (plantillaResponse.ok) {
+                    setPlantillaFormulario(await plantillaResponse.json());
+                }
+            }
+        } catch (e) {
             throw e;
         }
     };
 
-    const obtenerRespuestasDePregunta = (preguntaId: number): RespuestaGuardada[] =>
-        respuestas.filter((r) => r.pregunta_id === preguntaId);
+    const obtenerRespuestasDePregunta = (preguntaId, instancia) => {
+        if (instancia !== undefined) {
+            return respuestas.filter((r) => r.pregunta_id === preguntaId && r.instancia_respuesta === instancia);
+        }
+        return respuestas.filter((r) => r.pregunta_id === preguntaId);
+    };
 
-    const renderRespuesta = (respuesta: RespuestaGuardada, pregunta: any, i: number): JSX.Element => {
-        const opcionTexto =
-            respuesta.opcion?.texto ||
-            (pregunta.opciones?.find((op: any) => op.id === respuesta.opcion_id)?.texto ?? '');
+    const limpiarTitulo = (titulo) => {
+        if (!titulo) return '';
+        return titulo.replace(/\(Repetible\)/gi, '').trim();
+    };
 
-        const contenido = respuesta.texto || opcionTexto || 'No respondida';
+    const getDatosParaPDF = () => {
+        const gruposOrganizados = plantillaFormulario ? organizarPreguntasEnGrupos(plantillaFormulario) : [];
+        let respuestasSintesisAgrupadas = [];
 
-        return (
-            <div key={i} className="p-3 rounded bg-light mb-2 border w-100">
-                <div className="d-flex align-items-start text-muted">
-                    <i className="fas fa-check-circle text-success me-2 mt-1"></i>
-                    <span className="flex-grow-1" style={{ lineHeight: '1.5', color:'black'}}>
-                        {contenido}
-                    </span>
-                </div>
-            </div>
+        gruposOrganizados.forEach((grupo, index) => {
+            const esInformeSinteticoActual = tipoInstrumento === 'INFORME_SINTETICO';
+            let titulo_grupo = limpiarTitulo(grupo.nombre);
             
-        );
-    };
+            if (esInformeSinteticoActual && index === 0) titulo_grupo = 'Información General del Departamento';
+            else if (esInformeSinteticoActual && !titulo_grupo) titulo_grupo = `Sección ${index}`;
 
-    // Render preguntas de grupo
-    const renderPreguntasDelGrupo = (grupo: GrupoPreguntas) => {
-        return grupo.preguntas.map((pregunta) => {
-            const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
-
-            return (
-                <Card 
-                    key={pregunta.id} 
-                    className="mb-4 border-0 shadow-sm"
-                    style={{
-                        width: '100%',
-                        minWidth: '100%',
-                        maxWidth: '100%'
-                    }}
-                >
-                    <Card.Body 
-                        className="p-4"
-                        style={{
-                            width: '100%',
-                            minWidth: '100%'
-                        }}
-                    >
-                        {/* Encabezado de pregunta*/}
-                        <div 
-                            className="mb-3"
-                            style={{
-                                width: '100%',
-                                minWidth: '100%',
-                                maxWidth: '100%'
-                            }}
-                        >
-                            <div 
-                                className="fw-bold mb-2"
-                                style={{ 
-                                    fontSize: "1.2rem",
-                                    lineHeight: '1.4',
-                                    width: '100%',
-                                    minWidth: '100%',
-                                    maxWidth: '100%',
-                                    display: 'block',
-                                    whiteSpace: 'normal',
-                                    wordWrap: 'break-word',
-                                    overflowWrap: 'break-word',
-                                    wordBreak: 'normal',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                {pregunta.texto}
-                            </div>
-                            
-                            {/* Badges debajo del texto de la pregunta */}
-                            <div className="d-flex gap-2 flex-wrap mt-2">
-                                {pregunta.obligatoria && (
-                                    <Badge bg="danger" className="fs-7">Obligatoria</Badge>
-                                )}
-                                {pregunta.tipo === "abierta" && (
-                                    <Badge bg="secondary" className="fs-7">Abierta</Badge>
-                                )}
-                                {pregunta.tipo === "cerrada" && (
-                                    <Badge bg="primary" className="fs-7">Cerrada</Badge>
-                                )}
-                                {pregunta.multiple_respuestas && (
-                                    <Badge bg="warning" text="dark" className="fs-7">
-                                        Repetible
-                                    </Badge>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Respuestas */}
-                        <div 
-                            className="mt-3"
-                            style={{
-                                width: '100%',
-                                minWidth: '100%'
-                            }}
-                        >
-                            {respuestasPregunta.length > 0 ? (
-                                respuestasPregunta.map((r, i) =>
-                                    renderRespuesta(r, pregunta, i)
-                                )
-                            ) : (
-                                <div className="p-3 rounded bg-warning bg-opacity-10 w-100">
-                                    <i className="fas fa-exclamation-circle me-2 text-warning"></i>
-                                    <span className="text-muted">No respondida</span>
-                                </div>
-                            )}
-                        </div>
-                    </Card.Body>
-                </Card>
+            const preguntasFiltradas = grupo.preguntas.filter(
+                p => p.texto !== "Código de actividad curricular" && 
+                     p.texto !== "Nombre de la actividad curricular" &&
+                     p.texto !== "Información general de actividades curriculares"
             );
-        });
-    };
 
-    const getDatosParaPDF = (): DetalleInformeSinteticoCompleto => {
-        const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
-            ? organizarPreguntasEnGrupos(plantillaFormulario)
-            : [];
-
-        const respuestasSintesisAgrupadas: GrupoRespuestasSintesis[] = gruposOrganizados.map(grupo => {
-            const respuestasProcesadas: RespuestaSintesis[] = grupo.preguntas.map(pregunta => {
-                const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
-                
-                if (respuestasPregunta.length > 1) {
-                    const textosRespuestas = respuestasPregunta.map(respuesta => {
-                        const opcionTexto = respuesta.opcion?.texto || 
-                            (pregunta.opciones?.find((op: any) => op.id === respuesta.opcion_id)?.texto ?? '');
-                        return respuesta.texto || opcionTexto || 'No respondida';
+            if (esInformeSinteticoActual && grupo.tipo === 'multiple' && datosMaterias.length > 0) {
+                datosMaterias.forEach(materia => {
+                    const respuestasProcesadas = preguntasFiltradas.map(pregunta => {
+                        const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id, materia.instancia);
+                        if (respuestasPregunta.length >= 1) {
+                            const textosRespuestas = respuestasPregunta.map(r => r.texto || r.opcion?.texto || (pregunta.opciones?.find((op) => op.id === r.opcion_id)?.texto ?? '') || 'No respondida');
+                            return { pregunta_texto: pregunta.texto, respuesta_texto: textosRespuestas.join('; ') };
+                        } else {
+                            return { pregunta_texto: pregunta.texto, respuesta_texto: 'No respondida' };
+                        }
                     });
-                    
-                    // joinear respuestas múltiples en una
-                    return {
-                        pregunta_texto: pregunta.texto,
-                        respuesta_texto: textosRespuestas.join('; ')
-                    };
-                } 
-                // Si hay una sola respuesta
-                else if (respuestasPregunta.length === 1) {
-                    const respuesta = respuestasPregunta[0];
-                    const opcionTexto = respuesta.opcion?.texto || 
-                        (pregunta.opciones?.find((op: any) => op.id === respuesta.opcion_id)?.texto ?? '');
-                    const contenido = respuesta.texto || opcionTexto || 'No respondida';
-                    
-                    return {
-                        pregunta_texto: pregunta.texto,
-                        respuesta_texto: contenido
-                    };
-                } 
-                // Si no hay respuestas
-                else {
-                    return {
-                        pregunta_texto: pregunta.texto,
-                        respuesta_texto: 'No respondida'
-                    };
-                }
-            });
-
-            return {
-                grupo: grupo.id.toString(),
-                titulo_grupo: grupo.nombre,
-                respuestas: respuestasProcesadas
-            };
+                    respuestasSintesisAgrupadas.push({
+                        grupo: `${grupo.id}_${materia.instancia}`, 
+                        titulo_grupo: titulo_grupo,
+                        respuestas: respuestasProcesadas,
+                        datos_materia_agrupada: materia
+                    }); 
+                });
+            } else {
+                const respuestasProcesadas = preguntasFiltradas.map(pregunta => {
+                    const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
+                    if (respuestasPregunta.length >= 1) {
+                        const textosRespuestas = respuestasPregunta.map(r => r.texto || r.opcion?.texto || (pregunta.opciones?.find((op) => op.id === r.opcion_id)?.texto ?? '') || 'No respondida');
+                        return { pregunta_texto: pregunta.texto, respuesta_texto: textosRespuestas.join('; ') };
+                    } else {
+                        return { pregunta_texto: pregunta.texto, respuesta_texto: 'No respondida' };
+                    }
+                });
+                respuestasSintesisAgrupadas.push({ grupo: grupo.id.toString(), titulo_grupo: titulo_grupo, respuestas: respuestasProcesadas });
+            }
         });
 
         return {
             id: parseInt(respuestasFormularioId || '0'),
-            titulo_formulario:  (tipoInstrumento == 'INFORME_SINTETICO')? 'Informe Sintético' : 'Informe de Cátedra',
-            departamento: materiaNombre,
+            titulo_formulario: (tipoInstrumento === 'INFORME_SINTETICO') ? 'Informe Sintético' : 'Informe de Cátedra',
+            departamento: (tipoInstrumento === 'INFORME_SINTETICO') ? 'Ingenería':materiaNombre, 
             fecha_completado: fechaEnvio,
-            respuestas_sintesis_agrupadas: respuestasSintesisAgrupadas
+            respuestas_sintesis_agrupadas: respuestasSintesisAgrupadas,
+            datos_tabla: datosTabla,
+            datos_materias: datosMaterias
         };
     };
 
-    // Informe Sintético
-    const renderInforme = () => {
-        const datosPDF = getDatosParaPDF();
-        
-        let prefijoArchivo = ""
-        if (tipoInstrumento == 'INFORME_SINTETICO'){
-            prefijoArchivo = "Informe-Sintetico"
+    const handleDownloadPDF = async () => {
+        setPdfLoading(true);
+        try {
+            const { pdf } = await import('@react-pdf/renderer');
+            const datosPDF = getDatosParaPDF();
+            const blob = await pdf(<InformeSinteticoPDFDocument informe={datosPDF} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            let prefijoArchivo = tipoInstrumento === 'INFORME_SINTETICO' ? "Informe-Sintetico" : 'Informe-Catedra';
+            const nombreArchivo = materiaNombre;
+            a.download = `${prefijoArchivo}-${nombreArchivo}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error generando PDF:", error);
+            alert("Error al generar el PDF. Revisa la consola.");
+        } finally {
+            setPdfLoading(false);
         }
-        else{
-            prefijoArchivo = 'Informe-Catedra'
-        }
+    };
+
+    const renderRespuesta = (respuesta, pregunta, i) => {
+        const opcionTexto =
+            respuesta.opcion?.texto ||
+            (pregunta.opciones?.find((op) => op.id === respuesta.opcion_id)?.texto ?? '');
+        const contenido = respuesta.texto || opcionTexto || 'No respondida';
 
         return (
-            <div className="row justify-content-center">
-                <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                    <Card.Body className="p-4 p-md-5">
-                        {/* Vista */}
-                        {renderVistaEncuesta()}
-
-                        {/* Botón PDF*/}
-                        <div className="d-grid gap-2 mb-4">
-                        <PDFDownloadLink
-                            document={<InformeSinteticoPDFDocument informe={datosPDF} />}
-                            fileName={`${prefijoArchivo}-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
-                            className="btn btn-primary"
-                        >
-                            {({ loading: pdfLoading }) => 
-                                pdfLoading 
-                                    ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
-                                    : `Descargar Informe ${tipoInstrumento == 'INFORME_SINTETICO'? "Sintético" : "de Catedra"} en PDF`
-                            }
-                        </PDFDownloadLink>
-                        </div>
-                    </Card.Body>
-                </Card>
+            <div key={i} className="p-3 rounded mb-2 border w-100 bg-body-tertiary">
+                <div className="d-flex align-items-start">
+                    <i className="fas fa-check-circle text-success me-2 mt-1"></i>
+                    <span className="flex-grow-1 text-body" style={{ lineHeight: '1.5' }}>
+                        {contenido}
+                    </span>
+                </div>
             </div>
         );
     };
 
-    // Render para encuestas e informes de cátedra
-    const renderVistaEncuesta = () => {
-        const gruposOrganizados: GrupoPreguntas[] = plantillaFormulario
-            ? organizarPreguntasEnGrupos(plantillaFormulario)
-            : [];
+    const renderTablaInformacionGeneral = () => {
+        if (!datosTabla || !Array.isArray(datosTabla) || datosTabla.length === 0) {
+            return <CAlert color="info">No hay datos de información general disponibles.</CAlert>;
+        }
 
+        return (
+            <div className="mb-4">
+                <CTable striped hover responsive bordered className="rounded-3 overflow-hidden shadow-sm mb-0">
+                    <thead className="bg-body-secondary text-body"> 
+                        <tr className="text-center align-middle">
+                            <th className="text-body">Código</th>
+                            <th className="text-body">Asignatura</th>
+                            <th className="text-body">Inscriptos</th>
+                            <th className="text-body">Comisiones Teóricas</th>
+                            <th className="text-body">Comisiones Prácticas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {datosTabla.map((fila, index) => (
+                            <tr key={index}>
+                                <td className="text-center">{fila.codAsignatura || '-'}</td>
+                                <td className="text-center">{fila.asignatura || '-'}</td>
+                                <td className="text-center fw-bold">{fila.inscriptos ?? '-'}</td>
+                                <td className="text-center">
+                                    {Array.isArray(fila.comisionesTeoricas) 
+                                        ? fila.comisionesTeoricas.join(', ') 
+                                        : fila.comisionesTeoricas || '-'}
+                                </td>
+                                <td className="text-center">{fila.comisionesPracticas || '-'}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </CTable>
+            </div>
+        );
+    };
+
+    const renderPreguntasDelGrupo = (grupo) => {
+        const preguntasFiltradas = grupo.preguntas.filter(
+            p => p.texto !== "Código de actividad curricular" && 
+                 p.texto !== "Nombre de la actividad curricular" &&
+                 p.texto !== "Información general de actividades curriculares"
+        );
+
+        if (grupo.tipo === 'multiple' && datosMaterias.length > 0 && tipoInstrumento === 'INFORME_SINTETICO') {
+            const instanciasUnicas = [...new Set(datosMaterias.map(m => m.instancia))].sort((a, b) => a - b);
+            
+            return (
+                <>
+                    {instanciasUnicas.map((instancia) => {
+                        const materiaInfo = datosMaterias.find(m => m.instancia === instancia);
+                        
+                        return (
+                            <div key={instancia} className="mb-5">
+                                {materiaInfo && (
+                                    <div className="mb-3 p-3 rounded bg-body-secondary border-start border-4 border-primary">
+                                        <h5 className="mb-0 fw-bold text-body">
+                                            <i className="fas fa-book me-2"></i>
+                                            {materiaInfo.nombre}
+                                            <span className="ms-2 opacity-75 small text-body">(Código: {materiaInfo.codigo})</span>
+                                        </h5>
+                                    </div>
+                                )}
+                                
+                                {preguntasFiltradas.map((pregunta) => {
+                                    const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id, instancia);
+
+                                    return (
+                                        <div key={`${pregunta.id}-${instancia}`} className="mb-4 bg-body border rounded p-3 shadow-sm">
+                                            <div className="mb-3">
+                                                <div className="fw-bold mb-2 fs-5 text-body">
+                                                    {pregunta.texto}
+                                                </div>
+                                                <div className="d-flex gap-2 flex-wrap mt-2">
+                                                    {pregunta.obligatoria && <Badge bg="danger">Obligatoria</Badge>}
+                                                    {pregunta.tipo === "abierta" && <Badge bg="secondary">Abierta</Badge>}
+                                                    {pregunta.tipo === "cerrada" && <Badge bg="primary">Cerrada</Badge>}
+                                                </div>
+                                            </div>
+                                            <div className="mt-3">
+                                                {respuestasPregunta.length > 0 ? (
+                                                    respuestasPregunta.map((r, i) => renderRespuesta(r, pregunta, i))
+                                                ) : (
+                                                    <div className="p-3 rounded bg-warning bg-opacity-10 w-100">
+                                                        <i className="fas fa-exclamation-circle me-2 text-warning"></i>
+                                                        <span className="text-muted">No respondida</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </>
+            );
+        }
+
+        return preguntasFiltradas.map((pregunta) => {
+            const respuestasPregunta = obtenerRespuestasDePregunta(pregunta.id);
+
+            return (
+                <div key={pregunta.id} className="mb-4 bg-body border rounded p-3 shadow-sm">
+                    <div className="mb-3">
+                        <div className="fw-bold mb-2 fs-5 text-body">{pregunta.texto}</div>
+                        <div className="d-flex gap-2 flex-wrap mt-2">
+                            {pregunta.obligatoria && <Badge bg="danger">Obligatoria</Badge>}
+                            {pregunta.tipo === "abierta" && <Badge bg="secondary">Abierta</Badge>}
+                            {pregunta.tipo === "cerrada" && <Badge bg="primary">Cerrada</Badge>}
+                        </div>
+                    </div>
+                    <div className="mt-3">
+                        {respuestasPregunta.length > 0 ? (
+                            respuestasPregunta.map((r, i) => renderRespuesta(r, pregunta, i))
+                        ) : (
+                            <div className="p-3 rounded bg-warning bg-opacity-10 w-100">
+                                <i className="fas fa-exclamation-circle me-2 text-warning"></i>
+                                <span className="text-muted">No respondida</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        });
+    };
+
+    const renderVistaEncuesta = () => {
+        const gruposOrganizados = plantillaFormulario ? organizarPreguntasEnGrupos(plantillaFormulario) : [];
         if (!plantillaFormulario && respuestas.length > 0) {
             return (
                 <div className="text-center py-5">
                     <i className="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                     <h5 className="text-warning mb-3">Plantilla no disponible</h5>
-                    <p className="text-muted">
-                        Las respuestas se cargaron correctamente pero no se pudo obtener la plantilla.
-                    </p>
-                    <Button variant="primary" onClick={() => navigate(-1)}>
-                        Volver
-                    </Button>
-
+                    <p className="text-muted">Las respuestas se cargaron correctamente pero no se pudo obtener la plantilla.</p>
+                    <Button variant="primary" onClick={() => navigate(-1)}>Volver</Button>
                 </div>
             );
         }
-
-
-        const estiloBotonActivo = { backgroundColor: "#0d6efd", border: "none", color: "#fff" };
-        const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
+        
+        const mostrarPestanas = tipoInstrumento === 'INFORME_SINTETICO' || tipoInstrumento === 'INFORME_CATEDRA';
+        const esInformeSintetico = tipoInstrumento === 'INFORME_SINTETICO';
+        const mostrarTabInformacionGeneral = esInformeSintetico;
 
         return (
-            // <Container fluid className="mt-4 px-4">
             <>
-
                 <div className="mb-1">
-                    <Button
-                        variant="outline-secondary"
-                        onClick={() => navigate(-1)}
-                        className="mb-3"
-                        >
+                    <Button variant="outline-secondary" onClick={() => navigate(-1)} className="mb-3 no-print">
                         <i className="fa-solid fa-arrow-left"></i> Volver
                     </Button>
                 </div>
-            <ShadowedCard>
+                
                 <div className="row justify-content-center">
                     <div className="col-12">
-                        <CCard className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <CCardBody className="p-4 p-md-5">
-                                {/* Botón volver */}
-
-
-                                {/* Encabezado */}
-                                <div className="mb-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <div>
-                                            <h1>{materiaNombre}</h1>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        
-                                        
-                                        <h5 className='text-muted'>Respondido: {new Date(fechaEnvio).toLocaleDateString()}</h5>
-                                        {/* <div className="d-flex gap-3">
-                                            <Badge bg="primary" className="fs-6">
-                                                <i className="fas fa-calendar me-1" />
-                                                {new Date(fechaEnvio).toLocaleDateString()}
-                                            </Badge>
-                                        </div> */}
-
-                                        {gruposOrganizados.length > 0 && (
-                                            <div className="text-end">
-                                                <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
-                                                    <span style={{ color: "grey", fontSize: "13px" }}>TOTAL PREGUNTAS</span>
-                                                    <br />
-                                                    {gruposOrganizados.reduce((total, grupo) => total + grupo.preguntas.length, 0)} preguntas
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Contenido de respuestas */}
-                                {!gruposOrganizados.length ? (
-                                    <div className="text-center py-5">
-                                        <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <h5 className="text-muted mb-3">No se encontraron preguntas para mostrar</h5>
-                                        <p className="text-muted">
-                                            No hay preguntas disponibles en esta encuesta.
+                        <div className="mb-4">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <div><h1 className="text-body fw-bold">{materiaNombre}</h1></div>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h5 className='text-muted'>Respondido: {new Date(fechaEnvio).toLocaleDateString()}</h5>
+                                {gruposOrganizados.length > 0 && (
+                                    <div className="text-end">
+                                        <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
+                                            <span style={{ color: "grey", fontSize: "13px" }}>TOTAL PREGUNTAS</span><br />
+                                            {gruposOrganizados.reduce((total, grupo) => total + grupo.preguntas.length, 0)} preguntas
                                         </p>
                                     </div>
-                                ) : (
-                                    <div className="respuestas-content">
-                                        {/* Mostrar solo el grupo activo si hay múltiples grupos */}
-                                        {gruposOrganizados.length > 1 ? (
-                                            <>
-                                                {/* Botones de navegación entre grupos */}
-                                                <div className="row justify-content-center">
-                                                    <Stack className="pt-3 pb-3 mb-4" direction="horizontal" gap={3}>
-                                                        {gruposOrganizados.map((grupo, index) => (
-                                                            <Button
-                                                                key={grupo.id}
-                                                                style={grupoActivo === index ? estiloBotonActivo : estiloBotonInactivo}
-                                                                onClick={() => setGrupoActivo(index)}
-                                                                className="flex-grow-1"
-                                                            >
-                                                                {grupo.nombre} ({grupo.preguntas.length})
-                                                            </Button>
-                                                        ))}
-                                                    </Stack>
-                                                </div>
-                                                {gruposOrganizados.map((grupo, grupoIdx) => (
-                                                    grupoIdx === grupoActivo && (
-                                                        <div key={grupo.id}>
-                                                            {/* Encabezado del grupo */}
-                                                            
-                                                            <CCardHeader
-                                                                className="mb-4 p-3 rounded"
-                                                                style={{
-                                                                    borderLeft: "5px solid #0d6efd",
-                                                                }}
-                                                            >
-                                                                <h4 className="fw-bold mb-1 fs-5">{grupo.nombre}</h4>
-                                                                <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
-                                                                    {grupo.preguntas.length} preguntas
-                                                                </p>
-                                                                </CCardHeader>
+                                )}
+                            </div>
+                        </div>
 
-                                                            {/* Preguntas del grupo activo*/}
-                                                            {renderPreguntasDelGrupo(grupo)}
-                                                        </div>
-                                                    )
-                                                ))}
-                                            </>
-                                        ) : (
-                                            // Mostrar 1 solo grupo
-                                            gruposOrganizados.map((grupo) => (
-                                                <div key={grupo.id}>
+                        {!gruposOrganizados.length ? (
+                            <div className="text-center py-5">
+                                <h5 className="text-muted">No se encontraron preguntas</h5>
+                            </div>
+                        ) : (
+                            <div className="respuestas-content">
+                                {mostrarPestanas ? (
+                                    <div className='w-100'>
+                                        <CNav variant="pills" className="mb-4 gap-2 flex-wrap border-bottom pb-3">
+                                            {mostrarTabInformacionGeneral && (
+                                                <CNavItem>
+                                                    <CNavLink 
+                                                        active={tabActiva === 0}
+                                                        onClick={() => setTabActiva(0)}
+                                                        style={{ cursor: 'pointer', fontWeight: '500' }}
+                                                        className={tabActiva === 0 ? '' : 'bg-body-tertiary text-body border'}
+                                                    >
+                                                        Información General
+                                                    </CNavLink>
+                                                </CNavItem>
+                                            )}
+                                            {gruposOrganizados.map((grupo, idx) => (
+                                                <CNavItem key={grupo.id}>
+                                                    <CNavLink 
+                                                        active={tabActiva === (mostrarTabInformacionGeneral ? idx + 1 : idx)}
+                                                        onClick={() => setTabActiva(mostrarTabInformacionGeneral ? idx + 1 : idx)}
+                                                        style={{ cursor: 'pointer', fontWeight: '500' }}
+                                                        className={tabActiva === (mostrarTabInformacionGeneral ? idx + 1 : idx) ? '' : 'bg-body-tertiary text-body border'}
+                                                    >
+                                                        {limpiarTitulo(grupo.nombre) || `Sección ${idx + 1}`}
+                                                    </CNavLink>
+                                                </CNavItem>
+                                            ))}
+                                        </CNav>
+
+                                        {mostrarTabInformacionGeneral && tabActiva === 0 && (
+                                            <div className="animate__animated animate__fadeIn">
+                                                <CCardHeader className="mb-4 p-3 rounded bg-body-secondary border-start border-4 border-primary">
+                                                    <h4 className="fw-bold mb-0 fs-5 text-body">
+                                                        Información General del Departamento
+                                                    </h4>
+                                                </CCardHeader>
+                                                {renderTablaInformacionGeneral()}
+                                            </div>
+                                        )}
+
+                                        {gruposOrganizados.map((grupo, idx) => (
+                                            tabActiva === (mostrarTabInformacionGeneral ? idx + 1 : idx) && (
+                                                <div key={grupo.id} className="animate__animated animate__fadeIn">
+                                                    <CCardHeader className="mb-4 p-3 rounded bg-body-secondary border-start border-4 border-secondary">
+                                                        <h4 className="fw-bold mb-0 fs-5 text-body">
+                                                            {limpiarTitulo(grupo.nombre) || `Sección ${idx + 1}`}
+                                                        </h4>
+                                                    </CCardHeader>
                                                     {renderPreguntasDelGrupo(grupo)}
                                                 </div>
-                                            ))
-                                        )}
+                                            )
+                                        ))}
                                     </div>
+                                ) : (
+                                    gruposOrganizados.map((grupo) => (
+                                        <div key={grupo.id}>
+                                            <CCardHeader className="mb-4 p-3 rounded bg-body-secondary border-start border-4 border-secondary">
+                                                <h4 className="fw-bold mb-0 fs-5 text-body">{limpiarTitulo(grupo.nombre)}</h4>
+                                            </CCardHeader>
+                                            {renderPreguntasDelGrupo(grupo)}
+                                        </div>
+                                    ))
                                 )}
-
-                            </CCardBody>
-                        </CCard>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </ShadowedCard>
             </>
-            
         );
     };
 
-    // carga y error
-    if (cargando) {
-        return (
-            <Container className="mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5 text-center">
-                                <Spinner animation="border" role="status" className="mb-3">
-                                    <span className="visually-hidden">Cargando respuestas...</span>
-                                </Spinner>
-                                <p className="text-muted">Cargando respuestas...</p>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
-        );
-    }
+    if (cargando) return <Container className="mt-5 text-center"><Spinner animation="border" variant="primary"/></Container>;
+    if (error) return <Container className="mt-5"><CAlert color="danger">{error}</CAlert></Container>;
 
-    if (error) {
-        return (
-            <Container className="mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5">
-                                <Alert variant="danger" className="mb-0">
-                                    <i className="fas fa-exclamation-triangle me-2"></i>
-                                    {error}
-                                </Alert>
-                                <div className="text-center mt-4">
-                                    <Button variant="secondary" onClick={() => navigate(-1)}>
-                                        Volver
-                                    </Button>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
-        );
-    }
+    return (
+        <div className="row justify-content-center">
+            <ShadowedCard>
+                <CCard className="border-0 shadow-sm w-100 bg-body" style={{ borderRadius: "1rem" }}>
+                    <CCardBody className="p-4 p-md-5">
+                        {renderVistaEncuesta()}
 
-    // Render según tipo de instrumento - renderVistaEncuesta vale para informes de cátedra
-    // return tipoInstrumento === 'INFORME_SINTETICO' ? renderInforme() : renderVistaEncuesta();
-
-    return tipoInstrumento === 'ENCUESTA_ESTUDIANTE'? renderVistaEncuesta() : renderInforme()
+                        <div className="d-grid gap-2 mt-4 no-print border-top pt-4">
+                            <Button
+                                variant="primary"
+                                onClick={handleDownloadPDF}
+                                disabled={pdfLoading}
+                                size="lg"
+                            >
+                                {pdfLoading
+                                    ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
+                                    : <>
+                                        <i className="fas fa-file-pdf me-2"></i>
+                                        Descargar {tipoInstrumento === 'INFORME_SINTETICO' ? "Informe Sintético" : "Informe de Cátedra"} en PDF
+                                      </>
+                                }
+                            </Button>
+                        </div>
+                    </CCardBody>
+                </CCard>
+            </ShadowedCard>
+        </div>
+    );
 }

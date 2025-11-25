@@ -1,4 +1,4 @@
-import { Alert, Row, Col, ProgressBar } from 'react-bootstrap';
+import { ProgressBar } from 'react-bootstrap';
 import ModalExito from '../ModalEnvio';
 import type { GrupoPreguntas, RespuestaTemporal, InstanciaRespuestas } from '../types';
 import { esTipoRespuestaValido } from '../Funciones';
@@ -29,7 +29,13 @@ function ResumenRespuestas({
     onEnviar,
     onExito,
 }: Props) {
+    
     const obtenerRespuesta = (preguntaId: number) => respuestas.find((r) => r.pregunta_id === preguntaId);
+
+    const limpiarTitulo = (titulo: string) => {
+        if (!titulo) return '';
+        return titulo.replace(/\(Repetible\)/gi, '').trim();
+    };
 
     const calcularProgresoGrupo = (grupo: GrupoPreguntas) => {
         let completadas = 0;
@@ -43,8 +49,6 @@ function ResumenRespuestas({
 
             completadas = grupo.preguntas.filter((p: any) => {
                 const resp = obtenerRespuesta(p.id);
-                // return resp?.texto?.trim() || resp?.opcion_id;
-
                 return (resp && (resp?.opcion_id || ((resp.texto && (p.tipo_respuesta))? esTipoRespuestaValido(resp.texto, p.tipo_respuesta) : resp.texto))) 
             }).length;
 
@@ -52,7 +56,6 @@ function ResumenRespuestas({
                 .filter((p: any) => p.obligatoria)
                 .filter((p: any) => {
                     const resp = obtenerRespuesta(p.id);
-                    // return resp?.texto?.trim() || resp?.opcion_id;
                     return (resp && (resp?.opcion_id || ((resp.texto && (p.tipo_respuesta))? esTipoRespuestaValido(resp.texto, p.tipo_respuesta) : resp.texto))) 
                 }).length;
         } else {
@@ -66,14 +69,12 @@ function ResumenRespuestas({
                     if (pregunta?.obligatoria) {
                         totalObligatorias++;
                         if((r?.opcion_id || ((r.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))){
-                        // if (r.texto?.trim() || r.opcion_id) {
                             completadasObligatorias++;
                         }
                     }
                     
                     total++;
                     if(pregunta && (r?.opcion_id || ((r.texto && (pregunta.tipo_respuesta))? esTipoRespuestaValido(r.texto, pregunta.tipo_respuesta) : r.texto))){
-                    // if (r.texto?.trim() || r.opcion_id) {
                         completadas++;
                     }
                 }
@@ -100,46 +101,46 @@ function ResumenRespuestas({
     return (
         <div>
             <div className="text-center mb-4">
+                {/* Círculo de estado adaptativo */}
                 <div
+                    className={`rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 bg-${todasRespondidas ? 'success' : 'warning'} bg-opacity-25`}
                     style={{
                         width: '80px',
                         height: '80px',
-                        borderRadius: '50%',
-                        backgroundColor: todasRespondidas ? '#d1e7dd' : '#fff3cd',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1rem',
                         fontSize: '2.5rem',
                     }}
                 >
                     {todasRespondidas ? (
-                        <i className="fa-solid fa-check" style={{ color: '#0f5132' }}></i>
+                        <i className="fa-solid fa-check text-success"></i>
                     ) : (
-                        <i className="fa-solid fa-triangle-exclamation" style={{ color: '#FFD43B' }}></i>
+                        <i className="fa-solid fa-triangle-exclamation text-warning"></i>
                     )}
                 </div>
-                <h2 className="fw-bold mb-2" style={{ color: '#1f2937' }}>
+                
+                <h2 className="fw-bold mb-2 text-body">
                     Resumen de respuestas
                 </h2>
                 <p className="text-muted mb-0">Revise sus respuestas antes de enviar</p>
             </div>
 
             {todasRespondidas ? (
-                <CAlert variant="success" className="text-center border-0 mb-4" color={''}>
+                <CAlert color="success" className="text-center border-0 mb-4 d-flex align-items-center justify-content-center">
                     <i className="fas fa-check-circle me-2"></i>
-                    ¡Excelente! Has completado todas las preguntas obligatorias. Puedes revisar tus respuestas o enviar el
-                    formulario.
+                    <div>
+                        Has completado todas las preguntas obligatorias. Puedes enviar el formulario.
+                    </div>
                 </CAlert>
             ) : (
-                <CAlert variant="warning" className="text-center border-0 mb-4" color={''}>
+                <CAlert color="warning" className="text-center border-0 mb-4 d-flex align-items-center justify-content-center">
                     <i className="fas fa-exclamation-circle me-2"></i>
-                    Algunas preguntas obligatorias están incompletas. Debes completarlas antes de enviar.
+                    <div>
+                        Algunas preguntas obligatorias están incompletas. Debes completarlas antes de enviar.
+                    </div>
                 </CAlert>
             )}
 
             <div className="mb-4">
-                <h5 className="fw-bold mb-3" style={{ color: '#1f2937' }}>
+                <h5 className="fw-bold mb-3 text-body">
                     Progreso por sección
                 </h5>
 
@@ -153,66 +154,45 @@ function ResumenRespuestas({
                         opcionalesPendientes
                     } = calcularProgresoGrupo(grupo);
 
-                    const backgroundColor = !obligatoriasCompletas 
-                        ? '#dc3545' 
-                        : todoCompleto 
-                            ? '#198754'  
-                            : '#75b798'; 
+                    // Colores de estado (Bootstrap classes logic)
+                    let badgeColorClass = 'bg-secondary';
+                    let icon = <i className="fa-solid fa-exclamation"></i>;
+
+                    if (obligatoriasCompletas) {
+                        badgeColorClass = todoCompleto ? 'bg-success' : 'bg-success bg-opacity-75';
+                        icon = <i className="fa-solid fa-check"></i>;
+                    } else {
+                        badgeColorClass = 'bg-danger';
+                    }
+
+                    // Barra de progreso color
+                    const progressVariant = !obligatoriasCompletas ? 'danger' : todoCompleto ? 'success' : 'info';
 
                     return (
                         <div
                             key={grupo.id}
-                            className="mb-3 p-3 rounded"
-                            style={{
-                                backgroundColor: '#f8f9fa',
-                                border: '1px solid #dee2e6',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                            }}
+                            className="mb-3 p-3 rounded border bg-body-tertiary position-relative"
+                            style={{ cursor: 'pointer' }}
                             onClick={() => onIrAPagina(index)}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#e9ecef';
-                                e.currentTarget.style.borderColor = '#adb5bd';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#f8f9fa';
-                                e.currentTarget.style.borderColor = '#dee2e6';
-                            }}
                         >
                             <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
                                 <div className="d-flex align-items-center gap-2 flex-grow-1">
+                                    {/* Badge de estado */}
                                     <div
+                                        className={`d-flex align-items-center justify-content-center rounded text-white ${badgeColorClass}`}
                                         style={{
-                                            backgroundColor,
-                                            color: 'white',
-                                            fontSize: '0.9rem',
-                                            padding: '0.4rem',
-                                            borderRadius: '0.375rem',
-                                            fontWeight: 'bold',
-                                            flexShrink: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '0.25rem',
                                             minWidth: '32px',
-                                            height: '28px'
+                                            height: '28px',
+                                            fontSize: '0.9rem'
                                         }}
                                     >
-                                        {obligatoriasCompletas ? (
-                                            todoCompleto ? (
-                                                <>
-                                                    <i className="fa-solid fa-check"></i>
-                                                </>
-                                            ) : (
-                                                <i className="fa-solid fa-check"></i>
-                                            )
-                                        ) : (
-                                            <i className="fa-solid fa-exclamation"></i>
-                                        )}
+                                        {icon}
                                     </div>
+                                    
                                     <div className="flex-grow-1">
-                                        <h6 className="mb-0 fw-semibold" style={{ color: '#1f2937' }}>
-                                            {grupo.nombre}
+                                        {/* Título limpio sin (Repetible) y color adaptativo */}
+                                        <h6 className="mb-0 fw-semibold text-body">
+                                            {limpiarTitulo(grupo.nombre)}
                                         </h6>
                                         <small className="text-muted d-block">
                                             {todoCompleto ? (
@@ -225,45 +205,24 @@ function ResumenRespuestas({
                                         </small>
                                     </div>
                                 </div>
-                                <span 
+                                
+                                <button 
+                                    className={`btn btn-sm ${obligatoriasCompletas ? 'btn-outline-success' : 'btn-outline-primary'}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         onIrAPagina(index);
                                     }}
-                                    style={{
-                                        padding: '0.375rem 0.75rem',
-                                        fontSize: '0.875rem',
-                                        borderRadius: '0.25rem',
-                                        border: '1px solid #0d6efd',
-                                        color: '#0d6efd',
-                                        cursor: 'pointer',
-                                        backgroundColor: 'transparent',
-                                        whiteSpace: 'nowrap',
-                                        flexShrink: 0,
-                                    }}
                                 >
                                     {obligatoriasCompletas ? 'Revisar' : 'Completar'}
-                                </span>
+                                </button>
                             </div>
 
                             <ProgressBar
                                 now={porcentajeObligatorias}
-                                style={{ 
-                                    height: '8px', 
-                                    borderRadius: '4px',
-                                    backgroundColor: '#e9ecef'
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        width: `${porcentajeObligatorias}%`,
-                                        backgroundColor,
-                                        height: '100%',
-                                        borderRadius: '4px',
-                                        transition: 'width 0.3s ease'
-                                    }}
-                                />
-                            </ProgressBar>
+                                variant={progressVariant}
+                                style={{ height: '8px', borderRadius: '4px' }}
+                                className="bg-secondary bg-opacity-25"
+                            />
                         </div>
                     );
                 })}
@@ -274,7 +233,6 @@ function ResumenRespuestas({
                     <button
                         className="btn btn-outline-secondary w-100"
                         onClick={onRetroceder}
-                        style={{ cursor: 'pointer' }}
                     >
                         <i className="fa-solid fa-arrow-left me-2"></i>
                         Volver a editar

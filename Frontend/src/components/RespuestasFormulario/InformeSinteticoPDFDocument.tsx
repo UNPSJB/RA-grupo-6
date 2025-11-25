@@ -56,11 +56,15 @@ const styles = StyleSheet.create({
         minPresenceAhead: 50
     },
     groupTitle: {
-        fontSize: 12,
+        fontSize: 11,
         fontFamily: 'Helvetica-Bold',
-        color: '#2d3748',
+        color: '#0d6efd',
         marginBottom: 10,
-        paddingBottom: 5,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 8,
+        paddingBottom: 8,
+        backgroundColor: '#f0f6ff',
         textAlign: 'left',
         minPresenceAhead: 50
     },
@@ -207,9 +211,11 @@ export default function InformeSinteticoPDFDocument({ informe }: { informe: Deta
                                         </Text>
                                     </View>
                                 ) : (
-                                    <Text style={styles.groupTitle}>
-                                        {grupo.titulo_grupo}
-                                    </Text>
+                                    <View style={styles.materiaInfo}>
+                                        <Text style={styles.materiaText}>
+                                            {grupo.titulo_grupo}
+                                        </Text>
+                                    </View>
                                 )}
 
                                 {grupo.respuestas && grupo.respuestas.map((respuesta, respuestaIndex) => (

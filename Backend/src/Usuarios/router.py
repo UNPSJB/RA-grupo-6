@@ -61,7 +61,7 @@ async def logout(response: Response):
     """
     Borra la cookie de autenticación.
     """
-    response.delete_cookie(key="access_token", domain="localhost", path="/")
+    response.delete_cookie(key="access_token", domain=None, path="/")
     return {"status": "success"}
 
 @router.post("/register", response_model=schemas.AuthUsuarioSchema)

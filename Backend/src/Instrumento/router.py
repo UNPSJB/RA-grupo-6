@@ -55,7 +55,9 @@ def get_instrumentos_por_tipo(
 def get_tasa_respuestas(instrumento_id: int, db:Session = Depends(get_db)):
     return services.obtenerTasaRespuestas(db,instrumento_id)
 
-
+@router.get("/ObtenerTasaRespuestasDocente/{docente_id}", response_model=List[dict])
+def get_tasa_respuestas_docente(docente_id: int, db:Session = Depends(get_db)):
+    return services.getTasaRespuestasInstrumentosDocente(db,docente_id)
 
 @router.get("/{instrumento_id}/detail", response_model=InstrumentoDetalle)
 def get_instrumento_detalle(instrumento_id: int, db: Session = Depends(get_db)):

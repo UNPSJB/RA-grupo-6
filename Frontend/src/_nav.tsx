@@ -1,31 +1,16 @@
-import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
     cilBell,
-    cilCalculator,
     cilChartPie,
     cilDescription,
     cilNotes,
     cilPencil,
-    cilSpeedometer,
-    cilStar,
-    cilBuilding,
-    cilEducation,
-    cilUser,
     cilBarChart,
-    cilChartLine,
-    cilChart,
-    cilCalendar,
-    cilDoubleQuoteSansLeft,
-    cilBalanceScale,
     cilClone,
-    cilInbox,
-    cilInput,
-    cilCommentBubble,
     cilShortText,
     cilCalendarCheck,
 } from '@coreui/icons'
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import {CNavItem, CNavTitle } from '@coreui/react'
 
 const navSecretaria = [
     /* { component: CNavTitle, name: 'Secretaría Académica' }, */
@@ -129,12 +114,17 @@ const navDocente = [
     }, */
     {
         component: CNavItem,
+        name: 'Tasa Respuestas Alumnos',
+        to: '/TasaRespuestasAlumnos/',
+        icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
         name: 'Mis Respuestas',
         to: '/respuestas-informe-catedra',
         icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
-    
-    
+
 ];
 
 const navEstudiante = [

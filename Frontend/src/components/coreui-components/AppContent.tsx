@@ -22,6 +22,7 @@ import VerRespuestasDocente from '../RespuestasFormulario/VerRespuestasDocente'
 import VerRespuestasDepartamento from '../RespuestasFormulario/VerRespuestasDepartamento'
 import VerRespuestas from '../RespuestasFormulario/VerRespuestas'
 import { CompararPlantillas } from '../Estadisticas/CompararPeriodos'
+import { MostrarEstadisticasAlumnos } from '../Estadisticas/MostrarEstadisticasAlumnos'
 
 
 const PlaceholderComponent = ({ path }: { path: string }) => (
@@ -53,6 +54,9 @@ const AppContent = () => {
         <Route path="/instrumentos-docente" element={<InstrumentosDocente/>} />
         <Route path="/VerEncuestasEstudiante" element={<PaginaEncuestasEstudiantes/>} />
         <Route path="/respuestas-informe-catedra" element={<VerRespuestasDocente/>}>Informes de Cátedra Respondidos</Route>
+        <Route path="/TasaRespuestasAlumnos/" element={<MostrarEstadisticasAlumnos docente_id={2}/>} ></Route>
+
+
         {/* Rutas Estudiante */}
         <Route path="/materias" element={<SeleccionarMateria/>} />
         <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>
@@ -65,6 +69,7 @@ const AppContent = () => {
         <Route path="/PlanificarPeriodos" element={<PlanificarPeriodos/>} />
         <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas/>}></Route>
         <Route path='/comparar-plantillas' element={<CompararPlantillas/>} ></Route>
+
         
       </Routes>
     </CContainer>

@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   optionRow: { flexDirection: 'row', justifyContent: 'space-between', fontSize: 10, color: '#444', marginBottom: 3 },
   progressBarContainer: { height: 8, width: '100%', backgroundColor: '#e0e0e0', borderRadius: 4 },
   progressBar: { height: 8, backgroundColor: '#28a745', borderRadius: 4 },
-  footer: { position: 'absolute', bottom: 40, right: 30, fontSize: 10, color: 'grey'},
+  footer: { position: 'absolute', bottom: 30, right: 5, fontSize: 10, color: 'grey'},
 });
 
 export default function InformePDFDocument({ informe }: { informe: DetalleInformeCatedraCompleto | DetalleInformeSinteticoCompleto}) { 
@@ -104,8 +104,10 @@ export default function InformePDFDocument({ informe }: { informe: DetalleInform
                 </View>
               ))}
             </View>
-        }
-      <Text fixed style={styles.footer} render={({ pageNumber, totalPages }) => `${pageNumber} de ${totalPages}`} />
+      }
+
+        <Text fixed style={styles.footer} render={({ pageNumber, totalPages }) => `${pageNumber} de ${totalPages}`} />
+      
       </Page>
     </Document>
   );

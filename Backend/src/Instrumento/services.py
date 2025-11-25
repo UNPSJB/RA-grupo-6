@@ -1,10 +1,12 @@
 from datetime import timedelta
 from typing import List
+from fastapi.background import P
 from pytest import param
 import array
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from src.Usuarios.models import Usuario
 from src.Materias.services import get_Docente
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Dictados.models import Dictado
@@ -182,7 +184,39 @@ def getTasaRespuestasInstrumentos(db: Session, instrumentos: List[Instrumento], 
 
 
 
+def getTasaRespuestasInstrumentosDocente(db: Session, docente_id: int) -> List[dict]:
 
+    # docente = db.scalar(select(Usuario).where(Usuario.id == docente_id))
+
+    periodos_vinculados = db.scalars(select(PeriodoVinculado).where(PeriodoVinculado.usuario_id == docente_id)).all()
+
+    estadisticas_materias = []
+
+    for periodo in periodos_vinculados:
+        
+        estadistica_materia = {}
+
+        instrumento = db.query(Instrumento).where(Instrumento.materia_id == periodo.materia_id).order_by(Instrumento.fecha_cierre.desc()).first()
+        
+        tasa = obtenerTasaRespuestas(db, instrumento.id)
+
+        estadistica_materia['Instrumento_id'] = instrumento.id
+        estadistica_materia['Materia'] = instrumento.materia.nombre
+        estadistica_materia['Respondidos'] = tasa.respondidos
+        estadistica_materia['Asignados'] = 0
+        asignados = []
+        
+        for (periodoMateria) in periodo.materia.periodos_vinculados:
+            if ((periodoMateria.fecha_desde <= instrumento.dictado.fecha_inicio) and (periodoMateria.fecha_hasta == instrumento.dictado.fecha_cierre)):
+                asignados.append(periodoMateria)
+
+            estudiantes = list(filter(lambda x: x.usuario.rol.nombre.lower() == "estudiante", asignados)) 
+        
+        estadistica_materia['Asignados'] = len(estudiantes)
+        
+        estadisticas_materias.append(estadistica_materia)
+        
+    return estadisticas_materias
 
 
 

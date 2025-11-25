@@ -10,43 +10,27 @@ const styles = StyleSheet.create({
         color: '#333',
         lineHeight: 1.4
     },
-    header: {
-        marginBottom: 25,
-        borderBottom: '2px solid #1a365d',
-        paddingBottom: 15,
-        alignItems: 'center'
-    },
-    logoContainer: {
-        alignItems: 'center',
-        marginBottom: 15
-    },
-    headerImage: {
-        width: 80,
-        height: 80,
-        marginBottom: 10,
-        opacity: 0.9
-    },
+    header: { marginBottom: 20, borderBottom: '2px solid #eee', paddingBottom: 10 },
+    headerImage: {width: 80, opacity: 0.5, position: "absolute", top: 0, right: 10},
     title: {
         fontSize: 20,
         fontFamily: 'Helvetica-Bold',
         textAlign: "center",
         color: '#1a365d',
-        marginBottom: 8
+        marginBottom: 25
     },
     subtitle: {
         fontSize: 12,
         color: '#666',
-        textAlign: "center",
+        textAlign: "left",
         marginBottom: 4
     },
     section: {
         marginBottom: 20
     },
     sectionTitle: {
-        fontSize: 14,
+        fontSize: 18,
         fontFamily: 'Helvetica-Bold',
-        backgroundColor: '#1a365d',
-        color: 'white',
         padding: 8,
         marginBottom: 12,
         borderRadius: 4,
@@ -59,7 +43,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingBottom: 5,
         borderBottom: '1px solid #e2e8f0',
-        textAlign: 'center'
+        textAlign: 'left'
     },
     responseContainer: {
         marginBottom: 15,
@@ -78,24 +62,23 @@ const styles = StyleSheet.create({
         fontSize: 10,
         lineHeight: 1.5
     },
-    footer: {
-        position: 'absolute',
-        bottom: 30,
-        left: 40,
-        right: 40,
-        fontSize: 9,
-        color: '#a0aec0',
-        textAlign: 'center',
-        borderTop: '1px solid #e2e8f0',
-        paddingTop: 10
-    },
     pageNumber: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 20,
         right: 40,
         fontSize: 9,
-        color: '#a0aec0'
-    }
+        width: '100%',
+    },
+
+    footerText: {
+        position: 'absolute',
+        bottom: 35,
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        fontSize: 9,
+        width: '100%'
+    },
 });
 
 export default function InformeSinteticoPDFDocument({ informe }: { informe: DetalleInformeSinteticoCompleto }) {
@@ -110,10 +93,8 @@ export default function InformeSinteticoPDFDocument({ informe }: { informe: Deta
             <Page size="A4" style={styles.page}>
                 {/* Header con logo centrado */}
                 <View style={styles.header}>
-                    <View style={styles.logoContainer}>
-                        <Image src={Logo} style={styles.headerImage} />
-                    </View>
                     <Text style={styles.title}>{informe.titulo_formulario}</Text>
+                    <Image src={Logo} style={styles.headerImage}></Image>
                     <Text style={styles.subtitle}>Departamento: {informe.departamento}</Text>
                     <Text style={styles.subtitle}>
                         Fecha de finalización: {new Date(informe.fecha_completado).toLocaleDateString('es-ES', {
@@ -127,18 +108,17 @@ export default function InformeSinteticoPDFDocument({ informe }: { informe: Deta
                 {/* Contenido */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Síntesis del Informe</Text>
-
                     {informe.respuestas_sintesis_agrupadas.map((grupo, grupoIndex) => (
-                        <View key={grupo.grupo} style={{ marginBottom: grupoIndex < informe.respuestas_sintesis_agrupadas.length - 1 ? 20 : 0 }} wrap={false}>
+                        <View key={grupo.grupo} style={{ marginBottom: grupoIndex < informe.respuestas_sintesis_agrupadas.length - 1 ? 20 : 0 }} >
 
                             {/* Título del Grupo */}
                             <Text style={styles.groupTitle}>
-                                {grupo.grupo}. {grupo.titulo_grupo}
+                                {grupo.titulo_grupo}
                             </Text>
 
                             {/* Preguntas y Respuestas del Grupo */}
                             {grupo.respuestas.map((respuesta, respuestaIndex) => (
-                                <View key={respuestaIndex} style={styles.responseContainer} wrap={false}>
+                                <View key={respuestaIndex} style={styles.responseContainer} >
                                     <Text style={styles.question}>
                                         {respuesta.pregunta_texto}
                                     </Text>
@@ -151,15 +131,16 @@ export default function InformeSinteticoPDFDocument({ informe }: { informe: Deta
                     ))}
                 </View>
 
-                {/* Footer */}
-                <Text style={styles.footer}>
-                    Sistema de Reportes Académicos - Universidad Nacional de la Patagonia San Juan Bosco
-                </Text>
-                <Text
-                    style={styles.pageNumber}
-                    render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
-                    fixed
-                />
+
+                <View fixed style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                    <Text style={styles.pageNumber}
+                        render={({ pageNumber, totalPages }) => `${pageNumber} de ${totalPages}`}
+                    />
+                    <Text style={styles.footerText}>
+                        Sistema de Reportes Académicos - Universidad Nacional de la Patagonia San Juan Bosco
+                    </Text>
+                </View>
+
             </Page>
         </Document>
     );

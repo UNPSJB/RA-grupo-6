@@ -6,6 +6,8 @@ import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
 
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import InformeSinteticoPDFDocument from './InformeSinteticoPDFDocument';
+import ShadowedCard from '../coreui-components/ShadowedCard';
+import { CCard, CCardBody, CCardHeader } from '@coreui/react';
 
 interface RespuestaGuardada {
     id: number;
@@ -84,19 +86,6 @@ export default function VerRespuestas() {
         }
     };
 
-    // Función para obtener badge según el tipo
-    const getBadgeConfig = () => {
-        switch (tipoInstrumento) {
-            case 'INFORME_CATEDRA':
-                return { bg: "primary", text: "Informe de Cátedra"};
-            case 'INFORME_SINTETICO':
-                return { bg: "info", text: "Informe Sintético"};
-            case 'ENCUESTA_ESTUDIANTE':
-            default:
-                return { bg: "success", text: "Encuesta Estudiante"};
-        }
-    };
-
     const obtenerRespuestasDePregunta = (preguntaId: number): RespuestaGuardada[] =>
         respuestas.filter((r) => r.pregunta_id === preguntaId);
 
@@ -109,13 +98,14 @@ export default function VerRespuestas() {
 
         return (
             <div key={i} className="p-3 rounded bg-light mb-2 border w-100">
-                <div className="d-flex align-items-start">
+                <div className="d-flex align-items-start text-muted">
                     <i className="fas fa-check-circle text-success me-2 mt-1"></i>
-                    <span className="flex-grow-1" style={{ lineHeight: '1.5' }}>
+                    <span className="flex-grow-1" style={{ lineHeight: '1.5', color:'black'}}>
                         {contenido}
                     </span>
                 </div>
             </div>
+            
         );
     };
 
@@ -153,7 +143,6 @@ export default function VerRespuestas() {
                             <div 
                                 className="fw-bold mb-2"
                                 style={{ 
-                                    color: "#1f2937", 
                                     fontSize: "1.2rem",
                                     lineHeight: '1.4',
                                     width: '100%',
@@ -167,7 +156,7 @@ export default function VerRespuestas() {
                                     textAlign: 'left'
                                 }}
                             >
-                                {pregunta.orden}. {pregunta.texto}
+                                {pregunta.texto}
                             </div>
                             
                             {/* Badges debajo del texto de la pregunta */}
@@ -266,7 +255,7 @@ export default function VerRespuestas() {
 
         return {
             id: parseInt(respuestasFormularioId || '0'),
-            titulo_formulario: plantillaFormulario?.titulo || 'Informe Sintético',
+            titulo_formulario:  (tipoInstrumento == 'INFORME_SINTETICO')? 'Informe Sintético' : 'Informe de Cátedra',
             departamento: materiaNombre,
             fecha_completado: fechaEnvio,
             respuestas_sintesis_agrupadas: respuestasSintesisAgrupadas
@@ -274,27 +263,35 @@ export default function VerRespuestas() {
     };
 
     // Informe Sintético
-    const renderInformeSintetico = () => {
+    const renderInforme = () => {
         const datosPDF = getDatosParaPDF();
         
+        let prefijoArchivo = ""
+        if (tipoInstrumento == 'INFORME_SINTETICO'){
+            prefijoArchivo = "Informe-Sintetico"
+        }
+        else{
+            prefijoArchivo = 'Informe-Catedra'
+        }
+
         return (
             <div className="row justify-content-center">
                 <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
                     <Card.Body className="p-4 p-md-5">
                         {/* Vista */}
                         {renderVistaEncuesta()}
-                        
+
                         {/* Botón PDF*/}
                         <div className="d-grid gap-2 mb-4">
                         <PDFDownloadLink
                             document={<InformeSinteticoPDFDocument informe={datosPDF} />}
-                            fileName={`Informe-Sintetico-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
+                            fileName={`${prefijoArchivo}-${materiaNombre}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`}
                             className="btn btn-primary"
                         >
                             {({ loading: pdfLoading }) => 
                                 pdfLoading 
                                     ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
-                                    : 'Descargar Informe Sintético en PDF'
+                                    : `Descargar Informe ${tipoInstrumento == 'INFORME_SINTETICO'? "Sintético" : "de Catedra"} en PDF`
                             }
                         </PDFDownloadLink>
                         </div>
@@ -321,49 +318,54 @@ export default function VerRespuestas() {
                     <Button variant="primary" onClick={() => navigate(-1)}>
                         Volver
                     </Button>
+
                 </div>
             );
         }
+
 
         const estiloBotonActivo = { backgroundColor: "#0d6efd", border: "none", color: "#fff" };
         const estiloBotonInactivo = { backgroundColor: "#E8ECEF", border: "none", color: "#5A5B65" };
 
         return (
-            <Container fluid className="mt-4 px-4">
+            // <Container fluid className="mt-4 px-4">
+            <>
+
+                <div className="mb-1">
+                    <Button
+                        variant="outline-secondary"
+                        onClick={() => navigate(-1)}
+                        className="mb-3"
+                        >
+                        <i className="fa-solid fa-arrow-left"></i> Volver
+                    </Button>
+                </div>
+            <ShadowedCard>
                 <div className="row justify-content-center">
                     <div className="col-12">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5">
+                        <CCard className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
+                            <CCardBody className="p-4 p-md-5">
                                 {/* Botón volver */}
-                                <div className="mb-1">
-                                    <Button
-                                        variant="outline-secondary"
-                                        onClick={() => navigate(-1)}
-                                        className="mb-3"
-                                    >
-                                        <i className="fa-solid me-2"></i>
-                                        Volver
-                                    </Button>
-                                </div>
+
 
                                 {/* Encabezado */}
                                 <div className="mb-4">
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div>
-                                            <h1 className="fw-bold mb-2">Respuestas enviadas</h1>
-                                            <p className="text-muted mb-0">
-                                                {materiaNombre}
-                                            </p>
+                                            <h1>{materiaNombre}</h1>
                                         </div>
                                     </div>
                                     
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <div className="d-flex gap-3">
+                                        
+                                        
+                                        <h5 className='text-muted'>Respondido: {new Date(fechaEnvio).toLocaleDateString()}</h5>
+                                        {/* <div className="d-flex gap-3">
                                             <Badge bg="primary" className="fs-6">
                                                 <i className="fas fa-calendar me-1" />
                                                 {new Date(fechaEnvio).toLocaleDateString()}
                                             </Badge>
-                                        </div>
+                                        </div> */}
 
                                         {gruposOrganizados.length > 0 && (
                                             <div className="text-end">
@@ -410,10 +412,10 @@ export default function VerRespuestas() {
                                                     grupoIdx === grupoActivo && (
                                                         <div key={grupo.id}>
                                                             {/* Encabezado del grupo */}
-                                                            <div
+                                                            
+                                                            <CCardHeader
                                                                 className="mb-4 p-3 rounded"
                                                                 style={{
-                                                                    backgroundColor: "#e7f3ff",
                                                                     borderLeft: "5px solid #0d6efd",
                                                                 }}
                                                             >
@@ -421,7 +423,7 @@ export default function VerRespuestas() {
                                                                 <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
                                                                     {grupo.preguntas.length} preguntas
                                                                 </p>
-                                                            </div>
+                                                                </CCardHeader>
 
                                                             {/* Preguntas del grupo activo*/}
                                                             {renderPreguntasDelGrupo(grupo)}
@@ -440,22 +442,13 @@ export default function VerRespuestas() {
                                     </div>
                                 )}
 
-                                {/* Botón al pie */}
-                                <div className="text-center mt-4 pt-3 border-top">
-                                    <Button
-                                        variant="outline-primary"
-                                        onClick={() => navigate(-1)}
-                                        className="me-3"
-                                    >
-                                        <i className="fas me-2"></i>
-                                        Volver
-                                    </Button>
-                                </div>
-                            </Card.Body>
-                        </Card>
+                            </CCardBody>
+                        </CCard>
                     </div>
                 </div>
-            </Container>
+            </ShadowedCard>
+            </>
+            
         );
     };
 
@@ -504,5 +497,7 @@ export default function VerRespuestas() {
     }
 
     // Render según tipo de instrumento - renderVistaEncuesta vale para informes de cátedra
-    return tipoInstrumento === 'INFORME_SINTETICO' ? renderInformeSintetico() : renderVistaEncuesta();
+    // return tipoInstrumento === 'INFORME_SINTETICO' ? renderInforme() : renderVistaEncuesta();
+
+    return tipoInstrumento === 'ENCUESTA_ESTUDIANTE'? renderVistaEncuesta() : renderInforme()
 }

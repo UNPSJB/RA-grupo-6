@@ -24,7 +24,7 @@ export default function () {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
+                const userId = 3; // IMPORTANTE: adaptar al sistema de usuarios
                 
                 const res = await fetch(
                     `http://127.0.0.1:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${userId}&mostrar_respondidos=true`

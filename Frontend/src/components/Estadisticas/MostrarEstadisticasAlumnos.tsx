@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { CCol, CRow, CCardBody, CCardHeader } from "@coreui/react";
 import { CardCantRespondidos } from "./CardCantRespondidos";
 import ShadowedCard from "../coreui-components/ShadowedCard";
+import CIcon from "@coreui/icons-react";
+import { cilChartLine, cilFolderOpen } from "@coreui/icons";
 
 function MostrarCardEstadisticas(estadisticas: any[]){
     
@@ -55,7 +57,16 @@ export function MostrarEstadisticasAlumnos({docente_id} : {docente_id : number})
                 <CCardBody>
                     
                     <CRow className="g-4 justify-content-center">
-                        {estadisticas && MostrarCardEstadisticas(estadisticas)}
+                        {estadisticas.length === 0 ? (
+                            <div className="text-center m-4 text-medium-emphasis m-5">
+                                <CIcon icon={cilChartLine} size="xl" className="mb-2" />
+                                <p className="fw-bold mb-0">
+                                    No hay estadísticas disponibles para mostrar.
+                                </p>
+                            </div>
+                        ) : (
+                            MostrarCardEstadisticas(estadisticas)
+                        )} 
                     </CRow>
                 </CCardBody>
             </ShadowedCard>

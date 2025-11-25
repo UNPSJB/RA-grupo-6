@@ -28,12 +28,12 @@ const navSecretaria = [
         to: '/comparar-plantillas',
         icon: <CIcon icon={cilClone} customClassName="nav-icon" />,
     },
-    {
-        component: CNavItem,
-        name: 'Informes Sintéticos',
-        to: '/VerInformesSinteticos',
-        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
-    },
+    // {
+    //     component: CNavItem,
+    //     name: 'Informes Sintéticos',
+    //     to: '/VerInformesSinteticos',
+    //     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    // },
     {
         component: CNavItem,
         name: 'Banco de Preguntas',

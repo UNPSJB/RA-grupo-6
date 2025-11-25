@@ -56,7 +56,6 @@ export default function VerRespuestas() {
 
     const cargarDatosEncuesta = async (formId) => {
         try {
-            // CAMBIO: Usar localhost para consistencia con cookies
             const respResp = await fetch(`http://localhost:8000/respuestas/?formulario_id=${formId}`, {
                 credentials: 'include'
             });
@@ -93,7 +92,6 @@ export default function VerRespuestas() {
             setDatosMaterias(materiasCombinadas);
 
             if (plantillaFormularioId) {
-                // CAMBIO: Usar localhost
                 const plantillaResponse = await fetch(`http://localhost:8000/formularios/${plantillaFormularioId}`, {
                     credentials: 'include'
                 });
@@ -360,9 +358,10 @@ export default function VerRespuestas() {
             );
         }
         
-        const mostrarPestanas = tipoInstrumento === 'INFORME_SINTETICO' || tipoInstrumento === 'INFORME_CATEDRA';
+        const mostrarPestanas = true;
         const esInformeSintetico = tipoInstrumento === 'INFORME_SINTETICO';
         const mostrarTabInformacionGeneral = esInformeSintetico;
+        const mostrarBotonPDF = tipoInstrumento === 'INFORME_SINTETICO' || tipoInstrumento === 'INFORME_CATEDRA';
 
         return (
             <>
@@ -464,6 +463,25 @@ export default function VerRespuestas() {
                         )}
                     </div>
                 </div>
+
+                {mostrarBotonPDF && (
+                    <div className="d-grid gap-2 mt-4 no-print border-top pt-4">
+                        <Button
+                            variant="primary"
+                            onClick={handleDownloadPDF}
+                            disabled={pdfLoading}
+                            size="lg"
+                        >
+                            {pdfLoading
+                                ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
+                                : <>
+                                    <i className="fas fa-file-pdf me-2"></i>
+                                    Descargar {tipoInstrumento === 'INFORME_SINTETICO' ? "Informe Sintético" : "Informe de Cátedra"} en PDF
+                                  </>
+                            }
+                        </Button>
+                    </div>
+                )}
             </>
         );
     };
@@ -477,23 +495,6 @@ export default function VerRespuestas() {
                 <CCard className="border-0 shadow-sm w-100 bg-body" style={{ borderRadius: "1rem" }}>
                     <CCardBody className="p-4 p-md-5">
                         {renderVistaEncuesta()}
-
-                        <div className="d-grid gap-2 mt-4 no-print border-top pt-4">
-                            <Button
-                                variant="primary"
-                                onClick={handleDownloadPDF}
-                                disabled={pdfLoading}
-                                size="lg"
-                            >
-                                {pdfLoading
-                                    ? <><Spinner as="span" animation="border" size="sm" /> Generando PDF...</>
-                                    : <>
-                                        <i className="fas fa-file-pdf me-2"></i>
-                                        Descargar {tipoInstrumento === 'INFORME_SINTETICO' ? "Informe Sintético" : "Informe de Cátedra"} en PDF
-                                      </>
-                                }
-                            </Button>
-                        </div>
                     </CCardBody>
                 </CCard>
             </ShadowedCard>

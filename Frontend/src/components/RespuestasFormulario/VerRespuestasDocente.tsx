@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Spinner, Alert, Badge, ListGroup } from 'react-bootstrap';
 import ShadowedCard from '../coreui-components/ShadowedCard';
 import { CCard, CCardBody, CCardHeader, CHeader } from '@coreui/react';
+import type { Usuario } from '../types';
 
 interface InstrumentoRespondido {
     id: number;
@@ -19,6 +20,14 @@ export default function VerRespuestasDocente() {
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
+    const [usuario, setUsuario] = useState<Usuario>()
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/users/me")
+        .then((r) => r.json())
+        .then((data) => setUsuario(data))
+
+    }, [])
 
     useEffect(() => {
         const fetchInstrumentos = async () => {
@@ -26,7 +35,7 @@ export default function VerRespuestasDocente() {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
+                const userId = 2; // IMPORTANTE: adaptar al sistema de usuarios
                 
                 const res = await fetch(
                     `http://127.0.0.1:8000/instrumentos/tipo/INFORME_CATEDRA?usuario_id=${userId}&mostrar_respondidos=true`

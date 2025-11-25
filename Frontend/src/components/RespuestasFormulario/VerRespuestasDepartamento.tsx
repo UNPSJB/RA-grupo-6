@@ -27,7 +27,7 @@ interface InstrumentoRespondido {
     respuestas_formulario_id?: number;
 }
 
-export default function VerRespuestasDepartamento() {
+export default function () {
     const navigate = useNavigate();
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
@@ -39,7 +39,7 @@ export default function VerRespuestasDepartamento() {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 5; // IMPORTANTE: adaptar al sistema de usuarios
+                const userId = 3; // IMPORTANTE: adaptar al sistema de usuarios
                 
                 const res = await fetch(
                     `http://127.0.0.1:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${userId}&mostrar_respondidos=true`

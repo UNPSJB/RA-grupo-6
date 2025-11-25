@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Card, Button, Spinner, Alert, Badge, ListGroup } from 'react-bootstrap';
+import { 
+    CButton, 
+    CBadge, 
+    CSpinner, 
+    CAlert,
+    CCardBody,
+    CCardHeader,
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell,
+    CTableBody,
+    CTableDataCell
+} from '@coreui/react';
+import { capitalizarCadena } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
-import { CCard, CCardBody, CCardHeader, CHeader } from '@coreui/react';
 import type { Usuario } from '../types';
 
 interface InstrumentoRespondido {
@@ -10,7 +23,7 @@ interface InstrumentoRespondido {
     fecha_envio: string;
     instrumento_id: number;
     materia: { id: string; nombre: string };
-    plantilla_formulario?: { id: number; titulo: string }; //obj
+    plantilla_formulario?: { id: number; titulo: string };
     respondido: boolean;
     respuestas_formulario_id?: number;
 }
@@ -20,26 +33,42 @@ export default function VerRespuestasDocente() {
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
-    const [usuario, setUsuario] = useState<Usuario>()
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
 
+    // 1. Obtener el usuario actual
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/users/me")
-        .then((r) => r.json())
-        .then((data) => setUsuario(data))
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me", {
+                    credentials: 'include' // IMPORTANTE: Para enviar la cookie
+                });
+                if (!response.ok) throw new Error("No se pudo autenticar al usuario");
+                const data = await response.json();
+                setUsuario(data);
+            } catch (error) {
+                console.error(error);
+                setMensaje("Error: No se pudo identificar al usuario.");
+                setCargando(false);
+            }
+        };
+        fetchUser();
+    }, []);
 
-    }, [])
-
+    // 2. Obtener los instrumentos cuando ya tenemos el usuario
     useEffect(() => {
+        if (!usuario) return; // Esperar a que el usuario esté cargado
+
         const fetchInstrumentos = async () => {
             try {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 2; // IMPORTANTE: adaptar al sistema de usuarios
-                
+                // Usamos usuario.id dinámicamente
                 const res = await fetch(
-                    `http://127.0.0.1:8000/instrumentos/tipo/INFORME_CATEDRA?usuario_id=${userId}&mostrar_respondidos=true`
+                    `http://localhost:8000/instrumentos/tipo/INFORME_CATEDRA?usuario_id=${usuario.id}&mostrar_respondidos=true`,
+                    { credentials: 'include' }
                 );
+                
                 if (!res.ok) throw new Error('No se pudieron cargar los informes de cátedra');
 
                 const data = await res.json();
@@ -53,24 +82,28 @@ export default function VerRespuestasDocente() {
         };
 
         fetchInstrumentos();
-    }, []);
+    }, [usuario]);
+
+    const handleVerRespuestas = (instrumento: InstrumentoRespondido) => {
+        navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
+            state: {
+                materiaNombre: instrumento.materia.nombre,
+                fechaEnvio: instrumento.fecha_envio,
+                instrumentoId: instrumento.instrumento_id || instrumento.id,
+                plantillaFormularioId: instrumento.plantilla_formulario?.id,
+                tipoInstrumento: 'INFORME_CATEDRA'
+            }
+        });
+    };
 
     if (cargando) {
         return (
-            <Container className="mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <Card className="border-0 shadow-sm w-100" style={{ borderRadius: "1rem" }}>
-                            <Card.Body className="p-4 p-md-5 text-center">
-                                <Spinner animation="border" role="status" className="mb-3">
-                                    <span className="visually-hidden">Cargando informes...</span>
-                                </Spinner>
-                                <p className="text-muted">Cargando informes de cátedra respondidos...</p>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                </div>
-            </Container>
+            <ShadowedCard className="text-center">
+                <CCardBody className="p-5">
+                    <CSpinner color="primary" className="mb-3" />
+                    <p className="text-medium-emphasis">Cargando informes de cátedra respondidos...</p>
+                </CCardBody>
+            </ShadowedCard>
         );
     }
 
@@ -78,71 +111,70 @@ export default function VerRespuestasDocente() {
         <ShadowedCard>
             <CCardHeader>
                 <div className="m-2">
-                    <h4> Informes de Cátedra Respondidos</h4>
-                    <p className="text-muted mb-0">
+                    <h4>Informes de Cátedra Respondidos</h4>
+                    <p className="text-medium-emphasis mb-0">
                         Selecciona un informe para ver tus respuestas
                     </p>
                 </div>
             </CCardHeader>
             <CCardBody>
                 {mensaje && (
-                    <Alert variant={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
+                    <CAlert color={mensaje.includes('Error') ? 'warning' : 'info'} className="mb-4">
                         {mensaje}
-                    </Alert>
+                    </CAlert>
                 )}
 
                 {instrumentos.length > 0 ? (
-                    <ListGroup variant="flush">
-                        {instrumentos.map((instrumento) => (
-                            <ListGroup.Item
-                                key={instrumento.id}
-                                className="d-flex justify-content-between align-items-center p-4"
-                                style={{ borderBottom: '1px solid #e9ecef' }}
-                            >
-                                <div className="flex-grow-1">
-                                    <div className="fw-bold fs-5 mb-1">{instrumento.materia.nombre}</div>
-                                    <div className="d-flex align-items-center gap-3">
-                                        <small className="text-muted">
-                                            Fecha de envío: {new Date(instrumento.fecha_envio).toLocaleDateString()}
-                                        </small>
-                                        <Badge bg="primary" className="ms-2">
-                                            Informe de Cátedra
-                                        </Badge>
-                                        {instrumento.plantilla_formulario && (
-                                            <Badge bg="success" className="ms-2">
-                                                Formulario respondido
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() =>
-                                        navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
-                                            state: {
-                                                materiaNombre: instrumento.materia.nombre,
-                                                fechaEnvio: instrumento.fecha_envio,
-                                                instrumentoId: instrumento.instrumento_id || instrumento.id,
-                                                plantillaFormularioId: instrumento.plantilla_formulario?.id,
-                                                tipoInstrumento: 'INFORME_CATEDRA'
-                                            }
-                                        })
-                                    }
-                                    className="px-4 py-2"
+                    <CTable className='border mb-1' hover responsive>
+                        <CTableHead>
+                            <CTableRow>
+                                <CTableHeaderCell>Materia</CTableHeaderCell>
+                                <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+                                <CTableHeaderCell>Fecha de Envío</CTableHeaderCell>
+                                <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
+                            </CTableRow>
+                        </CTableHead>
+                        <CTableBody>
+                            {instrumentos.map((instrumento) => (
+                                <CTableRow 
+                                    key={instrumento.id}
+                                    onClick={() => handleVerRespuestas(instrumento)}
+                                    style={{ cursor: 'pointer' }}
                                 >
-                                    <i className="fas fa-eye me-2"></i>
-                                    Ver Respuestas
-                                </Button>
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
+                                    <CTableDataCell>
+                                        <div className="fw-bold">{capitalizarCadena(instrumento.materia.nombre)}</div>
+                                        <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                                    </CTableDataCell>
+                                    <CTableDataCell className="text-center">
+                                        {instrumento.plantilla_formulario && (
+                                            <CBadge color="success">Respondido</CBadge>
+                                        )}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {new Date(instrumento.fecha_envio).toLocaleDateString()}
+                                    </CTableDataCell>
+                                    <CTableDataCell className="text-center">
+                                        <CButton
+                                            color="primary"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleVerRespuestas(instrumento);
+                                            }}
+                                        >
+                                            <i className="fas fa-eye me-2"></i>
+                                            Ver Respuestas
+                                        </CButton>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            ))}
+                        </CTableBody>
+                    </CTable>
                 ) : (
                     <div className="text-center py-5">
-                        <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
-                        <h5 className="text-muted mb-3">No hay informes de cátedra respondidos</h5>
-                        <p className="text-muted">
+                        <i className="fas fa-inbox fa-3x text-medium-emphasis mb-3"></i>
+                        <h5 className="text-medium-emphasis mb-3">No hay informes de cátedra respondidos</h5>
+                        <p className="text-medium-emphasis">
                             Aún no has respondido ningún informe de cátedra.
                         </p>
                     </div>

@@ -6,6 +6,8 @@ from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Respuesta.models import Respuesta
 from src.Pregunta.models import Pregunta
 from src.Instrumento.models import Instrumento
+from src.Opciones.models import Opcion
+import json
 
 def crear_respuestas_formulario(
     db: Session, 
@@ -22,16 +24,33 @@ def crear_respuestas_formulario(
 
 
 def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int):
-    formulario = db.scalar(select(RespuestasFormulario).where(RespuestasFormulario.id == respuestas_formulario_id))
+    formulario = db.scalar(
+        select(RespuestasFormulario)
+        .options(
+            joinedload(RespuestasFormulario.respuestas).joinedload(Respuesta.pregunta),
+            joinedload(RespuestasFormulario.respuestas).joinedload(Respuesta.opcion),
+            joinedload(RespuestasFormulario.instrumento).joinedload(Instrumento.materia)
+        )
+        .where(RespuestasFormulario.id == respuestas_formulario_id)
+    )
 
     if not formulario:
         return None
+
+    # Obtener los datos de la tabla general si existen
+    datos_tabla = None
+    if formulario.datos:
+        try:
+            datos_tabla = json.loads(formulario.datos) if isinstance(formulario.datos, str) else formulario.datos
+        except:
+            datos_tabla = None
 
     respuestas_formulario = {
         "id": formulario.id,
         "fecha_envio": formulario.fecha_envio,
         "instrumento_id": formulario.instrumento_id,
         "usuario_id": formulario.usuario_id,
+        "datos": datos_tabla,
         "respuestas": [
             {
                 "id": respuesta.id,
@@ -40,13 +59,18 @@ def obtener_respuestas_formulario(db: Session, respuestas_formulario_id: int):
                 "texto_respuesta": respuesta.texto,
                 "instancia_respuesta": respuesta.instancia_respuesta,
                 "pregunta": {
+                    "id": respuesta.pregunta.id,
                     "tipo": respuesta.pregunta.tipo,
                     "texto": respuesta.pregunta.texto,
                     "multiple_respuestas": respuesta.pregunta.multiple_respuestas,
                     "grupo_cuadro_id": respuesta.pregunta.grupo_cuadro_id,
                     "orden_en_grupo": respuesta.pregunta.orden_en_grupo,
+                    "obligatoria": respuesta.pregunta.obligatoria,
                 } if respuesta.pregunta else None,
-                "opcion": {"texto": respuesta.opcion.texto} if respuesta.opcion else None,
+                "opcion": {
+                    "id": respuesta.opcion.id,
+                    "texto": respuesta.opcion.texto
+                } if respuesta.opcion else None,
             }
             for respuesta in formulario.respuestas
         ],
@@ -76,22 +100,60 @@ def buscar_respuestas_formulario(db: Session, instrumento_id: int = None, usuari
     formularios = db.scalars(
         query.options(
             joinedload(RespuestasFormulario.instrumento).joinedload(Instrumento.materia),
-            joinedload(RespuestasFormulario.usuario)
+            joinedload(RespuestasFormulario.instrumento).joinedload(Instrumento.plantilla_formulario),
+            joinedload(RespuestasFormulario.usuario),
+            joinedload(RespuestasFormulario.respuestas).joinedload(Respuesta.pregunta)
         )
-    ).all()
+    ).unique().all()
     
-    return [
-    {
-        "id": form.id,
-        "fecha_envio": form.fecha_envio,
-        "instrumento_id": form.instrumento_id,
-        "usuario_id": form.usuario_id,
-        "materia": {
-            "id": form.instrumento.materia.id,
-            "nombre": form.instrumento.materia.nombre
-        } if form.instrumento and form.instrumento.materia else None,
-        "plantilla_formulario_id": form.instrumento.plantilla_formulario_id
-        if form.instrumento else None
-    }
-    for form in formularios
-] ##hay q hacer otro :P
+    resultado = []
+    for form in formularios:
+        # Parsear datos de tabla si existen
+        datos_tabla = None
+        if form.datos:
+            try:
+                datos_tabla = json.loads(form.datos) if isinstance(form.datos, str) else form.datos
+            except:
+                datos_tabla = None
+        
+        form_data = {
+            "id": form.id,
+            "fecha_envio": form.fecha_envio,
+            "instrumento_id": form.instrumento_id,
+            "usuario_id": form.usuario_id,
+            "datos": datos_tabla,
+            "materia": {
+                "id": form.instrumento.materia.id,
+                "nombre": form.instrumento.materia.nombre
+            } if form.instrumento and form.instrumento.materia else None,
+            "plantilla_formulario_id": form.instrumento.plantilla_formulario_id
+            if form.instrumento else None,
+            "tipo_instrumento": form.instrumento.tipo.value if form.instrumento else None
+        }
+        
+        # Agregar información de código y nombre de materia si existen en las respuestas
+        if form.respuestas:
+            codigos_materias = []
+            nombres_materias = []
+            
+            for respuesta in form.respuestas:
+                if respuesta.pregunta:
+                    if respuesta.pregunta.texto == "Código de actividad curricular" and respuesta.texto:
+                        codigos_materias.append({
+                            "instancia": respuesta.instancia_respuesta,
+                            "codigo": respuesta.texto
+                        })
+                    elif respuesta.pregunta.texto == "Nombre de la actividad curricular" and respuesta.texto:
+                        nombres_materias.append({
+                            "instancia": respuesta.instancia_respuesta,
+                            "nombre": respuesta.texto
+                        })
+            
+            if codigos_materias:
+                form_data["codigos_materias"] = codigos_materias
+            if nombres_materias:
+                form_data["nombres_materias"] = nombres_materias
+        
+        resultado.append(form_data)
+    
+    return resultado

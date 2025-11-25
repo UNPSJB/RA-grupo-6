@@ -16,6 +16,7 @@ import {
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
+import type { Usuario } from '../types'; // Asegúrate de importar el tipo Usuario
 
 interface InstrumentoRespondido {
     id: number;
@@ -27,23 +28,47 @@ interface InstrumentoRespondido {
     respuestas_formulario_id?: number;
 }
 
-export default function () {
+export default function VerRespuestasDepartamento() {
     const navigate = useNavigate();
     const [instrumentos, setInstrumentos] = useState<InstrumentoRespondido[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
 
+    // 1. Obtener el usuario actual
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me", {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error("No se pudo autenticar al usuario");
+                const data = await response.json();
+                setUsuario(data);
+            } catch (error) {
+                console.error(error);
+                setMensaje("Error: No se pudo identificar al usuario.");
+                setCargando(false);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    // 2. Obtener los instrumentos (INFORME_SINTETICO)
+    useEffect(() => {
+        if (!usuario) return;
+
         const fetchInstrumentos = async () => {
             try {
                 setCargando(true);
                 setMensaje('');
 
-                const userId = 3; // IMPORTANTE: adaptar al sistema de usuarios
-                
+                // Usamos usuario.id dinámicamente
                 const res = await fetch(
-                    `http://127.0.0.1:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${userId}&mostrar_respondidos=true`
+                    `http://localhost:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${usuario.id}&mostrar_respondidos=true`,
+                    { credentials: 'include' }
                 );
+
                 if (!res.ok) throw new Error('No se pudieron cargar los informes sintéticos');
 
                 const data = await res.json();
@@ -57,7 +82,7 @@ export default function () {
         };
 
         fetchInstrumentos();
-    }, []);
+    }, [usuario]);
 
     const handleVerRespuestas = (instrumento: InstrumentoRespondido) => {
         navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
@@ -122,9 +147,7 @@ export default function () {
                                     </CTableDataCell>
                                     <CTableDataCell className="text-center">
                                         {instrumento.plantilla_formulario && (
-                                            <CBadge color="success">
-                                                Respondido
-                                            </CBadge>
+                                            <CBadge color="success">Respondido</CBadge>
                                         )}
                                     </CTableDataCell>
                                     <CTableDataCell>

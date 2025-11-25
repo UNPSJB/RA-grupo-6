@@ -49,7 +49,7 @@ async def login_for_access_token(
         httponly=True,
         secure=False,  # Poner en True en producción (con HTTPS)
         samesite="lax",
-        domain="localhost",
+        domain=None,
         path="/",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )

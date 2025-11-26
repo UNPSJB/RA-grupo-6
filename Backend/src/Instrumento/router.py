@@ -131,13 +131,10 @@ def get_datos_instrumento(instrumento_id: int, db:Session = Depends(get_db)):
 def get_datos_instrumento_sinteticos(instrumento_id: int, db:Session = Depends(get_db)):
     return services.getDatosInstrumentoSintetico(db,instrumento_id)
 
-###
-##Obtener instrumentos por tipo y usuario, opcinal: filtrar por respondidos
 @router.get("/tipo/{tipo}")
-def obtener_instrumentos_por_tipo_y_usuario(
-    tipo: str,
-    usuario_id: int = Query(...),
-    mostrar_respondidos: bool = Query(False),
-    db: Session = Depends(get_db)
-):
+def obtener_instrumentos_por_tipo_y_usuario(tipo: str,usuario_id: int = Query(...),mostrar_respondidos: bool = Query(False),db: Session = Depends(get_db)):
     return services.obtener_instrumentos_por_tipo_usuario(db, tipo, usuario_id, mostrar_respondidos)
+
+@router.get("/ObtenerDatosInstrumentosNoRespondidos/{tipo}")
+def obtener_instrumentos_no_respondidos(tipo: str,usuario_id: int = Query(...),mostrar_respondidos: bool = Query(False),db: Session = Depends(get_db)):
+    return services.obtener_instrumentos_no_respondidos(db, tipo, usuario_id, mostrar_respondidos)

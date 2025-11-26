@@ -55,7 +55,7 @@ function InstrumentosDocente() {
                 setCargando(true);
                 setMensaje('');
                 
-                const url = `http://127.0.0.1:8000/instrumentos/INFORME_CATEDRA?usuario_id=${usuario.id}&mostrar_respondidos=false`;
+                const url = `http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumentosNoRespondidos/INFORME_CATEDRA?usuario_id=${usuario.id}&mostrar_respondidos=false`;
                 console.log('URL:', url);
                 
                 const response = await fetch(url, { credentials: 'include' });

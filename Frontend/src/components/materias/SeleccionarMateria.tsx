@@ -16,6 +16,7 @@ import {
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
+import type { Usuario } from '../types';
 
 interface Materia {
     id: string;
@@ -26,23 +27,41 @@ interface Materia {
     fechaCierre?: string;
 }
 
-const USUARIO_ACTUAL = {
-    id: 1,
-    nombre: "Alumno",
-    apellido: "Demo"
-};
+
 
 function SeleccionarMateria() {
     const [materias, setMaterias] = useState<Materia[]>([]);
     const [mensaje, setMensaje] = useState('');
     const [cargando, setCargando] = useState(true);
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me", {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error("No se pudo autenticar al usuario");
+                const data = await response.json();
+                setUsuario(data);
+            } catch (error) {
+                console.error(error);
+                setMensaje("Error: No se pudo identificar al usuario.");
+                setCargando(false);
+            }
+        };
+        fetchUser();
+    }, []);
+
+
+    useEffect(() => {
+        
+        if(!usuario) return;
+
         const cargarMateriasConEncuestas = async () => {
             try {
-                // Obtener instrumentos de tipo ENCUESTA_ESTUDIANTE
-                const response = await fetch(`http://127.0.0.1:8000/instrumentos/ENCUESTA_ESTUDIANTE?usuario_id=${USUARIO_ACTUAL.id}&mostrar_respondidos=false`);
+                const response = await fetch(`http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumentosNoRespondidos/ENCUESTA_ESTUDIANTE?usuario_id=${usuario.id}&mostrar_respondidos=false`);
                 
                 if (!response.ok) {
                     throw new Error('Error al cargar encuestas');
@@ -71,7 +90,7 @@ function SeleccionarMateria() {
         };
 
         cargarMateriasConEncuestas();
-    }, []);
+    }, [usuario]);
 
     const handleResponderEncuesta = (materia: Materia) => {
         if (!materia.instrumentoId) {

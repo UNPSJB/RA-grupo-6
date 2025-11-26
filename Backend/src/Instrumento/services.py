@@ -1,11 +1,11 @@
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import List
 from fastapi.background import P
 from pytest import param
 import array
 from typing import List
-from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import and_, or_, select
 from src.Usuarios.models import Usuario
 from src.Materias.services import get_Docente
 from src.RespuestasFormulario.models import RespuestasFormulario
@@ -19,6 +19,7 @@ from src.Instrumento.schemas import TasaRespuesta
 from src.Instrumento.models import Instrumento, TipoInstrumento
 from src.Parametros import services
 from src.Instrumento import exceptions
+from src.UsuarioDepartamento.models import UsuarioDepartamento
 
 
 def esPeriodoActual(periodoVinculado : PeriodoVinculado, instrumento: Instrumento):
@@ -409,3 +410,93 @@ def obtener_informes_catedra_por_usuario(db: Session, usuario_id: int):
         }
         for rf in respuestas_form
     ]
+
+def obtener_instrumentos_no_respondidos(db: Session, tipo: str, usuario_id: int, mostrar_respondidos: bool):
+    usuario = db.scalar(select(Usuario).where(Usuario.id == usuario_id))
+    if not usuario:
+        return []
+    
+    hoy = date.today()
+    rol_nombre = usuario.rol.nombre.lower() if usuario.rol else ""
+    es_departamento = "departamento" in rol_nombre
+
+    if es_departamento:
+        informes = (
+            select(Instrumento)
+            .join(Materia, Instrumento.materia_id == Materia.id)
+            .join(UsuarioDepartamento, UsuarioDepartamento.departamento_id == Materia.departamento_id)
+            .where(
+                and_(
+                    Instrumento.tipo == tipo,
+                    UsuarioDepartamento.usuario_id == usuario_id,
+                    UsuarioDepartamento.fecha_hasta.is_(None),
+                    Instrumento.fecha_inicio <= hoy
+                )
+            )
+        )
+    else:
+        condiciones = [
+            Instrumento.tipo == tipo,
+            PeriodoVinculado.usuario_id == usuario_id,
+            Instrumento.fecha_inicio <= hoy
+        ]
+
+        # REGLAS ESPECIFICAS POR ROL
+        if "docente" in rol_nombre or "profesor" in rol_nombre:
+            condiciones.append(PeriodoVinculado.fecha_hasta.is_(None))
+        else:
+            condiciones.append(
+                or_(
+                    PeriodoVinculado.fecha_hasta >= hoy,
+                    PeriodoVinculado.fecha_hasta.is_(None)
+                )
+            )
+
+        informes = (
+            select(Instrumento)
+            .join(PeriodoVinculado, Instrumento.materia_id == PeriodoVinculado.materia_id) 
+            .where(and_(*condiciones))
+        )
+
+    informes = informes.distinct().options(
+        joinedload(Instrumento.materia),
+        joinedload(Instrumento.plantilla_formulario)
+    )
+
+    instrumentos = db.scalars(informes).all()
+
+    instrumentos_con_info = []
+    
+    for instrumento in instrumentos:
+        respuestas_form = db.scalar(
+            select(RespuestasFormulario)
+            .where(
+                and_(
+                    RespuestasFormulario.instrumento_id == instrumento.id,
+                    RespuestasFormulario.usuario_id == usuario_id
+                )
+            )
+        )
+        
+        respondido = respuestas_form is not None
+        
+        if (not mostrar_respondidos and not respondido) or (mostrar_respondidos):
+            instrumentos_con_info.append({
+                "id": instrumento.id,
+                "tipo": instrumento.tipo,
+                "fecha_inicio": instrumento.fecha_inicio,
+                "fecha_cierre": instrumento.fecha_cierre,
+                "materia": {
+                    "id": instrumento.materia.id,
+                    "nombre": instrumento.materia.nombre
+                },
+                "plantilla_formulario": {
+                    "id": instrumento.plantilla_formulario.id,
+                    "titulo": instrumento.plantilla_formulario.titulo
+                } if instrumento.plantilla_formulario else None,
+                "respondido": respondido,
+                "respuestas_formulario_id": respuestas_form.id if respuestas_form else None,
+                "fecha_envio": respuestas_form.fecha_envio if respuestas_form else None
+            })
+    
+    return instrumentos_con_info

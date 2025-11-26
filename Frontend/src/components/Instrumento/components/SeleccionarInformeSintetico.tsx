@@ -16,6 +16,7 @@ import {
 } from "@coreui/react";
 import { capitalizarCadena } from "../../Funciones";
 import ShadowedCard from '../../coreui-components/ShadowedCard';
+import type { Usuario } from "../../types";
 
 interface InstrumentoDepartamento {
     id: number;
@@ -38,52 +39,71 @@ export default function SeleccionarInformeSintetico() {
     const [informes, setInformes] = useState<InstrumentoDepartamento[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        cargarInformesSinteticos();
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me", {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error("No se pudo autenticar al usuario");
+                const data = await response.json();
+                setUsuario(data);
+            } catch (error) {
+                console.error(error);
+                setMensaje("Error: No se pudo identificar al usuario.");
+                setCargando(false);
+            }
+        };
+        fetchUser();
     }, []);
 
-    const cargarInformesSinteticos = async () => {
-        try {
-            setCargando(true);
-            console.log('Cargando informes sintéticos...');
+    useEffect(() => {
+        
+    
 
-            const usuarioActual = JSON.parse(localStorage.getItem('usuario_actual') || '{}');
-            const usuarioId = usuarioActual.id || 3; 
+        const cargarInformesSinteticos = async () => {
+            if (!usuario) return;
+            try {
+                setCargando(true);
+                setMensaje('');
 
-            const url = `http://127.0.0.1:8000/instrumentos/INFORME_SINTETICO?usuario_id=${usuarioId}&mostrar_respondidos=false`;
-            console.log('URL:', url);
-            
-            const response = await fetch(url);
-            console.log('Response status:', response.status, response.statusText);
-            
-            if (response.ok) {
-                const informesData: InstrumentoDepartamento[] = await response.json();
-                console.log('Datos recibidos:', informesData);
+                const url = `http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumentosNoRespondidos/INFORME_SINTETICO?usuario_id=${usuario.id}&mostrar_respondidos=false`;
+                console.log('URL:', url);
                 
-                const hoy = new Date();
-                const informesActivos = informesData.filter(instr => 
-                    new Date(instr.fecha_inicio) <= hoy && 
-                    new Date(instr.fecha_cierre) >= hoy
-                );
+                const response = await fetch(url);
+                console.log('Response status:', response.status, response.statusText);
                 
-                console.log('Informes activos:', informesActivos);
-                setInformes(informesActivos);
-            } else {
-                const errorText = await response.text();
-                console.error('Error del servidor:', errorText);
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
+                if (response.ok) {
+                    const informesData: InstrumentoDepartamento[] = await response.json();
+                    console.log('Datos recibidos:', informesData);
+                    
+                    const hoy = new Date();
+                    const informesActivos = informesData.filter(instr => 
+                        new Date(instr.fecha_inicio) <= hoy && 
+                        new Date(instr.fecha_cierre) >= hoy
+                    );
+                    
+                    console.log('Informes activos:', informesActivos);
+                    setInformes(informesActivos);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error del servidor:', errorText);
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                setCargando(false);
+                
+            } catch (error) {
+                console.error('Error completo:', error);
+                setMensaje(`Error al cargar los informes sintéticos: ${error}`);
+                setCargando(false);
             }
-            
-            setCargando(false);
-            
-        } catch (error) {
-            console.error('Error completo:', error);
-            setMensaje(`Error al cargar los informes sintéticos: ${error}`);
-            setCargando(false);
-        }
-    };
+        };
+        cargarInformesSinteticos();
+    }, [usuario]);
 
     const handleSeleccionarInforme = (informe: InstrumentoDepartamento) => {
         console.log('Informe sintético seleccionado:', informe);

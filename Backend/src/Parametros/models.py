@@ -16,7 +16,8 @@ class Parametros(ModeloBase):
     cierre_segundo_dictado: Mapped[date] = mapped_column(Date, nullable=False)
 
     #Plantillas de formularios
-    plantilla_estudiante: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
+    plantilla_estudiante_basico: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id")) 
+    plantilla_estudiante_superior: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id")) 
     plantilla_docente: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
     plantilla_departamento: Mapped[int] = mapped_column(ForeignKey("plantilla_formularios.id"), nullable=False)
 
@@ -26,6 +27,7 @@ class Parametros(ModeloBase):
     disponibilidad_departamento: Mapped[int] = mapped_column(Integer, nullable=False)
 
     #Relaciones
-    obj_plantilla_estudiante: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_est", foreign_keys=[plantilla_estudiante])
+    obj_plantilla_estudiante_basico = relationship("PlantillaFormulario", foreign_keys=[plantilla_estudiante_basico])
+    obj_plantilla_estudiante_superior = relationship("PlantillaFormulario", foreign_keys=[plantilla_estudiante_superior])
     obj_plantilla_docente: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_doc", foreign_keys=[plantilla_docente])
     obj_plantilla_departamento: Mapped["PlantillaFormulario"] = relationship("PlantillaFormulario", back_populates="parametro_plantilla_dep", foreign_keys=[plantilla_departamento])

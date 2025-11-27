@@ -23,4 +23,4 @@ class PeriodoVinculado(ModeloBase):
 
     materia: Mapped["Materia"] = relationship("Materia", back_populates="periodos_vinculados")
     usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="periodo_vinculado")
-
+    

@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from src.Usuarios.auth import require_role
 from src.database import get_db
@@ -32,6 +32,6 @@ def get_mejor_plantilla(rol_id: int, db: Session = Depends(get_db)):
 def get_tasa_resp_plantillas(rol_id: int, db: Session = Depends(get_db)):
     return services.getTasaRespuestasPlantillas(db, rol_id)
 
-@router.get("/rol/{rol_id}", response_model= list[schemas.PlantillaFormulario])
-def get_plantillas_rol(rol_id:int, db:Session = Depends(get_db)) -> list[schemas.PlantillaFormulario]:
-    return services.get_plantillas_rol(db, rol_id)
+@router.get("/rol/{rol_id}", response_model=list[schemas.PlantillaFormulario])
+def get_plantillas_rol(rol_id: int, ciclo: Optional[str] = Query(None), db: Session = Depends(get_db)) -> list[schemas.PlantillaFormulario]:
+    return services.get_plantillas_rol(db, rol_id, ciclo)

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from src.Roles.models import Rol
@@ -77,8 +77,11 @@ def getTasaRespuestasPlantillas(db:Session, rol_id:int) -> float:
         instrumentos = instrumentos + (plantilla.instrumentos)
 
     return getTasaRespuestasInstrumentos(db, instrumentos, rol_id)
-def get_plantillas_rol(db:Session, rol_id:int) -> List[schemas.PlantillaFormulario]:
-    return db.scalars(select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)).all()
-
-
+def get_plantillas_rol(db: Session, rol_id: int, ciclo: Optional[str] = None) -> List[PlantillaFormulario]:
+    query = select(PlantillaFormulario).where(PlantillaFormulario.rol_id == rol_id)
+    
+    if ciclo:
+        query = query.where(PlantillaFormulario.ciclo == ciclo)
+    
+    return db.scalars(query).all()
 

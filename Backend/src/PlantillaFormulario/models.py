@@ -1,10 +1,14 @@
 from __future__ import annotations
+import enum
 from typing import TYPE_CHECKING, List
-from sqlalchemy import Integer, String, Date, ForeignKey, Column, Table
+from sqlalchemy import Enum, Integer, String, Date, ForeignKey, Column, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from datetime import date
 
+class CicloMateria(str, enum.Enum):
+    CICLO_BASICO = "CICLO_BASICO"
+    CICLO_SUPERIOR = "CICLO_SUPERIOR"
 
 
 if TYPE_CHECKING:
@@ -33,8 +37,11 @@ class PlantillaFormulario(ModeloBase):
     instrumentos: Mapped[List["Instrumento"]] = relationship(back_populates="plantilla_formulario")
     rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False) 
     rol: Mapped["Rol"] =relationship("Rol", back_populates="Plantillaformularios")
+    ciclo: Mapped[CicloMateria] = mapped_column(Enum(CicloMateria), nullable=True)
 
-    parametro_plantilla_est : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante", foreign_keys="Parametros.plantilla_estudiante")
+
+    parametro_plantilla_est_basico : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante_basico", foreign_keys="Parametros.plantilla_estudiante_basico")
+    parametro_plantilla_est_superior : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_estudiante_superior", foreign_keys="Parametros.plantilla_estudiante_superior")
     parametro_plantilla_doc : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_docente", foreign_keys="Parametros.plantilla_docente")
     parametro_plantilla_dep : Mapped["Parametros"] = relationship("Parametros", back_populates="obj_plantilla_departamento", foreign_keys="Parametros.plantilla_departamento")
     

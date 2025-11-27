@@ -12,31 +12,39 @@ def actualizar_parametros(db: Session, parametros:Parametros):
     from src.Email.tasks import scheduler
     
     db_parametros = getParametros(db)
-    valores_a_actualizar = { 
-    "inicio_primer_dictado": parametros.inicio_primer_dictado,
-    "cierre_primer_dictado": parametros.cierre_primer_dictado,
-    "inicio_segundo_dictado": parametros.inicio_segundo_dictado,
-    "cierre_segundo_dictado": parametros.cierre_segundo_dictado,
-    "plantilla_estudiante": parametros.plantilla_estudiante,
-    "plantilla_docente": parametros.plantilla_docente,
-    "plantilla_departamento": parametros.plantilla_departamento,
-    "disponibilidad_estudiante": parametros.disponibilidad_estudiante,
-    "disponibilidad_docente": parametros.disponibilidad_docente,
-    "disponibilidad_departamento": parametros.disponibilidad_departamento
-    }
-    db.execute(update(Parametros).values(**valores_a_actualizar))
+    
+    db_parametros.inicio_primer_dictado = parametros.inicio_primer_dictado
+    db_parametros.cierre_primer_dictado = parametros.cierre_primer_dictado
+    db_parametros.inicio_segundo_dictado = parametros.inicio_segundo_dictado
+    db_parametros.cierre_segundo_dictado = parametros.cierre_segundo_dictado
+    
+    db_parametros.plantilla_estudiante_basico = parametros.plantilla_estudiante_basico
+    db_parametros.plantilla_estudiante_superior = parametros.plantilla_estudiante_superior
+    db_parametros.plantilla_docente = parametros.plantilla_docente
+    db_parametros.plantilla_departamento = parametros.plantilla_departamento
+    
+    db_parametros.disponibilidad_estudiante = parametros.disponibilidad_estudiante
+    db_parametros.disponibilidad_docente = parametros.disponibilidad_docente
+    db_parametros.disponibilidad_departamento = parametros.disponibilidad_departamento
+    
     db.commit()
     db.refresh(db_parametros)
 
     try:
-        scheduler.reschedule_job("creacion_instr_1C", trigger="cron", month=db_parametros.cierre_primer_dictado.month, day= db_parametros.cierre_primer_dictado.day)
+        scheduler.reschedule_job("creacion_instr_1C", trigger="cron", 
+                               year=db_parametros.cierre_primer_dictado.year,
+                               month=db_parametros.cierre_primer_dictado.month, 
+                               day=db_parametros.cierre_primer_dictado.day)
     except JobLookupError:
-        print("El proceso ya se ejecutó por lo que se planificará para el año proximo")
+        pass 
     
     try:
-        scheduler.reschedule_job("creacion_instr_2C", trigger="cron", month=db_parametros.cierre_segundo_dictado.month, day= db_parametros.cierre_segundo_dictado.day)
+        scheduler.reschedule_job("creacion_instr_2C", trigger="cron", 
+                               year=db_parametros.cierre_segundo_dictado.year,
+                               month=db_parametros.cierre_segundo_dictado.month, 
+                               day=db_parametros.cierre_segundo_dictado.day)
     except JobLookupError:
-        print("El proceso ya se ejecutó por lo que se planificará para el año proximo")
+        pass
 
     return db_parametros
 

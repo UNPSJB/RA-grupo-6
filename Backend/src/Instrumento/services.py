@@ -6,6 +6,7 @@ import array
 from typing import List
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_, select
+from src.PlantillaFormulario.models import CicloMateria
 from src.Usuarios.models import Usuario
 from src.Materias.services import get_Docente
 from src.RespuestasFormulario.models import RespuestasFormulario
@@ -60,46 +61,47 @@ def crearInstrumentos(db:Session, dictado: Dictado) -> bool:
     departamentos = []
     
     for materia in dictado.materias_dictados:
+        
+        plantilla_alumno_id = None
+        if materia.ciclo == CicloMateria.CICLO_BASICO: # O el string "CICLO_BASICO" si no usas Enum en el modelo
+            plantilla_alumno_id = parametros.plantilla_estudiante_basico
+        else:
+            plantilla_alumno_id = parametros.plantilla_estudiante_superior
 
         nuevoInstrumentoAlumno = Instrumento( 
-            plantilla_formulario= parametros.plantilla_estudiante, 
-            fecha_inicio= dictado.fecha_cierre, 
-            fecha_cierre= dictado.fecha_cierre + timedelta(parametros.disponibilidad_estudiante),
-            tipo = TipoInstrumento.ENCUESTA_ESTUDIANTE,
-            materia_id = materia.id,
-            dictado_id = dictado.id 
-            )
-
+            plantilla_formulario_id=plantilla_alumno_id, 
+            fecha_inicio=dictado.fecha_cierre, 
+            fecha_cierre=dictado.fecha_cierre + timedelta(days=parametros.disponibilidad_estudiante),
+            tipo=TipoInstrumento.ENCUESTA_ESTUDIANTE,
+            materia_id=materia.id,
+            dictado_id=dictado.id 
+        )
         db.add(nuevoInstrumentoAlumno)
-        db.commit()
-
-        nuevoInstrumentoDocente = Instrumento( 
-            plantilla_formulario_id= parametros.plantilla_docente,
-            fecha_inicio= nuevoInstrumentoAlumno.fecha_cierre + timedelta(1), 
-            fecha_cierre= nuevoInstrumentoAlumno.fecha_cierre + timedelta(parametros.disponibilidad_docente + 1),
-            tipo = TipoInstrumento.INFORME_CATEDRA,
-            materia_id = materia.id,
-            dictado_id = dictado.id
-            )
         
+        nuevoInstrumentoDocente = Instrumento( 
+            plantilla_formulario_id=parametros.plantilla_docente,
+            fecha_inicio=nuevoInstrumentoAlumno.fecha_cierre + timedelta(days=1), 
+            fecha_cierre=nuevoInstrumentoAlumno.fecha_cierre + timedelta(days=parametros.disponibilidad_docente + 1),
+            tipo=TipoInstrumento.INFORME_CATEDRA,
+            materia_id=materia.id,
+            dictado_id=dictado.id
+        )
         db.add(nuevoInstrumentoDocente)
-        db.commit()
-
-        if not(materia.departamento_id in departamentos):
+        
+        if materia.departamento_id not in departamentos:
             departamentos.append(materia.departamento_id)
             nuevoInstrumentoDepartamento = Instrumento( 
-                plantilla_formulario_id= parametros.plantilla_departamento,
-                fecha_inicio= nuevoInstrumentoDocente.fecha_cierre + timedelta(1), 
-                fecha_cierre= nuevoInstrumentoDocente.fecha_cierre + timedelta(parametros.disponibilidad_departamento + 1),
-                tipo = TipoInstrumento.INFORME_SINTETICO,
-                materia_id = materia.id,
-                dictado_id = dictado.id
+                plantilla_formulario_id=parametros.plantilla_departamento,
+                fecha_inicio=nuevoInstrumentoDocente.fecha_cierre + timedelta(days=1), 
+                fecha_cierre=nuevoInstrumentoDocente.fecha_cierre + timedelta(days=parametros.disponibilidad_departamento + 1),
+                tipo=TipoInstrumento.INFORME_SINTETICO,
+                materia_id=materia.id,
+                dictado_id=dictado.id
             )
-            
             db.add(nuevoInstrumentoDepartamento)
-            db.commit()
-
-        
+    
+    db.commit()
+    return True
 
 
 def crearInstrumentos(db:Session, dictado: Dictado) -> bool:
@@ -441,7 +443,6 @@ def obtener_instrumentos_no_respondidos(db: Session, tipo: str, usuario_id: int,
             Instrumento.fecha_inicio <= hoy
         ]
 
-        # REGLAS ESPECIFICAS POR ROL
         if "docente" in rol_nombre or "profesor" in rol_nombre:
             condiciones.append(PeriodoVinculado.fecha_hasta.is_(None))
         else:

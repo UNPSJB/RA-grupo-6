@@ -10,7 +10,8 @@ class ParametrosBase(BaseModel):
     inicio_segundo_dictado: date
     cierre_segundo_dictado: date
 
-    plantilla_estudiante: int
+    plantilla_estudiante_basico: int
+    plantilla_estudiante_superior: int
     plantilla_docente: int
     plantilla_departamento: int
 
@@ -20,7 +21,8 @@ class ParametrosBase(BaseModel):
     disponibilidad_departamento: int
 
     #Relaciones
-    obj_plantilla_estudiante: PlantillaFormulario
+    obj_plantilla_estudiante_basico: PlantillaFormulario
+    obj_plantilla_estudiante_superior: PlantillaFormulario
     obj_plantilla_docente: PlantillaFormulario
     obj_plantilla_departamento: PlantillaFormulario
 

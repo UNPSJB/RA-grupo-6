@@ -1,417 +1,295 @@
 import { useEffect, useState } from "react";
-import { Form} from "react-bootstrap";
-import type { Parametros, PlantillaFormulario} from "../types";
-import ModalExito from "../ModalEnvio";
-import { CButton, CCardBody, CCardHeader, CCol, CFormLabel, CFormSelect, CRow } from "@coreui/react";
+import { Form, Alert } from "react-bootstrap";
+import { CButton, CCardBody, CCardHeader, CCol, CFormLabel, CFormSelect, CRow, CFormInput } from "@coreui/react";
 import ShadowedCard from "../coreui-components/ShadowedCard";
+import ModalExito from "../ModalEnvio";
+
+
+interface Parametros {
+    inicio_primer_dictado: string;
+    cierre_primer_dictado: string;
+    inicio_segundo_dictado: string;
+    cierre_segundo_dictado: string;
+    
+    plantilla_estudiante_basico: number;    
+    plantilla_estudiante_superior: number;  
+    plantilla_docente: number;
+    plantilla_departamento: number;
+    
+    disponibilidad_estudiante: number;
+    disponibilidad_docente: number;
+    disponibilidad_departamento: number;
+}
+
+interface PlantillaFormulario {
+    id: number;
+    titulo: string;
+    ciclo?: string; 
+}
 
 export function PlanificarPeriodos() {
-
     const [parametros, setParametros] = useState<Parametros>();
     const [modificacionesParametros, setModificacionesParametros] = useState<Parametros>();
+    const [errorValidacion, setErrorValidacion] = useState<string>("");
 
-    const [plantillasEstudiante, setPlantillasEstudiante] = useState<PlantillaFormulario[]>([])
-    useEffect(() => {
-        fetch(`http://127.0.0.1:8000/formularios/rol/${1}`)
-            .then(res => res.json())
-            .then((data) =>  setPlantillasEstudiante(data))
-            .catch(console.log);
-    }, []);
-
-    
-    const [plantillasDocente, setPlantillasDocente] = useState<PlantillaFormulario[]>([])
-    useEffect(() => {
-        fetch(`http://127.0.0.1:8000/formularios/rol/${2}`)
-            .then(res => res.json())
-            .then((data) =>  setPlantillasDocente(data))
-            .catch(console.log);
-    }, []);
-
-    
-    const [plantillasDepartamento, setPlantillasDepartamento] = useState<PlantillaFormulario[]>([])
-    useEffect(() => {
-        fetch(`http://127.0.0.1:8000/formularios/rol/${3}`)
-            .then(res => res.json())
-            .then((data) =>  setPlantillasDepartamento(data))
-            .catch(console.log);
-    }, []);
-
+    const [plantillasEstudianteBasico, setPlantillasEstudianteBasico] = useState<PlantillaFormulario[]>([]);
+    const [plantillasEstudianteSuperior, setPlantillasEstudianteSuperior] = useState<PlantillaFormulario[]>([]);
+    const [plantillasDocente, setPlantillasDocente] = useState<PlantillaFormulario[]>([]);
+    const [plantillasDepartamento, setPlantillasDepartamento] = useState<PlantillaFormulario[]>([]);
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/Parametros/")
-            .then(res => res.json())
-            .then((data) => {
-                setParametros(data);
-                setModificacionesParametros(data);
-            })
-            .catch(console.log);
-    }, []);
+        const cargarDatos = async () => {
+            try {
+                const [estBasico, estSuperior, doc, dep] = await Promise.all([
+                    fetch("http://127.0.0.1:8000/formularios/rol/1?ciclo=CICLO_BASICO").then(r => r.json()),
+                    fetch("http://127.0.0.1:8000/formularios/rol/1?ciclo=CICLO_SUPERIOR").then(r => r.json()),
+                    fetch("http://127.0.0.1:8000/formularios/rol/2").then(r => r.json()),
+                    fetch("http://127.0.0.1:8000/formularios/rol/3").then(r => r.json())
+                ]);
 
-    const esBisiesto = (anio: number) =>
-        (anio % 4 === 0 && anio % 100 !== 0) || anio % 400 === 0;
+                setPlantillasEstudianteBasico(estBasico);
+                setPlantillasEstudianteSuperior(estSuperior);
+                setPlantillasDocente(doc);
+                setPlantillasDepartamento(dep);
 
-    const obtenerDiasDelMes = (mes: number, anio?: number) => {
-        // if (!mes) return 31;
-        const anioActual = anio || (new Date().getUTCFullYear()) + 1;
-        if (mes == 2) return esBisiesto(anioActual) ? 29 : 28;
-        if ([4, 6, 9, 11].includes(mes)) return 30;
-        return 31;
-    };
+                const paramsRes = await fetch("http://127.0.0.1:8000/Parametros/");
+                const paramsData = await paramsRes.json();
+                
+                setParametros(paramsData);
+                setModificacionesParametros(paramsData);
 
-    const formatearFecha = (fecha: any): string => {
-        if (!fecha) return "";
-        const d = new Date(fecha);
-        if (isNaN(d.getTime())) return "";
-        const yyyy = (d.getUTCFullYear()) + 1;
-        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-        const dd = String(d.getUTCDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-    };
-
-
-    const handleFechaChange = (campo: keyof Parametros, parte: "mes" | "dia", valor: string) => {
-        if (!valor) return;
-
-        const fechaActual = formatearFecha(modificacionesParametros?.[campo]) || `${(new Date().getUTCFullYear()) + 1}-01-01`;
-        const partes = fechaActual.split("-");
-
-        const anioActual = parseInt(partes[0]);
-
-        if (parte === "mes") {
-            partes[1] = valor;
-            const maxDias = obtenerDiasDelMes(Number(valor), anioActual);
-            const diaSeleccionado = parseInt(partes[2] || "1");
-            partes[2] = String(Math.min(diaSeleccionado, maxDias)).padStart(2, "0");
-        } else {
-            const mesActual = partes[1] || "01";
-            const maxDias = obtenerDiasDelMes(Number(mesActual), anioActual);
-            partes[2] = String(Math.min(parseInt(valor), maxDias)).padStart(2, "0");
-        }
-
-        const nuevaFecha = `${partes[0]}-${partes[1]}-${partes[2]}`;
-
-        setModificacionesParametros({
-            ...modificacionesParametros!,
-            [campo]: nuevaFecha,
-        });
-    };
-
-    const renderOpcionesDias = (mes: number, campo?: keyof Parametros) => {
-        let anioActual = (new Date().getUTCFullYear()) + 1;
-
-        if (campo && modificacionesParametros?.[campo]) {
-            const fechaStr = formatearFecha(modificacionesParametros[campo]);
-            if (fechaStr) {
-                anioActual = parseInt(fechaStr.split("-")[0]);
+            } catch (e) {
+                console.error("Error al cargar datos iniciales:", e);
+                setErrorValidacion("Error de conexión al cargar los datos.");
             }
+        };
+
+        cargarDatos();
+    }, []);
+
+   
+    const handleFechaChange = (campo: keyof Parametros, valor: string) => {
+        if (!modificacionesParametros) return;
+        setModificacionesParametros({ ...modificacionesParametros, [campo]: valor });
+        setErrorValidacion("");
+    };
+
+    const handlePlantillaChange = (campo: keyof Parametros, valor: string) => {
+        if (!modificacionesParametros) return;
+        setModificacionesParametros({ ...modificacionesParametros, [campo]: Number(valor) });
+    };
+
+    const handleDisponibilidadChange = (campo: keyof Parametros, valor: string) => {
+        if (!modificacionesParametros) return;
+        const numVal = Number(valor);
+        if (numVal >= 0 && numVal <= 60) {
+            setModificacionesParametros({ ...modificacionesParametros, [campo]: numVal });
+        }
+    };
+
+    const validarFechas = (): boolean => {
+        if (!modificacionesParametros) return false;
+        
+        const inicio1 = new Date(modificacionesParametros.inicio_primer_dictado);
+        const cierre1 = new Date(modificacionesParametros.cierre_primer_dictado);
+        const inicio2 = new Date(modificacionesParametros.inicio_segundo_dictado);
+        const cierre2 = new Date(modificacionesParametros.cierre_segundo_dictado);
+
+        if (cierre1 <= inicio1) {
+            setErrorValidacion("Error en 1° Dictado: La fecha de cierre debe ser posterior al inicio.");
+            return false;
+        }
+        if (cierre2 <= inicio2) {
+            setErrorValidacion("Error en 2° Dictado: La fecha de cierre debe ser posterior al inicio.");
+            return false;
         }
         
-        const maxDias = obtenerDiasDelMes(mes, anioActual);
-        // const opciones = [<option key="empty" value="">Día</option>];
-        let opciones = []
-
-        let i = 1
-
-        if (modificacionesParametros){
-                let fechaInicio
-                let fechaCierre
-
-                if (campo == "cierre_primer_dictado"){
-                    fechaInicio = new Date(modificacionesParametros.inicio_primer_dictado)
-                    fechaCierre = new Date(modificacionesParametros.cierre_primer_dictado)
-                    
-                }
-                if (campo == "cierre_segundo_dictado"){
-                    fechaInicio = new Date(modificacionesParametros.inicio_segundo_dictado)
-                    fechaCierre = new Date(modificacionesParametros.cierre_segundo_dictado)
-                    
-                }
-
-                if ((fechaInicio?.getUTCMonth() == fechaCierre?.getUTCMonth())){
-                    i = fechaInicio? fechaInicio.getUTCDate() : 1;                 
-                }
-
+        if (inicio2 <= cierre1) {
+            setErrorValidacion("Conflicto cronológico: El 2° dictado no puede comenzar antes de que termine el 1°.");
+            return false;
         }
 
-        for (i; i <= maxDias; i++) {
-            opciones.push(
-                <option key={i} value={i}>
-                    {i}
-                </option>
-            );
+        return true;
+    };
+    
+    const actualizarParametrosServidor = async () => {
+        if (!validarFechas() || !modificacionesParametros) return false;
+
+        try {
+            const res = await fetch("http://127.0.0.1:8000/Parametros/actualizar/", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(modificacionesParametros),
+            });
+            
+            if (res.ok) {
+                const dataActualizada = await res.json();
+                setParametros(dataActualizada);
+                return true;
+            } else {
+                console.error("Error en respuesta del servidor");
+                return false;
+            }
+        } catch (e) {
+            console.error("Error de red:", e);
+            return false;
         }
-        return opciones;
     };
 
-
-
-    function actualizarParametros(parametros : Parametros): Promise<boolean>{
-        return new Promise((resolve) => {
-            if(parametros.inicio_primer_dictado && parametros.cierre_primer_dictado && parametros.inicio_segundo_dictado &&
-            parametros.cierre_segundo_dictado && parametros.plantilla_estudiante && parametros.plantilla_docente &&
-            parametros.plantilla_departamento && parametros.disponibilidad_estudiante && parametros.disponibilidad_docente && parametros.disponibilidad_departamento
-            ){
-                fetch("http://localhost:8000/Parametros/actualizar/", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(parametros),
-                })
-                .then(res => {
-                    if(res.ok) {
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                })
-                .catch(() => resolve(false));
-            } else {
-                resolve(false);
-            }
-        });
-    }
-
-    const meses = [
-        { valor: "1", nombre: "Enero" },
-        { valor: "2", nombre: "Febrero" },
-        { valor: "3", nombre: "Marzo" },
-        { valor: "4", nombre: "Abril" },
-        { valor: "5", nombre: "Mayo" },
-        { valor: "6", nombre: "Junio" },
-        { valor: "7", nombre: "Julio" },
-        { valor: "8", nombre: "Agosto" },
-        { valor: "9", nombre: "Septiembre" },
-        { valor: "10", nombre: "Octubre" },
-        { valor: "11", nombre: "Noviembre" },
-        { valor: "12", nombre: "Diciembre" }
-    ];
-
     return (
-            <ShadowedCard >
-                <CCardHeader>
-                    <div className="m-2">
-                        <h4>Parametrización de los dictados</h4>
-                        <p className="text-medium-emphasis">Configure los dictados para su asignación automática</p>
-                    </div>
-                </CCardHeader>
+        <ShadowedCard>
+            <CCardHeader>
+                <div className="m-2">
+                    <h4>Parametrización de los dictados</h4>
+                    <p className="text-medium-emphasis">
+                        Configure los dictados para su asignación automática
+                    </p>
+                </div>
+            </CCardHeader>
             
-                <CCardBody className="m-2">
-                    <CRow className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
+            <CCardBody className="m-2">
+                {errorValidacion && <Alert variant="danger" className="mb-4">{errorValidacion}</Alert>}
 
-                    <h5 >Primer Dictado</h5>
-                    
+                <CRow className="p-2" style={{ borderLeft: "3px solid #0d6efd" }}>
+                    <h5>Primer Dictado</h5>
                     <CCol>
                         <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
-                            <div className="d-flex gap-2">
-                                <CFormSelect
-                                    value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_primer_dictado)).getUTCMonth() + 1)}
-                                    onChange={(e) => handleFechaChange("inicio_primer_dictado", "mes", e.target.value)}
-                                >
-                                    {meses.slice(0,6).map(m => (
-                                        <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                                    ))}
-                                </CFormSelect>
-
-                                <CFormSelect
-                                    value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_primer_dictado)).getUTCDate())}
-                                    onChange={(e) => handleFechaChange("inicio_primer_dictado", "dia", e.target.value)}
-                                >
-                                    {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_primer_dictado)).getUTCMonth() + 1, "inicio_primer_dictado")}
-                                </CFormSelect>
-                            </div>
-                        </CCol>
-                    <CCol>
-
-                    <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
-                        <div className="d-flex gap-2">
-                            <CFormSelect
-                                value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_primer_dictado)).getUTCMonth() + 1)}
-                                onChange={(e) => handleFechaChange("cierre_primer_dictado", "mes", e.target.value)}
-                            >
-                                {modificacionesParametros && meses.filter(m => Number(m.valor) >= (new Date(modificacionesParametros.inicio_primer_dictado).getUTCMonth() + 1)).map(m => (
-                                    <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                                ))}
-                            </CFormSelect>
-                            
-                            <CFormSelect
-                                value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_primer_dictado)).getUTCDate())}
-                                onChange={(e) => handleFechaChange("cierre_primer_dictado", "dia", e.target.value)}
-                            >
-                                {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.cierre_primer_dictado)).getUTCMonth() + 1, "cierre_primer_dictado")}
-                            </CFormSelect>
-                        </div>
+                        <CFormInput 
+                            type="date" 
+                            value={modificacionesParametros?.inicio_primer_dictado || ''} 
+                            onChange={(e) => handleFechaChange('inicio_primer_dictado', e.target.value)} 
+                        />
                     </CCol>
-                    </CRow>
+                    <CCol>
+                        <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
+                        <CFormInput 
+                            type="date" 
+                            value={modificacionesParametros?.cierre_primer_dictado || ''} 
+                            onChange={(e) => handleFechaChange('cierre_primer_dictado', e.target.value)} 
+                        />
+                    </CCol>
+                </CRow>
 
-                    {/* Segundo dictado */}
-                    <CRow className="p-2" style={{ borderLeft: "3px solid #198754" }}>
+                <CRow className="p-2" style={{ borderLeft: "3px solid #198754" }}>
                     <h5>Segundo Dictado</h5>
                     <CCol>
-                    <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
-                    <div className="d-flex gap-2">
-                        <CFormSelect
-                            value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth() + 1)}
-                            onChange={(e) => handleFechaChange("inicio_segundo_dictado", "mes", e.target.value)}
-                        >
-                            {meses.slice(6,12).map(m => (
-                                <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                            ))}
-                        </CFormSelect>
-                        <CFormSelect
-                            value={(modificacionesParametros && (new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCDate())}
-                            onChange={(e) => handleFechaChange("inicio_segundo_dictado", "dia", e.target.value)}
-                        >
-                            { modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth() + 1, "inicio_segundo_dictado")}
-                        </CFormSelect>
-                    </div>
+                        <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
+                        <CFormInput 
+                            type="date" 
+                            value={modificacionesParametros?.inicio_segundo_dictado || ''} 
+                            onChange={(e) => handleFechaChange('inicio_segundo_dictado', e.target.value)} 
+                        />
                     </CCol>
                     <CCol>
-
-                    <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
-                    <div className="d-flex gap-2">
-                        <CFormSelect
-                            value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_segundo_dictado)).getUTCMonth() + 1)}
-                            onChange={(e) => handleFechaChange("cierre_segundo_dictado", "mes", e.target.value)}
-                        >
-                            {modificacionesParametros && meses.slice((new Date(modificacionesParametros?.inicio_segundo_dictado)).getUTCMonth(), 12).map(m => (
-                                    <option key={m.valor} value={m.valor}>{m.nombre}</option>
-                                ))}
-                        </CFormSelect>
-
-                        <CFormSelect
-                            value={(modificacionesParametros && (new Date(modificacionesParametros.cierre_segundo_dictado)).getUTCDate())}
-                            onChange={(e) => handleFechaChange("cierre_segundo_dictado", "dia", e.target.value)}
-                        >
-                            {modificacionesParametros && renderOpcionesDias((new Date(modificacionesParametros.inicio_segundo_dictado)).getUTCMonth()+ 1, "cierre_segundo_dictado")}
-                        </CFormSelect>
-                    </div>
+                        <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
+                        <CFormInput 
+                            type="date" 
+                            value={modificacionesParametros?.cierre_segundo_dictado || ''} 
+                            onChange={(e) => handleFechaChange('cierre_segundo_dictado', e.target.value)} 
+                        />
                     </CCol>
-                    </CRow>
+                </CRow>
 
-                    {/* Plantillas */}
-                    <CRow className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
-                    <h5 >Plantillas</h5>
-                    <CCol >
-                        <CFormLabel className="text-muted"> Plantilla del estudiante</CFormLabel>
-                        <CFormSelect
-                            value={modificacionesParametros?.plantilla_estudiante}
-                            onChange={(e) => {
-                                const selectedId = Number(e.target.value);
-                                const plantillaSeleccionada = plantillasEstudiante?.find(p => p.id === selectedId);
-
-                                if (plantillaSeleccionada) {
-                                setModificacionesParametros({
-                                    ...modificacionesParametros!,
-                                    plantilla_estudiante: plantillaSeleccionada.id,
-                                    obj_plantilla_estudiante: plantillaSeleccionada
-                                });
-                                }
-                            }}
+                <CRow className="p-2" style={{ borderLeft: "3px solid #dc3545" }}>
+                    <h5>Plantillas</h5>
+                    
+                    <CCol>
+                        <CFormLabel className="text-muted">Plantilla del estudiante (Básico)</CFormLabel>
+                        <CFormSelect 
+                            value={modificacionesParametros?.plantilla_estudiante_basico}
+                            onChange={(e) => handlePlantillaChange('plantilla_estudiante_basico', e.target.value)}
                         >
-                            <option value="0" disabled>Seleccione una plantilla.. </option>
-                            {plantillasEstudiante?.map((plantilla) => (
-                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
+                            <option value="0" disabled>Seleccione una plantilla..</option>
+                            {plantillasEstudianteBasico.map(p => (
+                                <option key={p.id} value={p.id}>{p.titulo}</option>
                             ))}
                         </CFormSelect>
                     </CCol>
 
-                    <CCol >
-                        <CFormLabel className="text-muted"> Plantilla del docente</CFormLabel>
-                        <CFormSelect
+                    <CCol>
+                        <CFormLabel className="text-muted">Plantilla del estudiante (Superior)</CFormLabel>
+                        <CFormSelect 
+                            value={modificacionesParametros?.plantilla_estudiante_superior}
+                            onChange={(e) => handlePlantillaChange('plantilla_estudiante_superior', e.target.value)}
+                        >
+                            <option value="0" disabled>Seleccione una plantilla..</option>
+                            {plantillasEstudianteSuperior.map(p => (
+                                <option key={p.id} value={p.id}>{p.titulo}</option>
+                            ))}
+                        </CFormSelect>
+                    </CCol>
+
+                    <CCol>
+                        <CFormLabel className="text-muted">Plantilla del docente</CFormLabel>
+                        <CFormSelect 
                             value={modificacionesParametros?.plantilla_docente}
-                            onChange={(e) => {
-                                const selectedId = Number(e.target.value);
-                                const plantillaSeleccionada = plantillasDocente?.find(p => p.id === selectedId);
-
-                                if (plantillaSeleccionada) {
-                                setModificacionesParametros({
-                                    ...modificacionesParametros!,
-                                    plantilla_docente: plantillaSeleccionada.id,
-                                    obj_plantilla_docente: plantillaSeleccionada
-                                });
-                                }
-                            }}>
-                            <option value="0" disabled>Seleccione una plantilla.. </option>
-                            {plantillasDocente?.map((plantilla) => (
-                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
+                            onChange={(e) => handlePlantillaChange('plantilla_docente', e.target.value)}
+                        >
+                            <option value="0" disabled>Seleccione una plantilla..</option>
+                            {plantillasDocente.map(p => (
+                                <option key={p.id} value={p.id}>{p.titulo}</option>
                             ))}
                         </CFormSelect>
                     </CCol>
 
-                    <CCol >
-                        <CFormLabel className="text-muted"> Plantilla del departamento</CFormLabel>
-                        <CFormSelect value={modificacionesParametros?.plantilla_departamento}   
-                        onChange={(e) => {
-                            const selectedId = Number(e.target.value);
-                            const plantillaSeleccionada = plantillasDepartamento?.find(p => p.id === selectedId);
-
-                            if (plantillaSeleccionada) {
-                            setModificacionesParametros({
-                                ...modificacionesParametros!,
-                                plantilla_departamento: plantillaSeleccionada.id,
-                                obj_plantilla_departamento: plantillaSeleccionada
-                            });
-                            }
-                        }}>
-                            <option value="0" disabled>Seleccione una plantilla.. </option>
-                            {plantillasDepartamento?.map((plantilla) => (
-                                <option key={plantilla.id} value={String(plantilla.id)}>{plantilla.titulo}</option>
+                    <CCol>
+                        <CFormLabel className="text-muted">Plantilla del departamento</CFormLabel>
+                        <CFormSelect 
+                            value={modificacionesParametros?.plantilla_departamento}
+                            onChange={(e) => handlePlantillaChange('plantilla_departamento', e.target.value)}
+                        >
+                            <option value="0" disabled>Seleccione una plantilla..</option>
+                            {plantillasDepartamento.map(p => (
+                                <option key={p.id} value={p.id}>{p.titulo}</option>
                             ))}
                         </CFormSelect>
                     </CCol>
-                    </CRow>
+                </CRow>
 
-
-                    {/* Disponibilidad */}
-                    <CRow className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
+                <CRow className="p-2" style={{ borderLeft: "3px solid #ffc107" }}>
                     <h5>Disponibilidad de Formularios</h5>
-                    {["estudiante", "docente", "departamento"].map((tipo) => {
-                    const key = `disponibilidad_${tipo}` as keyof Parametros;
-                    return (
-                        <CCol key={tipo} className="d-flex justify-content-center flex-column">
-                            <CFormLabel>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</CFormLabel>
-                            <Form.Control
-                                type="number"
-                                min={0}
-                                max={30}
-                                placeholder="Cantidad de dias"
-                                value={String(modificacionesParametros?.[key] ?? "")}
-                                onChange={(e) => {
-                                    const value = Number(e.target.value);
-                                    if (value <= 30) {
-                                        setModificacionesParametros({
-                                            ...modificacionesParametros!,
-                                            [key]: value,
-                                        });
-                                    }
-                                }}
-                            />
-                        </CCol>
-                    );
+                    
+                    {['estudiante', 'docente', 'departamento'].map(tipo => {
+                        const key = `disponibilidad_${tipo}` as keyof Parametros;
+                        return (
+                            <CCol key={tipo} className="d-flex justify-content-center flex-column">
+                                <CFormLabel>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</CFormLabel>
+                                <Form.Control
+                                    type="number"
+                                    min={0}
+                                    max={60}
+                                    placeholder="Cantidad de días"
+                                    value={String(modificacionesParametros?.[key] ?? '')}
+                                    onChange={(e) => handleDisponibilidadChange(key, e.target.value)}
+                                />
+                            </CCol>
+                        );
                     })}
-                    </CRow>
+                </CRow>
 
-                    <CRow className="justify-content-center mt-4 pt-4 border-top">
-                        <CCol xs="auto">
-                            <ModalExito 
-                                onEnviar={() => modificacionesParametros ? actualizarParametros(modificacionesParametros) : Promise.resolve(false)}
-                                onExito={() => setParametros(modificacionesParametros)}
-                                desactivado={!modificacionesParametros}
-                                textoBoton="Guardar configuración"
-                                variante="success"
-                                className="text-white"
-                            />
-                        </CCol>
-                        <CCol xs="auto">
-                            <CButton color="secondary" variant="outline" onClick={() => setModificacionesParametros(parametros)}>
-                                Restablecer
-                            </CButton>
-                        </CCol>
-                    </CRow>
-                </CCardBody>
-
-            
-            </ShadowedCard>
+                {/* BOTONES ACCIÓN */}
+                <CRow className="justify-content-center mt-4 pt-4 border-top">
+                    <CCol xs="auto">
+                        <ModalExito 
+                            onEnviar={actualizarParametrosServidor}
+                            onExito={() => setParametros(modificacionesParametros)}
+                            desactivado={!modificacionesParametros}
+                            textoBoton="Guardar configuración"
+                            variante="success"
+                            className="text-white"
+                        />
+                    </CCol>
+                    <CCol xs="auto">
+                        <CButton 
+                            color="secondary" 
+                            variant="outline" 
+                            onClick={() => setModificacionesParametros(parametros)}
+                        >
+                            Restablecer
+                        </CButton>
+                    </CCol>
+                </CRow>
+            </CCardBody>
+        </ShadowedCard>
     );
 }

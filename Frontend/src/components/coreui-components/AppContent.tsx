@@ -23,6 +23,7 @@ import VerRespuestasDepartamento from '../RespuestasFormulario/VerRespuestasDepa
 import VerRespuestas from '../RespuestasFormulario/VerRespuestas'
 import { CompararPlantillas } from '../Estadisticas/CompararPeriodos'
 import { MostrarEstadisticasAlumnos } from '../Estadisticas/MostrarEstadisticasAlumnos'
+import HomeDashboard from '../../HomeDashboard'
 
 
 const PlaceholderComponent = ({ path }: { path: string }) => (
@@ -46,11 +47,13 @@ const AppContent = () => {
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos />} />
         <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
         {/* Rutas Departamento */}
+        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
         <Route path="/seleccionar-informe-sintetico" element={<SeleccionarInformeSintetico/>} />
         <Route path="/VerInformeActividadCurricular" element={<PaginaInformesCatedra/>} />
         <Route path="/respuestas-informe-sintetico" element={<VerRespuestasDepartamento/>}>Informes Sintéticos Respondidos</Route>
         <Route path='/mostrar-estadisticas-departamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
         {/* Rutas Docente */}
+        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
         <Route path="/instrumentos-docente" element={<InstrumentosDocente/>} />
         <Route path="/VerEncuestasEstudiante" element={<PaginaEncuestasEstudiantes/>} />
         <Route path="/respuestas-informe-catedra" element={<VerRespuestasDocente/>}>Informes de Cátedra Respondidos</Route>
@@ -58,11 +61,13 @@ const AppContent = () => {
 
 
         {/* Rutas Estudiante */}
+        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
         <Route path="/materias" element={<SeleccionarMateria/>} />
         <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>
         <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
         <Route path="/respuestas-encuesta-estudiante" element={<VerRespuestasEstudiante/>}>Ver Mis Respuestas</Route>
         {/* Rutas Secretaria Académica */}
+        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
         <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
         <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas />} />
         <Route path="/EstadisticasDeDocente" element={<EstadisticasCatedras/>} />

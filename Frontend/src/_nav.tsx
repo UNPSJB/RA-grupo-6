@@ -9,11 +9,18 @@ import {
     cilClone,
     cilShortText,
     cilCalendarCheck,
+    cilHome,
 } from '@coreui/icons'
 import {CNavItem, CNavTitle } from '@coreui/react'
 
 const navSecretaria = [
     /* { component: CNavTitle, name: 'Secretaría Académica' }, */
+    {
+        component: CNavItem,
+        name: 'Home',
+        to: '/dashboard',
+        icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+    },
     
     { component: CNavTitle, name: 'Formularios y Reportes' },
     {
@@ -71,6 +78,12 @@ const navDepartamento = [
     { component: CNavTitle, name: 'Departamento' },
     {
         component: CNavItem,
+        name: 'Home',
+        to: '/dashboard',
+        icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+    },
+    {
+        component: CNavItem,
         name: 'Responder formularios',
         to: '/seleccionar-informe-sintetico',
         icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
@@ -100,6 +113,13 @@ const navDepartamento = [
 
 const navDocente = [
     { component: CNavTitle, name: 'Docente' },
+
+    {
+        component: CNavItem,
+        name: 'Home',
+        to: '/dashboard',
+        icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+    },
     {
         component: CNavItem,
         name: 'Responder Formularios',
@@ -129,6 +149,13 @@ const navDocente = [
 
 const navEstudiante = [
     { component: CNavTitle, name: 'Estudiante' },
+
+    {
+        component: CNavItem,
+        name: 'Home',
+        to: '/dashboard',
+        icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+    },
     {
         component: CNavItem,
         name: 'Responder Formularios',
@@ -141,6 +168,7 @@ const navEstudiante = [
         to: '/respuestas-encuesta-estudiante',
         icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     },
+
 ];
 
 const navDefault = [

@@ -16,7 +16,7 @@ import {
 } from '@coreui/react';
 import { capitalizarCadena } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
-import type { Usuario } from '../types'; // Asegúrate de importar el tipo Usuario
+import type { Usuario } from '../types'; 
 
 interface InstrumentoRespondido {
     id: number;
@@ -35,7 +35,6 @@ export default function VerRespuestasDepartamento() {
     const [mensaje, setMensaje] = useState('');
     const [usuario, setUsuario] = useState<Usuario | null>(null);
 
-    // 1. Obtener el usuario actual
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -54,7 +53,6 @@ export default function VerRespuestasDepartamento() {
         fetchUser();
     }, []);
 
-    // 2. Obtener los instrumentos (INFORME_SINTETICO)
     useEffect(() => {
         if (!usuario) return;
 
@@ -62,8 +60,6 @@ export default function VerRespuestasDepartamento() {
             try {
                 setCargando(true);
                 setMensaje('');
-
-                // Usamos usuario.id dinámicamente
                 const res = await fetch(
                     `http://localhost:8000/instrumentos/tipo/INFORME_SINTETICO?usuario_id=${usuario.id}&mostrar_respondidos=true`,
                     { credentials: 'include' }
@@ -71,8 +67,14 @@ export default function VerRespuestasDepartamento() {
 
                 if (!res.ok) throw new Error('No se pudieron cargar los informes sintéticos');
 
-                const data = await res.json();
-                setInstrumentos(data);
+                const data: InstrumentoRespondido[] = await res.json();
+                const datosOrdenados = data.sort((a, b) => {
+                    const fechaA = new Date(a.fecha_envio).getTime();
+                    const fechaB = new Date(b.fecha_envio).getTime();
+                    return fechaB - fechaA; 
+                });
+
+                setInstrumentos(datosOrdenados);
             } catch (err: unknown) {
                 const msg = err instanceof Error ? err.message : 'Error desconocido';
                 setMensaje(msg);
@@ -87,7 +89,7 @@ export default function VerRespuestasDepartamento() {
     const handleVerRespuestas = (instrumento: InstrumentoRespondido) => {
         navigate(`/ver-respuestas/${instrumento.respuestas_formulario_id || instrumento.id}`, {
             state: {
-                materiaNombre: instrumento.materia.nombre,
+                materiaNombre: instrumento.plantilla_formulario?.titulo,
                 fechaEnvio: instrumento.fecha_envio,
                 instrumentoId: instrumento.instrumento_id || instrumento.id,
                 plantillaFormularioId: instrumento.plantilla_formulario?.id,
@@ -128,7 +130,7 @@ export default function VerRespuestasDepartamento() {
                     <CTable className='border mb-1' hover responsive>
                         <CTableHead>
                             <CTableRow>
-                                <CTableHeaderCell>Materia</CTableHeaderCell>
+                                <CTableHeaderCell>Informe</CTableHeaderCell>
                                 <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
                                 <CTableHeaderCell>Fecha de Envío</CTableHeaderCell>
                                 <CTableHeaderCell className="text-center">Acción</CTableHeaderCell>
@@ -142,8 +144,10 @@ export default function VerRespuestasDepartamento() {
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <CTableDataCell>
-                                        <div className="fw-bold">{capitalizarCadena(instrumento.materia.nombre)}</div>
-                                        <div className="small text-medium-emphasis">Código: {instrumento.materia.id}</div>
+                                        <div className="fw-bold">{capitalizarCadena(instrumento.plantilla_formulario?.titulo)}</div>
+                                        <div className="small text-medium-emphasis">
+                                            Ciclo Lectivo: {new Date(instrumento.fecha_envio).getFullYear()}
+                                        </div>
                                     </CTableDataCell>
                                     <CTableDataCell className="text-center">
                                         {instrumento.plantilla_formulario && (

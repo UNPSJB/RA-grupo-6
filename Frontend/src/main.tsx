@@ -28,7 +28,7 @@ import VerRespuestasEstudiante from './components/RespuestasFormulario/VerRespue
 import VerRespuestasDocente from './components/RespuestasFormulario/VerRespuestasDocente.tsx';
 import VerRespuestasDepartamento from './components/RespuestasFormulario/VerRespuestasDepartamento.tsx';
 import VerRespuestas from './components/RespuestasFormulario/VerRespuestas.tsx';
-
+import HomeDashboard from './HomeDashboard.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -40,6 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Menu />
               <Routes>
                 <Route path='/' element={<CompararPlantillas/>} ></Route>
+                <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
                 <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
                 <Route path='/EstadisticasDeDocente' element={<EstadisticasCatedras/>} ></Route>
                 <Route path='/mostrar-estadisticas-departamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>

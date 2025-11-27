@@ -112,3 +112,7 @@ app.include_router(grupo_cuadro_router)
 
 from src.Email.router import router as email_router
 app.include_router(email_router)
+
+from src.Home.router import router as home_router
+app.include_router(home_router)
+

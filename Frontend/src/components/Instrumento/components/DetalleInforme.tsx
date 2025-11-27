@@ -1,5 +1,3 @@
-// DetalleInforme.tsx
-
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from '@react-pdf/renderer'; 
 import { Card, Button, ListGroup, Badge, Spinner } from "react-bootstrap";

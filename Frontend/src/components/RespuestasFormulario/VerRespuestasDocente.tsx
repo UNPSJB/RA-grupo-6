@@ -35,12 +35,12 @@ export default function VerRespuestasDocente() {
     const [mensaje, setMensaje] = useState('');
     const [usuario, setUsuario] = useState<Usuario | null>(null);
 
-    // 1. Obtener el usuario actual
+ 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const response = await fetch("http://localhost:8000/users/me", {
-                    credentials: 'include' // IMPORTANTE: Para enviar la cookie
+                    credentials: 'include'
                 });
                 if (!response.ok) throw new Error("No se pudo autenticar al usuario");
                 const data = await response.json();
@@ -54,16 +54,14 @@ export default function VerRespuestasDocente() {
         fetchUser();
     }, []);
 
-    // 2. Obtener los instrumentos cuando ya tenemos el usuario
     useEffect(() => {
-        if (!usuario) return; // Esperar a que el usuario esté cargado
+        if (!usuario) return;
 
         const fetchInstrumentos = async () => {
             try {
                 setCargando(true);
                 setMensaje('');
 
-                // Usamos usuario.id dinámicamente
                 const res = await fetch(
                     `http://localhost:8000/instrumentos/tipo/INFORME_CATEDRA?usuario_id=${usuario.id}&mostrar_respondidos=true`,
                     { credentials: 'include' }

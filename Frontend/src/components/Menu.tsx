@@ -26,23 +26,27 @@ function Menu(){
                         <Nav.Link href='/'> <i className="fa-solid fa-house"></i> Volver al inicio </Nav.Link>
                         {/*  BOTONES DEPARTAMENTO */}
                         <RequireAuth roles={['Departamento']}>
+                            <Nav.Link href="/dashboard">Home</Nav.Link>
                             <Nav.Link href="/seleccionar-informe-sintetico">Responder Informe Sintetico</Nav.Link>
                             <Nav.Link href="/VerInformeActividadCurricular">Ver Informes de Actividad Curricular</Nav.Link>  
                         </RequireAuth>
                         
                         {/*  BOTONES DOCENTE */}
                         <RequireAuth roles={['Docente']}>
+                            <Nav.Link href="/dashboard">Home</Nav.Link>
                             <Nav.Link href="/instrumentos-docente">Responder Informe Catedra</Nav.Link>
                             <Nav.Link href="/VerEncuestasEstudiante">Encuestas de Estudiante</Nav.Link>
                         </RequireAuth>
                         {/*  BOTONES ESTUDIANTE */}
                         <RequireAuth roles={['Estudiante']}>
+                            <Nav.Link href="/dashboard">Home</Nav.Link>
                             <Nav.Link href="/materias">Responder Encuestas</Nav.Link>
                             <Nav.Link href='/RespuestasFormularios'> Ver Respuestas </Nav.Link>
                         </RequireAuth>
                         
                         {/*  BOTONES SECRETARIA */}
                         <RequireAuth roles={['Secretaria Academica']}>
+                            <Nav.Link href="/dashboard">Home</Nav.Link>
                             <Nav.Link href="/MostrarEstadisticas">Ver Estadisticas Encuestados</Nav.Link>
                             <Nav.Link href="/CrearFormulario">Crear Formulario</Nav.Link>  
                             <Nav.Link href="/VerInformesSinteticos">Informes Sintéticos</Nav.Link>  

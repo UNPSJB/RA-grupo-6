@@ -1,6 +1,7 @@
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 import type { DetalleInformeSinteticoCompleto } from "../types";
 import Logo from "../../assets/Unipat.png";
+import { capitalizarCadena } from '../Funciones';
 
 interface DatosMateriaInstancia {
     instancia: number;
@@ -154,7 +155,7 @@ export default function InformeSinteticoPDFDocument({ informe }: { informe: Deta
                 <View style={styles.header} fixed>
                     <Text style={styles.title}>{informe.titulo_formulario || 'Informe'}</Text>
                     <Image src={Logo} style={styles.headerImage}></Image>
-                    <Text style={styles.subtitle}>Departamento: {informe.departamento || 'Ingenería'}</Text>
+                    <Text style={styles.subtitle}>{esInformeSintetico? "Departamento" : "Materia"}: {capitalizarCadena(informe.departamento)}</Text>
                     <Text style={styles.subtitle}>
                         Fecha: {informe.fecha_completado ? new Date(informe.fecha_completado).toLocaleDateString('es-ES', {
                             day: '2-digit',

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Container, ListGroup, ListGroupItem, Row, Stack } from "react-bootstrap";
+import { Stack } from "react-bootstrap";
 import { EnumTipoPregunta } from "../types";
 import { useParams } from "react-router-dom";
 import { capitalizarCadena } from "../Funciones";

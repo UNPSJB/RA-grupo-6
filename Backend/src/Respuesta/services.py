@@ -291,5 +291,24 @@ def _obtener_respuestas_informe_sintetico(db: Session, pregunta_fuente: Pregunta
     
     return {"respuestas": [], "multiple": pregunta.multiple_respuestas}
 
-def obtener_respuestas_por_formulario(db, formulario_id: int):
-    return db.query(Respuesta).filter(Respuesta.formulario_id == formulario_id).all()
+def obtener_respuestas_por_formulario(db: Session, formulario_id: int):
+    respuestas_db = db.query(Respuesta).filter(Respuesta.formulario_id == formulario_id).all()
+    
+    respuestas_limpias = [schemas.Respuesta.model_validate(r) for r in respuestas_db]
+    
+    formulario = db.query(RespuestasFormulario).filter(RespuestasFormulario.id == formulario_id).first()
+    
+    nombre_depto = "Desconocido"
+    nombre_mat = ""
+
+    if formulario and formulario.instrumento:
+        if formulario.instrumento.departamento:
+            nombre_depto = formulario.instrumento.departamento.nombre
+        if formulario.instrumento.materia:
+            nombre_mat = formulario.instrumento.materia.nombre
+
+    return {
+        "respuestas": respuestas_limpias, 
+        "nombre_departamento": nombre_depto,
+        "nombre_materia": nombre_mat
+    }

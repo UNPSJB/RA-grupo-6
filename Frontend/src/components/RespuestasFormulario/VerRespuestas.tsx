@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Spinner, Button, Badge } from 'react-bootstrap';
+import { Spinner, Button, Badge } from 'react-bootstrap';
 import { organizarPreguntasEnGrupos } from '../Pregunta/OrganizarPreguntas';
 import InformeSinteticoPDFDocument from './InformeSinteticoPDFDocument';
 import ShadowedCard from '../coreui-components/ShadowedCard';
@@ -12,22 +12,28 @@ import {
     CNavItem,
     CNavLink,
     CCard,
-    CAlert
+    CAlert,
+    CContainer
 } from '@coreui/react';
+import { pdf } from '@react-pdf/renderer';
 
 export default function VerRespuestas() {
     const { respuestasFormularioId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
 
+
     const [respuestas, setRespuestas] = useState([]);
+    const [nombreDepartamento, setNombreDepartamento] = useState(''); 
     const [plantillaFormulario, setPlantillaFormulario] = useState(null);
+    
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState('');
     const [tabActiva, setTabActiva] = useState(0);
+    const [pdfLoading, setPdfLoading] = useState(false);
+    
     const [datosTabla, setDatosTabla] = useState(null);
     const [datosMaterias, setDatosMaterias] = useState([]);
-    const [pdfLoading, setPdfLoading] = useState(false);
 
     const locationState = location.state || {};
     const materiaNombre = locationState.materiaNombre || '';
@@ -45,41 +51,43 @@ export default function VerRespuestas() {
         setCargando(true);
         setError('');
         try {
-            await cargarDatosEncuesta(formId);
-        } catch (e) {
-            const mensaje = e instanceof Error ? e.message : 'Error al cargar los datos';
-            setError(mensaje);
-        } finally {
-            setCargando(false);
-        }
-    };
-
-    const cargarDatosEncuesta = async (formId) => {
-        try {
             const respResp = await fetch(`http://localhost:8000/respuestas/?formulario_id=${formId}`, {
                 credentials: 'include'
             });
             if (!respResp.ok) throw new Error('No se pudieron cargar las respuestas individuales');
             
-            const respuestasData = await respResp.json();
-            setRespuestas(respuestasData);
+            const data = await respResp.json();
+            let respuestasData = [];
 
+            if (data.respuestas && Array.isArray(data.respuestas)) {
+                respuestasData = data.respuestas;
+                setRespuestas(respuestasData);
+                if (data.nombre_departamento) {
+                    setNombreDepartamento(data.nombre_departamento);
+                }
+            } else if (Array.isArray(data)) {
+                respuestasData = data;
+                setRespuestas(respuestasData);
+            } else {
+                respuestasData = [];
+                setRespuestas([]);
+            }
             const respuestaTablaGeneral = respuestasData.find(r => r.pregunta?.texto === "Información general de actividades curriculares");
             if (respuestaTablaGeneral && respuestaTablaGeneral.texto) {
                 try {
                     setDatosTabla(JSON.parse(respuestaTablaGeneral.texto));
                 } catch (e) {
-                    console.error(e);
+                    console.error("Error parsing tabla:", e);
                 }
             }
 
             const codigosMap = new Map();
             const nombresMap = new Map();
             respuestasData.forEach((respuesta) => {
-                if (respuesta.pregunta?.texto === "Código de actividad curricular" && respuesta.texto && respuesta.instancia_respuesta) {
+                if (respuesta.pregunta?.texto === "Código de actividad curricular" && respuesta.texto && respuesta.instancia_respuesta !== null) {
                     codigosMap.set(respuesta.instancia_respuesta, respuesta.texto);
                 }
-                if (respuesta.pregunta?.texto === "Nombre de la actividad curricular" && respuesta.texto && respuesta.instancia_respuesta) {
+                if (respuesta.pregunta?.texto === "Nombre de la actividad curricular" && respuesta.texto && respuesta.instancia_respuesta !== null) {
                     nombresMap.set(respuesta.instancia_respuesta, respuesta.texto);
                 }
             });
@@ -100,7 +108,10 @@ export default function VerRespuestas() {
                 }
             }
         } catch (e) {
-            throw e;
+            const mensaje = e instanceof Error ? e.message : 'Error al cargar los datos';
+            setError(mensaje);
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -168,7 +179,8 @@ export default function VerRespuestas() {
         return {
             id: parseInt(respuestasFormularioId || '0'),
             titulo_formulario: (tipoInstrumento === 'INFORME_SINTETICO') ? 'Informe Sintético' : 'Informe de Cátedra',
-            departamento: (tipoInstrumento === 'INFORME_SINTETICO') ? 'Ingenería':materiaNombre, 
+            departamento: (tipoInstrumento === 'INFORME_SINTETICO') ? (nombreDepartamento || 'Ingeniería') : materiaNombre,
+            
             fecha_completado: fechaEnvio,
             respuestas_sintesis_agrupadas: respuestasSintesisAgrupadas,
             datos_tabla: datosTabla,
@@ -179,15 +191,17 @@ export default function VerRespuestas() {
     const handleDownloadPDF = async () => {
         setPdfLoading(true);
         try {
-            const { pdf } = await import('@react-pdf/renderer');
             const datosPDF = getDatosParaPDF();
             const blob = await pdf(<InformeSinteticoPDFDocument informe={datosPDF} />).toBlob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
+            
             let prefijoArchivo = tipoInstrumento === 'INFORME_SINTETICO' ? "Informe-Sintetico" : 'Informe-Catedra';
-            const nombreArchivo = materiaNombre;
-            a.download = `${prefijoArchivo}-${nombreArchivo}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`;
+            
+            const nombreParaArchivo = (tipoInstrumento === 'INFORME_SINTETICO' && nombreDepartamento) ? nombreDepartamento : materiaNombre;
+            
+            a.download = `${prefijoArchivo}-${nombreParaArchivo}-${new Date(fechaEnvio).toISOString().split('T')[0]}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -243,8 +257,8 @@ export default function VerRespuestas() {
                                 <td className="text-center fw-bold">{fila.inscriptos ?? '-'}</td>
                                 <td className="text-center">
                                     {Array.isArray(fila.comisionesTeoricas) 
-                                        ? fila.comisionesTeoricas.join(', ') 
-                                        : fila.comisionesTeoricas || '-'}
+                                    ? fila.comisionesTeoricas.join(', ') 
+                                    : fila.comisionesTeoricas || '-'}
                                 </td>
                                 <td className="text-center">{fila.comisionesPracticas || '-'}</td>
                             </tr>
@@ -375,7 +389,11 @@ export default function VerRespuestas() {
                     <div className="col-12">
                         <div className="mb-4">
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div><h1 className="text-body fw-bold">{materiaNombre}</h1></div>
+                                <div>
+                                    <h1 className="text-body fw-bold">
+                                        {esInformeSintetico ? (nombreDepartamento || 'Informe Sintético') : materiaNombre}
+                                    </h1>
+                                </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center">
                                 <h5 className='text-muted'>Respondido: {new Date(fechaEnvio).toLocaleDateString()}</h5>
@@ -486,8 +504,8 @@ export default function VerRespuestas() {
         );
     };
 
-    if (cargando) return <Container className="mt-5 text-center"><Spinner animation="border" variant="primary"/></Container>;
-    if (error) return <Container className="mt-5"><CAlert color="danger">{error}</CAlert></Container>;
+    if (cargando) return <CContainer className="mt-5 text-center"><Spinner animation="border" variant="primary"/></CContainer>;
+    if (error) return <CContainer className="mt-5"><CAlert color="danger">{error}</CAlert></CContainer>;
 
     return (
         <div className="row justify-content-center">

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form"
 import type { Rol } from "../types";
@@ -9,6 +8,8 @@ type ELegirRolProps = {
     error?: string;
 };
 
+const ROLES_PERMITIDOS = ["estudiante", "docente", "departamento"];
+
 function ELegirRol({ selectedRol, onChangeRol, error }: ELegirRolProps){
 
     const [roles, setRoles] = useState<Rol[]>([])
@@ -18,7 +19,12 @@ function ELegirRol({ selectedRol, onChangeRol, error }: ELegirRolProps){
     useEffect(() => {
         fetch(url_base)
         .then(response => response.json())
-        .then((data) => setRoles(data))
+        .then((data: Rol[]) => {
+            const rolesFiltrados = data.filter(rol => 
+                ROLES_PERMITIDOS.includes(rol.nombre.toLowerCase())
+            );
+            setRoles(rolesFiltrados);
+        })
         .catch(error => console.log(error));
     }, []);
 
@@ -28,20 +34,20 @@ function ELegirRol({ selectedRol, onChangeRol, error }: ELegirRolProps){
         Dirigido a
         </h5>
         <Form.Select
-        id="select-roles"
-        value={selectedRol}
-        onChange={(e) => onChangeRol(e.target.value)}
-        className="border-2"
-        style={{ 
-            borderColor: error? "#dc3545" : "#dee2e6", borderWidth: "2px"
-        }}
+            id="select-roles"
+            value={selectedRol}
+            onChange={(e) => onChangeRol(e.target.value)}
+            className="border-2"
+            style={{ 
+                borderColor: error? "#dc3545" : "#dee2e6", borderWidth: "2px"
+            }}
         >
-        <option value="">Seleccione un rol...</option>
-        {roles.map((rol) => (
-            <option key={rol.id} value={rol.id}>
-            {rol.nombre}
-            </option>
-        ))}
+            <option value="">Seleccione un rol...</option>
+            {roles.map((rol) => (
+                <option key={rol.id} value={rol.id}>
+                    {rol.nombre}
+                </option>
+            ))}
         </Form.Select>
 
         {error && (

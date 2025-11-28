@@ -11,7 +11,7 @@ def crear_plantilla_formulario(db: Session, plantilla_formulario: schemas.Formul
     
     preguntas_validas = db.query(Pregunta).filter(Pregunta.id.in_([preg for preg in plantilla_formulario.preguntas if preg > 0])).all()
     
-    _nuevo_plantilla_formulario = PlantillaFormulario(titulo = plantilla_formulario.titulo, rol_id = plantilla_formulario.rol)
+    _nuevo_plantilla_formulario = PlantillaFormulario(titulo = plantilla_formulario.titulo, rol_id = plantilla_formulario.rol, ciclo = plantilla_formulario.ciclo)
     _nuevo_plantilla_formulario.preguntas = preguntas_validas
 
     db.add(_nuevo_plantilla_formulario)

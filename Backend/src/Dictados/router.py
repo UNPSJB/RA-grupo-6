@@ -52,6 +52,6 @@ def get_inscriptos(materia_id:str, instrumento_id:int, db: Session = Depends(get
     return services.get_inscriptos(db, materia_id, instrumento_id)
 
 
-@router.post("/Prueba", response_model=list[schemas.Dictado])
-def probar(db:Session = Depends(get_db)):
-    return services.CrearDictadosAnuales(db)
+# @router.post("/Prueba", response_model=list[schemas.Dictado])
+# def probar(db:Session = Depends(get_db)):
+#     return services.CrearDictadosAnuales(db)

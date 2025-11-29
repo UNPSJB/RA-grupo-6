@@ -5,7 +5,7 @@ from pytest import param
 import array
 from typing import List
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import and_, or_, select
+from sqlalchemy import Null, and_, or_, select
 from src.PlantillaFormulario.models import CicloMateria
 from src.Usuarios.models import Usuario
 from src.Materias.services import get_Docente
@@ -172,7 +172,7 @@ def getTasaRespuestasInstrumentos(db: Session, instrumentos: List[Instrumento], 
             
             for usuario in departamento.usuarios_info:
                 if (usuario.fecha_hasta is None):
-                    respondidos = respondidos + 1
+                    asignados = asignados + 1
 
     else:
         for instrumento in instrumentos:
@@ -239,8 +239,12 @@ def getCompletitud(db:Session, instrumentos: List[Instrumento]):
     preguntas = len(instrumentos[0].plantilla_formulario.preguntas)
 
     for instrumento in instrumentos:
+        
         for respuestasFormulario in instrumento.respuestas_formulario:
-            respondidas = respondidas + len(respuestasFormulario.respuestas)
+
+            var = set([x.pregunta_id for x in respuestasFormulario.respuestas if (((x.instancia_respuesta == None) | (x.instancia_respuesta == 1)) & ((x.opcion_id != Null) | (x.texto != "") ))])
+            
+            respondidas = respondidas + len(var)
             cantEncuestados = cantEncuestados + 1
 
     if ((preguntas == 0) or (cantEncuestados == 0)):

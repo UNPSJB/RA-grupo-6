@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 from pydantic import BaseModel
 
 from src.PlantillaFormulario.schemas import PlantillaFormulario
@@ -21,10 +22,10 @@ class ParametrosBase(BaseModel):
     disponibilidad_departamento: int
 
     #Relaciones
-    obj_plantilla_estudiante_basico: PlantillaFormulario
-    obj_plantilla_estudiante_superior: PlantillaFormulario
-    obj_plantilla_docente: PlantillaFormulario
-    obj_plantilla_departamento: PlantillaFormulario
+    obj_plantilla_estudiante_basico: Optional[PlantillaFormulario] = None
+    obj_plantilla_estudiante_superior: Optional[PlantillaFormulario] = None
+    obj_plantilla_docente: Optional[PlantillaFormulario] = None
+    obj_plantilla_departamento: Optional[PlantillaFormulario] = None
 
 
 class Parametros(ParametrosBase):

@@ -50,3 +50,8 @@ def get_estadisticas_por_anio(departamento_id: Optional[int] = Query(None, descr
 @router.get("/Inscriptos/{materia_id}/{instrumento_id}", response_model=int)
 def get_inscriptos(materia_id:str, instrumento_id:int, db: Session = Depends(get_db)):
     return services.get_inscriptos(db, materia_id, instrumento_id)
+
+
+@router.post("/Prueba", response_model=list[schemas.Dictado])
+def probar(db:Session = Depends(get_db)):
+    return services.CrearDictadosAnuales(db)

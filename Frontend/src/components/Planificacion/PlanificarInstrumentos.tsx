@@ -3,6 +3,8 @@ import { Form, Alert } from "react-bootstrap";
 import { CButton, CCardBody, CCardHeader, CCol, CFormLabel, CFormSelect, CRow, CFormInput } from "@coreui/react";
 import ShadowedCard from "../coreui-components/ShadowedCard";
 import ModalExito from "../ModalEnvio";
+import { esTipoRespuestaValido, formatearFecha, getFecha, parsearStringFecha } from "../Funciones";
+import { TipoRespuesta } from "../types";
 
 
 interface Parametros {
@@ -31,11 +33,13 @@ export function PlanificarPeriodos() {
     const [parametros, setParametros] = useState<Parametros>();
     const [modificacionesParametros, setModificacionesParametros] = useState<Parametros>();
     const [errorValidacion, setErrorValidacion] = useState<string>("");
-
     const [plantillasEstudianteBasico, setPlantillasEstudianteBasico] = useState<PlantillaFormulario[]>([]);
     const [plantillasEstudianteSuperior, setPlantillasEstudianteSuperior] = useState<PlantillaFormulario[]>([]);
     const [plantillasDocente, setPlantillasDocente] = useState<PlantillaFormulario[]>([]);
     const [plantillasDepartamento, setPlantillasDepartamento] = useState<PlantillaFormulario[]>([]);
+
+    const anioActual = (new Date().getUTCFullYear()) + 1
+
 
     useEffect(() => {
         const cargarDatos = async () => {
@@ -67,10 +71,34 @@ export function PlanificarPeriodos() {
         cargarDatos();
     }, []);
 
-   
     const handleFechaChange = (campo: keyof Parametros, valor: string) => {
         if (!modificacionesParametros) return;
-        setModificacionesParametros({ ...modificacionesParametros, [campo]: valor });
+
+        let modificaciones = { ...modificacionesParametros, [campo]: valor }
+
+        if (campo === "inicio_primer_dictado") {
+            const inicio = parsearStringFecha(valor);
+            const cierre = parsearStringFecha(modificacionesParametros?.cierre_primer_dictado);
+
+            if (cierre <= inicio) {
+                const nuevoCierre = new Date(inicio);
+                nuevoCierre.setDate(inicio.getUTCDate() + 1);
+                modificaciones = ({ ...modificaciones, ["cierre_primer_dictado"]: formatearFecha(nuevoCierre)});
+            }
+        }
+
+        if (campo === "inicio_segundo_dictado") {
+            const inicio = parsearStringFecha(valor);
+            const cierre = parsearStringFecha(modificacionesParametros?.cierre_segundo_dictado);
+
+            if (cierre <= inicio) {
+                const nuevoCierre = new Date(inicio);
+                nuevoCierre.setDate(inicio.getUTCDate() + 1);
+                modificaciones = ({ ...modificaciones, ["cierre_segundo_dictado"]: formatearFecha(nuevoCierre)});
+            }
+        }
+
+        setModificacionesParametros(modificaciones)
         setErrorValidacion("");
     };
 
@@ -90,30 +118,56 @@ export function PlanificarPeriodos() {
     const validarFechas = (): boolean => {
         if (!modificacionesParametros) return false;
         
-        const inicio1 = new Date(modificacionesParametros.inicio_primer_dictado);
-        const cierre1 = new Date(modificacionesParametros.cierre_primer_dictado);
-        const inicio2 = new Date(modificacionesParametros.inicio_segundo_dictado);
-        const cierre2 = new Date(modificacionesParametros.cierre_segundo_dictado);
+
+        const inicio1 = parsearStringFecha(modificacionesParametros.inicio_primer_dictado);
+        const cierre1 = parsearStringFecha(modificacionesParametros.cierre_primer_dictado);
+        const inicio2 = parsearStringFecha(modificacionesParametros.inicio_segundo_dictado);
+        const cierre2 = parsearStringFecha(modificacionesParametros.cierre_segundo_dictado);
+
+        console.log(inicio1)
+
+        const fechaInicioPrimDictado = (new Date(anioActual, 0, 1))
+        if (inicio1 < fechaInicioPrimDictado){
+            setErrorValidacion(`Error en 1° Dictado: La fecha de inicio debe ser mayor o igual a 01/01/${anioActual}`)
+            return false;
+        }
 
         if (cierre1 <= inicio1) {
             setErrorValidacion("Error en 1° Dictado: La fecha de cierre debe ser posterior al inicio.");
             return false;
         }
+
+        const fechaCierrePrimDictado = (new Date(anioActual,5,30))
+        if (cierre1 > fechaCierrePrimDictado){
+            setErrorValidacion(`Error en 1° Dictado: La fecha de cierre debe ser menor o igual a 30/06/${anioActual}`)
+            return false;
+        }
+
+        const fechaInicioSegDictado = (new Date(anioActual,5,30))
+        if (inicio2 < fechaInicioSegDictado){
+            setErrorValidacion(`Error en 2° Dictado: La fecha de inicio debe ser mayor a 30/06/${anioActual}`)
+            return false;
+        
+        }
+
         if (cierre2 <= inicio2) {
             setErrorValidacion("Error en 2° Dictado: La fecha de cierre debe ser posterior al inicio.");
             return false;
         }
         
-        if (inicio2 <= cierre1) {
-            setErrorValidacion("Conflicto cronológico: El 2° dictado no puede comenzar antes de que termine el 1°.");
+        const fechaCierreSegDictado = new Date(anioActual, 11, 31); 
+        if (cierre2 > fechaCierreSegDictado){
+            setErrorValidacion(`Error en 2° Dictado: La fecha de cierre debe ser menor a 31/12/${anioActual}`)
             return false;
+        
         }
 
         return true;
     };
     
+
     const actualizarParametrosServidor = async () => {
-        if (!validarFechas() || !modificacionesParametros) return false;
+        if (!validarFechas() || !modificacionesParametros ) return false;
 
         try {
             const res = await fetch("http://127.0.0.1:8000/Parametros/actualizar/", {
@@ -156,16 +210,21 @@ export function PlanificarPeriodos() {
                         <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
                         <CFormInput 
                             type="date" 
+                            min={`${anioActual}-01-01`}
+                            max={`${anioActual}-06-29`}
                             value={modificacionesParametros?.inicio_primer_dictado || ''} 
-                            onChange={(e) => handleFechaChange('inicio_primer_dictado', e.target.value)} 
+                            onChange={(e) => {handleFechaChange('inicio_primer_dictado', e.target.value); validarFechas() }} 
                         />
                     </CCol>
                     <CCol>
                         <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
                         <CFormInput 
                             type="date" 
+                            min={modificacionesParametros?.inicio_primer_dictado}
+                            max={`${anioActual}-06-30`}
+                            disabled={!(modificacionesParametros?.inicio_primer_dictado)}
                             value={modificacionesParametros?.cierre_primer_dictado || ''} 
-                            onChange={(e) => handleFechaChange('cierre_primer_dictado', e.target.value)} 
+                            onChange={(e) => {handleFechaChange('cierre_primer_dictado', e.target.value) ; validarFechas() }} 
                         />
                     </CCol>
                 </CRow>
@@ -176,16 +235,21 @@ export function PlanificarPeriodos() {
                         <CFormLabel className="text-muted">Fecha de inicio:</CFormLabel>
                         <CFormInput 
                             type="date" 
+                            min={`${anioActual}-07-01`}
+                            max={`${anioActual}-12-30`}
                             value={modificacionesParametros?.inicio_segundo_dictado || ''} 
-                            onChange={(e) => handleFechaChange('inicio_segundo_dictado', e.target.value)} 
+                            onChange={(e) => {handleFechaChange('inicio_segundo_dictado', e.target.value); validarFechas() }} 
                         />
                     </CCol>
                     <CCol>
                         <CFormLabel className="text-muted">Fecha de cierre:</CFormLabel>
                         <CFormInput 
                             type="date" 
+                            min={modificacionesParametros?.inicio_segundo_dictado}
+                            max={`${anioActual}-12-31`}
                             value={modificacionesParametros?.cierre_segundo_dictado || ''} 
-                            onChange={(e) => handleFechaChange('cierre_segundo_dictado', e.target.value)} 
+                            disabled = {! (modificacionesParametros?.inicio_segundo_dictado)}
+                            onChange={(e) => {handleFechaChange('cierre_segundo_dictado', e.target.value); validarFechas()}} 
                         />
                     </CCol>
                 </CRow>
@@ -256,7 +320,7 @@ export function PlanificarPeriodos() {
                                 <CFormLabel>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</CFormLabel>
                                 <Form.Control
                                     type="number"
-                                    min={0}
+                                    min={1}
                                     max={60}
                                     placeholder="Cantidad de días"
                                     value={String(modificacionesParametros?.[key] ?? '')}
@@ -273,7 +337,7 @@ export function PlanificarPeriodos() {
                         <ModalExito 
                             onEnviar={actualizarParametrosServidor}
                             onExito={() => setParametros(modificacionesParametros)}
-                            desactivado={!modificacionesParametros}
+                            desactivado={!modificacionesParametros || !validarFechas}
                             textoBoton="Guardar configuración"
                             variante="success"
                             className="text-white"

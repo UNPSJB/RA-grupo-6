@@ -3,10 +3,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from src.Parametros.models import Parametros
+from src.Parametros import schemas
 from apscheduler.jobstores.base import JobLookupError
 
 def getParametros(db: Session) :
-    return db.scalar(select(Parametros))
+    
+    parametros = db.scalar(select(Parametros))
+    
+    return parametros
 
 def actualizar_parametros(db: Session, parametros:Parametros):
     from src.Email.tasks import scheduler
@@ -29,22 +33,6 @@ def actualizar_parametros(db: Session, parametros:Parametros):
     
     db.commit()
     db.refresh(db_parametros)
-
-    try:
-        scheduler.reschedule_job("creacion_instr_1C", trigger="cron", 
-                               year=db_parametros.cierre_primer_dictado.year,
-                               month=db_parametros.cierre_primer_dictado.month, 
-                               day=db_parametros.cierre_primer_dictado.day)
-    except JobLookupError:
-        pass 
-    
-    try:
-        scheduler.reschedule_job("creacion_instr_2C", trigger="cron", 
-                               year=db_parametros.cierre_segundo_dictado.year,
-                               month=db_parametros.cierre_segundo_dictado.month, 
-                               day=db_parametros.cierre_segundo_dictado.day)
-    except JobLookupError:
-        pass
 
     return db_parametros
 

@@ -83,3 +83,25 @@ export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
 
     return esValido
 }
+
+
+export function getFecha(fecha : Date){
+
+    const dia = fecha.getUTCDate()
+    const mes = fecha.getUTCMonth()
+    const anio =  fecha.getUTCFullYear()
+
+    return (`${dia}/${mes}/${anio}`)
+}
+
+export function parsearStringFecha(fechaStr: string): Date {
+    const [anio, mes, dia] = fechaStr.split("-").map(Number);
+    return new Date(anio, mes - 1, dia); // <-- interpreta como fecha local SIN UTC
+}
+
+export function formatearFecha(date: Date): string {
+    const y = date.getUTCFullYear();
+    const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(date.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}

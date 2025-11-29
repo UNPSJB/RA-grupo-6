@@ -12,7 +12,7 @@ from src.Materias.services import get_Docente
 from src.RespuestasFormulario.models import RespuestasFormulario
 from src.Dictados.models import Dictado
 from src.Departamento.models import Departamento
-from src.Materias.models import Materia
+from src.Materias.models import EnumTipoCiclo, Materia
 from src.Instrumento import schemas
 from src.Roles.models import Rol
 from src.PeriodoVinculado.models import PeriodoVinculado
@@ -109,15 +109,18 @@ def crearInstrumentos(db:Session, dictado: Dictado) -> bool:
 
     departamentos = []
     
+
     for materia in dictado.materias_dictados:
+        db_materia = db.scalar(select(Materia).where(Materia.id == materia.materia_id))
 
         nuevoInstrumentoAlumno = Instrumento( 
-            plantilla_formulario= parametros.plantilla_estudiante, 
+            plantilla_formulario_id= parametros.plantilla_estudiante_superior if(db_materia.ciclo == EnumTipoCiclo.CICLO_SUPERIOR) else parametros.plantilla_estudiante_basico, 
             fecha_inicio= dictado.fecha_cierre, 
             fecha_cierre= dictado.fecha_cierre + timedelta(parametros.disponibilidad_estudiante),
             tipo = TipoInstrumento.ENCUESTA_ESTUDIANTE,
-            materia_id = materia.id,
-            dictado_id = dictado.id 
+            materia_id = materia.materia_id,
+            dictado_id = materia.dictado_id,
+            departamento_id = db_materia.departamento_id
             )
 
         db.add(nuevoInstrumentoAlumno)
@@ -128,22 +131,24 @@ def crearInstrumentos(db:Session, dictado: Dictado) -> bool:
             fecha_inicio= nuevoInstrumentoAlumno.fecha_cierre + timedelta(1), 
             fecha_cierre= nuevoInstrumentoAlumno.fecha_cierre + timedelta(parametros.disponibilidad_docente + 1),
             tipo = TipoInstrumento.INFORME_CATEDRA,
-            materia_id = materia.id,
-            dictado_id = dictado.id
+            materia_id = materia.materia_id,
+            dictado_id = materia.dictado_id,
+            departamento_id = db_materia.departamento_id
             )
         
         db.add(nuevoInstrumentoDocente)
         db.commit()
 
-        if not(materia.departamento_id in departamentos):
-            departamentos.append(materia.departamento_id)
+        if not(db_materia.departamento_id in departamentos):
+            departamentos.append(db_materia.departamento_id)
             nuevoInstrumentoDepartamento = Instrumento( 
                 plantilla_formulario_id= parametros.plantilla_departamento,
                 fecha_inicio= nuevoInstrumentoDocente.fecha_cierre + timedelta(1), 
                 fecha_cierre= nuevoInstrumentoDocente.fecha_cierre + timedelta(parametros.disponibilidad_departamento + 1),
                 tipo = TipoInstrumento.INFORME_SINTETICO,
-                materia_id = materia.id,
-                dictado_id = dictado.id
+                materia_id = materia.materia_id,
+                dictado_id = materia.dictado_id,
+                departamento_id = db_materia.departamento_id
             )
             
             db.add(nuevoInstrumentoDepartamento)

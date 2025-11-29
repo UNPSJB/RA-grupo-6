@@ -406,56 +406,41 @@ def get_inscriptos(db:Session, materia_id:str, instrumento_id:int) -> int:
 
 
 
-def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
+def CrearDictadosAnuales(db:Session) -> list[schemas.Dictado]:
     parametros = services.getParametros(db)
-
-    #Definicion de fechas de referencia
-    ANIO_DICTADO_NUEVO = date.today().year
-    INICIO_PRIMER_CUATRIMESTRE = date(ANIO_DICTADO_NUEVO, 3, 1)
-    INICIO_SEGUNDO_CUATRIMESTRE = date(ANIO_DICTADO_NUEVO, 7, 1)
-    FIN_SEGUNDO_CUATRIMESTRE = date(ANIO_DICTADO_NUEVO, 12, 31)
 
     dictados_creados = []
 
     #PRIMER DICTADO
-    dictado_prim_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_PRIMER_CUATRIMESTRE) & (Dictado.fecha_cierre <= INICIO_SEGUNDO_CUATRIMESTRE))).first() 
+    dictado_prim_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= parametros.inicio_primer_dictado) & (Dictado.fecha_cierre <= parametros.cierre_primer_dictado))).first() 
 
     if (dictado_prim_cuatri is None):
         materias = db.scalars(select(Materia).where(Materia.dictado == EnumTipoDictado.PRIMER_CUATRIMESTRE)).all()  
-        nuevoDictado = Dictado(fecha_inicio=parametros.inicio_primer_dictado, fecha_cierre=parametros.cierre_primer_dictado)
+        nuevoDictado_prim = Dictado(fecha_inicio=parametros.inicio_primer_dictado, fecha_cierre=parametros.cierre_primer_dictado)
         
-        db.add(nuevoDictado)
+        db.add(nuevoDictado_prim)
         db.commit()
-        db.refresh(nuevoDictado)
+        db.refresh(nuevoDictado_prim)
 
-        dictados_creados.append(nuevoDictado)
+        dictados_creados.append(nuevoDictado_prim)
 
         for materia in materias:
 
-            materiaDictado = MateriaDictado(materia_id = materia.id, dictado_id=nuevoDictado.id) 
+            materiaDictado = MateriaDictado(materia_id = materia.id, dictado_id=nuevoDictado_prim.id) 
 
             db.add(materiaDictado)
             db.commit()
     
-    scheduler.add_job(
-        crearInstrumentos,
-        trigger='cron',
-        month=nuevoDictado.fecha_cierre.month, 
-        day=nuevoDictado.fecha_cierre.day,   
-        hour=0,  
-        minute=0,
-        id="creacion_instr_1C",
-        args=[db, nuevoDictado]
-    )
+        crearInstrumentos(db, nuevoDictado_prim)
 
     #SEGUNDO DICTADO
-    dictado_seg_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= INICIO_SEGUNDO_CUATRIMESTRE) & (Dictado.fecha_cierre <= FIN_SEGUNDO_CUATRIMESTRE))).first() 
+    dictado_seg_cuatri =  db.scalars(select(Dictado).where((Dictado.fecha_inicio >= parametros.inicio_primer_dictado) & (Dictado.fecha_cierre <= parametros.cierre_segundo_dictado))).first() 
 
     if (dictado_seg_cuatri is None):
         materias = db.scalars(select(Materia).where(Materia.dictado == EnumTipoDictado.SEGUNDO_CUATRIMESTRE)).all()  
 
         nuevoDictado = Dictado(fecha_inicio=parametros.inicio_segundo_dictado, fecha_cierre=parametros.cierre_segundo_dictado)
-    
+
         db.add(nuevoDictado)
         db.commit()
         db.refresh(nuevoDictado)
@@ -469,16 +454,6 @@ def CrearDictadosAnuales(db:Session) -> schemas.Dictado:
             db.add(materiaDictado)
             db.commit()
 
+        crearInstrumentos(db, nuevoDictado)
 
-    scheduler.add_job(
-        crearInstrumentos,
-        trigger='cron',
-        month=nuevoDictado.fecha_cierre.month, 
-        day=nuevoDictado.fecha_cierre.day,   
-        hour=0,  
-        minute=0,
-        id="creacion_instr_2C",
-        args=[db, nuevoDictado]
-    )
-
-    return nuevoDictado
+    return dictados_creados

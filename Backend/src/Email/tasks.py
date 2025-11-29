@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from pytest import param
 from sqlalchemy.orm import Session
 from src.Parametros.router import getParametros
 from src.Dictados.services import CrearDictadosAnuales
@@ -33,24 +34,32 @@ def enviar_recordatorios_diarios():
 def ActualizarFechas(db: Session):
     parametros = getParametros(db)
 
-    inicio = parametros.inicio_primer_dictado 
-    parametros.inicio_primer_dictado = date(date.today().year, inicio.month, inicio.day)
+    parametros.inicio_primer_dictado = date(date.today().year + 1, 1,1)
+    parametros.cierre_primer_dictado = date(date.today().year + 1, 3,1)
+    parametros.inicio_segundo_dictado = date(date.today().year + 1, 7,1)
+    parametros.cierre_segundo_dictado = date(date.today().year + 1, 10,1)
 
-    inicio = parametros.inicio_segundo_dictado 
-    parametros.inicio_segundo_dictado = date(date.today().year, inicio.month, inicio.day)
+    parametros.plantilla_estudiante_basico=0
+    parametros.plantilla_estudiante_superior=0
+    parametros.plantilla_docente=0
+    parametros.plantilla_departamento=0
 
-    cierre = parametros.cierre_primer_dictado 
-    parametros.cierre_primer_dictado = date(date.today().year, cierre.month, cierre.day)
-    
-    cierre = parametros.cierre_segundo_dictado 
-    parametros.cierre_segundo_dictado = date(date.today().year, cierre.month, cierre.day)
+    parametros.disponibilidad_estudiante=30
+    parametros.disponibilidad_docente=30
+    parametros.disponibilidad_departamento=30
+
+    parametros.obj_plantilla_estudiante_basico=None
+    parametros.obj_plantilla_estudiante_superior=None
+    parametros.obj_plantilla_docente=None
+    parametros.obj_plantilla_departamento=None
     
     db.commit()
+    db.refresh(parametros)
 
 def tareasAnuales():
     db: Session = SessionLocal()
-    ActualizarFechas(db)
     CrearDictadosAnuales(db)
+    ActualizarFechas(db)
 
 
 def iniciar_programador():

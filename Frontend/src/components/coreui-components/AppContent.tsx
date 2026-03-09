@@ -1,4 +1,4 @@
-import { CContainer } from '@coreui/react'
+import WideContainer from './WideContainer'
 import { Routes, Route } from 'react-router-dom'
 import { MonitoreoRecordatorios } from '../MonitoreoRecordatorios'
 import VerPregunta from '../Pregunta/VerPregunta'
@@ -38,46 +38,46 @@ const PlaceholderComponent = ({ path }: { path: string }) => (
 
 const AppContent = () => {
   return (
-    <CContainer lg>
+    <WideContainer>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path="/monitoreo-recordatorios" element={<MonitoreoRecordatorios />} />
         <Route path='/VerPregunta' element={<VerPregunta />} />
         <Route path='/CrearFormulario' element={<CrearPlantillaFormulario />} />
         <Route path='/VerInformesSinteticos' element={<PaginaInformesSinteticos />} />
-        <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento/>}></Route>
+        <Route path='/Responder-instrumento/:instrumentoId' element={<ResponderInstrumento />}></Route>
         {/* Rutas Departamento */}
-        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
-        <Route path="/seleccionar-informe-sintetico" element={<SeleccionarInformeSintetico/>} />
-        <Route path="/VerInformeActividadCurricular" element={<PaginaInformesCatedra/>} />
-        <Route path="/respuestas-informe-sintetico" element={<VerRespuestasDepartamento/>}>Informes Sintéticos Respondidos</Route>
-        <Route path='/mostrar-estadisticas-departamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
+        <Route path='/dashboard' element={<HomeDashboard />} ></Route>
+        <Route path="/seleccionar-informe-sintetico" element={<SeleccionarInformeSintetico />} />
+        <Route path="/VerInformeActividadCurricular" element={<PaginaInformesCatedra />} />
+        <Route path="/respuestas-informe-sintetico" element={<VerRespuestasDepartamento />}>Informes Sintéticos Respondidos</Route>
+        <Route path='/mostrar-estadisticas-departamento' element={<MostrarEstadisticasDepartamento departamento_id={1} />} ></Route>
         {/* Rutas Docente */}
-        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
-        <Route path="/instrumentos-docente" element={<InstrumentosDocente/>} />
-        <Route path="/VerEncuestasEstudiante" element={<PaginaEncuestasEstudiantes/>} />
-        <Route path="/respuestas-informe-catedra" element={<VerRespuestasDocente/>}>Informes de Cátedra Respondidos</Route>
-        <Route path="/TasaRespuestasAlumnos/" element={<MostrarEstadisticasAlumnos docente_id={2}/>} ></Route>
+        <Route path='/dashboard' element={<HomeDashboard />} ></Route>
+        <Route path="/instrumentos-docente" element={<InstrumentosDocente />} />
+        <Route path="/VerEncuestasEstudiante" element={<PaginaEncuestasEstudiantes />} />
+        <Route path="/respuestas-informe-catedra" element={<VerRespuestasDocente />}>Informes de Cátedra Respondidos</Route>
+        <Route path="/TasaRespuestasAlumnos/" element={<MostrarEstadisticasAlumnos docente_id={2} />} ></Route>
 
 
         {/* Rutas Estudiante */}
-        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
-        <Route path="/materias" element={<SeleccionarMateria/>} />
-        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10}/>}></Route>
-        <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario/>}></Route>
-        <Route path="/respuestas-encuesta-estudiante" element={<VerRespuestasEstudiante/>}>Ver Mis Respuestas</Route>
+        <Route path='/dashboard' element={<HomeDashboard />} ></Route>
+        <Route path="/materias" element={<SeleccionarMateria />} />
+        <Route path='/RespuestasFormularios' element={<SeleccionarRespuestasFormularios usuario_id={10} />}></Route>
+        <Route path='/RespuestaFormulario/:id' element={<RespuestasFormulario />}></Route>
+        <Route path="/respuestas-encuesta-estudiante" element={<VerRespuestasEstudiante />}>Ver Mis Respuestas</Route>
         {/* Rutas Secretaria Académica */}
-        <Route path='/dashboard' element={<HomeDashboard/>} ></Route>
-        <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1}/>} ></Route>
+        <Route path='/dashboard' element={<HomeDashboard />} ></Route>
+        <Route path='/mostrar-estadisticas-despartamento' element={<MostrarEstadisticasDepartamento departamento_id={1} />} ></Route>
         <Route path="/MostrarEstadisticas" element={<MostrarEstadisticas />} />
-        <Route path="/EstadisticasDeDocente" element={<EstadisticasCatedras/>} />
-        <Route path="/PlanificarPeriodos" element={<PlanificarPeriodos/>} />
-        <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas/>}></Route>
-        <Route path='/comparar-plantillas' element={<CompararPlantillas/>} ></Route>
+        <Route path="/EstadisticasDeDocente" element={<EstadisticasCatedras />} />
+        <Route path="/PlanificarPeriodos" element={<PlanificarPeriodos />} />
+        <Route path="/ver-respuestas/:respuestasFormularioId" element={<VerRespuestas />}></Route>
+        <Route path='/comparar-plantillas' element={<CompararPlantillas />} ></Route>
 
-        
+
       </Routes>
-    </CContainer>
+    </WideContainer>
   )
 }
 

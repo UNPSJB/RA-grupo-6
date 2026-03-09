@@ -54,23 +54,23 @@ function InstrumentosDocente() {
             try {
                 setCargando(true);
                 setMensaje('');
-                
+
                 const url = `http://127.0.0.1:8000/instrumentos/ObtenerDatosInstrumentosNoRespondidos/INFORME_CATEDRA?usuario_id=${usuario.id}&mostrar_respondidos=false`;
                 console.log('URL:', url);
-                
+
                 const response = await fetch(url, { credentials: 'include' });
                 console.log('Response status:', response.status, response.statusText);
-                
+
                 if (response.ok) {
                     const instrumentosData: InstrumentoDocente[] = await response.json();
                     console.log('Datos recibidos:', instrumentosData);
-                    
+
                     const hoy = new Date();
-                    const instrumentosActivos = instrumentosData.filter(instr => 
-                        new Date(instr.fecha_inicio) <= hoy && 
+                    const instrumentosActivos = instrumentosData.filter(instr =>
+                        new Date(instr.fecha_inicio) <= hoy &&
                         new Date(instr.fecha_cierre) >= hoy
                     );
-                    
+
                     console.log('Instrumentos activos:', instrumentosActivos);
                     setInstrumentos(instrumentosActivos);
                 } else {
@@ -78,7 +78,7 @@ function InstrumentosDocente() {
                     console.error('Error del servidor:', errorText);
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
-                
+
             } catch (error) {
                 console.error('Error completo:', error);
                 setMensaje(`Error al cargar los informes de cátedra: ${error}`);
@@ -103,7 +103,7 @@ function InstrumentosDocente() {
 
     const estaActivo = (instrumento: InstrumentoDocente) => {
         const hoy = new Date();
-        return new Date(instrumento.fecha_inicio) <= hoy && 
+        return new Date(instrumento.fecha_inicio) <= hoy &&
             new Date(instrumento.fecha_cierre) >= hoy;
     };
 
@@ -134,7 +134,7 @@ function InstrumentosDocente() {
                         {mensaje}
                     </CAlert>
                 )}
-                
+
                 {instrumentos.length > 0 ? (
                     <CTable className='border mb-1' hover responsive>
                         <CTableHead>
@@ -149,9 +149,9 @@ function InstrumentosDocente() {
                             {instrumentos.map((instrumento) => {
                                 const activo = estaActivo(instrumento);
                                 return (
-                                    <CTableRow 
-                                        key={instrumento.id} 
-                                        onClick={() => activo && handleSeleccionarInstrumento(instrumento)} 
+                                    <CTableRow
+                                        key={instrumento.id}
+                                        onClick={() => activo && handleSeleccionarInstrumento(instrumento)}
                                         style={{ cursor: activo ? 'pointer' : 'not-allowed' }}
                                     >
                                         <CTableDataCell>

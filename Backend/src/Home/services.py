@@ -1,6 +1,7 @@
 from sqlalchemy import select, or_, func, distinct
 from sqlalchemy.orm import Session
 from datetime import date
+from src.utils import get_today
 
 from src.Usuarios.models import Usuario
 from src.UsuarioDepartamento.models import UsuarioDepartamento
@@ -16,7 +17,7 @@ def get_home_estadisticas(db: Session, usuario_id: int):
         return None
 
     rol_nombre = usuario.rol.nombre.lower()
-    hoy = date.today()
+    hoy = get_today()
 
     estadisticas = {
         "nombre_completo": f"{usuario.nombre} {usuario.apellido}",
@@ -66,13 +67,13 @@ def get_home_estadisticas(db: Session, usuario_id: int):
             select(func.count(distinct(PeriodoVinculado.materia_id)))
             .where(
                 PeriodoVinculado.usuario_id == usuario_id,
-                PeriodoVinculado.fecha_hasta.is_(None)
+                or_(PeriodoVinculado.fecha_hasta >= hoy, PeriodoVinculado.fecha_hasta.is_(None))
             )
         )
 
         ids_materias = db.scalars(
             select(PeriodoVinculado.materia_id)
-            .where(PeriodoVinculado.usuario_id == usuario_id, PeriodoVinculado.fecha_hasta.is_(None))
+            .where(PeriodoVinculado.usuario_id == usuario_id, or_(PeriodoVinculado.fecha_hasta >= hoy, PeriodoVinculado.fecha_hasta.is_(None)))
         ).all()
 
         total_informes = 0
@@ -102,7 +103,7 @@ def get_home_estadisticas(db: Session, usuario_id: int):
     elif "departamento" in rol_nombre:
         depto_id = db.scalar(
             select(UsuarioDepartamento.departamento_id)
-            .where(UsuarioDepartamento.usuario_id == usuario_id, UsuarioDepartamento.fecha_hasta.is_(None))
+            .where(UsuarioDepartamento.usuario_id == usuario_id, or_(UsuarioDepartamento.fecha_hasta >= hoy, UsuarioDepartamento.fecha_hasta.is_(None)))
         )
         
         estadisticas["materias_departamento"] = 0
@@ -116,7 +117,7 @@ def get_home_estadisticas(db: Session, usuario_id: int):
                  .join(Materia)
                  .where(
                      Materia.departamento_id == depto_id,
-                     PeriodoVinculado.fecha_hasta.is_(None)
+                     or_(PeriodoVinculado.fecha_hasta >= hoy, PeriodoVinculado.fecha_hasta.is_(None))
                  )
              )
 
@@ -135,7 +136,7 @@ def get_home_estadisticas(db: Session, usuario_id: int):
         estadisticas["total_docentes"] = db.scalar(
             select(func.count(distinct(PeriodoVinculado.usuario_id)))
             .join(Usuario)
-            .where(Usuario.rol_id == 2, PeriodoVinculado.fecha_hasta.is_(None))
+            .where(Usuario.rol_id == 2, or_(PeriodoVinculado.fecha_hasta >= hoy, PeriodoVinculado.fecha_hasta.is_(None)))
         )
 
         estadisticas["total_carreras"] = db.scalar(select(func.count(Carrera.id)))

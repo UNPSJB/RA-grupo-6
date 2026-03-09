@@ -11,10 +11,12 @@ def listar_materias(db: Session) -> List[schemas.Materia]:
     return db.scalars(select(Materia)).all()
 
 
+from src.utils import get_today
+
 def get_Docente(materia_id:str, db:Session) -> UsuarioSchema:
     materia = db.scalar(select(Materia).where(Materia.id == materia_id))
-
-    docente = list(filter(lambda periodo_vinculado: periodo_vinculado.fecha_hasta is None ,materia.periodos_vinculados))[0]
+    hoy = get_today()
+    docente = list(filter(lambda periodo_vinculado: periodo_vinculado.fecha_hasta is None or periodo_vinculado.fecha_hasta >= hoy, materia.periodos_vinculados))[0]
 
     if docente is None:
         raise MateriaSinDocente

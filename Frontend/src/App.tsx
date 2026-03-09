@@ -4,6 +4,7 @@ import { useSelector, type TypedUseSelectorHook } from 'react-redux'
 
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
+import { initializeDate } from './components/Funciones'
 
 import PrivateRoute from './PrivateRoute.tsx' 
 import './scss/examples.scss'
@@ -44,6 +45,10 @@ const App: FC = () => {
     }
     setColorMode(storedTheme)
   }, [isColorModeSet, setColorMode, storedTheme])
+
+  useEffect(() => {
+    initializeDate();
+  }, [])
   return (
     <BrowserRouter >
       <Suspense

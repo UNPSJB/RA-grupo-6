@@ -25,6 +25,11 @@ async def db_creation_lifespan(app: FastAPI):
 
 app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 
+@app.get("/current-date")
+async def get_current_date():
+    from src.utils import get_today
+    return {"date": get_today().isoformat()}
+
 origins = [
     "http://localhost:5173",      # Vite (sin barra al final)
     "http://127.0.0.1:5173",      # Vite IP (sin barra al final)

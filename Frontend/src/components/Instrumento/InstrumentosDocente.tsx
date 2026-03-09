@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CButton, CBadge, CSpinner, CAlert, CCardBody, CCardHeader, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell } from '@coreui/react';
-import { capitalizarCadena } from "../Funciones";
+import { capitalizarCadena, getToday } from "../Funciones";
 import ShadowedCard from '../coreui-components/ShadowedCard';
 import type { Usuario } from '../types';
 
@@ -65,7 +65,7 @@ function InstrumentosDocente() {
                     const instrumentosData: InstrumentoDocente[] = await response.json();
                     console.log('Datos recibidos:', instrumentosData);
 
-                    const hoy = new Date();
+                    const hoy = getToday();
                     const instrumentosActivos = instrumentosData.filter(instr =>
                         new Date(instr.fecha_inicio) <= hoy &&
                         new Date(instr.fecha_cierre) >= hoy
@@ -102,7 +102,7 @@ function InstrumentosDocente() {
     };
 
     const estaActivo = (instrumento: InstrumentoDocente) => {
-        const hoy = new Date();
+        const hoy = getToday();
         return new Date(instrumento.fecha_inicio) <= hoy &&
             new Date(instrumento.fecha_cierre) >= hoy;
     };

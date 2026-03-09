@@ -1,4 +1,5 @@
 from datetime import date
+from src.utils import get_today
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 from typing import TYPE_CHECKING, Dict, Any 
@@ -23,7 +24,7 @@ def create_dictado(db: Session, dictado: schemas.DictadoCreate ) -> schemas.Dict
 
     #VER SI HAY QUE EVALUAR QUE TENGAN 15 SEMANAS DE DIFERENCIA.
 
-    if (date.today() >= dictado.fecha_inicio):
+    if (get_today() >= dictado.fecha_inicio):
         raise exceptions.DictadoPasado
 
     if (dictado.fecha_inicio >= dictado.fecha_cierre):
@@ -193,6 +194,7 @@ def getPromedioDocentes(db: Session):
                 if respuesta.pregunta.tipo == "cerrada" and respuesta.opcion:
                     letra = respuesta.pregunta.grupo_pregunta.letra
                     titulo = respuesta.pregunta.grupo_pregunta.titulo
+                    hoy = get_today()
                     texto_opcion = respuesta.opcion.texto.strip()
                     
                     if letra == "A":

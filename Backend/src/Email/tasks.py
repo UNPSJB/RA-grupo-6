@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from src.utils import get_today
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytest import param
@@ -34,10 +35,11 @@ def enviar_recordatorios_diarios():
 def ActualizarFechas(db: Session):
     parametros = getParametros(db)
 
-    parametros.inicio_primer_dictado = date(date.today().year + 1, 1,1)
-    parametros.cierre_primer_dictado = date(date.today().year + 1, 3,1)
-    parametros.inicio_segundo_dictado = date(date.today().year + 1, 7,1)
-    parametros.cierre_segundo_dictado = date(date.today().year + 1, 10,1)
+    hoy = get_today()
+    parametros.inicio_primer_dictado = date(hoy.year + 1, 1,1)
+    parametros.cierre_primer_dictado = date(hoy.year + 1, 3,1)
+    parametros.inicio_segundo_dictado = date(hoy.year + 1, 7,1)
+    parametros.cierre_segundo_dictado = date(hoy.year + 1, 10,1)
 
     parametros.plantilla_estudiante_basico=0
     parametros.plantilla_estudiante_superior=0

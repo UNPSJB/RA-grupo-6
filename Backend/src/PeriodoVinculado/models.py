@@ -18,7 +18,7 @@ class PeriodoVinculado(ModeloBase):
     fecha_desde: Mapped[date] = mapped_column(Date)
     fecha_hasta: Mapped[date] = mapped_column(Date, nullable=True)
 
-    materia_id: Mapped[int] = mapped_column(ForeignKey("materia.id"))
+    materia_id: Mapped[str] = mapped_column(ForeignKey("materia.id"))
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
 
     materia: Mapped["Materia"] = relationship("Materia", back_populates="periodos_vinculados")

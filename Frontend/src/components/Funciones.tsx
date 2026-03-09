@@ -1,5 +1,24 @@
 import { TipoRespuesta } from "./types";
-import {z} from 'zod';
+import { z } from 'zod';
+
+let cachedServerDate: Date | null = null;
+
+export async function initializeDate(): Promise<Date> {
+    try {
+        const response = await fetch("http://localhost:8000/current-date");
+        const data = await response.json();
+        cachedServerDate = new Date(data.date + 'T12:00:00');
+        return cachedServerDate;
+    } catch (error) {
+        console.error("Error fetching date from server:", error);
+        cachedServerDate = new Date();
+        return cachedServerDate;
+    }
+}
+
+export function getToday(): Date {
+    return cachedServerDate || new Date();
+}
 
 export function capitalizarCadena(cadena: string): string {
     cadena = cadena.toLocaleLowerCase()
@@ -13,15 +32,15 @@ export function capitalizarCadena(cadena: string): string {
     return cadenaCapitalizada
 }
 
-export function separarPalabras(cadena: string) : string {
+export function separarPalabras(cadena: string): string {
 
     let nuevaCadena = ""
 
-    for(let i = 0; i < cadena.length; i++){
-        if ((cadena[i].charCodeAt(0) >= 65) && (cadena[i].charCodeAt(0)  <= 90)){
+    for (let i = 0; i < cadena.length; i++) {
+        if ((cadena[i].charCodeAt(0) >= 65) && (cadena[i].charCodeAt(0) <= 90)) {
             nuevaCadena = nuevaCadena + " " + cadena[i]
         }
-        else{
+        else {
             nuevaCadena = nuevaCadena + cadena[i]
         }
     }
@@ -30,25 +49,25 @@ export function separarPalabras(cadena: string) : string {
 
 
 
-export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
+export function esTipoRespuestaValido(valor: string, jsonTipoDato: string) {
 
     const valorTipoDato = JSON.parse(jsonTipoDato)
     const schemaEntero = z.coerce.number().int()
     const schemaDecimal = z.coerce.number()
     const schemaCadena = z.coerce.string()
 
-    let esValido : boolean = true;
+    let esValido: boolean = true;
 
     if (valorTipoDato.tipo != TipoRespuesta.TEXTO && valor.trim() === "") return (!esValido);
 
-    let resultado : any = 0 
-    try{
-        switch (valorTipoDato.tipo){
+    let resultado: any = 0
+    try {
+        switch (valorTipoDato.tipo) {
 
             case (TipoRespuesta.ENTERO):
                 resultado = schemaEntero.parse(valor);
                 break;
-            
+
             case (TipoRespuesta.DECIMAL):
                 resultado = schemaDecimal.parse(valor);
                 break;
@@ -69,14 +88,14 @@ export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
                 esValido = false;
         }
     }
-    catch(error){
-        if (error instanceof z.ZodError){
+    catch (error) {
+        if (error instanceof z.ZodError) {
             esValido = false
         }
     }
 
-    if ((valorTipoDato.tipo == TipoRespuesta.RANGO_ENTERO) || (valorTipoDato.tipo == TipoRespuesta.RANGO_DECIMAL)){
-        if((Number(valorTipoDato.valor_minimo) > resultado) || (resultado > Number(valorTipoDato.valor_maximo) ) ){
+    if ((valorTipoDato.tipo == TipoRespuesta.RANGO_ENTERO) || (valorTipoDato.tipo == TipoRespuesta.RANGO_DECIMAL)) {
+        if ((Number(valorTipoDato.valor_minimo) > resultado) || (resultado > Number(valorTipoDato.valor_maximo))) {
             esValido = false;
         }
     }
@@ -85,11 +104,11 @@ export function esTipoRespuestaValido(valor:string, jsonTipoDato: string){
 }
 
 
-export function getFecha(fecha : Date){
+export function getFecha(fecha: Date) {
 
     const dia = fecha.getUTCDate()
     const mes = fecha.getUTCMonth()
-    const anio =  fecha.getUTCFullYear()
+    const anio = fecha.getUTCFullYear()
 
     return (`${dia}/${mes}/${anio}`)
 }

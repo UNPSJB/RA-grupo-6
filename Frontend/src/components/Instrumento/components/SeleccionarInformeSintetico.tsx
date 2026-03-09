@@ -14,7 +14,7 @@ import {
     CTableBody,
     CTableDataCell
 } from "@coreui/react";
-import { capitalizarCadena } from "../../Funciones";
+import { capitalizarCadena, getToday } from "../../Funciones";
 import ShadowedCard from '../../coreui-components/ShadowedCard';
 import type { Usuario } from "../../types";
 
@@ -80,7 +80,7 @@ export default function SeleccionarInformeSintetico() {
                     const informesData: InstrumentoDepartamento[] = await response.json();
                     console.log('Datos recibidos:', informesData);
                     
-                    const hoy = new Date();
+                    const hoy = getToday();
                     const informesActivos = informesData.filter(instr => 
                         new Date(instr.fecha_inicio) <= hoy && 
                         new Date(instr.fecha_cierre) >= hoy
@@ -117,7 +117,7 @@ export default function SeleccionarInformeSintetico() {
     };
 
     const estaActivo = (instrumento: InstrumentoDepartamento) => {
-        const hoy = new Date();
+        const hoy = getToday();
         return new Date(instrumento.fecha_inicio) <= hoy && 
                new Date(instrumento.fecha_cierre) >= hoy;
     };

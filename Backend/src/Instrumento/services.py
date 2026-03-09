@@ -1,7 +1,5 @@
 from datetime import date, timedelta
-from typing import List
-from fastapi.background import P
-from pytest import param
+from src.utils import get_today
 import array
 from typing import List
 from sqlalchemy.orm import Session, joinedload
@@ -427,7 +425,7 @@ def obtener_instrumentos_no_respondidos(db: Session, tipo: str, usuario_id: int,
     if not usuario:
         return []
     
-    hoy = date.today()
+    hoy = get_today()
     rol_nombre = usuario.rol.nombre.lower() if usuario.rol else ""
     es_departamento = "departamento" in rol_nombre
 

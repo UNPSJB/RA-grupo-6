@@ -2,6 +2,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
+from src.utils import get_today
 from typing import List, Dict
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_, not_, exists
@@ -44,8 +45,8 @@ def obtener_estudiantes_pendientes_proximos_vencer(db: Session, dias_antes: int 
     from src.Materias.models import Materia
     
     # Calcular fecha límite (hoy + días especificados)
-    fecha_limite = datetime.now().date() + timedelta(days=dias_antes)
-    fecha_hoy = datetime.now().date()
+    fecha_hoy = get_today()
+    fecha_limite = fecha_hoy + timedelta(days=dias_antes)
     
     # Consulta para estudiantes con encuestas pendientes que vencen pronto
     subquery_respuesta = exists().where(
@@ -78,8 +79,8 @@ def obtener_instrumentos_proximos_vencer(db: Session, dias_antes: int = 7, depar
     from src.Usuarios.models import Usuario
     from src.PeriodoVinculado.models import PeriodoVinculado
     
-    fecha_limite = datetime.now().date() + timedelta(days=dias_antes)
-    fecha_hoy = datetime.now().date()
+    fecha_hoy = get_today()
+    fecha_limite = fecha_hoy + timedelta(days=dias_antes)
     
     instrumentos = db.scalars(
         select(Instrumento).where(
